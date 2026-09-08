@@ -1,0 +1,427 @@
+[
+  {
+    "id": "harness-init-bootstraps",
+    "category": "quality",
+    "description": "bash init.sh brings the demo-mode dev server up from cold on the project's own port (build/ports.json) and --stop tears it down.",
+    "verification": "bash init.sh >/dev/null && curl -fsS -o /dev/null http://localhost:$(jq -r .dev build/ports.json)/ && bash init.sh --stop >/dev/null",
+    "priority": 1,
+    "hermetic": false,
+    "passes": true
+  },
+  {
+    "id": "harness-architecture-tests",
+    "category": "quality",
+    "description": "Executable layer rules: domain stays pure, fetch() only in the API client, UI depends on ports not adapters, no AWS SDK or VITE_ secrets in the browser bundle, backend reuses the rules engine.",
+    "verification": "npx vitest run tests/architecture --reporter=dot",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "harness-guardrails-block",
+    "category": "quality",
+    "description": "The PreToolUse guard blocks merges, protected-branch pushes, force pushes, gate bypasses, deploys (incl. sam/aws) and shell-wrapper evasions while allowing benign look-alikes.",
+    "verification": "bash scripts/hooks/guard-destructive-commands.sh --self-test && bash tests/guardrails/run.sh",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "harness-quality-sweep-clean",
+    "category": "quality",
+    "description": "quality-sweep.sh exits zero: architecture, config integrity, registry re-verification, debug artifacts, doc validity, secrets, guardrails, dead exports.",
+    "verification": "bash quality-sweep.sh",
+    "priority": 1,
+    "hermetic": false,
+    "passes": true
+  },
+  {
+    "id": "harness-branch-protection-active",
+    "category": "quality",
+    "description": "Layer 3: main requires review, required check 'build-and-test', and admins cannot bypass (run harden-github.sh after the first push).",
+    "verification": "gh api repos/$(git remote get-url origin | sed -E 's#.*github\\.com[:/]([^/]+/[^/.]+)(\\.git)?#\\1#')/branches/main/protection | jq -e '.enforce_admins.enabled == true and .required_pull_request_reviews.required_approving_review_count >= 1'",
+    "priority": 2,
+    "hermetic": false,
+    "passes": false
+  },
+  {
+    "id": "lint-clean",
+    "category": "quality",
+    "description": "ESLint (typescript-eslint, react-hooks, react-refresh, jsx-a11y) reports zero problems.",
+    "verification": "npx eslint .",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "typecheck-clean",
+    "category": "quality",
+    "description": "TypeScript strict mode passes for the app, node tooling and backend projects.",
+    "verification": "npm run -s typecheck",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "unit-suite-green",
+    "category": "quality",
+    "description": "All vitest suites pass: domain rules, import, config, components, backend routes/images/sync, base path, static server.",
+    "verification": "npx vitest run --reporter=dot",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "dead-code-clean",
+    "category": "quality",
+    "description": "knip reports no unused files, exports or dependencies (tailwindcss is CSS-imported and allowlisted).",
+    "verification": "npx knip --no-progress",
+    "priority": 3,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-win-no-life",
+    "category": "functional",
+    "description": "A win consumes no life.",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts -t 'a win consumes no life'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-loss-one-life",
+    "category": "functional",
+    "description": "A loss consumes exactly one life.",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts -t 'a loss consumes exactly one life'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-tie-one-life",
+    "category": "functional",
+    "description": "A tie consumes exactly one life (configurable per league).",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts -t 'a tie consumes exactly one life'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-third-miss-eliminates",
+    "category": "functional",
+    "description": "The third miss eliminates the player in that week; later weeks cannot add strikes.",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts -t 'third miss eliminates'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-team-reuse-blocked",
+    "category": "functional",
+    "description": "A team used earlier in the season cannot be picked again; the check runs in the domain and again on the API.",
+    "verification": "npx vitest run src/domain/rules/picks.test.ts backend/src/routes/routes.test.ts -t 'already used'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-same-team-different-players",
+    "category": "functional",
+    "description": "Different players may use the same team in the same week.",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts -t 'different players may use the same team'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-no-change-after-kickoff",
+    "category": "functional",
+    "description": "A pick cannot change once its game kicked off, but can change right up to kickoff.",
+    "verification": "npx vitest run src/domain/rules/picks.test.ts -t 'kick'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-bye-team-rejected",
+    "category": "functional",
+    "description": "A team on bye cannot be selected.",
+    "verification": "npx vitest run src/domain/rules/picks.test.ts -t 'rejects a team on bye'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-missing-pick",
+    "category": "functional",
+    "description": "No pick is pending while the week is open and a miss once the last game kicks off; weeks without schedule data never strike anyone.",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts -t 'missing picks'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-result-processing-idempotent",
+    "category": "functional",
+    "description": "Re-applying the same result observation is a no-op; corrections bump the version once; commissioner results lock against provider overwrites.",
+    "verification": "npx vitest run src/domain/rules/results.test.ts backend/src/sync.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-commissioner-correction-recalculates",
+    "category": "functional",
+    "description": "A commissioner result override recalculates lives, eliminations and champions from scratch.",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts -t 'commissioner corrections'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-simultaneous-elimination",
+    "category": "functional",
+    "description": "Everyone out in the same week yields co-champions by default or tied finalists pending a recorded commissioner decision.",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts -t 'eliminated in the same week'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-cancelled-postponed-games",
+    "category": "functional",
+    "description": "Cancelled games void the pick (or count as a miss per settings) and return the team; postponed games stay pending.",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts -t 'cancelled|postponed'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-pick-visibility",
+    "category": "functional",
+    "description": "Other players' picks are hidden until kickoff; own picks and the commissioner's view are never redacted (domain + API).",
+    "verification": "npx vitest run src/domain/rules/picks.test.ts backend/src/routes/routes.test.ts -t 'visib|redact'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "api-rules-enforced-server-side",
+    "category": "functional",
+    "description": "The API re-validates deadlines (server clock), team reuse, eliminations and roles on every pick; writes are version-conditional (409 on races).",
+    "verification": "npx vitest run backend/src/routes/routes.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "api-espn-parser-and-manual-fallback",
+    "category": "functional",
+    "description": "The ESPN scoreboard parser maps events to provider-independent games (skipping unknown teams); commissioners can enter schedules/results manually when the provider is down (503 surfaced).",
+    "verification": "npx vitest run backend/src/sync.test.ts",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "api-bundle-builds",
+    "category": "quality",
+    "description": "Both Lambda handlers bundle with esbuild (AWS SDK external).",
+    "verification": "node backend/build.mjs && test -f backend/dist/api/index.mjs && test -f backend/dist/syncResults/index.mjs",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "images-valid-upload",
+    "category": "functional",
+    "description": "A valid JPG/PNG/WebP under 5 MB gets presigned POSTs and finalizes after the API verifies both objects.",
+    "verification": "npx vitest run backend/src/routes/images.test.ts -t 'issues presigned'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "images-invalid-and-oversized",
+    "category": "functional",
+    "description": "Unsupported types (gif, svg) and oversized/empty images are rejected before a ticket is issued and again at finalize (object deleted).",
+    "verification": "npx vitest run backend/src/routes/images.test.ts src/lib/image.test.ts -t 'reject|oversized|unsupported'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "images-replacement",
+    "category": "functional",
+    "description": "Replacing a headshot deletes the previous objects; removing restores the default avatar.",
+    "verification": "npx vitest run backend/src/routes/images.test.ts -t 'replacing'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "images-default-avatar",
+    "category": "visual",
+    "description": "Players without a headshot, or whose image fails to load, show the default avatar with meaningful alt text.",
+    "verification": "npx vitest run src/components/Headshot.test.tsx",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "pages-base-path",
+    "category": "functional",
+    "description": "The Vite base is derived from VITE_BASE_PATH or GITHUB_REPOSITORY and never assumed to be '/'; user/org sites resolve to '/'.",
+    "verification": "npx vitest run tests/unit/basePath.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "build-static-output",
+    "category": "functional",
+    "description": "npm run build emits a static site (index.html, base-aware 404.html, .nojekyll, hashed assets) deployable directly to GitHub Pages.",
+    "verification": "npx vite build --base=/Survivor/ --outDir dist-e2e >/dev/null && test -f dist-e2e/index.html && grep -q \"var base = '/Survivor/'\" dist-e2e/404.html && test -f dist-e2e/.nojekyll && grep -q '/Survivor/assets/' dist-e2e/index.html",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "pages-static-server-parity",
+    "category": "quality",
+    "description": "scripts/serve-static.mjs behaves like GitHub Pages (base-only serving, 301 on bare repo path, real 404 with 404.html, no SPA rewrite).",
+    "verification": "npx vitest run tests/unit/serveStatic.test.ts",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true,
+    "depends_on": ["build-static-output"]
+  },
+  {
+    "id": "e2e-pages-subpath-refresh",
+    "category": "functional",
+    "description": "Under /Survivor/: boots with zero 404s, nested-route refresh keeps the page, clean deep links are rewritten by 404.html, unknown routes render Not Found.",
+    "verification": "npx playwright test tests/e2e/pages.spec.ts",
+    "priority": 1,
+    "hermetic": false,
+    "passes": true
+  },
+  {
+    "id": "e2e-demo-mode-no-backend",
+    "category": "functional",
+    "description": "Demo mode runs entirely from static files: league home, sign-in, make/change pick, locked picks, grid, my-season, mobile navigation.",
+    "verification": "npx playwright test tests/e2e/player.spec.ts",
+    "priority": 1,
+    "hermetic": false,
+    "passes": true
+  },
+  {
+    "id": "e2e-commissioner-workflow",
+    "category": "functional",
+    "description": "Commissioner adds players, corrects results (standings recalculate), imports CSV with a blocking report, sets picks after kickoff, moves the demo clock; non-commissioners are redirected.",
+    "verification": "npx playwright test tests/e2e/commissioner.spec.ts",
+    "priority": 1,
+    "hermetic": false,
+    "passes": true
+  },
+  {
+    "id": "a11y-wcag-aa",
+    "category": "quality",
+    "description": "axe-core reports no WCAG 2.x A/AA violations on the ten primary screens, desktop and mobile.",
+    "verification": "npx playwright test tests/e2e/a11y.spec.ts",
+    "priority": 1,
+    "hermetic": false,
+    "passes": true
+  },
+  {
+    "id": "demo-fixtures-deterministic",
+    "category": "quality",
+    "description": "The synthetic demo season regenerates byte-identically (seeded PRNG) and is flagged isSynthetic.",
+    "verification": "cp src/data/demo/fixtures/demo-season.json node_modules/.tmp/fixture.before.json && npm run -s fixtures:generate >/dev/null && cmp -s node_modules/.tmp/fixture.before.json src/data/demo/fixtures/demo-season.json && jq -e '.season.isSynthetic==true' src/data/demo/fixtures/demo-season.json >/dev/null",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "headshots-sample-assets",
+    "category": "visual",
+    "description": "Sample headshots (SVG placeholders) and a default avatar ship as static assets for demo mode.",
+    "verification": "test -f public/headshots/default.svg && test \"$(ls public/headshots/*.svg | wc -l | tr -d ' ')\" -ge 10",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "import-report-sample",
+    "category": "functional",
+    "description": "The CSV import CLI validates a players×weeks sheet against the schedule and rules and writes a Markdown report (ambiguous teams, reuse, missing picks, byes, loss markers).",
+    "verification": "npm run -s import:report -- data/import/sample-league.csv --out node_modules/.tmp/report.md >/dev/null && npx vitest run src/domain/import --reporter=dot",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "import-real-league-from-screenshot",
+    "category": "functional",
+    "description": "Seed the real league from the commissioner's spreadsheet. BLOCKED: the screenshot referenced in the brief was not attached to the session, so nothing was seeded (see docs/import-report.md). Export the sheet to data/import/league.csv and re-run.",
+    "verification": "test -f data/import/league.csv && npm run -s import:report -- data/import/league.csv --out docs/import-report.generated.md",
+    "priority": 2,
+    "hermetic": true,
+    "passes": false
+  },
+  {
+    "id": "ci-workflows-valid",
+    "category": "quality",
+    "description": "CI (pull_request + push) and Pages deploy workflows parse; the deploy job is pinned to refs/heads/main and the CI job is named build-and-test for branch protection.",
+    "verification": "node scripts/validate-yaml.mjs .github/workflows/ci.yml .github/workflows/deploy-pages.yml && grep -q \"github.ref == 'refs/heads/main'\" .github/workflows/deploy-pages.yml && grep -q 'build-and-test:' .github/workflows/ci.yml && grep -q 'pull_request:' .github/workflows/ci.yml",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "infra-template-valid",
+    "category": "quality",
+    "description": "The SAM template parses as YAML and declares the table, bucket, Cognito pool, HTTP API with JWT authorizer, API + sync functions and the schedule.",
+    "verification": "node scripts/validate-yaml.mjs infra/template.yaml && grep -q 'AWS::Serverless::HttpApi' infra/template.yaml && grep -q 'JwtConfiguration' infra/template.yaml && grep -q 'AWS::Scheduler::Schedule' infra/template.yaml",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "infra-sam-validate",
+    "category": "quality",
+    "description": "sam validate --lint passes (requires the AWS SAM CLI, not installed on this machine).",
+    "verification": "sam validate --lint -t infra/template.yaml",
+    "priority": 3,
+    "hermetic": false,
+    "passes": false
+  },
+  {
+    "id": "deploy-pages-live",
+    "category": "functional",
+    "description": "The GitHub Actions workflow has deployed the demo site to GitHub Pages (set PAGES_URL to https://<owner>.github.io/<repo>/).",
+    "verification": "curl -fsS \"${PAGES_URL:?set PAGES_URL}\" | grep -q 'Survivor League'",
+    "priority": 2,
+    "hermetic": false,
+    "passes": false
+  },
+  {
+    "id": "connected-mode-deployed",
+    "category": "functional",
+    "description": "The AWS backend is deployed and reachable; the static site is rebuilt with VITE_DATA_MODE=connected (see docs/aws-connected-mode.md).",
+    "verification": "bash scripts/verify-connected.sh",
+    "priority": 3,
+    "hermetic": false,
+    "passes": false
+  },
+  {
+    "id": "connected-image-upload-real",
+    "category": "functional",
+    "description": "A commissioner uploads a headshot through the deployed API (presigned S3 POST) and the new image appears in the league home.",
+    "verification": "bash scripts/verify-connected.sh --image",
+    "priority": 3,
+    "hermetic": false,
+    "passes": false,
+    "depends_on": ["connected-mode-deployed"]
+  }
+]

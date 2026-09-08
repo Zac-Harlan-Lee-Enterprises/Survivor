@@ -1,0 +1,60 @@
+claude-progress.txt — Session continuity log
+
+Format for each entry:
+---
+[YYYY-MM-DD] <short session label>
+Agent: <name>/<model-version>
+Branch: <git branch>
+DONE   : <comma-separated completed items>
+TESTS  : <counts before → after>
+NEXT   : <exact next action — file, function, or command>
+BLOCKED: <anything requiring human input, or "none">
+---
+
+================================================================
+[2026-09-08] harness + application bootstrap (/create-ai-harness, new-project mode)
+Agent: Claude Code / Claude Fable 5.1
+Branch: feat/initial-harness
+
+DONE   : stack scaffold (Vite 8, React 19, TS 6, Tailwind 4, Vitest 5, Playwright 1.63, ESLint 9 + jsx-a11y);
+         pure domain (32 teams w/ aliases, zod models, rules engine, pick validation/visibility, idempotent
+         results, CSV import + report); demo data layer (deterministic synthetic season, localStorage overlay,
+         pinned demo clock w/ subscribe, demo sign-in); connected data layer (single fetch module, OIDC PKCE,
+         /public read fallback); all eight experiences (league home, dashboard, pick, leaderboard w/ graveyard,
+         season grid + mobile cards, my season, player card, commissioner: players/headshots w/ crop, picks,
+         results + manual schedule, settings + champion decision + demo clock, CSV import, audit);
+         AWS backend (router, single-table repo, DynamoDB/S3 adapters, presigned uploads, ESPN parser,
+         manual provider, idempotent sync, seed script, SAM template); GitHub Pages: base-path helper,
+         build-time 404.html + .nojekyll plugin, Pages-parity static server on port 5892;
+         harness: init.sh (--with-pages/--stop), agent-status.sh, quality-sweep.sh, policy.sh, hooks
+         (pre-commit/commit-msg/pre-push), PreToolUse guard (+AWS/SAM rules, shell-wrapper evasion),
+         .claude/settings.json, tests/guardrails, feature_list.json (47 entries), AGENTS.md/CLAUDE.md/
+         SECURITY.md, README + docs/*, CI + Pages workflows. Ports moved to 5891/5892/5893 (build/ports.json)
+         at the user's request to avoid colliding with PageProof on 4173.
+TESTS  : 0 → 124 vitest (domain/config/components/backend/arch/unit) + 28 Playwright (desktop+mobile) +
+         20 axe a11y checks + 37 guard self-test probes + 53 guardrail-suite probes. All green.
+NEXT   : 1) Human: review + commit the sensitive paths left UNCOMMITTED on purpose (they need a
+            SECURITY-REVIEW trailer): .github/workflows/*, infra/*, .claude/settings.json, scripts/hooks/*,
+            scripts/lib/policy.sh, harden-github.sh — e.g.
+              git add .github infra .claude/settings.json scripts/hooks scripts/lib harden-github.sh
+              git commit -m "chore: add CI/Pages workflows, infra and agent guardrails" -m "SECURITY-REVIEW: <your name>"
+         2) Human: create the GitHub repo, push feat/initial-harness, open a PR, enable Pages (Source: GitHub
+            Actions), then run: bash harden-github.sh <owner>/<repo>
+         3) Export the real league spreadsheet to data/import/league.csv and run
+              npm run import:report -- data/import/league.csv --out docs/import-report.generated.md
+            then import via Commissioner → Import (registry: import-real-league-from-screenshot).
+         4) Connected mode when wanted: docs/aws-connected-mode.md (sam deploy is a human action).
+BLOCKED: The spreadsheet screenshot referenced in the brief was NOT attached to the session; no real league
+         data was seeded (docs/import-report.md). SAM CLI is not installed locally, so `sam validate --lint`
+         (registry: infra-sam-validate) has not been run. No GitHub remote exists yet, so branch protection
+         (Layer 3) is unverified.
+DECISIONS:
+         - HashRouter (zero-404 on Pages) + build-time 404.html shim for clean deep links.
+         - Standings are derived, never stored; same validatePick() in browser and Lambda.
+         - Provider-independent game ids (<year>-w<ww>-<away>-at-<home>) so provider swaps never orphan picks.
+         - Demo schedule is synthetic and flagged; real schedules are never fabricated.
+         - Cancelled game → pick void (team returned) by default; missing pick strikes only after the week's
+           LAST kickoff; weeks with no schedule data never strike anyone.
+         - Public anonymous reads go through /public/* because HTTP API JWT authorizers reject missing tokens.
+         - Browser-side crop/resize to two WebP variants; S3 presigned POST policies + finalize HEAD checks.
+================================================================
