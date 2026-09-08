@@ -6,3 +6,5 @@ coverage
 playwright-report
 test-results
 *.md
+src/data/demo/fixtures/
+public/headshots/

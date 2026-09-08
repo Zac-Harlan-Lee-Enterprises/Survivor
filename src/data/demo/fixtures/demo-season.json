@@ -3985,49 +3985,89 @@
       "seasonYear": 2026,
       "week": 5,
       "label": "Week 5",
-      "byeTeamIds": ["BUF", "PIT", "HOU", "SEA"]
+      "byeTeamIds": [
+        "BUF",
+        "PIT",
+        "HOU",
+        "SEA"
+      ]
     },
     {
       "seasonYear": 2026,
       "week": 6,
       "label": "Week 6",
-      "byeTeamIds": ["CAR", "LAC", "CLE", "NYJ"]
+      "byeTeamIds": [
+        "CAR",
+        "LAC",
+        "CLE",
+        "NYJ"
+      ]
     },
     {
       "seasonYear": 2026,
       "week": 7,
       "label": "Week 7",
-      "byeTeamIds": ["JAX", "NYG", "SF", "DAL"]
+      "byeTeamIds": [
+        "JAX",
+        "NYG",
+        "SF",
+        "DAL"
+      ]
     },
     {
       "seasonYear": 2026,
       "week": 8,
       "label": "Week 8",
-      "byeTeamIds": ["CIN", "IND", "CHI", "PHI"]
+      "byeTeamIds": [
+        "CIN",
+        "IND",
+        "CHI",
+        "PHI"
+      ]
     },
     {
       "seasonYear": 2026,
       "week": 9,
       "label": "Week 9",
-      "byeTeamIds": ["ATL", "ARI", "TB", "NO"]
+      "byeTeamIds": [
+        "ATL",
+        "ARI",
+        "TB",
+        "NO"
+      ]
     },
     {
       "seasonYear": 2026,
       "week": 10,
       "label": "Week 10",
-      "byeTeamIds": ["MIN", "TEN", "LAR", "NE"]
+      "byeTeamIds": [
+        "MIN",
+        "TEN",
+        "LAR",
+        "NE"
+      ]
     },
     {
       "seasonYear": 2026,
       "week": 11,
       "label": "Week 11",
-      "byeTeamIds": ["WAS", "DET", "KC", "BAL"]
+      "byeTeamIds": [
+        "WAS",
+        "DET",
+        "KC",
+        "BAL"
+      ]
     },
     {
       "seasonYear": 2026,
       "week": 12,
       "label": "Week 12",
-      "byeTeamIds": ["GB", "MIA", "LV", "DEN"]
+      "byeTeamIds": [
+        "GB",
+        "MIA",
+        "LV",
+        "DEN"
+      ]
     },
     {
       "seasonYear": 2026,
