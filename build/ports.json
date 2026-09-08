@@ -1,0 +1,6 @@
+{
+  "_comment": "Distinctive ports so this project never collides with other local apps (Vite's 5173/4173 defaults are shared by everything). Read by vite.config.ts, playwright.config.ts, init.sh, agent-status.sh and the npm scripts.",
+  "dev": 5891,
+  "pages": 5892,
+  "pagesTest": 5893
+}

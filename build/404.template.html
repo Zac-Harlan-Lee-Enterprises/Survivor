@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Redirecting… · Survivor League</title>
+    <script>
+      // GitHub Pages serves this file (with a 404 status) for any path that is
+      // not a real file. The app uses hash routing, so a "clean" deep link such
+      // as <base>leaderboard is rewritten to <base>#/leaderboard.
+      // The base is injected at build time from Vite's `base` option, so it is
+      // always the exact path the bundle was built for.
+      ;(function () {
+        var base = '__BASE__'
+        var path = window.location.pathname
+        var rest = path.indexOf(base) === 0 ? path.slice(base.length) : path.replace(/^\/+/, '')
+        var hash = (window.location.hash || '').replace(/^#\/?/, '')
+        var target = base + (window.location.search || '') + '#/' + rest.replace(/^\/+/, '') + hash
+        window.location.replace(target)
+      })()
+    </script>
+  </head>
+  <body>
+    <p style="font-family: system-ui, sans-serif; padding: 2rem">
+      Redirecting to the Survivor League app… If nothing happens,
+      <a href="__BASE__">open the league home</a>.
+    </p>
+  </body>
+</html>

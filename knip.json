@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "backend/src/handlers/*.ts",
+    "scripts/*.mjs",
+    "scripts/*.ts",
+    "tests/**/*.test.ts",
+    "tests/e2e/**/*.spec.ts"
+  ],
+  "project": ["src/**/*.{ts,tsx}", "backend/src/**/*.ts", "build/**/*.ts", "scripts/**/*.{mjs,ts}"],
+  "ignoreDependencies": ["tailwindcss"],
+  "ignoreExportsUsedInFile": true
+}

@@ -1,0 +1,8 @@
+dist
+dist-e2e
+backend/dist
+node_modules
+coverage
+playwright-report
+test-results
+*.md

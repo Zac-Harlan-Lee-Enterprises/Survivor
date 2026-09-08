@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Survivor League">
+  <rect width="64" height="64" rx="14" fill="#0b1020"/>
+  <ellipse cx="32" cy="32" rx="22" ry="14" transform="rotate(-35 32 32)" fill="#8b4513" stroke="#f5deb3" stroke-width="2"/>
+  <path d="M22 40 L42 24 M27 34 l3 3 M31 31 l3 3 M35 28 l3 3" stroke="#f5deb3" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+</svg>
