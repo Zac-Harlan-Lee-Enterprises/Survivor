@@ -295,7 +295,9 @@
     "priority": 2,
     "hermetic": true,
     "passes": true,
-    "depends_on": ["build-static-output"]
+    "depends_on": [
+      "build-static-output"
+    ]
   },
   {
     "id": "e2e-pages-subpath-refresh",
@@ -354,7 +356,7 @@
   {
     "id": "import-report-sample",
     "category": "functional",
-    "description": "The CSV import CLI validates a players×weeks sheet against the schedule and rules and writes a Markdown report (ambiguous teams, reuse, missing picks, byes, loss markers).",
+    "description": "The CSV import CLI validates a players\u00d7weeks sheet against the schedule and rules and writes a Markdown report (ambiguous teams, reuse, missing picks, byes, loss markers).",
     "verification": "npm run -s import:report -- data/import/sample-league.csv --out node_modules/.tmp/report.md >/dev/null && npx vitest run src/domain/import --reporter=dot",
     "priority": 1,
     "hermetic": true,
@@ -363,7 +365,7 @@
   {
     "id": "import-real-league-from-screenshot",
     "category": "functional",
-    "description": "Seed the real league from the commissioner's spreadsheet. BLOCKED: the screenshot referenced in the brief was not attached to the session, so nothing was seeded (see docs/import-report.md). Export the sheet to data/import/league.csv and re-run.",
+    "description": "Seed the real league from the commissioner's picks. data/import/league.csv now holds week 1 (9 players, supplied in chat, not from the screenshot \u2014 that was never attached). The CSV parses clean, but 0 of 9 picks are committable until those 9 people are league members: the demo fixture still has the fictional sample cast. Add them (Commissioner -> Players, or reseed) then import.",
     "verification": "test -f data/import/league.csv && npm run -s import:report -- data/import/league.csv --out docs/import-report.generated.md",
     "priority": 2,
     "hermetic": true,
@@ -422,6 +424,8 @@
     "priority": 3,
     "hermetic": false,
     "passes": false,
-    "depends_on": ["connected-mode-deployed"]
+    "depends_on": [
+      "connected-mode-deployed"
+    ]
   }
 ]
