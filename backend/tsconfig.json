@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "../node_modules/.tmp/tsconfig.backend.tsbuildinfo",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "paths": {
+      "@/*": ["../src/*"],
+      "@domain/*": ["../src/domain/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "../src/domain/**/*.ts"],
+  "exclude": ["../src/domain/**/*.test.ts"]
+}
