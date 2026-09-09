@@ -197,6 +197,17 @@
       "medium": "headshots/stacey-markendorff-medium.webp"
     }
   },
+  "tony-canody": {
+    "from": "TonyCanody.jpg",
+    "contentType": "image/webp",
+    "sizeBytes": 56438,
+    "width": 487,
+    "height": 487,
+    "variants": {
+      "thumb": "headshots/tony-canody-thumb.webp",
+      "medium": "headshots/tony-canody-medium.webp"
+    }
+  },
   "tracy-nelson": {
     "from": "TracyNelson.jpg",
     "contentType": "image/webp",
