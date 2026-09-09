@@ -12,10 +12,12 @@ import { Button } from '@/components/ui/button'
 import { useConfetti } from '@/components/useConfetti'
 import { livesLine, statusHeadline, streakLine } from '@/lib/copy'
 import { formatKickoff } from '@/lib/time'
+import { getConfig } from '@/config/env'
 import { cn } from '@/lib/cn'
 
 export function PlayerDashboard() {
   const tz = useLeagueTimeZone()
+  const { readOnly } = getConfig()
   const session = useSession()
   const { evaluation, profileOf } = useLeagueContext()
   const playerId = session!.actor.playerId
@@ -140,7 +142,7 @@ export function PlayerDashboard() {
                 : ''}
             </p>
           )}
-          {me.status === 'alive' && week?.phase === 'open' && (
+          {!readOnly && me.status === 'alive' && week?.phase === 'open' && (
             <Button className="mt-5" size="lg" asChild>
               <Link to="/pick">
                 <Zap className="h-5 w-5" aria-hidden="true" />{' '}

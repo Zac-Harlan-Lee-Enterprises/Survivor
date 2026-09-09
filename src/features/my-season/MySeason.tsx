@@ -9,6 +9,7 @@ import { OutcomePill } from '@/components/OutcomePill'
 import { StatusBadge } from '@/components/StatusBadge'
 import { TeamMonogram } from '@/components/TeamMonogram'
 import { formatKickoff } from '@/lib/time'
+import { getConfig } from '@/config/env'
 import { cn } from '@/lib/cn'
 
 export function MySeason() {
@@ -89,7 +90,7 @@ export function MySeason() {
         title="Available this week"
         options={available}
         note={me.status === 'alive' ? 'Tap through to make your pick.' : undefined}
-        link={me.status === 'alive' ? '/pick' : undefined}
+        link={!getConfig().readOnly && me.status === 'alive' ? '/pick' : undefined}
       />
       <TeamBucket title="Already used" options={used} note="Gone for the season." />
       <TeamBucket

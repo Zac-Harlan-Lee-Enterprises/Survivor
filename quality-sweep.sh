@@ -105,6 +105,10 @@ check_doc_refs() {
     # repo paths (so `owner/repo`, `refs/heads/main`, `actions/x` are ignored).
     first="${ref%%/*}"
     [[ -e "$first" ]] || continue
+    # A path git deliberately ignores is absent ON PURPOSE (real player data,
+    # local config, build output). Missing here is not drift, and failing on it
+    # would make CI red on every clean clone.
+    if git check-ignore -q "$ref" 2>/dev/null; then continue; fi
     if [[ ! -e "$ref" ]]; then
       fail "$doc references '$ref' — not found (renamed or deleted?)"
       broken=1

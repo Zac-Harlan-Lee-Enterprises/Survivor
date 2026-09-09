@@ -363,6 +363,15 @@
     "passes": true
   },
   {
+    "id": "published-site-is-read-only",
+    "category": "functional",
+    "description": "The published GitHub Pages build offers no way to pick: no sign-in, no Pick or Me nav, no make/change-pick calls to action, and write routes redirect to the league. In demo mode a visitor's pick could never reach anyone else, so offering the controls would mislead people into believing they had entered. Running locally (the commissioner's machine) and connected mode stay fully interactive.",
+    "verification": "npx vitest run src/config/env.test.ts --reporter=dot && npx playwright test --project=published",
+    "priority": 1,
+    "hermetic": false,
+    "passes": true
+  },
+  {
     "id": "e2e-demo-mode-no-backend",
     "category": "functional",
     "description": "Demo mode runs entirely from static files: league home, sign-in, make/change pick, locked picks, grid, my-season, mobile navigation.",

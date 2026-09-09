@@ -6,7 +6,7 @@ The spreadsheet screenshot referenced in the original brief **never reached the 
 
 Instead the commissioner supplied the week 1 picks directly, and those are what the app is seeded with:
 
-- `data/import/league.csv` holds them in import format (gitignored: it names real people).
+- `data/import/league.csv` holds them in import format. It is **gitignored on purpose** — it names real people — so it exists only on the commissioner's machine, not in a fresh clone.
 - `scripts/generate-demo-fixtures.ts` seeds the same nine players and picks into the league.
 - **No results are seeded.** None were supplied, so none were invented; every pick is pending and everyone holds three lives until real results are entered.
 - The **schedule remains synthetic**. The real NFL fixture list is not known here, so matchups and kickoff times are placeholders and the season stays flagged `isSynthetic`.
