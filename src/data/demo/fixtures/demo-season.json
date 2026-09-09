@@ -303,7 +303,7 @@
     {
       "playerId": "kc-walker",
       "displayName": "KC Walker",
-      "imageId": null
+      "imageId": "img-kc-walker"
     },
     {
       "playerId": "zac-harlan",
@@ -530,6 +530,19 @@
       "variants": {
         "thumb": "headshots/mike-lancaster-thumb.webp",
         "medium": "headshots/mike-lancaster-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-kc-walker",
+      "playerId": "kc-walker",
+      "contentType": "image/webp",
+      "sizeBytes": 54034,
+      "width": 512,
+      "height": 512,
+      "variants": {
+        "thumb": "headshots/kc-walker-thumb.webp",
+        "medium": "headshots/kc-walker-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },

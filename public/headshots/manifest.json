@@ -87,6 +87,17 @@
       "medium": "headshots/joseph-tomczuk-medium.webp"
     }
   },
+  "kc-walker": {
+    "from": "KCWalker.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 54034,
+    "width": 512,
+    "height": 512,
+    "variants": {
+      "thumb": "headshots/kc-walker-thumb.webp",
+      "medium": "headshots/kc-walker-medium.webp"
+    }
+  },
   "matt-hadley": {
     "from": "MattHadley.jpg",
     "contentType": "image/webp",
