@@ -92,6 +92,7 @@ const PEOPLE: Person[] = [
   { id: 'kc-walker', name: 'KC Walker', role: 'player' },
   { id: 'paul-lim', name: 'Paul Lim', role: 'player' },
   { id: 'tony-canody', name: 'Tony Canody', role: 'player' },
+  { id: 'joanna-moss', name: 'Joanna Moss', role: 'player' },
   // Commissioner: runs the league and holds the admin tools.
   { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner' },
 ]
@@ -125,6 +126,8 @@ const STORY: Story = {
   'kc-walker': { 1: ['JAX', 'P'] },
   'paul-lim': { 1: ['JAX', 'P'] },
   'tony-canody': { 1: ['LAC', 'P'] },
+  // First player on the Cowboys.
+  'joanna-moss': { 1: ['DAL', 'P'] },
   'zac-harlan': { 1: ['LAC', 'P'] },
 }
 
