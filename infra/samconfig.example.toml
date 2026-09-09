@@ -1,0 +1,18 @@
+# Copy to infra/samconfig.toml (gitignored) and fill in your values.
+# Deploy is a HUMAN action: `sam deploy` is blocked for agents by the guardrails.
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "survivor-league"
+resolve_s3 = true
+s3_prefix = "survivor-league"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+parameter_overrides = [
+  "SiteOrigin=https://YOUR-GITHUB-USER.github.io",
+  "SiteBasePath=/Survivor/",
+  "CognitoDomainPrefix=your-unique-prefix",
+  "DefaultLeagueId=league",
+  "NflProvider=manual",
+]

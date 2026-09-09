@@ -1,0 +1,274 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >-
+  NFL Survivor League — optional serverless backend for connected mode.
+  One HTTP API + Lambda (modular monolith), one on-demand DynamoDB table,
+  one S3 bucket for headshots (presigned POST uploads, public read of images/*),
+  a Cognito user pool (Authorization Code + PKCE, no client secret) and a
+  scheduled results-sync Lambda. Costs pennies per month for a small league.
+
+Parameters:
+  SiteOrigin:
+    Type: String
+    Description: Origin of the GitHub Pages site, e.g. https://owner.github.io (no trailing slash)
+  SiteBasePath:
+    Type: String
+    Default: /Survivor/
+    Description: Repository subpath the site is served from (with leading and trailing slash)
+  CognitoDomainPrefix:
+    Type: String
+    Description: Globally unique Hosted UI domain prefix, e.g. sunday-survivors-8f3a
+  DefaultLeagueId:
+    Type: String
+    Default: league
+  NflProvider:
+    Type: String
+    Default: manual
+    AllowedValues: [manual, espn]
+    Description: manual = commissioner enters results; espn = poll the unofficial public scoreboard
+  SyncScheduleExpression:
+    Type: String
+    Default: rate(15 minutes)
+    Description: How often the results sync runs when NflProvider != manual
+
+Conditions:
+  UsesProvider: !Not [!Equals [!Ref NflProvider, manual]]
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Architectures: [arm64]
+    MemorySize: 512
+    Timeout: 20
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref Table
+        IMAGES_BUCKET: !Ref ImagesBucket
+        IMAGES_BASE_URL: !Sub https://${ImagesBucket}.s3.${AWS::Region}.amazonaws.com
+        DEFAULT_LEAGUE_ID: !Ref DefaultLeagueId
+        NFL_PROVIDER: !Ref NflProvider
+        NODE_OPTIONS: --enable-source-maps
+
+Resources:
+  # ---------------------------------------------------------------- data ----
+  Table:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+  # -------------------------------------------------------------- images ----
+  ImagesBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - !Ref SiteOrigin
+              - http://localhost:5891
+            AllowedMethods: [POST, GET, HEAD]
+            AllowedHeaders: ['*']
+            MaxAge: 3600
+
+  # Public READ of headshots only; writes happen solely through presigned POSTs
+  # issued by the API (the bucket is never public-write).
+  ImagesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ImagesBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: PublicReadHeadshots
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Sub ${ImagesBucket.Arn}/images/*
+
+  # ---------------------------------------------------------------- auth ----
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub ${AWS::StackName}-users
+      UsernameAttributes: [email]
+      AutoVerifiedAttributes: [email]
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true # commissioner invites members; no open sign-up
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 12
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Ref CognitoDomainPrefix
+      UserPoolId: !Ref UserPool
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: survivor-web
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false # public SPA client: Authorization Code + PKCE
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows: [code]
+      AllowedOAuthScopes: [openid, email, profile]
+      SupportedIdentityProviders: [COGNITO]
+      CallbackURLs:
+        - !Sub ${SiteOrigin}${SiteBasePath}
+        - http://localhost:5891/
+      LogoutURLs:
+        - !Sub ${SiteOrigin}${SiteBasePath}
+        - http://localhost:5891/
+      PreventUserExistenceErrors: ENABLED
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+
+  # ----------------------------------------------------------------- api ----
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref SiteOrigin
+          - http://localhost:5891
+        AllowMethods: [GET, PUT, POST, PATCH, DELETE, OPTIONS]
+        AllowHeaders: [Authorization, Content-Type]
+        MaxAge: 3600
+      Auth:
+        Authorizers:
+          CognitoJwt:
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
+              audience:
+                - !Ref UserPoolClient
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/dist/api
+      Handler: index.handler
+      Description: Survivor league API (all routes)
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Table
+        - S3CrudPolicy:
+            BucketName: !Ref ImagesBucket
+      Events:
+        # Public, anonymous READS (league home, leaderboard, grid without sign-in).
+        # The router strips the /public prefix; only GET is accepted there.
+        PublicReads:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: GET
+            Path: /public/{proxy+}
+        # Everything else requires a valid Cognito JWT; roles are checked in code
+        # against DynamoDB memberships, never trusted from the client.
+        Authenticated:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: ANY
+            Path: /{proxy+}
+            Auth:
+              Authorizer: CognitoJwt
+
+  # ---------------------------------------------------------------- sync ----
+  SyncFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/dist/syncResults
+      Handler: index.handler
+      Description: Polls the NFL provider and applies results idempotently
+      Timeout: 60
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref Table
+
+  SyncSchedulerRole:
+    Type: AWS::IAM::Role
+    Condition: UsesProvider
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: invoke-sync
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt SyncFunction.Arn
+
+  SyncSchedule:
+    Type: AWS::Scheduler::Schedule
+    Condition: UsesProvider
+    Properties:
+      Description: Survivor results sync
+      ScheduleExpression: !Ref SyncScheduleExpression
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      Target:
+        Arn: !GetAtt SyncFunction.Arn
+        RoleArn: !GetAtt SyncSchedulerRole.Arn
+        RetryPolicy:
+          MaximumRetryAttempts: 2
+
+Outputs:
+  ApiUrl:
+    Description: VITE_API_BASE_URL for the static site (no trailing slash)
+    Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+  CognitoAuthority:
+    Description: VITE_COGNITO_AUTHORITY
+    Value: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
+  CognitoClientId:
+    Description: VITE_COGNITO_CLIENT_ID
+    Value: !Ref UserPoolClient
+  CognitoHostedUiDomain:
+    Value: !Sub https://${CognitoDomainPrefix}.auth.${AWS::Region}.amazoncognito.com
+  ImagesBaseUrl:
+    Description: VITE_IMAGE_BASE_URL
+    Value: !Sub https://${ImagesBucket}.s3.${AWS::Region}.amazonaws.com
+  TableName:
+    Value: !Ref Table
+  UserPoolId:
+    Value: !Ref UserPool

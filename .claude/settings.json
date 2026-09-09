@@ -1,0 +1,80 @@
+{
+  "permissions": {
+    "ask": [
+      "Bash(git push *)",
+      "Bash(gh pr create *)",
+      "Bash(sam deploy *)",
+      "Bash(sam delete *)",
+      "Edit(./.github/**)",
+      "Edit(./.claude/settings.json)",
+      "Edit(./scripts/hooks/**)",
+      "Edit(./scripts/lib/**)",
+      "Edit(./CODEOWNERS)",
+      "Edit(./harden-github.sh)",
+      "Edit(./infra/**)",
+      "Edit(./deploy/**)"
+    ],
+    "deny": [
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr review:*)",
+      "Bash(gh release create:*)",
+      "Bash(gh release delete:*)",
+      "Bash(gh workflow run:*)",
+      "Bash(gh workflow enable:*)",
+      "Bash(gh workflow disable:*)",
+      "Bash(gh api --method PUT:*)",
+      "Bash(gh api --method POST:*)",
+      "Bash(gh api --method PATCH:*)",
+      "Bash(gh api --method DELETE:*)",
+      "Bash(gh api -X PUT:*)",
+      "Bash(gh api -X POST:*)",
+      "Bash(gh api -X PATCH:*)",
+      "Bash(gh api -X DELETE:*)",
+      "Bash(gh secret set:*)",
+      "Bash(gh secret delete:*)",
+      "Bash(gh variable set:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -fdx:*)",
+      "Bash(git update-ref:*)",
+      "Bash(git filter-branch:*)",
+      "Bash(aws cloudformation delete-stack:*)",
+      "Bash(aws cloudformation deploy:*)",
+      "Bash(aws s3 rm:*)",
+      "Bash(aws s3 rb:*)",
+      "Bash(aws s3 sync:*)",
+      "Bash(aws dynamodb delete-table:*)",
+      "Bash(aws dynamodb delete-item:*)",
+      "Bash(aws dynamodb put-item:*)",
+      "Bash(aws cognito-idp delete-user-pool:*)",
+      "Bash(aws lambda update-function-code:*)",
+      "Bash(aws lambda delete-function:*)",
+      "Bash(terraform apply:*)",
+      "Bash(terraform destroy:*)",
+      "Bash(npm publish:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)",
+      "Read(./**/*.p12)",
+      "Read(./**/id_rsa)",
+      "Read(./**/.aws/**)"
+    ]
+  },
+  "_comment_ask_vs_deny": "Sensitive-path Edit rules are ASK rules, not deny: the documented approval flow (a human approves in-session, the commit carries a SECURITY-REVIEW trailer) must be mechanically possible. gh api denies cover both --method and -X spellings because prefix rules are literal; the PreToolUse guard backstops flag-position variations and compound commands.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/scripts/hooks/guard-destructive-commands.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

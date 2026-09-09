@@ -1,0 +1,80 @@
+# Deploys the static build to GitHub Pages.
+#
+# One-time setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+#
+# The build derives the Vite base from the repository name (owner/Survivor →
+# /Survivor/); a user/org site (<owner>.github.io) resolves to "/". Override
+# with the VITE_BASE_PATH repository variable if needed.
+#
+# Connected mode: set the (non-secret) repository VARIABLES VITE_DATA_MODE,
+# VITE_API_BASE_URL, VITE_COGNITO_AUTHORITY, VITE_COGNITO_CLIENT_ID,
+# VITE_IMAGE_BASE_URL, VITE_DEFAULT_LEAGUE_ID. Never use secrets here — every
+# VITE_* value is compiled into the public bundle.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # Pinned by ref: a workflow_dispatch on any other branch must never publish.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Validate before publishing
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+
+      - name: Build static site
+        env:
+          VITE_DATA_MODE: ${{ vars.VITE_DATA_MODE || 'demo' }}
+          VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH }}
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          VITE_COGNITO_AUTHORITY: ${{ vars.VITE_COGNITO_AUTHORITY }}
+          VITE_COGNITO_CLIENT_ID: ${{ vars.VITE_COGNITO_CLIENT_ID }}
+          VITE_IMAGE_BASE_URL: ${{ vars.VITE_IMAGE_BASE_URL }}
+          VITE_DEFAULT_LEAGUE_ID: ${{ vars.VITE_DEFAULT_LEAGUE_ID || 'demo-league' }}
+        run: |
+          npm run build
+          test -f dist/index.html && test -f dist/404.html && test -f dist/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

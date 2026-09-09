@@ -58,3 +58,17 @@ DECISIONS:
          - Public anonymous reads go through /public/* because HTTP API JWT authorizers reject missing tokens.
          - Browser-side crop/resize to two WebP variants; S3 presigned POST policies + finalize HEAD checks.
 ================================================================
+
+================================================================
+[2026-09-08] sensitive-path approval
+Approver: Zac Harlan (repo owner / league commissioner)
+Reviewed: .github/workflows/ci.yml, .github/workflows/deploy-pages.yml, infra/ (SAM template,
+          seed example, samconfig example, README), .claude/settings.json, scripts/hooks/
+          (pre-commit, commit-msg, pre-push, guard-destructive-commands.sh), scripts/lib/policy.sh,
+          harden-github.sh
+Approval:  "the workflow changes look good. please ship them as well" — given in session after being
+           shown what was held back and why. Recorded here per the flow in AGENTS.md; the commit
+           carries SECURITY-REVIEW: Zac Harlan.
+Note:      Repo visibility was also decided by the approver: PUBLIC, with player photos included.
+           That publishes nine real people's names and headshots; it was raised explicitly first.
+================================================================

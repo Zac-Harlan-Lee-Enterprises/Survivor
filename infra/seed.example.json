@@ -1,0 +1,33 @@
+{
+  "league": {
+    "id": "league",
+    "name": "The Sunday Survivors",
+    "tagline": "One pick. Three lives. No mercy.",
+    "settings": {
+      "defaultLives": 3,
+      "tieCountsAsMiss": true,
+      "missingPickCountsAsMiss": true,
+      "cancelledGamePolicy": "void",
+      "simultaneousEliminationPolicy": "co-champions",
+      "hidePicksUntilLocked": true,
+      "displayTimeZone": "America/Chicago"
+    }
+  },
+  "season": {
+    "id": "2026",
+    "year": 2026,
+    "label": "2026 Season",
+    "startWeek": 1,
+    "endWeek": 18,
+    "status": "active"
+  },
+  "members": [
+    {
+      "displayName": "Commissioner Name",
+      "email": "commissioner@example.com",
+      "role": "commissioner",
+      "nickname": "Commish"
+    },
+    { "displayName": "Player One", "email": "player1@example.com", "role": "player" }
+  ]
+}
