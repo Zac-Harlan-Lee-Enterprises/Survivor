@@ -72,3 +72,24 @@ Approval:  "the workflow changes look good. please ship them as well" — given 
 Note:      Repo visibility was also decided by the approver: PUBLIC, with player photos included.
            That publishes nine real people's names and headshots; it was raised explicitly first.
 ================================================================
+
+--- 2026-09-09  Claude (feat/add-tracy-nelson) ---
+DONE   : Tracy Nelson added (SEA, week 1 — same team as Sheila Acker); Maya Israel's photo
+         re-imported; import-headshots.mjs now reads the roster from the generator, not the
+         built fixture, removing the generate-import-generate ordering trap; roster counts in
+         specs derived from the fixture instead of hard-coded. Then: /rules page rendering
+         docs/survivor-rules.md in-app, linked from the primary nav (desktop + mobile) and the
+         footer, with a live-settings strip; begin/end-player-rules markers keep engineering
+         notes off the page; small Markdown subset renderer in src/lib/markdown.ts.
+         Fixed two latent bugs: the mobile nav's hard-coded grid-cols ternary, and
+         quality-sweep.sh mangling registry verifications through jq @tsv.
+TESTS  : vitest 166 -> 184 passing; playwright 66 -> 71 passing (2 skipped: the footer link is
+         desktop-only). quality-sweep.sh clean.
+NEXT   : Open/merge the PR for feat/add-tracy-nelson.
+BLOCKED: Merging still needs a branch-protection change only the repo owner can make, in the
+         GitHub UI under Settings -> Branches -> main: turn OFF "Require approval of the most
+         recent reviewable push" and "Require review from Code Owners". Those two, plus "Do not
+         allow bypassing the above settings" and a single maintainer, leave nobody able to merge.
+NOTE   : The PreToolUse guard blocks any command whose TEXT contains a mutating gh api call,
+         including documentation quoting one. Describe such fixes in prose, not as a pasteable
+         command, or the note cannot be written.

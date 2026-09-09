@@ -43,6 +43,21 @@ export function formatDateTime(iso: string, timeZone = viewerTimeZone()): string
   }).format(new Date(iso))
 }
 
+/**
+ * The zone's short name at a given instant ("CDT" in summer, "CST" in winter),
+ * so a time on screen is never ambiguous about which clock it is on.
+ */
+export function zoneAbbreviation(timeZone: string, at: Date): string {
+  try {
+    const part = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'short' })
+      .formatToParts(at)
+      .find((p) => p.type === 'timeZoneName')
+    return part?.value ?? timeZone
+  } catch {
+    return timeZone
+  }
+}
+
 export interface Countdown {
   totalMs: number
   days: number

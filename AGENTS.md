@@ -116,6 +116,8 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | `src/data/api/repositories.ts` | Connected adapters over `http.ts`. |
 | `src/app/router.tsx` | HashRouter + routes; GitHub-Pages-safe routing. |
 | `src/features/pick/PickPage.tsx` | The most important screen: weekly pick cards. |
+| `src/features/rules/RulesPage.tsx` | `/rules` — renders `docs/survivor-rules.md` in the app, linked from the nav and footer. |
+| `src/lib/markdown.ts` | Small Markdown subset the rules page renders; `extractMarkedRegion` picks the player-facing slice. |
 | `src/features/commissioner/*` | Players/headshots, picks, results, settings, import, audit. |
 | `scripts/generate-demo-fixtures.ts` | Seeds the league: real roster, week 1 picks, real cached schedule, no results. `npm run fixtures:generate`. |
 | `scripts/fetch-nfl-schedule.mjs` | Caches the real NFL schedule from ESPN. `npm run schedule:fetch`. |
@@ -142,6 +144,7 @@ All frontend variables are **public** (compiled into the bundle). Values in `.en
 | `VITE_COGNITO_AUTHORITY`, `VITE_COGNITO_CLIENT_ID` | repo variable | OIDC issuer + public client id (PKCE, no secret). |
 | `VITE_IMAGE_BASE_URL` | repo variable | Public base for headshot objects. |
 | `VITE_DEFAULT_LEAGUE_ID` | repo variable | League the site opens. |
+| `VITE_REPO_URL` | CI (derived from `GITHUB_REPOSITORY`) | Public repo URL; only builds "view the source" links. Empty = no link. |
 | `TABLE_NAME`, `IMAGES_BUCKET`, `IMAGES_BASE_URL`, `DEFAULT_LEAGUE_ID`, `NFL_PROVIDER` | Lambda (set by SAM) | Backend config. Provider secrets go in SSM, never env/VITE. |
 | `PAGES_URL`, `SURVIVOR_TOKEN`, `SURVIVOR_PLAYER_ID` | shell, verification only | Used by registry checks for deployed environments. |
 
@@ -209,7 +212,7 @@ See [SECURITY.md](SECURITY.md).
 
 - [README.md](README.md) — product overview, local dev, deployment.
 - [docs/architecture.md](docs/architecture.md) — modules, data flow, decisions.
-- [docs/survivor-rules.md](docs/survivor-rules.md) — every edge case and how it resolves.
+- [docs/survivor-rules.md](docs/survivor-rules.md) — every edge case and how it resolves. It is also **rendered in the app at `/rules`**, so it is a player-facing document, not just a spec: the `<!-- begin-player-rules -->` / `<!-- end-player-rules -->` markers bound what league members see. Keep engine notes outside them.
 - [docs/github-pages.md](docs/github-pages.md) — base path, HashRouter, 404 shim, workflow.
 - [docs/aws-connected-mode.md](docs/aws-connected-mode.md) — SAM deploy, Cognito, seeding, verification.
 - [docs/nfl-provider.md](docs/nfl-provider.md) — providers, sync, manual fallback.

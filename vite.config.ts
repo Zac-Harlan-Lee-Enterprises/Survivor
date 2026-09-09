@@ -14,9 +14,14 @@ export default defineConfig(({ mode }) => {
   const base = env.VITE_BASE_PATH
     ? resolveBasePath(env.VITE_BASE_PATH)
     : basePathFromRepository(env.GITHUB_REPOSITORY)
+  // Public, non-secret: it only builds "view the source" links. CI always sets
+  // GITHUB_REPOSITORY, so the published site gets this without configuration.
+  const repoUrl =
+    env.VITE_REPO_URL ?? (env.GITHUB_REPOSITORY ? `https://github.com/${env.GITHUB_REPOSITORY}` : '')
 
   return {
     base,
+    define: { 'import.meta.env.VITE_REPO_URL': JSON.stringify(repoUrl) },
     plugins: [react(), tailwindcss(), githubPagesPlugin()],
     resolve: {
       alias: {

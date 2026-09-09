@@ -62,8 +62,14 @@ fi
 echo "── Registry re-verification (hermetic entries claiming passes:true) ─"
 # ---------------------------------------------------------------------------
 if [[ -f feature_list.json ]]; then
-  while IFS=$'\t' read -r id verification; do
-    [[ -z "$id" ]] && continue
+  # Read each field on its own, NOT via @tsv: @tsv escapes backslashes, so a
+  # verification containing one reached bash mangled and failed for no reason.
+  hermetic_filter='[.[] | select(.passes==true and .hermetic==true)]'
+  total="$(jq "$hermetic_filter | length" feature_list.json 2>/dev/null || echo 0)"
+  for ((n = 0; n < total; n++)); do
+    id="$(jq -r "$hermetic_filter[$n].id" feature_list.json)"
+    verification="$(jq -r "$hermetic_filter[$n].verification" feature_list.json)"
+    [[ -z "$id" || "$verification" == "null" ]] && continue
     if bash -c "$verification" >/dev/null 2>&1; then
       ok "registry '$id' re-verified"
     else
@@ -71,7 +77,7 @@ if [[ -f feature_list.json ]]; then
       echo "      $verification" >&2
       echo "      → fix the regression, or flip passes to false" >&2
     fi
-  done < <(jq -r '.[] | select(.passes==true and .hermetic==true) | [.id, .verification] | @tsv' feature_list.json 2>/dev/null)
+  done
 fi
 
 # ---------------------------------------------------------------------------

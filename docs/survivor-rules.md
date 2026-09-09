@@ -2,6 +2,13 @@
 
 All rules live in `src/domain/rules/` and are covered by `src/domain/rules/*.test.ts`. League settings (`LeagueSettings`) make the configurable parts explicit; defaults match the league's spec.
 
+<!-- The app's /rules page renders exactly what sits between the two markers
+     below (src/features/rules/RulesPage.tsx). Anything outside them is a note
+     for whoever maintains the engine, not for league members. Move a section
+     across a marker to change who reads it. -->
+
+<!-- begin-player-rules -->
+
 ## Core
 
 - Each active player picks **one team to win** each week.
@@ -57,6 +64,8 @@ Kickoff changes are result observations; a rescheduled game keeps its id (`<year
 Every timestamp is stored in UTC. Kickoffs and deadlines are rendered in the
 league's own timezone (`displayTimeZone`, currently `America/Chicago`) with the
 zone abbreviation shown, so everyone quotes the same clock wherever they are.
+
+<!-- end-player-rules -->
 
 ## Determinism
 

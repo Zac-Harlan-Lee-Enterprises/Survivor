@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { ROSTER_SIZE } from './helpers'
 
 /**
  * The bundle exactly as GitHub Pages serves it.
@@ -17,13 +18,16 @@ test.describe('published site offers no way to pick', () => {
 
   test('the league still reads correctly', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/week \d+/i)
-    await expect(page.getByRole('heading', { name: /still standing/i })).toContainText('9')
+    await expect(page.getByRole('heading', { name: /still standing/i })).toContainText(
+      String(ROSTER_SIZE),
+    )
     await expect(page.getByRole('img', { name: /headshot of maya israel/i }).first()).toBeVisible()
     // Read-only pages remain reachable.
     for (const [name, path] of [
       ['leaderboard', './#/leaderboard'],
       ['grid', './#/grid'],
       ['profile', './#/players/maya-israel'],
+      ['rules', './#/rules'],
     ] as const) {
       await page.goto(path)
       await expect(page.getByRole('heading', { level: 1 }), name).toBeVisible()
@@ -40,6 +44,8 @@ test.describe('published site offers no way to pick', () => {
     await expect(nav.getByRole('link', { name: /^league$/i })).toBeVisible()
     await expect(nav.getByRole('link', { name: /^board$/i })).toBeVisible()
     await expect(nav.getByRole('link', { name: /^grid$/i })).toBeVisible()
+    // Reading the rules needs no account, so it stays on the published site.
+    await expect(nav.getByRole('link', { name: /^rules$/i })).toBeVisible()
   })
 
   test('no call to action invites a pick', async ({ page }) => {
