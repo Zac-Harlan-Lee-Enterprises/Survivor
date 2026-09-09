@@ -395,6 +395,12 @@ export function createDemoPickRepository(ctx: Ctx): PickRepository {
       if (snap.season.id !== seasonId) return []
       return delay(redactPicks(snap, ctx.viewer(), ctx.clock.now()))
     },
+    async listAllPicks(seasonId) {
+      requireCommissioner(ctx)
+      const snap = store.snapshot()
+      if (snap.season.id !== seasonId) return []
+      return delay([...snap.picks])
+    },
     async submitPick(input): Promise<SubmitPickResult> {
       const v = ctx.viewer()
       if (v.playerId !== input.playerId) {

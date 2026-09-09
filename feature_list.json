@@ -236,10 +236,10 @@
   {
     "id": "rules-pick-visibility",
     "category": "functional",
-    "description": "Other players' picks are hidden until kickoff; own picks and the commissioner's view are never redacted (domain + API).",
-    "verification": "npx vitest run src/domain/rules/picks.test.ts backend/src/routes/routes.test.ts -t 'visib|redact'",
+    "description": "Picks are hidden from every viewer until the week's shared deadline \u2014 the commissioner included, since a competing commissioner would otherwise see rivals' picks while their own was still changeable. Own picks always visible. Administration uses a separate commissioner-only route, and the admin panel keeps picks collapsed behind a deliberate reveal.",
+    "verification": "npx vitest run src/domain/rules/picks.test.ts backend/src/routes/routes.test.ts -t 'visib|redact|admin route' --reporter=dot && npx playwright test --project=chromium -g 'rivals'",
     "priority": 1,
-    "hermetic": true,
+    "hermetic": false,
     "passes": true
   },
   {

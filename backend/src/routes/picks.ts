@@ -46,6 +46,16 @@ export function registerPickRoutes(router: Router): void {
     return json(200, redactSnapshot(snapshot, viewer, ctx.now()).picks)
   })
 
+  /**
+   * Unredacted picks, for administration only. Kept off the snapshot so a
+   * competing commissioner does not get a free look at rivals' picks.
+   */
+  router.add('GET', '/seasons/:seasonId/picks/all', async (ctx) => {
+    const { league, season } = await ctx.loadLeagueSeason(ctx.params.seasonId!)
+    await ctx.requireCommissioner(league.id)
+    return json(200, await ctx.repo.listPicks(season.id))
+  })
+
   router.add('PUT', '/seasons/:seasonId/picks/:week', async (ctx) => {
     const actor = await ctx.requireActor()
     const { league, season } = await ctx.loadLeagueSeason(ctx.params.seasonId!)

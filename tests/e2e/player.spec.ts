@@ -24,7 +24,56 @@ test.describe('player workflow (demo mode, no backend)', () => {
     await expect(page.getByRole('heading', { name: /graves|graveyard/i })).toHaveCount(0)
   })
 
-  test('other players’ picks stay hidden until kickoff, and the commissioner sees them all', async ({
+  test('the commissioner does not see rivals’ picks before the deadline (regression)', async ({
+    page,
+    isMobile,
+  }) => {
+    // Reported bug: the season grid showed everyone's pick to the commissioner
+    // while the week was still open. The commissioner also competes, so that
+    // was an information advantage, not just a display slip.
+    await signInAs(page, COMMISSIONER)
+    await page.goto('./#/grid')
+
+    // Both layouts sit in the DOM and only one is shown, so scope to the
+    // visible one: a hidden desktop cell would otherwise satisfy the assertion.
+    // Dave Johnson rides the Lions; his pick is the one that must not leak.
+    let scope = page.getByRole('table')
+    if (isMobile) {
+      await expect(scope).toBeHidden()
+      const card = page.locator('details').filter({ hasText: 'Dave Johnson' }).first()
+      await card.locator('summary').click()
+      scope = card
+    }
+    await expect(scope).toBeVisible()
+    await expect(scope.getByLabel(/detroit lions:/i)).toHaveCount(0)
+    await expect(scope.getByLabel(/hidden until the pick deadline/i).first()).toBeVisible()
+
+    // The leaderboard and league home must not leak it either.
+    await page.goto('./#/leaderboard')
+    const row = page.getByRole('listitem').filter({ hasText: 'Dave Johnson' }).first()
+    await expect(row).toContainText(/locked in/i)
+    await expect(row).not.toContainText(/DET/)
+  })
+
+  test('the admin picks panel conceals picks until the commissioner deliberately reveals them', async ({
+    page,
+  }) => {
+    await signInAs(page, COMMISSIONER)
+    await page.goto('./#/commissioner/picks')
+    const daveRow = page.getByRole('listitem').filter({ hasText: 'Dave Johnson' }).first()
+    await expect(daveRow).toContainText(/pick in/i)
+    await expect(daveRow).not.toContainText(/detroit lions/i)
+    await expect(page.getByRole('status')).toContainText(/picks stay concealed here too/i)
+
+    await page.getByRole('button', { name: /reveal picks/i }).click()
+    await expect(daveRow).toContainText(/detroit lions/i)
+    await expect(page.getByRole('alert')).toContainText(/you are still alive this week/i)
+
+    await page.getByRole('button', { name: /hide picks/i }).click()
+    await expect(daveRow).not.toContainText(/detroit lions/i)
+  })
+
+  test('other players’ picks stay hidden until the deadline, for every viewer', async ({
     page,
   }) => {
     const card = (name: string) =>
@@ -41,8 +90,9 @@ test.describe('player workflow (demo mode, no backend)', () => {
     await page.getByRole('button', { name: /sign out/i }).click()
     await signInAs(page, COMMISSIONER)
     await page.goto('./')
-    await expect(card('Sheila Acker')).toContainText(/riding seahawks/i)
-    await expect(card('Dominic Green')).toContainText(/riding ravens/i)
+    // Not even the commissioner: concealment is league-wide until the deadline.
+    await expect(card('Sheila Acker')).toContainText(/locked in/i)
+    await expect(card('Dominic Green')).toContainText(/locked in/i)
   })
 
   test('a player reviews and changes a pick before kickoff', async ({ page }) => {

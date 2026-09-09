@@ -254,7 +254,9 @@ describe('pick visibility', () => {
     ).toBe(true)
   })
 
-  it('always shows your own pick and everything to the commissioner', () => {
+  it('shows your own pick, and hides everyone else from the commissioner too', () => {
+    // A commissioner who is also competing must not see rivals' picks while
+    // their own is still changeable. Administration uses listAllPicks instead.
     expect(
       isPickVisible(
         annPick,
@@ -262,15 +264,29 @@ describe('pick visibility', () => {
         { playerId: 'ann', isCommissioner: false },
         kickoffFor(1, -1),
         snap.league.settings,
+        kickoffFor(1, -5 / 60),
       ),
     ).toBe(true)
     expect(
       isPickVisible(
         annPick,
         game(annPick.gameId),
-        { playerId: null, isCommissioner: true },
+        { playerId: 'bob', isCommissioner: true },
         kickoffFor(1, -1),
         snap.league.settings,
+        kickoffFor(1, -5 / 60),
+      ),
+      'commissioner gets no peek before the deadline',
+    ).toBe(false)
+    // Their own pick is still their own.
+    expect(
+      isPickVisible(
+        annPick,
+        game(annPick.gameId),
+        { playerId: 'ann', isCommissioner: true },
+        kickoffFor(1, -1),
+        snap.league.settings,
+        kickoffFor(1, -5 / 60),
       ),
     ).toBe(true)
   })
@@ -319,12 +335,21 @@ describe('redactSnapshot', () => {
     )
     expect(forBob.picks.map((p) => p.playerId)).toEqual(['bob'])
     expect(forBob.hiddenPicks).toEqual([{ playerId: 'ann', week: 1 }])
+    // The commissioner is redacted like everyone else before the deadline.
     const forCommish = redactSnapshot(
       snap,
       { playerId: null, isCommissioner: true },
       kickoffFor(1, -1),
     )
-    expect(forCommish.picks).toHaveLength(2)
-    expect(forCommish.hiddenPicks).toEqual([])
+    expect(forCommish.picks).toEqual([])
+    expect(forCommish.hiddenPicks).toHaveLength(2)
+    // After the deadline the whole league is public, commissioner or not.
+    const afterDeadline = redactSnapshot(
+      snap,
+      { playerId: null, isCommissioner: false },
+      kickoffFor(1, -4 / 60),
+    )
+    expect(afterDeadline.picks).toHaveLength(2)
+    expect(afterDeadline.hiddenPicks).toEqual([])
   })
 })

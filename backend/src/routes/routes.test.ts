@@ -74,10 +74,11 @@ describe('/public prefix (no authorizer on API Gateway)', () => {
 })
 
 describe('snapshot redaction', () => {
-  it('hides other players’ unlocked picks from players and anonymous viewers, not from the commissioner', async () => {
+  it('hides other players’ picks from everyone before the deadline — commissioner included', async () => {
     const h = await createHarness(baseSnapshot(), NOW)
     const anon = await h.call('GET', '/seasons/season-1/snapshot')
     expect(anon.status).toBe(200)
+    // Week 1 is long past its deadline, so those picks are public.
     expect(anon.body.picks.map((p: { id: string }) => p.id).sort()).toEqual([
       'p-ann-1',
       'p-bob-1',
@@ -91,14 +92,33 @@ describe('snapshot redaction', () => {
     })
     expect(bob.body.picks.some((p: { id: string }) => p.id === 'p-bob-2')).toBe(true)
 
+    // The commissioner gets no peek: a competing commissioner would otherwise
+    // see every rival's pick while their own was still changeable.
     const commish = await h.call('GET', '/seasons/season-1/snapshot', {
       sub: 'sub-c',
       email: 'commish@example.com',
     })
-    expect(commish.body.picks).toHaveLength(4)
-    expect(commish.body.hiddenPicks).toEqual([])
+    expect(commish.body.picks.map((p: { id: string }) => p.id)).not.toContain('p-bob-2')
+    expect(commish.body.hiddenPicks).toEqual([{ playerId: 'bob', week: 2 }])
     // Emails never leave the server.
     expect(JSON.stringify(commish.body)).not.toContain('@example.com')
+  })
+
+  it('serves unredacted picks to the commissioner only through the explicit admin route', async () => {
+    const h = await createHarness(baseSnapshot(), NOW)
+    const commish = { sub: 'sub-c', email: 'commish@example.com' }
+    const all = await h.call('GET', '/seasons/season-1/picks/all', commish)
+    expect(all.status).toBe(200)
+    expect(all.body.map((p: { id: string }) => p.id)).toContain('p-bob-2')
+
+    // Players and anonymous visitors cannot reach it.
+    expect(
+      (await h.call('GET', '/seasons/season-1/picks/all', { sub: 'sub-ann', email: 'ann@example.com' }))
+        .status,
+    ).toBe(403)
+    expect((await h.call('GET', '/seasons/season-1/picks/all')).status).toBe(401)
+    // Nor through the anonymous public prefix.
+    expect((await h.call('GET', '/public/seasons/season-1/picks/all')).status).toBe(401)
   })
 })
 

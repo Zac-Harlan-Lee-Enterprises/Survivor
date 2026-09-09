@@ -248,7 +248,12 @@ export function isPickVisible(
   /** The week's shared deadline; picks become public once it passes. */
   deadlineAt?: string | null,
 ): boolean {
-  if (viewer.isCommissioner) return true
+  // NOTE: the commissioner gets NO blanket bypass here. A commissioner who is
+  // also competing would otherwise see every rival's pick while still free to
+  // change their own — an unfair information advantage, and the exact thing
+  // "hidden until locked" exists to prevent. Administration reads picks through
+  // an explicit commissioner-only call instead (listAllPicks), so seeing them
+  // is a deliberate act rather than a side effect of browsing the league.
   if (viewer.playerId && viewer.playerId === pick.playerId) return true
   if (!settings.hidePicksUntilLocked) return true
   const now = toDate(nowInput)

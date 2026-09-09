@@ -92,7 +92,7 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | Week with no schedule data | `not_required` — nobody is struck by a data outage | `evaluateSeason` |
 | Last one standing (week settled) | champion | crown logic in `evaluateSeason` |
 | Everyone out same week / several survive week 18 | co-champions or tied finalists → commissioner `SeasonDecision` | `simultaneousEliminationPolicy` |
-| Other players' picks | hidden until the shared deadline (`redactSnapshot`, server-side too) | `src/domain/rules/picks.ts`, `backend/src/routes/picks.ts` |
+| Other players' picks | hidden until the shared deadline from EVERY viewer, commissioner included (`redactSnapshot`, server-side too); admin reads go through `listAllPicks` | `src/domain/rules/picks.ts`, `backend/src/routes/picks.ts` |
 | Result observations | idempotent, versioned, commissioner-locked | `results.ts`, `backend/src/sync.ts` |
 
 ---

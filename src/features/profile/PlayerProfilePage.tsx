@@ -101,7 +101,7 @@ export function PlayerProfilePage() {
             </div>
           </div>
         ) : hidden ? (
-          <p className="mt-2 text-ink-300">Locked in — hidden until kickoff. 🔒</p>
+          <p className="mt-2 text-ink-300">Locked in — hidden until the pick deadline. 🔒</p>
         ) : standing.status === 'alive' ? (
           <p className="mt-2 text-ink-400">No pick yet.</p>
         ) : (

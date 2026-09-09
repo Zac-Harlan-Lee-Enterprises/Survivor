@@ -122,6 +122,12 @@ export type SubmitPickResult = { ok: true; pick: Pick } | { ok: false; violation
 
 export interface PickRepository {
   listPicks(seasonId: string): Promise<Pick[]>
+  /**
+   * Every pick, unredacted. Commissioner-only, and deliberately NOT part of the
+   * season snapshot: a commissioner who is also competing must not see rivals'
+   * picks just by browsing the league. Reading them is an explicit act.
+   */
+  listAllPicks(seasonId: string): Promise<Pick[]>
   /** Authoritative in connected mode: the API re-validates every rule. */
   submitPick(input: SubmitPickInput): Promise<SubmitPickResult>
   /** Commissioner entry/correction; bypasses the kickoff lock, audited. */

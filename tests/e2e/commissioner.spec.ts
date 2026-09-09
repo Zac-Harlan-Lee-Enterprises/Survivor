@@ -29,6 +29,10 @@ test.describe('commissioner workflow (demo mode)', () => {
   test('entering a real result costs the losing players a life and recalculates standings', async ({
     page,
   }) => {
+    // Move past the deadline first: before it, picks are concealed from
+    // everyone (the commissioner included), so standings derived from the
+    // snapshot would not yet reflect anyone's pick.
+    await setDemoClock(page, '2026-09-14T06:00')
     // Dave Johnson and James Parker both ride the Lions (NO at DET in the real
     // week 1 schedule); make that game a loss for Detroit.
     await page.goto('./#/commissioner/results')
