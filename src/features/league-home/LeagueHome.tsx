@@ -1,10 +1,22 @@
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { CalendarOff, Crown, Flame, Skull, Zap } from 'lucide-react'
 import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useSession } from '@/app/hooks'
 import { useSelectedWeek } from '@/app/useSelectedWeek'
+import { useLiveScores } from '@/app/useLiveScores'
 import { WeekSelect } from '@/components/WeekSelect'
-import { getTeam, teamsOnBye, weekSummary, type NFLGame, type PlayerStanding } from '@/domain'
+import {
+  applyGameOverrides,
+  changedScores,
+  getTeam,
+  teamsOnBye,
+  weekSummary,
+  type NFLGame,
+  type PlayerStanding,
+  type ScoreChange,
+  type ScoreLine,
+} from '@/domain'
 import { Headshot } from '@/components/Headshot'
 import { PlayerCard } from '@/components/PlayerCard'
 import { TeamMonogram } from '@/components/TeamMonogram'
@@ -37,9 +49,12 @@ export function LeagueHome() {
     .filter((g) => g.week === evaluation.currentWeek)
     .sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))
   const { week: viewedWeek } = useSelectedWeek()
-  const slate = snapshot.games
+  // Overrides are applied here as everywhere else (engine, picks, results): a
+  // commissioner correction must show on the tile, which already has copy for it.
+  const slate = applyGameOverrides(snapshot.games, snapshot.gameOverrides ?? [])
     .filter((g) => g.week === viewedWeek)
     .sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))
+  const liveScores = useLiveScores(snapshot.season.year, viewedWeek, slate)
   const byes = teamsOnBye(snapshot.games, snapshot.season.year, viewedWeek)
   const nextKickoff = currentWeekGames.find(
     (g) =>
@@ -271,7 +286,7 @@ export function LeagueHome() {
           <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {slate.map((g) => (
               <li key={g.id}>
-                <GameRow game={g} />
+                <GameRow game={g} detail={liveScores.detail[g.id]} />
               </li>
             ))}
           </ul>
@@ -348,13 +363,28 @@ function Stat({
   )
 }
 
-export function GameRow({ game }: { game: NFLGame }) {
+/**
+ * One game on the slate.
+ *
+ * Scores show while a game is being played, not only once it is over: an
+ * in-progress game used to render no score at all and fall through to its
+ * kickoff time, which read as though it had not started.
+ *
+ * `detail` is where the game is up to ("3rd 5:21"). It is passed in rather than
+ * read from the game because it is display-only and never stored — see
+ * ParsedScoreboard.liveDetail.
+ */
+export function GameRow({ game, detail }: { game: NFLGame; detail?: string }) {
   const tz = useLeagueTimeZone()
   const away = getTeam(game.awayTeamId)
   const home = getTeam(game.homeTeamId)
   const final = game.status === 'final'
+  const playing = game.status === 'in_progress'
+  const showScores = final || playing
   const winner = game.winnerTeamId
-  const side = (teamId: string, score: number | undefined) => (
+  const changed = useScoreChange(game)
+
+  const side = (teamId: string, score: number | undefined, moved: boolean) => (
     <div
       className={cn(
         'flex items-center gap-2',
@@ -363,25 +393,75 @@ export function GameRow({ game }: { game: NFLGame }) {
     >
       <TeamMonogram teamId={teamId} size="sm" />
       <span className="font-display font-bold uppercase">{getTeam(teamId)?.name}</span>
-      {final && <span className="ml-auto font-display text-lg tabular-nums">{score}</span>}
+      {showScores && (
+        <span
+          // Keyed on the value so the animation restarts on every change; without
+          // a new key React reuses the node and the class change alone does nothing.
+          key={score}
+          className={cn(
+            'ml-auto font-display text-lg tabular-nums',
+            moved && 'animate-score-bump',
+          )}
+        >
+          {score ?? 0}
+        </span>
+      )}
     </div>
   )
+
   return (
-    <div className="card flex flex-col gap-1.5 p-3 text-sm">
-      {side(game.awayTeamId, game.awayScore)}
-      {side(game.homeTeamId, game.homeScore)}
+    <div className={cn('card flex flex-col gap-1.5 p-3 text-sm', playing && 'border-gold-400/30')}>
+      {side(game.awayTeamId, game.awayScore, changed.away)}
+      {side(game.homeTeamId, game.homeScore, changed.home)}
       <p className="text-xs text-ink-400">
-        {final
-          ? winner === null
-            ? 'Final · Tie'
-            : `Final · ${getTeam(winner ?? '')?.name} win`
-          : game.status === 'cancelled'
-            ? 'Cancelled'
-            : game.status === 'postponed'
-              ? `Postponed · ${formatKickoff(game.kickoffAt, { timeZone: tz })}`
-              : `${away?.abbreviation} at ${home?.abbreviation} · ${formatKickoff(game.kickoffAt, { timeZone: tz })}`}
-        {game.resultSource === 'commissioner' && ' · corrected by commissioner'}
+        {final ? (
+          winner === null ? (
+            'Final \u00b7 Tie'
+          ) : (
+            `Final \u00b7 ${getTeam(winner ?? '')?.name} win`
+          )
+        ) : game.status === 'cancelled' ? (
+          'Cancelled'
+        ) : game.status === 'postponed' ? (
+          `Postponed \u00b7 ${formatKickoff(game.kickoffAt, { timeZone: tz })}`
+        ) : playing ? (
+          <span className="font-semibold text-gold-300">
+            {/* A live dot, not an emoji: it inherits colour and reads as decoration. */}
+            <span
+              className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-gold-400 align-middle"
+              aria-hidden="true"
+            />
+            {detail ?? 'In progress'}
+          </span>
+        ) : (
+          `${away?.abbreviation} at ${home?.abbreviation} \u00b7 ${formatKickoff(game.kickoffAt, { timeZone: tz })}`
+        )}
+        {game.resultSource === 'commissioner' && ' \u00b7 corrected by commissioner'}
       </p>
     </div>
   )
+}
+
+/**
+ * Which side of this game just scored, true for about a second after it moves.
+ *
+ * The comparison itself is a pure domain function; all this adds is the memory
+ * of the previous reading and a timer to stop the highlight. A first reading is
+ * never a change, so opening the page mid-game does not flash every tile.
+ */
+function useScoreChange(game: NFLGame): ScoreChange {
+  const previous = useRef<ScoreLine | undefined>(undefined)
+  const [changed, setChanged] = useState<ScoreChange>({ home: false, away: false })
+
+  useEffect(() => {
+    const next = { homeScore: game.homeScore, awayScore: game.awayScore }
+    const moved = changedScores(previous.current, next)
+    previous.current = next
+    if (!moved.home && !moved.away) return
+    setChanged(moved)
+    const id = window.setTimeout(() => setChanged({ home: false, away: false }), 1000)
+    return () => window.clearTimeout(id)
+  }, [game.homeScore, game.awayScore])
+
+  return changed
 }

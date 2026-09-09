@@ -159,6 +159,14 @@ export interface SyncSummary {
   /** Where the data came from, for display. */
   provider: string
   observedAt: string
+  /**
+   * Game id → where it is up to right now ("3rd 5:21"), from THIS observation.
+   *
+   * Ephemeral by design and never stored: a clock that moves every few seconds
+   * would either bump resultVersion on every tick or be served stale between
+   * syncs. Absent when the provider does not report it.
+   */
+  liveDetail?: Record<string, string>
 }
 
 export interface GameResultInput {

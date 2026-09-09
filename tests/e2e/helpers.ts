@@ -13,6 +13,7 @@ import type { Page } from '@playwright/test'
  * the moment week 1 actually kicks off.
  */
 export async function resetDemo(page: Page): Promise<void> {
+  await stubEspnOffline(page)
   await page.goto('./')
   await page.evaluate(() => localStorage.clear())
   // First reload lets the app write its seed fingerprint; a pin set before that
@@ -20,6 +21,33 @@ export async function resetDemo(page: Page): Promise<void> {
   await page.reload()
   await page.evaluate((pin) => localStorage.setItem('survivor:demo:clock:v1', pin), CLOCK_PIN)
   await page.reload()
+}
+
+/**
+ * Makes the live-score feed unreachable, instantly.
+ *
+ * The league page polls ESPN through the real global fetch while a week is
+ * being played. CI has no outbound network, so an unstubbed request would hang
+ * until it times out — once per page view, doubled by the query client's retry.
+ * Aborting fails it in a millisecond, which is exactly what a viewer offline
+ * would get: the tiles keep showing the last thing known to be true.
+ *
+ * A spec that wants real scores registers its own route afterwards; the most
+ * recently added route wins.
+ */
+export async function stubEspnOffline(page: Page): Promise<void> {
+  await page.route('**/site.api.espn.com/**', (route) => route.abort())
+}
+
+/** Serves one ESPN scoreboard payload to the page, replacing the offline stub. */
+export async function serveEspn(page: Page, payload: unknown): Promise<void> {
+  await page.route('**/site.api.espn.com/**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(payload),
+    }),
+  )
 }
 
 export async function signInAs(page: Page, name: string): Promise<void> {
