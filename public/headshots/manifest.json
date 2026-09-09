@@ -1,4 +1,15 @@
 {
+  "allison-petty": {
+    "from": "AllisonPetty.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 19162,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/allison-petty-thumb.webp",
+      "medium": "headshots/allison-petty-medium.webp"
+    }
+  },
   "bradley-riedell": {
     "from": "BradleyRiedell.jpeg",
     "contentType": "image/webp",

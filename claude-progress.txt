@@ -167,3 +167,10 @@ TESTS  : after merging main (live scores): vitest 224 passing, playwright 89 pas
          validate green, sweep clean.
 NEXT   : Open/merge the PR.
 BLOCKED: none.
+
+--- 2026-09-09  Claude (feat/add-allison-petty) ---
+DONE   : Added Allison Petty (DET) with her photo — fourth on the Lions. League is 24. Chloe
+         Bourque remains the only player without a photo.
+TESTS  : vitest 224 passing, playwright 89 passing / 2 skipped, validate green, sweep clean.
+NEXT   : Open/merge the PR.
+BLOCKED: none.
