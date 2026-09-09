@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { RefreshCw } from 'lucide-react'
 import { useLeagueContext } from '@/app/hooks'
 import { useServices } from '@/app/hooks'
@@ -30,6 +30,10 @@ export function ResultsPanel() {
     .filter((g) => g.week === week)
     .sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))
   const overridden = new Set(snapshot.gameOverrides.map((o) => o.gameId))
+  const weekSource =
+    snapshot.weeks.find((w) => w.seasonYear === snapshot.season.year && w.week === week)?.source ??
+    'synthetic'
+  const hasLiveGame = games.some((g) => g.status === 'in_progress')
 
   const sync = async () => {
     if (!nfl.syncResults) return
@@ -38,9 +42,15 @@ export function ResultsPanel() {
     try {
       const r = await nfl.syncResults(snapshot.season.year, week)
       invalidate()
+      const parts = [`${r.changed} updated`, `${r.skipped} unchanged`]
+      if (r.created) parts.push(`${r.created} games added`)
+      if (r.relinkedPicks) parts.push(`${r.relinkedPicks} picks re-linked to the real fixtures`)
+      const orphans = r.orphanedPicks.length
+        ? ` Check these picks — their team is not on ${r.provider}'s slate for week ${week}: ${r.orphanedPicks.join(', ')}.`
+        : ''
       setNotice({
-        tone: 'success',
-        text: `Provider "${nfl.name}" polled: ${r.changed} changed, ${r.skipped} unchanged.`,
+        tone: orphans ? 'error' : 'success',
+        text: `${r.provider}: ${parts.join(', ')}.${orphans}`,
       })
     } catch (err) {
       setNotice({
@@ -51,6 +61,19 @@ export function ResultsPanel() {
       setSyncing(false)
     }
   }
+
+  // While a game is actually being played, keep the scores fresh on their own.
+  // The ref keeps the interval stable without re-subscribing on every render;
+  // it is written in an effect because refs must not be touched during render.
+  const syncRef = useRef(sync)
+  useEffect(() => {
+    syncRef.current = sync
+  })
+  useEffect(() => {
+    if (!hasLiveGame || !nfl.syncResults) return
+    const id = window.setInterval(() => void syncRef.current(), 60_000)
+    return () => window.clearInterval(id)
+  }, [hasLiveGame, week, nfl])
 
   return (
     <div className="space-y-4">
@@ -70,11 +93,17 @@ export function ResultsPanel() {
             </option>
           ))}
         </Select>
-        <span className="text-sm text-ink-400">Source: {nfl.name}</span>
+        <span className="text-sm text-ink-400">
+          {weekSource === 'provider'
+            ? 'Schedule and scores are live from ESPN.'
+            : weekSource === 'manual'
+              ? 'Schedule entered by hand.'
+              : 'Placeholder schedule — sync to load the real fixtures and live scores.'}
+        </span>
         {nfl.syncResults && (
           <Button variant="secondary" size="sm" onClick={() => void sync()} disabled={syncing}>
             <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} aria-hidden="true" />{' '}
-            Sync results now
+            {weekSource === 'provider' ? 'Refresh live scores' : 'Load real schedule & scores'}
           </Button>
         )}
       </div>

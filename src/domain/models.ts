@@ -156,11 +156,16 @@ export const NFLTeamSchema = z.object({
 })
 export type NFLTeam = z.infer<typeof NFLTeamSchema>
 
+/** Where a week's schedule came from, so the UI never implies invented data is real. */
+export const ScheduleSourceSchema = z.enum(['synthetic', 'provider', 'manual'])
+export type ScheduleSource = z.infer<typeof ScheduleSourceSchema>
+
 export const NFLWeekSchema = z.object({
   seasonYear: z.number().int(),
   week: WeekNumberSchema,
   label: z.string(),
   byeTeamIds: z.array(TeamIdSchema),
+  source: ScheduleSourceSchema.default('synthetic'),
 })
 export type NFLWeek = z.infer<typeof NFLWeekSchema>
 

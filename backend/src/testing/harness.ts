@@ -48,7 +48,13 @@ export class FakeProvider implements ExternalNFLProvider {
   set(week: number, games: NFLGame[], byeTeamIds: string[] = []) {
     this.weeks[week] = {
       games,
-      week: { seasonYear: games[0]?.seasonYear ?? 2026, week, label: `Week ${week}`, byeTeamIds },
+      week: {
+        seasonYear: games[0]?.seasonYear ?? 2026,
+        week,
+        label: `Week ${week}`,
+        byeTeamIds,
+        source: 'provider',
+      },
     }
   }
 }

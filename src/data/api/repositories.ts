@@ -193,7 +193,15 @@ export function createApiNFLProvider(http: HttpClient): NFLDataProvider {
     syncResults: (year, week) =>
       http.request(`/nfl/${year}/weeks/${week}/sync`, {
         method: 'POST',
-        schema: z.object({ changed: z.number(), skipped: z.number() }),
+        schema: z.object({
+          changed: z.number(),
+          skipped: z.number(),
+          created: z.number().default(0),
+          relinkedPicks: z.number().default(0),
+          orphanedPicks: z.array(z.string()).default([]),
+          provider: z.string().default('provider'),
+          observedAt: z.iso.datetime({ offset: true }).default(new Date(0).toISOString()),
+        }),
       }),
     putSchedule: (year, week, games) =>
       http.request(`/nfl/${year}/weeks/${week}/games`, {

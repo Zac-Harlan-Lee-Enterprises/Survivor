@@ -24,12 +24,3 @@ export function toResultUpdates(games: NFLGame[], observedAt: string): GameResul
   }))
 }
 
-/** Deterministic, provider-independent game id. Picks reference this, so switching providers never orphans a pick. */
-export function gameIdFor(
-  seasonYear: number,
-  week: number,
-  awayTeamId: string,
-  homeTeamId: string,
-): string {
-  return `${seasonYear}-w${String(week).padStart(2, '0')}-${awayTeamId}-at-${homeTeamId}`
-}

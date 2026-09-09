@@ -1,5 +1,6 @@
 import {
   applyGameResult,
+  applyGameResults,
   evaluateSeason,
   redactPicks,
   redactSnapshot,
@@ -20,6 +21,7 @@ import {
   type Season,
   type SeasonDecision,
   type SeasonSnapshot,
+  type GameResultUpdate,
 } from '@/domain'
 import {
   DataError,
@@ -34,6 +36,7 @@ import {
   type SubmitPickInput,
   type SubmitPickResult,
 } from '../interfaces'
+import { createEspnClient, type EspnClient } from '../nfl/espnClient'
 import type { DemoStore } from './store'
 
 /**
@@ -516,11 +519,14 @@ export function createDemoPickRepository(ctx: Ctx): PickRepository {
   }
 }
 
-export function createDemoNFLProvider(ctx: Ctx): NFLDataProvider {
+export function createDemoNFLProvider(
+  ctx: Ctx,
+  espn: EspnClient = createEspnClient(),
+): NFLDataProvider {
   const { store } = ctx
   const games = () => store.snapshot().games
   return {
-    name: 'demo-synthetic',
+    name: 'ESPN public scoreboard',
     async getTeams(): Promise<NFLTeam[]> {
       return [...NFL_TEAMS]
     },
@@ -558,9 +564,108 @@ export function createDemoNFLProvider(ctx: Ctx): NFLDataProvider {
       }
       return outcome.game
     },
-    async syncResults() {
-      // The synthetic provider has nothing external to poll.
-      return { changed: 0, skipped: 0 }
+    /**
+     * Pulls the real schedule and live scores for one week straight from ESPN
+     * (the browser can call it: the endpoint sends `access-control-allow-origin: *`).
+     *
+     * The seeded schedule is a placeholder, so the first sync for a week
+     * REPLACES it with the real slate and re-points that week's picks at the
+     * real games by team — otherwise a pick would reference a game id that no
+     * longer exists and would read as "no game" forever.
+     *
+     * Re-syncing is idempotent: unchanged games are skipped, and a result the
+     * commissioner entered by hand is never overwritten (applyGameResults
+     * enforces both).
+     */
+    async syncResults(seasonYear, week) {
+      const parsed = await espn.fetchWeek(seasonYear, week)
+      const at = ctx.clock.now().toISOString()
+      const snap = store.snapshot()
+      const weekRow = snap.weeks.find((w) => w.seasonYear === seasonYear && w.week === week)
+      const wasPlaceholder = weekRow?.source !== 'provider'
+      const existing = snap.games.filter((g) => g.seasonYear === seasonYear && g.week === week)
+
+      // Base games to merge onto: the real ones we already hold, plus any the
+      // provider is reporting for the first time (inserted as scheduled so the
+      // result pass below applies scores through the idempotent path).
+      const byId = new Map(wasPlaceholder ? [] : existing.map((g) => [g.id, g]))
+      let created = 0
+      for (const g of parsed.games) {
+        if (byId.has(g.id)) continue
+        byId.set(g.id, {
+          ...g,
+          status: 'scheduled',
+          homeScore: undefined,
+          awayScore: undefined,
+          winnerTeamId: undefined,
+          resultVersion: 0,
+          resultSource: undefined,
+        })
+        created += 1
+      }
+
+      const updates: GameResultUpdate[] = parsed.games.map((g) => ({
+        gameId: g.id,
+        status: g.status,
+        homeScore: g.homeScore,
+        awayScore: g.awayScore,
+        winnerTeamId: g.status === 'final' ? (g.winnerTeamId ?? undefined) : undefined,
+        kickoffAt: g.kickoffAt,
+        source: 'provider',
+        observedAt: at,
+      }))
+      const merged = applyGameResults([...byId.values()], updates)
+
+      // Re-point this week's picks at the real games, by team.
+      const gameForTeam = (teamId: string) =>
+        merged.games.find((g) => g.homeTeamId === teamId || g.awayTeamId === teamId) ?? null
+      let relinkedPicks = 0
+      const orphanedPicks: string[] = []
+      for (const pick of snap.picks.filter((p) => p.week === week)) {
+        const game = gameForTeam(pick.teamId)
+        if (!game) {
+          const name =
+            snap.profiles.find((pr) => pr.playerId === pick.playerId)?.displayName ?? pick.playerId
+          orphanedPicks.push(`${name} (${pick.teamId})`)
+        } else if (game.id !== pick.gameId) {
+          relinkedPicks += 1
+        }
+      }
+
+      store.update((d) => {
+        d.snapshot.games = [
+          ...d.snapshot.games.filter((g) => !(g.seasonYear === seasonYear && g.week === week)),
+          ...merged.games,
+        ]
+        const i = d.snapshot.weeks.findIndex((w) => w.seasonYear === seasonYear && w.week === week)
+        if (i >= 0) d.snapshot.weeks[i] = parsed.week
+        else d.snapshot.weeks.push(parsed.week)
+        for (const pick of d.snapshot.picks) {
+          if (pick.week !== week) continue
+          const game = merged.games.find(
+            (g) => g.homeTeamId === pick.teamId || g.awayTeamId === pick.teamId,
+          )
+          if (game && game.id !== pick.gameId) pick.gameId = game.id
+        }
+      })
+
+      const viewer = ctx.viewer()
+      store.audit({
+        at,
+        actorPlayerId: viewer.playerId,
+        type: 'results.synced',
+        summary: `Week ${week} synced from ${parsed.week.source === 'provider' ? 'ESPN' : 'the provider'}: ${merged.changed.length} changed, ${created} added${relinkedPicks ? `, ${relinkedPicks} picks re-linked` : ''}`,
+      })
+
+      return {
+        changed: merged.changed.length,
+        skipped: merged.skipped.length,
+        created,
+        relinkedPicks,
+        orphanedPicks,
+        provider: 'ESPN public scoreboard',
+        observedAt: at,
+      }
     },
     async putSchedule(seasonYear, week, incoming) {
       const actor = requireCommissioner(ctx)
@@ -598,6 +703,7 @@ export function createDemoNFLProvider(ctx: Ctx): NFLDataProvider {
           week,
           label: `Week ${week}`,
           byeTeamIds: NFL_TEAMS.map((t) => t.id).filter((t) => !playing.has(t)),
+          source: 'manual' as const,
         }
         if (i >= 0) d.snapshot.weeks[i] = weekRow
         else d.snapshot.weeks.push(weekRow)

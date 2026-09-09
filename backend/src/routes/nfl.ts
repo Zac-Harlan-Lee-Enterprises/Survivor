@@ -66,6 +66,7 @@ export function registerNflRoutes(router: Router): void {
       week,
       label: `Week ${week}`,
       byeTeamIds: ALL_TEAM_IDS.filter((t) => !playing.has(t)),
+      source: 'manual',
     })
     await audit(
       ctx,

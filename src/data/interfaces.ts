@@ -135,6 +135,26 @@ export interface PickRepository {
   importPicks(seasonId: string, picks: Pick[], reason: string): Promise<{ imported: number }>
 }
 
+/** What one live-score sync did. */
+export interface SyncSummary {
+  /** Games whose score or status moved. */
+  changed: number
+  /** Games the provider reported that were already up to date. */
+  skipped: number
+  /** Games added because this week had no provider schedule yet. */
+  created: number
+  /** Picks re-pointed at the real game after replacing a placeholder schedule. */
+  relinkedPicks: number
+  /**
+   * Picks whose team does not appear in the provider's slate for that week —
+   * surfaced, never silently dropped.
+   */
+  orphanedPicks: string[]
+  /** Where the data came from, for display. */
+  provider: string
+  observedAt: string
+}
+
 export interface GameResultInput {
   gameId: string
   status: NFLGame['status']
@@ -153,8 +173,8 @@ export interface NFLDataProvider {
   getFinalResults(seasonYear: number, week: number): Promise<NFLGame[]>
   /** Commissioner manual-result fallback (also used when the provider is down). */
   recordManualResult?(input: GameResultInput, reason: string): Promise<NFLGame>
-  /** Ask the backend to poll the external provider now. */
-  syncResults?(seasonYear: number, week: number): Promise<{ changed: number; skipped: number }>
+  /** Pull the live schedule and scores for one week from the provider. */
+  syncResults?(seasonYear: number, week: number): Promise<SyncSummary>
   /** Commissioner enters/replaces one week's schedule by hand (provider outage or manual mode). */
   putSchedule?(seasonYear: number, week: number, games: NFLGame[]): Promise<{ saved: number }>
 }

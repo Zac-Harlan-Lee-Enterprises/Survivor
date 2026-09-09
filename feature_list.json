@@ -218,9 +218,18 @@
   {
     "id": "api-espn-parser-and-manual-fallback",
     "category": "functional",
-    "description": "The ESPN scoreboard parser maps events to provider-independent games (skipping unknown teams); commissioners can enter schedules/results manually when the provider is down (503 surfaced).",
+    "description": "The Lambda results sync uses the SAME domain ESPN parser as the browser (skipping unknown teams rather than guessing); commissioners can enter schedules/results manually when the provider is down (503 surfaced).",
     "verification": "npx vitest run backend/src/sync.test.ts",
     "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "nfl-live-scores-espn",
+    "category": "functional",
+    "description": "Live schedule and scores come from ESPN's public scoreboard for the correct week. The parser is shared by the browser and the Lambda; the first sync replaces the placeholder slate and re-links picks to the real fixtures by team; re-syncing is idempotent and never overwrites a commissioner result. NOTE: the live browser call cannot be exercised in CI (no outbound network), so the request shape and failure paths are covered with a stubbed fetch and the parser against a real captured payload.",
+    "verification": "npx vitest run src/domain/nfl src/data/nfl src/data/demo/sync.test.ts --reporter=dot",
+    "priority": 1,
     "hermetic": true,
     "passes": true
   },
@@ -295,7 +304,9 @@
     "priority": 2,
     "hermetic": true,
     "passes": true,
-    "depends_on": ["build-static-output"]
+    "depends_on": [
+      "build-static-output"
+    ]
   },
   {
     "id": "e2e-pages-subpath-refresh",
@@ -422,6 +433,8 @@
     "priority": 3,
     "hermetic": false,
     "passes": false,
-    "depends_on": ["connected-mode-deployed"]
+    "depends_on": [
+      "connected-mode-deployed"
+    ]
   }
 ]

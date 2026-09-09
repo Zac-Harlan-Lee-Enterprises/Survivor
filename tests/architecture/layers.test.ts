@@ -95,18 +95,27 @@ describe('domain layer is pure', () => {
   })
 })
 
-describe('network access is confined to the API client', () => {
-  it('fetch()/XMLHttpRequest/axios appear only in src/data/api/http.ts', () => {
+describe('network access is confined to declared network modules', () => {
+  /**
+   * Exactly two modules may talk to the network, each owning one upstream:
+   *   - src/data/api/http.ts       our AWS API (auth headers, DataError mapping)
+   *   - src/data/nfl/espnClient.ts the public ESPN scoreboard (no auth, CORS-open)
+   * Keeping them explicit means every network failure maps to one error type
+   * and every caller can be stubbed in tests.
+   */
+  const NETWORK_MODULES = ['src/data/api/http.ts', 'src/data/nfl/espnClient.ts']
+
+  it('fetch()/XMLHttpRequest/axios appear only in the declared network modules', () => {
     const problems: string[] = []
     for (const file of SRC) {
       const r = rel(file)
-      if (r === 'src/data/api/http.ts' || /\.test\.tsx?$/.test(r)) continue
+      if (NETWORK_MODULES.includes(r) || /\.test\.tsx?$/.test(r)) continue
       const src = readFileSync(file, 'utf8')
         .replace(/\/\/.*$/gm, '')
         .replace(/\/\*[\s\S]*?\*\//g, '')
       if (/\bfetch\s*\(|XMLHttpRequest|from ['"]axios['"]/.test(src)) {
         problems.push(
-          `\nFAIL  ${r} performs a network call directly\n      Why: one HTTP module means one place for auth headers, error mapping and response validation — and one place to mock.\n      Fix: add a typed method to src/data/api/repositories.ts that uses the HttpClient from src/data/api/http.ts.\n`,
+          `\nFAIL  ${r} performs a network call directly\n      Why: network calls live in declared modules (${NETWORK_MODULES.join(', ')}) so errors map to one type and callers stay mockable.\n      Fix: add a typed method to src/data/api/repositories.ts (our API) or src/data/nfl/espnClient.ts (ESPN), and call that.\n`,
         )
       }
     }

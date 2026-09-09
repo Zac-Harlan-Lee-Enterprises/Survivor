@@ -3393,25 +3393,29 @@
       "seasonYear": 2026,
       "week": 1,
       "label": "Week 1",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
       "week": 2,
       "label": "Week 2",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
       "week": 3,
       "label": "Week 3",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
       "week": 4,
       "label": "Week 4",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
@@ -3422,7 +3426,8 @@
         "PIT",
         "HOU",
         "SEA"
-      ]
+      ],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
@@ -3433,7 +3438,8 @@
         "LAC",
         "CLE",
         "NYJ"
-      ]
+      ],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
@@ -3444,7 +3450,8 @@
         "NYG",
         "SF",
         "DAL"
-      ]
+      ],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
@@ -3455,7 +3462,8 @@
         "IND",
         "CHI",
         "PHI"
-      ]
+      ],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
@@ -3466,7 +3474,8 @@
         "ARI",
         "TB",
         "NO"
-      ]
+      ],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
@@ -3477,7 +3486,8 @@
         "TEN",
         "LAR",
         "NE"
-      ]
+      ],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
@@ -3488,7 +3498,8 @@
         "DET",
         "KC",
         "BAL"
-      ]
+      ],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
@@ -3499,43 +3510,50 @@
         "MIA",
         "LV",
         "DEN"
-      ]
+      ],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
       "week": 13,
       "label": "Week 13",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
       "week": 14,
       "label": "Week 14",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
       "week": 15,
       "label": "Week 15",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
       "week": 16,
       "label": "Week 16",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
       "week": 17,
       "label": "Week 17",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     },
     {
       "seasonYear": 2026,
       "week": 18,
       "label": "Week 18",
-      "byeTeamIds": []
+      "byeTeamIds": [],
+      "source": "synthetic"
     }
   ],
   "gameOverrides": [],

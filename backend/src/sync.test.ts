@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { NFLGame } from '@domain/index'
 import { kickoffFor, scenario } from '@domain/testing/scenario'
-import { parseScoreboard } from './providers'
 import { syncActiveSeasons, syncWeek } from './sync'
 import { createHarness } from './testing/harness'
 
@@ -155,70 +154,5 @@ describe('result sync', () => {
       body: { games: [games[0], { ...games[1], awayTeamId: 'CHI' }] },
     })
     expect(dup.status).toBe(400)
-  })
-})
-
-describe('ESPN scoreboard parser', () => {
-  it('maps events to provider-independent games, skipping unknown teams', () => {
-    const data = {
-      events: [
-        {
-          id: '401',
-          date: '2026-09-13T17:00Z',
-          status: { type: { name: 'STATUS_FINAL', completed: true } },
-          competitions: [
-            {
-              date: '2026-09-13T17:00Z',
-              competitors: [
-                { homeAway: 'home', score: '27', winner: true, team: { abbreviation: 'GB' } },
-                { homeAway: 'away', score: '20', winner: false, team: { abbreviation: 'CHI' } },
-              ],
-            },
-          ],
-        },
-        {
-          id: '402',
-          date: '2026-09-14T00:20Z',
-          status: { type: { name: 'STATUS_SCHEDULED' } },
-          competitions: [
-            {
-              competitors: [
-                { homeAway: 'home', team: { abbreviation: 'WSH' } },
-                { homeAway: 'away', team: { abbreviation: 'LAR' } },
-              ],
-            },
-          ],
-        },
-        {
-          id: '403',
-          date: '2026-09-14T00:20Z',
-          status: { type: { name: 'STATUS_POSTPONED' } },
-          competitions: [
-            {
-              competitors: [
-                { homeAway: 'home', team: { abbreviation: '???' } },
-                { homeAway: 'away', team: { abbreviation: 'MIA' } },
-              ],
-            },
-          ],
-        },
-      ],
-    }
-    const { games, week } = parseScoreboard(data, 2026, 1, '2026-09-14T04:00:00.000Z')
-    expect(games).toHaveLength(2)
-    expect(games[0]).toMatchObject({
-      id: '2026-w01-CHI-at-GB',
-      status: 'final',
-      homeScore: 27,
-      awayScore: 20,
-      winnerTeamId: 'GB',
-      kickoffAt: '2026-09-13T17:00:00.000Z',
-    })
-    expect(games[1]).toMatchObject({
-      id: '2026-w01-LAR-at-WAS',
-      homeTeamId: 'WAS',
-      status: 'scheduled',
-    })
-    expect(week.byeTeamIds).toHaveLength(28)
   })
 })

@@ -199,6 +199,7 @@ export class ScenarioBuilder {
         week: w,
         label: `Week ${w}`,
         byeTeamIds: ALL_TEAM_IDS.filter((t) => !playing.has(t)),
+        source: 'synthetic',
       })
     }
     return {

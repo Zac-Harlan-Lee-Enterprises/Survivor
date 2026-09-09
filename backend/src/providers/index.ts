@@ -3,7 +3,6 @@ import { createEspnProvider } from './espn'
 import type { ExternalNFLProvider } from './types'
 
 export * from './types'
-export { parseScoreboard } from './espn'
 
 /**
  * Manual mode: no external polling at all. Schedules and results are entered
