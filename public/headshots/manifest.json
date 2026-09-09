@@ -65,6 +65,17 @@
       "medium": "headshots/jared-marks-medium.webp"
     }
   },
+  "jason-snook": {
+    "from": "JasonSnook.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 24972,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/jason-snook-thumb.webp",
+      "medium": "headshots/jason-snook-medium.webp"
+    }
+  },
   "joseph-tomczuk": {
     "from": "JosephTomczuk.jpeg",
     "contentType": "image/webp",

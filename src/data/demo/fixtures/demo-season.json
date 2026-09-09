@@ -164,6 +164,15 @@
       "joinedAt": "2026-08-15T14:00:00.000Z"
     },
     {
+      "id": "m-jason-snook",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "jason-snook",
+      "role": "player",
+      "status": "active",
+      "joinedAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
       "id": "m-zac-harlan",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -248,6 +257,11 @@
       "playerId": "melanie-moeller",
       "displayName": "Melanie Moeller",
       "imageId": "img-melanie-moeller"
+    },
+    {
+      "playerId": "jason-snook",
+      "displayName": "Jason Snook",
+      "imageId": "img-jason-snook"
     },
     {
       "playerId": "zac-harlan",
@@ -435,6 +449,19 @@
       "variants": {
         "thumb": "headshots/melanie-moeller-thumb.webp",
         "medium": "headshots/melanie-moeller-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-jason-snook",
+      "playerId": "jason-snook",
+      "contentType": "image/webp",
+      "sizeBytes": 24972,
+      "width": 400,
+      "height": 400,
+      "variants": {
+        "thumb": "headshots/jason-snook-thumb.webp",
+        "medium": "headshots/jason-snook-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },
@@ -649,6 +676,19 @@
       "source": "import"
     },
     {
+      "id": "pick-jason-snook-1",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "jason-snook",
+      "week": 1,
+      "teamId": "JAX",
+      "gameId": "2026-w01-CLE-at-JAX",
+      "submittedAt": "2026-09-12T07:00:00.000Z",
+      "updatedAt": "2026-09-12T07:00:00.000Z",
+      "version": 1,
+      "source": "import"
+    },
+    {
       "id": "pick-zac-harlan-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -656,8 +696,8 @@
       "week": 1,
       "teamId": "LAC",
       "gameId": "2026-w01-ARI-at-LAC",
-      "submittedAt": "2026-09-12T10:25:00.000Z",
-      "updatedAt": "2026-09-12T10:25:00.000Z",
+      "submittedAt": "2026-09-10T19:25:00.000Z",
+      "updatedAt": "2026-09-10T19:25:00.000Z",
       "version": 1,
       "source": "import"
     }
