@@ -317,7 +317,7 @@
     {
       "playerId": "paul-lim",
       "displayName": "Paul Lim",
-      "imageId": null
+      "imageId": "img-paul-lim"
     },
     {
       "playerId": "zac-harlan",
@@ -557,6 +557,19 @@
       "variants": {
         "thumb": "headshots/kc-walker-thumb.webp",
         "medium": "headshots/kc-walker-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-paul-lim",
+      "playerId": "paul-lim",
+      "contentType": "image/webp",
+      "sizeBytes": 23714,
+      "width": 400,
+      "height": 400,
+      "variants": {
+        "thumb": "headshots/paul-lim-thumb.webp",
+        "medium": "headshots/paul-lim-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },
