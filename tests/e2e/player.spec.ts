@@ -3,6 +3,7 @@ import {
   COMMISSIONER,
   PLAYER,
   resetDemo,
+  ROSTER_SIZE,
   setDemoClock,
   signInAs,
   SUNDAY_AFTERNOON,
@@ -15,7 +16,9 @@ test.describe('player workflow (demo mode, no backend)', () => {
 
   test('league home shows the whole roster alive with three lives in week 1', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/week 1/i)
-    await expect(page.getByRole('heading', { name: /still standing/i })).toContainText('9')
+    await expect(page.getByRole('heading', { name: /still standing/i })).toContainText(
+      String(ROSTER_SIZE),
+    )
     for (const name of [PLAYER, COMMISSIONER, 'Sheila Acker', 'Stacey Markendorff']) {
       await expect(page.getByRole('link', { name: new RegExp(name, 'i') }).first()).toBeVisible()
     }

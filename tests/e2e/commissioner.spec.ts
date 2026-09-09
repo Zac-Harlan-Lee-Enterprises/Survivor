@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { COMMISSIONER, PLAYER, resetDemo, setDemoClock, signInAs } from './helpers'
+import { COMMISSIONER, PLAYER, resetDemo, ROSTER_SIZE, setDemoClock, signInAs } from './helpers'
 
 test.describe('commissioner workflow (demo mode)', () => {
   test.beforeEach(async ({ page }) => {
@@ -21,7 +21,9 @@ test.describe('commissioner workflow (demo mode)', () => {
     await expect(page.getByRole('status')).toContainText(/jordan lee added with 3 lives/i)
 
     await page.goto('./')
-    await expect(page.getByRole('heading', { name: /still standing/i })).toContainText('10')
+    await expect(page.getByRole('heading', { name: /still standing/i })).toContainText(
+      String(ROSTER_SIZE + 1),
+    )
     await page.goto('./#/commissioner/audit')
     await expect(page.getByText(/jordan lee joined the league/i)).toBeVisible()
   })

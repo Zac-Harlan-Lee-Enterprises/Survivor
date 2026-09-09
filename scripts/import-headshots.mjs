@@ -26,7 +26,7 @@ const flag = (name, fallback) => {
 }
 const SRC = resolve(process.cwd(), flag('dir', 'photos'))
 const OUT = resolve(process.cwd(), 'public/headshots')
-const FIXTURE = resolve(process.cwd(), 'src/data/demo/fixtures/demo-season.json')
+const GENERATOR = resolve(process.cwd(), 'scripts/generate-demo-fixtures.ts')
 const DRY = args.includes('--dry-run')
 const VARIANTS = { thumb: 128, medium: 512 }
 const ACCEPTED = new Set(['.jpg', '.jpeg', '.png', '.webp'])
@@ -37,10 +37,29 @@ if (!existsSync(SRC)) {
 }
 
 // ---------------------------------------------------------------- matching --
-const roster = JSON.parse(readFileSync(FIXTURE, 'utf8')).profiles.map((p) => ({
-  playerId: p.playerId,
-  displayName: p.displayName,
-}))
+/**
+ * The roster comes from the GENERATOR, not the built fixture.
+ *
+ * Reading the fixture created a chicken-and-egg trap: a player added to the
+ * generator had no photo until the fixture was rebuilt, but the fixture could
+ * not attach a photo that had not been imported yet, so adding someone
+ * required generate → import → generate and reported their photo as unmatched
+ * in between. The generator is the source of truth for who is in the league.
+ */
+function readRoster() {
+  const src = readFileSync(GENERATOR, 'utf8')
+  const block = src.slice(src.indexOf('const PEOPLE: Person[] = ['), src.indexOf('/** [team, outcome]'))
+  const people = [...block.matchAll(/id:\s*'([^']+)',\s*name:\s*'([^']+)'/g)].map((m) => ({
+    playerId: m[1],
+    displayName: m[2],
+  }))
+  if (people.length === 0) {
+    console.error(`Could not read the roster from ${GENERATOR}. Has the PEOPLE list changed shape?`)
+    process.exit(1)
+  }
+  return people
+}
+const roster = readRoster()
 const norm = (s) =>
   s
     .normalize('NFKD')

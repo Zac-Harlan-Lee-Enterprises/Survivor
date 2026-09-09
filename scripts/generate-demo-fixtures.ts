@@ -79,6 +79,7 @@ const PEOPLE: Person[] = [
   { id: 'stacey-markendorff', name: 'Stacey Markendorff', role: 'player' },
   { id: 'sheila-acker', name: 'Sheila Acker', role: 'player' },
   { id: 'dominic-green', name: 'Dominic Green', role: 'player' },
+  { id: 'tracy-nelson', name: 'Tracy Nelson', role: 'player' },
   // Commissioner: runs the league and holds the admin tools.
   { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner' },
 ]
@@ -97,6 +98,8 @@ const STORY: Story = {
   'stacey-markendorff': { 1: ['LAC', 'P'] },
   'sheila-acker': { 1: ['SEA', 'P'] },
   'dominic-green': { 1: ['BAL', 'P'] },
+  // Same team as Sheila Acker — different players may ride the same team.
+  'tracy-nelson': { 1: ['SEA', 'P'] },
   'zac-harlan': { 1: ['LAC', 'P'] },
 }
 

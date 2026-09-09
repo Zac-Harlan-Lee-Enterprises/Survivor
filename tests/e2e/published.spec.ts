@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { ROSTER_SIZE } from './helpers'
 
 /**
  * The bundle exactly as GitHub Pages serves it.
@@ -17,7 +18,9 @@ test.describe('published site offers no way to pick', () => {
 
   test('the league still reads correctly', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/week \d+/i)
-    await expect(page.getByRole('heading', { name: /still standing/i })).toContainText('9')
+    await expect(page.getByRole('heading', { name: /still standing/i })).toContainText(
+      String(ROSTER_SIZE),
+    )
     await expect(page.getByRole('img', { name: /headshot of maya israel/i }).first()).toBeVisible()
     // Read-only pages remain reachable.
     for (const [name, path] of [

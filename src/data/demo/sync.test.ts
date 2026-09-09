@@ -20,6 +20,15 @@ const base = () => SeasonSnapshotSchema.parse(fixture)
 
 /** The real week 1 games the seeded picks depend on. */
 const realWeek1 = () => base().games.filter((g) => g.week === WEEK)
+/** Derived, so adding a player to the league does not break these tests. */
+const week1PickCount = () => base().picks.filter((p) => p.week === WEEK).length
+const playersOn = (teamId: string) =>
+  base()
+    .picks.filter((p) => p.week === WEEK && p.teamId === teamId)
+    .map((p) => {
+      const name = base().profiles.find((pr) => pr.playerId === p.playerId)?.displayName
+      return `${name} (${teamId})`
+    })
 
 function withScores(games: NFLGame[], edits: Record<string, Partial<NFLGame>>): NFLGame[] {
   return games.map((g) => (edits[g.id] ? { ...g, ...edits[g.id] } : g))
@@ -198,7 +207,7 @@ describe('demo live-score sync — league still on a placeholder schedule', () =
 
     const r = await h.provider.syncResults!(SEASON, WEEK)
     expect(r.created).toBe(realWeek1().length)
-    expect(r.relinkedPicks).toBe(9)
+    expect(r.relinkedPicks).toBe(week1PickCount())
     expect(r.orphanedPicks).toEqual([])
 
     const snap = h.store.snapshot()
@@ -215,6 +224,7 @@ describe('demo live-score sync — league still on a placeholder schedule', () =
     const partial = realWeek1().filter((g) => g.homeTeamId !== 'SEA' && g.awayTeamId !== 'SEA')
     const h = harness(partial, placeholderSnapshot())
     const r = await h.provider.syncResults!(SEASON, WEEK)
-    expect(r.orphanedPicks).toEqual(['Sheila Acker (SEA)'])
+    // Everyone riding the Seahawks is reported, not silently dropped.
+    expect(r.orphanedPicks.sort()).toEqual(playersOn('SEA').sort())
   })
 })

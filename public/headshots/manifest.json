@@ -35,9 +35,9 @@
   "maya-israel": {
     "from": "MayaIsrael.jpeg",
     "contentType": "image/webp",
-    "sizeBytes": 49542,
-    "width": 512,
-    "height": 512,
+    "sizeBytes": 55138,
+    "width": 480,
+    "height": 480,
     "variants": {
       "thumb": "headshots/maya-israel-thumb.webp",
       "medium": "headshots/maya-israel-medium.webp"
@@ -85,6 +85,17 @@
     "variants": {
       "thumb": "headshots/stacey-markendorff-thumb.webp",
       "medium": "headshots/stacey-markendorff-medium.webp"
+    }
+  },
+  "tracy-nelson": {
+    "from": "TracyNelson.jpg",
+    "contentType": "image/webp",
+    "sizeBytes": 54606,
+    "width": 512,
+    "height": 512,
+    "variants": {
+      "thumb": "headshots/tracy-nelson-thumb.webp",
+      "medium": "headshots/tracy-nelson-medium.webp"
     }
   },
   "zac-harlan": {

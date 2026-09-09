@@ -1,9 +1,10 @@
+import { readFileSync } from 'node:fs'
 import type { Page } from '@playwright/test'
 
 /**
  * Demo-mode helpers. The demo clock is pinned (see src/data/demo/clock.ts) to
- * the Wednesday before week 1, so every run starts from the same state: all
- * nine picks in, nothing kicked off, everyone holding three lives.
+ * the Wednesday before week 1, so every run starts from the same state: every
+ * pick in, nothing kicked off, everyone holding three lives.
  */
 
 /**
@@ -33,6 +34,19 @@ export async function setDemoClock(page: Page, utcMinute: string): Promise<void>
   await page.getByLabel('Now (UTC)').fill(utcMinute)
   await page.getByRole('button', { name: /set clock/i }).click()
 }
+
+/**
+ * Derived from the seeded fixture rather than hard-coded: adding a player to
+ * the league should not require editing a pile of specs.
+ *
+ * Read from disk rather than imported: these specs run in Node, where a JSON
+ * import needs an import attribute, and the file is data anyway.
+ */
+const fixture = JSON.parse(
+  readFileSync(new URL('../../src/data/demo/fixtures/demo-season.json', import.meta.url), 'utf8'),
+) as { memberships: { status: string }[] }
+
+export const ROSTER_SIZE = fixture.memberships.filter((m) => m.status === 'active').length
 
 export const PLAYER = 'Maya Israel'
 export const COMMISSIONER = 'Zac Harlan'
