@@ -116,3 +116,16 @@ BLOCKED: none.
 NOTE   : Playwright TRIMS a hasText string, so filter({hasText: ' at '}) also matched "Patriots"
          in the bye list and inflated a count by one. Use a regex (/\sat\s/) when the surrounding
          whitespace is the point.
+
+--- 2026-09-09  Claude (feat/add-five-players) ---
+DONE   : Added Chloe Bourque (JAX), Jared Marks (LAC), Joseph Tomczuk (JAX), Corey Cowell (PIT)
+         and Melanie Moeller (LAC). League is 16. Four photos imported; Chloe has none yet and
+         falls back to the neutral default avatar.
+         Relaxed the 'headshots-real-photos' registry check, which asserted every profile had an
+         image — stricter than its own description and a blocker for any new player before their
+         photo arrives. It now asserts every image is a real WebP and no profile points at a
+         missing image; proved by injecting a dangling reference.
+TESTS  : vitest 189 passing, playwright 81 passing / 2 skipped, npm run validate green,
+         quality-sweep clean. No spec needed editing (roster size is fixture-derived).
+NEXT   : Open/merge the PR. Branched off feat/week-selector, so merge PR #5 first.
+BLOCKED: none.
