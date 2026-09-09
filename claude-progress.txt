@@ -130,3 +130,10 @@ TESTS  : vitest 189 passing, playwright 81 passing / 2 skipped, npm run validate
          quality-sweep clean. No spec needed editing (roster size is fixture-derived).
 NEXT   : Open/merge the PR. Branched off feat/week-selector, so merge PR #5 first.
 BLOCKED: none.
+
+--- 2026-09-09  Claude (feat/add-paul-lim) ---
+DONE   : Added Paul Lim (JAX). League is 21. No photo yet, so he and Chloe Bourque both fall
+         back to the neutral default avatar.
+TESTS  : vitest 193 passing, playwright 81 passing / 2 skipped, validate green, sweep clean.
+NEXT   : Open/merge the PR.
+BLOCKED: none.
