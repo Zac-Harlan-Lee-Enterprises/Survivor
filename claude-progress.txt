@@ -174,3 +174,15 @@ DONE   : Added Allison Petty (DET) with her photo — fourth on the Lions. Leagu
 TESTS  : vitest 224 passing, playwright 89 passing / 2 skipped, validate green, sweep clean.
 NEXT   : Open/merge the PR.
 BLOCKED: none.
+
+--- 2026-09-09  Claude (feat/add-don-turner) ---
+DONE   : Added Don Turner (PIT) — second on the Steelers. League is 25. His square source had no
+         crop slack, so CROP_NUDGES gained an optional `zoom` (keep a smaller square centred on
+         a point). x/y were unified to mean the crop CENTRE as a fraction of the image; the two
+         existing entries were re-expressed and proved byte-identical. Don's medium variant is
+         200px, not 512 — zooming cannot invent detail.
+TESTS  : vitest 226 passing, playwright 89 passing / 2 skipped, validate green, sweep clean.
+NEXT   : Open/merge the PR.
+BLOCKED: none.
+NOTE   : cropNudges.test.ts caps the list at 3 entries and it is now full. A fourth is a
+         deliberate decision, not a routine edit — prefer a better original.
