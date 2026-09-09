@@ -9,6 +9,7 @@ import {
   createDemoPickRepository,
   createDemoPlayerRepository,
 } from './repositories'
+import { resetDemoStorageIfStale } from './seed'
 import { DemoStore } from './store'
 import fixture from './fixtures/demo-season.json'
 
@@ -20,6 +21,9 @@ export interface DemoOptions {
 export function createDemoServices(options: DemoOptions): Services {
   const storage = options.storage === undefined ? safeLocalStorage() : options.storage
   const snapshot = SeasonSnapshotSchema.parse(fixture)
+  // A reseeded fixture must win over whatever this browser saved last time,
+  // otherwise the app appears not to update no matter how often it restarts.
+  resetDemoStorageIfStale(snapshot, storage)
   const store = new DemoStore(snapshot, storage)
   const clock = createDemoClock(storage)
   const auth = createDemoAuth(store)

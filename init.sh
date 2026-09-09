@@ -30,26 +30,68 @@ ok()   { printf "\033[1;32m[ ok ]\033[0m %s\n" "$*"; }
 warn() { printf "\033[1;33m[warn]\033[0m %s\n" "$*" >&2; }
 die()  { printf "\033[1;31m[fail]\033[0m %s\n" "$*" >&2; exit 1; }
 
+# Processes LISTENING on a port. Plain `lsof -ti:PORT` also returns clients
+# with an open connection to it — an editor with port forwarding shows up that
+# way — which produced bogus "used by another process" warnings and pointless
+# kill attempts against innocent processes.
+listeners_on() {
+  lsof -ti:"$1" -sTCP:LISTEN 2>/dev/null || true
+}
+
 kill_port() {
   local port="$1" pids me
-  pids="$(lsof -ti:"$port" 2>/dev/null || true)"
+  pids="$(listeners_on "$port")"
   [[ -z "$pids" ]] && return 0
   me="${USER:-$(id -un)}"
-  # Only kill our OWN processes, and only ones that look like this project
-  # (vite / serve-static). Another app on the port is reported, never killed.
+  # Only ever kill OUR OWN processes that look like this project (vite /
+  # serve-static). Anything else on the port is reported, never killed.
   while IFS= read -r pid; do
     [[ -z "$pid" ]] && continue
     local owner cmdline
     owner="$(ps -o user= -p "$pid" 2>/dev/null || true)"
     cmdline="$(ps -o command= -p "$pid" 2>/dev/null || true)"
     if [[ "$owner" == "$me" ]] && [[ "$cmdline" == *vite* || "$cmdline" == *serve-static* ]]; then
-      log "Stopping stale $(basename "${cmdline%% *}") process on port $port (pid $pid)"
+      log "Stopping process on port $port (pid $pid)"
       kill "$pid" 2>/dev/null || true
     else
-      warn "Port $port is used by another process (pid $pid: ${cmdline:0:60}). Change build/ports.json if this is not ours."
+      warn "Port $port is held by another application (pid $pid: ${cmdline:0:60})."
+      warn "  Change the port in build/ports.json, or stop that application."
+      return 1
     fi
   done <<< "$pids"
-  sleep 0.5
+  wait_for_port_free "$port"
+}
+
+# Vite runs with --strictPort, so it refuses to start if the old server has not
+# actually let go yet. A blind `sleep` raced with that; poll instead, and
+# escalate to SIGKILL if a process ignores SIGTERM.
+wait_for_port_free() {
+  local port="$1" waited=0 pids
+  while (( waited < 100 )); do
+    pids="$(listeners_on "$port")"
+    [[ -z "$pids" ]] && return 0
+    if (( waited == 30 )); then
+      for pid in $pids; do
+        log "Port $port still held by pid $pid after SIGTERM — sending SIGKILL"
+        kill -9 "$pid" 2>/dev/null || true
+      done
+    fi
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+  die "Port $port did not free up. Inspect with: lsof -i:$port"
+}
+
+# The pid we recorded must be the process actually listening, or `--stop` will
+# kill the wrong thing and leave the server running.
+verify_pidfile() {
+  local name="$1" port="$2" recorded listening
+  recorded="$(cat ".pids/$name.pid" 2>/dev/null || echo '')"
+  listening="$(listeners_on "$port" | head -n1)"
+  if [[ -n "$listening" && "$recorded" != "$listening" ]]; then
+    warn "Recorded $name pid ($recorded) is not the listener ($listening) — correcting .pids/$name.pid"
+    echo "$listening" > ".pids/$name.pid"
+  fi
 }
 
 wait_for_url() {
@@ -82,8 +124,8 @@ if [[ "${1:-}" == "--stop" ]]; then
       rm -f "$pidfile"
     done
   fi
-  kill_port "$DEV_PORT"
-  kill_port "$PAGES_PORT"
+  kill_port "$DEV_PORT" || true
+  kill_port "$PAGES_PORT" || true
   ok "Stopped. Safe to re-run: bash init.sh"
   exit 0
 fi
@@ -110,8 +152,10 @@ mkdir -p .logs .pids
 # ---------------------------------------------------------------------------
 # 1. Kill stale processes on our ports
 # ---------------------------------------------------------------------------
-kill_port "$DEV_PORT"
-[[ "${1:-}" == "--with-pages" ]] && kill_port "$PAGES_PORT"
+kill_port "$DEV_PORT" || die "Cannot start: port $DEV_PORT is unavailable."
+# Always clear the preview port too. Leaving an old serve-static running there
+# would keep serving a PREVIOUS build, which reads as "my changes did nothing".
+kill_port "$PAGES_PORT" || warn "Leaving port $PAGES_PORT alone."
 
 # ---------------------------------------------------------------------------
 # 2. Dependencies (skip when lockfile is unchanged since last install)
@@ -157,10 +201,15 @@ fi
 # ---------------------------------------------------------------------------
 # 5. Start services
 # ---------------------------------------------------------------------------
+# Run the vite binary DIRECTLY rather than through npx. `npx vite` forks a
+# wrapper, so $! recorded the wrapper's pid while the real server ran as a
+# child — `--stop` then killed the wrapper and orphaned the actual listener.
 log "Starting Vite dev server (demo mode) on port $DEV_PORT"
-nohup npx vite --port "$DEV_PORT" --strictPort > .logs/dev.log 2>&1 &
+[[ -x node_modules/.bin/vite ]] || die "node_modules/.bin/vite missing — run: npm ci"
+nohup node_modules/.bin/vite --port "$DEV_PORT" --strictPort > .logs/dev.log 2>&1 &
 echo $! > .pids/dev.pid
 wait_for_url "$DEV_URL" "$HEALTH_TIMEOUT_SECS"
+verify_pidfile dev "$DEV_PORT"
 
 if [[ "${1:-}" == "--with-pages" ]]; then
   log "Building production bundle under $PAGES_BASE (GitHub Pages parity)"
@@ -168,6 +217,7 @@ if [[ "${1:-}" == "--with-pages" ]]; then
   nohup node scripts/serve-static.mjs --dir dist-e2e --base "$PAGES_BASE" --port "$PAGES_PORT" > .logs/pages.log 2>&1 &
   echo $! > .pids/pages.pid
   wait_for_url "$PAGES_URL" "$HEALTH_TIMEOUT_SECS"
+  verify_pidfile pages "$PAGES_PORT"
 fi
 
 # ---------------------------------------------------------------------------
@@ -179,5 +229,9 @@ echo "  Dev server (demo mode): $DEV_URL"
 [[ "${1:-}" == "--with-pages" ]] && echo "  Pages-like preview:     $PAGES_URL"
 echo "  Logs:                   ./.logs/"
 echo "  PIDs:                   ./.pids/"
+echo
+echo "  Demo data lives in your BROWSER (localStorage), not on the server."
+echo "  A reseeded fixture clears it automatically; to wipe it by hand use"
+echo "  Commissioner → Settings → Reset demo data, or a private window."
 echo
 echo "Next: bash agent-status.sh   (state)   ·   bash quality-sweep.sh   (drift)"
