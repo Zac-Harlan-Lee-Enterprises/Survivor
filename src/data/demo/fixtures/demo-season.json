@@ -110,6 +110,15 @@
       "joinedAt": "2026-08-15T14:00:00.000Z"
     },
     {
+      "id": "m-bradley-riedell",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "bradley-riedell",
+      "role": "player",
+      "status": "active",
+      "joinedAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
       "id": "m-zac-harlan",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -164,6 +173,11 @@
       "playerId": "tracy-nelson",
       "displayName": "Tracy Nelson",
       "imageId": "img-tracy-nelson"
+    },
+    {
+      "playerId": "bradley-riedell",
+      "displayName": "Bradley Riedell",
+      "imageId": "img-bradley-riedell"
     },
     {
       "playerId": "zac-harlan",
@@ -286,6 +300,19 @@
       "variants": {
         "thumb": "headshots/tracy-nelson-thumb.webp",
         "medium": "headshots/tracy-nelson-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-bradley-riedell",
+      "playerId": "bradley-riedell",
+      "contentType": "image/webp",
+      "sizeBytes": 30916,
+      "width": 512,
+      "height": 512,
+      "variants": {
+        "thumb": "headshots/bradley-riedell-thumb.webp",
+        "medium": "headshots/bradley-riedell-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },
@@ -422,6 +449,19 @@
       "source": "import"
     },
     {
+      "id": "pick-bradley-riedell-1",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "bradley-riedell",
+      "week": 1,
+      "teamId": "DET",
+      "gameId": "2026-w01-NO-at-DET",
+      "submittedAt": "2026-09-10T07:00:00.000Z",
+      "updatedAt": "2026-09-10T07:00:00.000Z",
+      "version": 1,
+      "source": "import"
+    },
+    {
       "id": "pick-zac-harlan-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -429,8 +469,8 @@
       "week": 1,
       "teamId": "LAC",
       "gameId": "2026-w01-ARI-at-LAC",
-      "submittedAt": "2026-09-10T10:25:00.000Z",
-      "updatedAt": "2026-09-10T10:25:00.000Z",
+      "submittedAt": "2026-09-10T12:25:00.000Z",
+      "updatedAt": "2026-09-10T12:25:00.000Z",
       "version": 1,
       "source": "import"
     }

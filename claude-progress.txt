@@ -93,3 +93,11 @@ BLOCKED: Merging still needs a branch-protection change only the repo owner can 
 NOTE   : The PreToolUse guard blocks any command whose TEXT contains a mutating gh api call,
          including documentation quoting one. Describe such fixes in prose, not as a pasteable
          command, or the note cannot be written.
+
+--- 2026-09-09  Claude (feat/add-bradley-riedell) ---
+DONE   : Bradley Riedell added (DET, week 1 — third player on the Lions, with Dave Johnson and
+         James Parker). Photo imported from photos/BradleyRiedell.jpeg. Roster now 11.
+TESTS  : vitest 184 passing, playwright 71 passing / 2 skipped, quality-sweep clean. No spec
+         needed editing: the fixture-derived roster size from the previous session held.
+NEXT   : Open/merge the PR for feat/add-bradley-riedell.
+BLOCKED: none.
