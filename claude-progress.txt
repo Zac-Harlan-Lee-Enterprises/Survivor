@@ -101,3 +101,18 @@ TESTS  : vitest 184 passing, playwright 71 passing / 2 skipped, quality-sweep cl
          needed editing: the fixture-derived roster size from the previous session held.
 NEXT   : Open/merge the PR for feat/add-bradley-riedell.
 BLOCKED: none.
+
+--- 2026-09-09  Claude (feat/week-selector) ---
+DONE   : Header week chip is now a select listing all 18 weeks; the league home slate follows it
+         and names the teams on bye for that week. Selection lives in the URL (?week=N), so it is
+         shareable and reload-safe, with a fallback to the current week for a bad value. The hero
+         still reports the live week. New pure domain fn teamsOnBye (derived from the schedule,
+         never stored). WeekSelect renders in the header on desktop and beside the slate heading
+         on mobile, so exactly one is visible at any width.
+TESTS  : vitest 189 passing (5 new for teamsOnBye), playwright 81 passing / 2 skipped (5 new in
+         week-select.spec.ts), quality-sweep clean, npm run validate green.
+NEXT   : Open/merge the PR for feat/week-selector.
+BLOCKED: none.
+NOTE   : Playwright TRIMS a hasText string, so filter({hasText: ' at '}) also matched "Patriots"
+         in the bye list and inflated a count by one. Use a regex (/\sat\s/) when the surrounding
+         whitespace is the point.
