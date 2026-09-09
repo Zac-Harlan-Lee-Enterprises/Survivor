@@ -196,3 +196,13 @@ DONE   : Added Phyllis Collins (SEA) and Wesley Childers (DET), both with photos
 TESTS  : vitest 226 passing, playwright 89 passing / 2 skipped, validate green, sweep clean.
 NEXT   : Open/merge the PR.
 BLOCKED: none.
+
+--- 2026-09-09  Claude (feat/league-message) ---
+DONE   : New LeagueMessage section between the hero and Still standing — a commissioner's note
+         to the whole league. Copy is editorial, keyed by week in NOTES; an unwritten week
+         renders nothing, so it cannot go stale. Week 1 note written.
+TESTS  : vitest 226 passing, playwright 93 passing / 2 skipped (new league-message.spec.ts
+         asserts DOM order hero -> note -> standings), validate green.
+NEXT   : Make the note commissioner-editable (settings panel + fixture field) if it is wanted
+         every week; right now writing one is a code change.
+BLOCKED: none.
