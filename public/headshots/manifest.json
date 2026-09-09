@@ -120,6 +120,17 @@
       "medium": "headshots/melanie-moeller-medium.webp"
     }
   },
+  "mike-lancaster": {
+    "from": "MikeLancaster.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 15900,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/mike-lancaster-thumb.webp",
+      "medium": "headshots/mike-lancaster-medium.webp"
+    }
+  },
   "nate-adams": {
     "from": "NateAdams.jpeg",
     "contentType": "image/webp",

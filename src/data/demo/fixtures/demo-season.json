@@ -182,6 +182,15 @@
       "joinedAt": "2026-08-15T14:00:00.000Z"
     },
     {
+      "id": "m-mike-lancaster",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "mike-lancaster",
+      "role": "player",
+      "status": "active",
+      "joinedAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
       "id": "m-zac-harlan",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -276,6 +285,11 @@
       "playerId": "matt-hadley",
       "displayName": "Matt Hadley",
       "imageId": "img-matt-hadley"
+    },
+    {
+      "playerId": "mike-lancaster",
+      "displayName": "Mike Lancaster",
+      "imageId": "img-mike-lancaster"
     },
     {
       "playerId": "zac-harlan",
@@ -489,6 +503,19 @@
       "variants": {
         "thumb": "headshots/matt-hadley-thumb.webp",
         "medium": "headshots/matt-hadley-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-mike-lancaster",
+      "playerId": "mike-lancaster",
+      "contentType": "image/webp",
+      "sizeBytes": 15900,
+      "width": 400,
+      "height": 400,
+      "variants": {
+        "thumb": "headshots/mike-lancaster-thumb.webp",
+        "medium": "headshots/mike-lancaster-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },
@@ -729,6 +756,19 @@
       "source": "import"
     },
     {
+      "id": "pick-mike-lancaster-1",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "mike-lancaster",
+      "week": 1,
+      "teamId": "SEA",
+      "gameId": "2026-w01-NE-at-SEA",
+      "submittedAt": "2026-09-07T17:20:00.000Z",
+      "updatedAt": "2026-09-07T17:20:00.000Z",
+      "version": 1,
+      "source": "import"
+    },
+    {
       "id": "pick-zac-harlan-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -736,8 +776,8 @@
       "week": 1,
       "teamId": "LAC",
       "gameId": "2026-w01-ARI-at-LAC",
-      "submittedAt": "2026-09-11T13:25:00.000Z",
-      "updatedAt": "2026-09-11T13:25:00.000Z",
+      "submittedAt": "2026-09-09T22:25:00.000Z",
+      "updatedAt": "2026-09-09T22:25:00.000Z",
       "version": 1,
       "source": "import"
     }
