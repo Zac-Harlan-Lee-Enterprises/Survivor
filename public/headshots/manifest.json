@@ -54,6 +54,17 @@
       "medium": "headshots/dominic-green-medium.webp"
     }
   },
+  "don-turner": {
+    "from": "DonTurner.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 14852,
+    "width": 200,
+    "height": 200,
+    "variants": {
+      "thumb": "headshots/don-turner-thumb.webp",
+      "medium": "headshots/don-turner-medium.webp"
+    }
+  },
   "james-parker": {
     "from": "JamesParker.jpg",
     "contentType": "image/webp",

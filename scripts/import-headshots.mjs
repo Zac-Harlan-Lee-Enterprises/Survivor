@@ -36,25 +36,30 @@ const VARIANTS = { thumb: 128, medium: 512 }
 /**
  * Per-player crop nudges, for the occasional photo the attention strategy
  * reads wrong. A wide landscape selfie is the usual culprit: a bright sky and
- * a busy horizon can outscore the face, leaving the person low in the frame
- * under a band of cloud.
+ * a busy horizon can outscore the face, leaving the person adrift in the frame.
  *
- * `y` positions the square down the source as a fraction of the leftover
- * height — 0 is flush to the top, 0.5 centred, 1 flush to the bottom. `x` does
- * the same across the width. A larger `y` moves the crop DOWN the photo, which
- * moves the subject UP in the finished headshot.
+ * `x` and `y` say where the CENTRE of the crop sits in the photo, as fractions
+ * of its width and height — 0.5, 0.5 is the middle. The crop is clamped to the
+ * edges, so a value that would hang off the side simply sits flush against it.
  *
- * Values are expressed against the image after EXIF rotation, so they mean
- * what they look like rather than however the camera happened to store it.
- * Anything not listed here uses the attention strategy, which is right nearly
- * always. Keep this list short: a better original beats a nudge.
+ * `zoom` keeps a square that fraction of the shorter edge (default 1, the
+ * largest square that fits). Use it when the face is small in a wide scene —
+ * moving a full-size square cannot help when the source is already square,
+ * because there is no slack to move it into.
+ *
+ * Values are read after EXIF rotation, so they mean what they look like rather
+ * than however the camera happened to store it. Anything not listed here uses
+ * the attention strategy, which is right nearly always. Keep this list short:
+ * a better original beats a nudge, and zooming cannot invent detail.
  */
 const CROP_NUDGES = {
   // Wide mountain selfie — the sky outscored his face.
-  'kc-walker': { y: 0.85 },
-  // Tall caricature: the head fills the frame, so any crop below the top
-  // slices it. Take the square from the very top of the source.
-  'tony-canody': { y: 0 },
+  'kc-walker': { y: 0.5874 },
+  // Tall caricature whose head fills the frame: anything lower slices the top.
+  'tony-canody': { y: 0.3769 },
+  // A square forest photo, so there is no slack to slide: his face is small and
+  // off to one side. Zoom in on it instead.
+  'don-turner': { zoom: 0.55, x: 0.62, y: 0.6 },
 }
 const ACCEPTED = new Set(['.jpg', '.jpeg', '.png', '.webp'])
 
@@ -165,10 +170,15 @@ for (const file of files) {
   const oriented = nudge ? await sharp(src).rotate().toBuffer({ resolveWithObject: true }) : null
   let square = null
   if (oriented) {
-    const edge = Math.min(oriented.info.width, oriented.info.height)
+    const { width, height } = oriented.info
+    const edge = Math.round(Math.min(width, height) * (nudge.zoom ?? 1))
+    // Clamped, so a centre near an edge yields a crop flush against it rather
+    // than one hanging off the picture.
+    const place = (centre, span) =>
+      Math.max(0, Math.min(span - edge, Math.round(span * centre - edge / 2)))
     square = {
-      left: Math.round((oriented.info.width - edge) * (nudge.x ?? 0.5)),
-      top: Math.round((oriented.info.height - edge) * (nudge.y ?? 0.5)),
+      left: place(nudge.x ?? 0.5, width),
+      top: place(nudge.y ?? 0.5, height),
       width: edge,
       height: edge,
     }
