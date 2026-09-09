@@ -16,20 +16,25 @@ import { useLeagueContext, useServices, useSession } from './hooks'
 import { Button } from '@/components/ui/button'
 import { Headshot } from '@/components/Headshot'
 import { cn } from '@/lib/cn'
+import { getConfig } from '@/config/env'
 
-const NAV = [
-  { to: '/', label: 'League', icon: Home, end: true },
-  { to: '/pick', label: 'Pick', icon: Zap },
-  { to: '/leaderboard', label: 'Board', icon: Trophy },
-  { to: '/grid', label: 'Grid', icon: Grid3X3 },
-  { to: '/me', label: 'Me', icon: User },
+const ALL_NAV = [
+  { to: '/', label: 'League', icon: Home, end: true, write: false },
+  { to: '/pick', label: 'Pick', icon: Zap, write: true },
+  { to: '/leaderboard', label: 'Board', icon: Trophy, write: false },
+  { to: '/grid', label: 'Grid', icon: Grid3X3, write: false },
+  { to: '/me', label: 'Me', icon: User, write: true },
 ]
 
 export function Layout() {
-  const { league, evaluation, viewer, profileOf, snapshot } = useLeagueContext()
+  const { league, evaluation, viewer, profileOf } = useLeagueContext()
   const services = useServices()
   const session = useSession()
   const location = useLocation()
+  // On a published demo build nobody's pick can reach anyone else, so every
+  // write affordance is hidden rather than offered and quietly ignored.
+  const { readOnly } = getConfig()
+  const NAV = ALL_NAV.filter((item) => !item.write || !readOnly)
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -45,7 +50,7 @@ export function Layout() {
       >
         Skip to content
       </a>
-      {services.mode === 'demo' && <DemoBanner synthetic={snapshot.season.isSynthetic} />}
+      {services.mode === 'demo' && !readOnly && <DemoBanner />}
       <header className="sticky top-0 z-30 border-b border-white/8 bg-pitch-900/85 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
           <NavLink
@@ -76,7 +81,7 @@ export function Layout() {
                 <Icon className="h-4 w-4" aria-hidden="true" /> {label}
               </NavLink>
             ))}
-            {viewer.isCommissioner && (
+            {viewer.isCommissioner && !readOnly && (
               <NavLink
                 to="/commissioner"
                 className={({ isActive }) =>
@@ -90,7 +95,7 @@ export function Layout() {
               </NavLink>
             )}
           </nav>
-          <div className="ml-auto flex items-center gap-2 md:ml-2">
+          <div className={cn('ml-auto flex items-center gap-2 md:ml-2', readOnly && 'hidden')}>
             {session && me ? (
               <>
                 <NavLink
@@ -140,7 +145,7 @@ export function Layout() {
         className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-pitch-900/95 backdrop-blur md:hidden"
         aria-label="Primary mobile"
       >
-        <ul className="grid grid-cols-5">
+        <ul className={cn('grid', NAV.length === 3 ? 'grid-cols-3' : 'grid-cols-5')}>
           {NAV.map(({ to, label, icon: Icon, end }) => (
             <li key={to}>
               <NavLink
@@ -159,7 +164,7 @@ export function Layout() {
             </li>
           ))}
         </ul>
-        {viewer.isCommissioner && (
+        {viewer.isCommissioner && !readOnly && (
           <NavLink
             to="/commissioner"
             className="block border-t border-white/10 py-1.5 text-center font-display text-[11px] font-bold uppercase tracking-widest text-gold-300"
@@ -172,14 +177,16 @@ export function Layout() {
   )
 }
 
-function DemoBanner({ synthetic }: { synthetic: boolean }) {
+/**
+ * Shown only where editing is actually possible: the commissioner's own
+ * machine. The published build has no write controls at all, so it needs no
+ * warning about them.
+ */
+function DemoBanner() {
   return (
     <div className="bg-sky-400/15 px-4 py-1.5 text-center text-xs text-sky-400" role="note">
-      <strong className="font-display uppercase tracking-widest">Demo mode</strong> —{' '}
-      {synthetic
-        ? 'the matchups and kickoff times are placeholders, not the real NFL schedule. '
-        : ''}
-      Changes are saved in this browser only, not shared with other users.
+      <strong className="font-display uppercase tracking-widest">Local commissioner mode</strong> —{' '}
+      edits are saved in this browser only. Export and commit the league to publish them.
     </div>
   )
 }

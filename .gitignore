@@ -39,3 +39,4 @@ docs/import-report.generated.md
 # Original full-resolution headshots. The derived variants in
 # public/headshots/ are what the app ships; originals stay local.
 photos/
+dist-e2e-readonly

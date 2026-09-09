@@ -6,6 +6,7 @@ A responsive React + TypeScript survivor-pool app that replaces the commissioner
 
 | Mode | Hosting | Data | Who it's for |
 |------|---------|------|--------------|
+| **Published** (what visitors see) | GitHub Pages | read-only scoreboard: real schedule, live scores, picks the commissioner has published | the league, on their phones |
 | **Demo / static** (default) | GitHub Pages only | real roster, real picks, the real NFL schedule, live scores from ESPN, localStorage overlay (this browser only, not shared) | running the league, sharing a link |
 | **Connected** | GitHub Pages + AWS (API Gateway, Lambda, DynamoDB, S3, Cognito) | authoritative, multi-user, audited | the real league |
 
@@ -32,7 +33,7 @@ bash init.sh --with-pages    # + production build served exactly like GitHub Pag
 bash init.sh --stop
 ```
 
-Sign in as any league member (no passwords in demo mode); **Zac Harlan** is the commissioner. The demo clock is pinned to the Wednesday before week 1, so the season always opens in the same state: every pick in, nothing kicked off. The commissioner's Settings tab can move the clock forward, and *Reset demo data* wipes localStorage.
+Running locally gives you the full commissioner experience: sign in as any league member (no passwords in demo mode), with **Zac Harlan** as commissioner. The **published** build hides every write control — no sign-in, no Pick tab, no make/change-pick buttons — because in demo mode a visitor's pick would only ever reach their own browser, and offering the button would make people think they had entered when they had not. Connected mode is interactive everywhere, because picks really are shared. The demo clock is pinned to the Wednesday before week 1, so the season always opens in the same state: every pick in, nothing kicked off. The commissioner's Settings tab can move the clock forward, and *Reset demo data* wipes localStorage.
 
 Headshots come from your own photos: drop one image per player into `photos/` (named after them) and run `npm run headshots:import`.
 

@@ -10,10 +10,12 @@ import { Countdown } from '@/components/Countdown'
 import { Button } from '@/components/ui/button'
 import { useConfetti } from '@/components/useConfetti'
 import { formatKickoff } from '@/lib/time'
+import { getConfig } from '@/config/env'
 import { cn } from '@/lib/cn'
 
 export function LeagueHome() {
   const tz = useLeagueTimeZone()
+  const { readOnly } = getConfig()
   const { league, snapshot, evaluation, profileOf, viewer } = useLeagueContext()
   const session = useSession()
   const week = weekSummary(evaluation, evaluation.currentWeek)
@@ -94,7 +96,7 @@ export function LeagueHome() {
               </p>
             )}
           </div>
-          {me && me.status === 'alive' && week?.phase === 'open' && (
+          {!readOnly && me && me.status === 'alive' && week?.phase === 'open' && (
             <Button size="lg" asChild>
               <Link to="/pick">
                 <Zap className="h-5 w-5" aria-hidden="true" />{' '}
@@ -102,7 +104,7 @@ export function LeagueHome() {
               </Link>
             </Button>
           )}
-          {!session && (
+          {!readOnly && !session && (
             <Button size="lg" variant="secondary" asChild>
               <Link to="/sign-in">Sign in to pick</Link>
             </Button>
