@@ -120,8 +120,8 @@ NOTE   : Playwright TRIMS a hasText string, so filter({hasText: ' at '}) also ma
 --- 2026-09-09  Claude (feat/add-five-players) ---
 DONE   : Added Chloe Bourque (JAX), Jared Marks (LAC), Joseph Tomczuk (JAX), Corey Cowell (PIT),
          Melanie Moeller (LAC), Jason Snook (JAX), Matt Hadley (GB), Mike Lancaster (SEA) and
-         KC Walker (JAX). League is 20. Seven photos imported; Chloe Bourque and KC Walker have
-         none yet and fall back to the neutral default avatar.
+         KC Walker (JAX). League is 20. Eight photos imported; Chloe Bourque is the only player
+         without one and falls back to the neutral default avatar.
          Relaxed the 'headshots-real-photos' registry check, which asserted every profile had an
          image — stricter than its own description and a blocker for any new player before their
          photo arrives. It now asserts every image is a real WebP and no profile points at a
