@@ -87,6 +87,17 @@
       "medium": "headshots/joseph-tomczuk-medium.webp"
     }
   },
+  "matt-hadley": {
+    "from": "MattHadley.jpg",
+    "contentType": "image/webp",
+    "sizeBytes": 46464,
+    "width": 512,
+    "height": 512,
+    "variants": {
+      "thumb": "headshots/matt-hadley-thumb.webp",
+      "medium": "headshots/matt-hadley-medium.webp"
+    }
+  },
   "maya-israel": {
     "from": "MayaIsrael.jpeg",
     "contentType": "image/webp",
