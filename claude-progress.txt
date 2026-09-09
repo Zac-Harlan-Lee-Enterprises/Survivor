@@ -130,3 +130,23 @@ TESTS  : vitest 189 passing, playwright 81 passing / 2 skipped, npm run validate
          quality-sweep clean. No spec needed editing (roster size is fixture-derived).
 NEXT   : Open/merge the PR. Branched off feat/week-selector, so merge PR #5 first.
 BLOCKED: none.
+
+--- 2026-09-09  Claude (feat/live-scores) ---
+DONE   : Live scores on the league slate. The ESPN pipeline already existed but its ONLY trigger
+         was the commissioner Results tab, which <Writable> removes from the published build —
+         so GitHub Pages had never refreshed a score. Its poll also armed only on in_progress,
+         the very fact a sync exists to discover, so it could not start unaided.
+         New: src/domain/rules/live.ts (weekIsLive, changedScores — pure, no timers),
+         src/app/useLiveScores.ts (polls for every reader, kickoff-driven, pauses on a hidden
+         tab, silent on failure), GameRow shows in-progress scores + "3rd 5:21" + a one-second
+         pulse on the number that moved. Live clock rides on SyncSummary.liveDetail and is
+         NEVER persisted (it would bump resultVersion every tick or go stale between syncs).
+         Fixed on the way: the slate ignored applyGameOverrides (commissioner corrections were
+         invisible); ResultsPanel printed raw enums at people; syncResults no longer audits a
+         no-op poll.
+TESTS  : vitest 224 passing (live.test.ts, GameRow.test.tsx, espn + sync additions);
+         playwright 89 passing / 2 skipped incl. new live-scores.spec.ts. Sweep clean.
+NEXT   : Open/merge the PR.
+BLOCKED: none.
+NOTE   : e2e MUST keep ESPN stubbed. resetDemo now aborts every call to the feed; without it the
+         suite fires real requests that hang, once per page view, doubled by retry: 1.
