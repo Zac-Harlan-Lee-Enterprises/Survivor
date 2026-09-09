@@ -52,6 +52,9 @@ const VARIANTS = { thumb: 128, medium: 512 }
 const CROP_NUDGES = {
   // Wide mountain selfie — the sky outscored his face.
   'kc-walker': { y: 0.85 },
+  // Tall caricature: the head fills the frame, so any crop below the top
+  // slices it. Take the square from the very top of the source.
+  'tony-canody': { y: 0 },
 }
 const ACCEPTED = new Set(['.jpg', '.jpeg', '.png', '.webp'])
 

@@ -131,6 +131,15 @@ TESTS  : vitest 189 passing, playwright 81 passing / 2 skipped, npm run validate
 NEXT   : Open/merge the PR. Branched off feat/week-selector, so merge PR #5 first.
 BLOCKED: none.
 
+--- 2026-09-09  Claude (feat/add-paul-lim) ---
+DONE   : Added Paul Lim (JAX) and Tony Canody (LAC), both with photos. League is 22. Chloe
+         Bourque is the only player without a photo and falls back to the default avatar.
+         Tony needed a CROP_NUDGES entry (y: 0) — his caricature's head fills the frame, so the
+         attention crop sliced the top off.
+TESTS  : vitest 193 passing, playwright 81 passing / 2 skipped, validate green, sweep clean.
+NEXT   : Open/merge the PR.
+BLOCKED: none.
+
 --- 2026-09-09  Claude (feat/live-scores) ---
 DONE   : Live scores on the league slate. The ESPN pipeline already existed but its ONLY trigger
          was the commissioner Results tab, which <Writable> removes from the published build —
