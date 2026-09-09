@@ -5,6 +5,7 @@ import {
   ListOrdered,
   LogIn,
   LogOut,
+  ScrollText,
   Shield,
   Trophy,
   User,
@@ -23,6 +24,7 @@ const ALL_NAV = [
   { to: '/pick', label: 'Pick', icon: Zap, write: true },
   { to: '/leaderboard', label: 'Board', icon: Trophy, write: false },
   { to: '/grid', label: 'Grid', icon: Grid3X3, write: false },
+  { to: '/rules', label: 'Rules', icon: ScrollText, write: false },
   { to: '/me', label: 'Me', icon: User, write: true },
 ]
 
@@ -139,13 +141,20 @@ export function Layout() {
         {league.tagline ??
           'Pick one team to win each week. Lose or tie and you burn a life. Last one standing wins.'}
         {' · '}
+        <NavLink to="/rules" className="underline underline-offset-2 hover:text-ink-100">
+          Official rules
+        </NavLink>
+        {' · '}
         <span>Times shown in your local timezone.</span>
       </footer>
       <nav
         className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-pitch-900/95 backdrop-blur md:hidden"
         aria-label="Primary mobile"
       >
-        <ul className={cn('grid', NAV.length === 3 ? 'grid-cols-3' : 'grid-cols-5')}>
+        <ul
+          className="grid"
+          style={{ gridTemplateColumns: `repeat(${NAV.length}, minmax(0, 1fr))` }}
+        >
           {NAV.map(({ to, label, icon: Icon, end }) => (
             <li key={to}>
               <NavLink

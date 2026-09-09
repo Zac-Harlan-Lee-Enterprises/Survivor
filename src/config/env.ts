@@ -12,6 +12,11 @@ const EnvSchema = z.object({
   VITE_COGNITO_CLIENT_ID: z.string().default(''),
   VITE_IMAGE_BASE_URL: z.string().default(''),
   VITE_DEFAULT_LEAGUE_ID: z.string().default('demo-league'),
+  /**
+   * Public URL of the repository, used only to link out to source documents.
+   * Set by the build from GITHUB_REPOSITORY; empty means "no link".
+   */
+  VITE_REPO_URL: z.string().default(''),
   /** Force the published (read-only) experience on or off. Rarely needed. */
   VITE_READ_ONLY: z.enum(['true', 'false']).optional(),
   BASE_URL: z.string().default('/'),
@@ -27,6 +32,8 @@ export interface AppConfig {
   cognito: { authority: string; clientId: string } | null
   imageBaseUrl: string
   defaultLeagueId: string
+  /** Public repository URL, or null when the build did not supply one. */
+  repoUrl: string | null
   /**
    * A published, read-only view of the league.
    *
@@ -78,6 +85,7 @@ export function parseConfig(raw: Record<string, unknown>, hints: RuntimeHints = 
       : null,
     imageBaseUrl: env.VITE_IMAGE_BASE_URL.replace(/\/+$/, ''),
     defaultLeagueId: env.VITE_DEFAULT_LEAGUE_ID,
+    repoUrl: env.VITE_REPO_URL === '' ? null : env.VITE_REPO_URL.replace(/\/+$/, ''),
   }
 }
 

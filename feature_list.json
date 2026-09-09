@@ -471,6 +471,15 @@
     "passes": false
   },
   {
+    "id": "rules-page-linked",
+    "category": "functional",
+    "description": "Every screen links to the official rulebook: /rules renders docs/survivor-rules.md (the same document the rules engine is tested against) with the league's live settings, and the link sits in the primary nav and the footer. Only the region the document marks for players is shown, so engineering notes never reach league members.",
+    "verification": "npx vitest run src/lib/markdown.test.ts >/dev/null 2>&1 && grep -q 'begin-player-rules' docs/survivor-rules.md && grep -q 'end-player-rules' docs/survivor-rules.md && grep -q 'path=\"rules\"' src/app/router.tsx && grep -q \"label: 'Rules'\" src/app/Layout.tsx",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
     "id": "connected-mode-deployed",
     "category": "functional",
     "description": "The AWS backend is deployed and reachable; the static site is rebuilt with VITE_DATA_MODE=connected (see docs/aws-connected-mode.md).",
