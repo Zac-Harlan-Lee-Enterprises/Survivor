@@ -207,8 +207,8 @@ function Cell({
       <span
         className="inline-block min-w-11 rounded-md border border-white/10 bg-white/5 px-1 py-1 text-xs text-ink-300"
         role="img"
-        aria-label="Pick locked in, hidden until kickoff"
-        title="Pick locked in, hidden until kickoff"
+        aria-label="Pick locked in, hidden until the pick deadline"
+        title="Pick locked in, hidden until the pick deadline"
       >
         🔒
       </span>
@@ -267,7 +267,7 @@ function Legend() {
         </li>
       ))}
       <li className="inline-flex items-center gap-1 rounded-md border border-white/10 px-1.5 py-0.5 text-ink-300">
-        🔒 hidden until kickoff
+        🔒 hidden until the pick deadline
       </li>
       <li className="inline-flex items-center gap-1 rounded-md border border-flag-500 px-1.5 py-0.5 text-flag-400">
         ☠ eliminated

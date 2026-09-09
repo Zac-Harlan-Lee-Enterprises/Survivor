@@ -42,8 +42,9 @@ Kickoff changes are result observations; a rescheduled game keeps its id (`<year
 
 ## Visibility
 
-- Your own pick is always visible to you; the commissioner sees everything.
-- Other players' picks are hidden until the week's deadline passes (`hidePicksUntilLocked`), at which point the whole league is revealed at once. The UI shows "Locked in 🔒" until then. Enforced in the demo adapter and on the API (`redactSnapshot`).
+- Your own pick is always visible to you.
+- Everyone else's picks are hidden until the week's deadline passes (`hidePicksUntilLocked`), at which point the whole league is revealed at once. The UI shows "Locked in 🔒" until then. Enforced in the demo adapter and on the API (`redactSnapshot`).
+- **The commissioner is not exempt.** A commissioner who is also competing would otherwise see every rival's pick while their own was still changeable — an information advantage, and exactly what this rule exists to prevent. Administration reads picks through a separate commissioner-only call (`listAllPicks`, `GET /seasons/:id/picks/all`), and the admin panel keeps them collapsed behind a deliberate reveal that warns when the commissioner is still alive. A commissioner who must enter picks will inevitably see them; the design makes that an explicit act rather than a side effect of browsing.
 
 ## Results processing
 

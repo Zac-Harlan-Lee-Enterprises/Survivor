@@ -130,6 +130,8 @@ export function createApiPickRepository(http: HttpClient): PickRepository {
         schema: z.array(PickSchema),
         publicRead: true,
       }),
+    listAllPicks: (seasonId) =>
+      http.request(`/seasons/${enc(seasonId)}/picks/all`, { schema: z.array(PickSchema) }),
     submitPick: async (input): Promise<SubmitPickResult> =>
       http.request(`/seasons/${enc(input.seasonId)}/picks/${input.week}`, {
         method: 'PUT',
