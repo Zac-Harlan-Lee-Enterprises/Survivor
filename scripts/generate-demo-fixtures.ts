@@ -81,6 +81,11 @@ const PEOPLE: Person[] = [
   { id: 'dominic-green', name: 'Dominic Green', role: 'player' },
   { id: 'tracy-nelson', name: 'Tracy Nelson', role: 'player' },
   { id: 'bradley-riedell', name: 'Bradley Riedell', role: 'player' },
+  { id: 'chloe-bourque', name: 'Chloe Bourque', role: 'player' },
+  { id: 'jared-marks', name: 'Jared Marks', role: 'player' },
+  { id: 'joseph-tomczuk', name: 'Joseph Tomczuk', role: 'player' },
+  { id: 'corey-cowell', name: 'Corey Cowell', role: 'player' },
+  { id: 'melanie-moeller', name: 'Melanie Moeller', role: 'player' },
   // Commissioner: runs the league and holds the admin tools.
   { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner' },
 ]
@@ -103,6 +108,11 @@ const STORY: Story = {
   'tracy-nelson': { 1: ['SEA', 'P'] },
   // Third player on the Lions, alongside Dave Johnson and James Parker.
   'bradley-riedell': { 1: ['DET', 'P'] },
+  'chloe-bourque': { 1: ['JAX', 'P'] },
+  'jared-marks': { 1: ['LAC', 'P'] },
+  'joseph-tomczuk': { 1: ['JAX', 'P'] },
+  'corey-cowell': { 1: ['PIT', 'P'] },
+  'melanie-moeller': { 1: ['LAC', 'P'] },
   'zac-harlan': { 1: ['LAC', 'P'] },
 }
 
