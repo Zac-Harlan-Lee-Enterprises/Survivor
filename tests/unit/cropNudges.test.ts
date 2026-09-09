@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest'
 const importer = readFileSync('scripts/import-headshots.mjs', 'utf8')
 const generator = readFileSync('scripts/generate-demo-fixtures.ts', 'utf8')
 
-function nudges(): { playerId: string; x?: number; y?: number }[] {
+function nudges(): { playerId: string; x?: number; y?: number; zoom?: number }[] {
   const block = importer.slice(
     importer.indexOf('const CROP_NUDGES = {'),
     importer.indexOf('const ACCEPTED'),
@@ -20,7 +20,7 @@ function nudges(): { playerId: string; x?: number; y?: number }[] {
       const hit = new RegExp(`${key}:\\s*([0-9.]+)`).exec(body)
       return hit ? Number(hit[1]) : undefined
     }
-    return { playerId: m[1] ?? '', x: num('x'), y: num('y') }
+    return { playerId: m[1] ?? '', x: num('x'), y: num('y'), zoom: num('zoom') }
   })
 }
 
@@ -44,7 +44,7 @@ describe('headshot crop nudges', () => {
     }
   })
 
-  it('every offset is a fraction of the crop slack, never a pixel count', () => {
+  it('every offset is a fraction of the image, never a pixel count', () => {
     for (const n of nudges()) {
       for (const axis of ['x', 'y'] as const) {
         const v = n[axis]
@@ -52,6 +52,29 @@ describe('headshot crop nudges', () => {
         expect(v, `${n.playerId}.${axis}`).toBeGreaterThanOrEqual(0)
         expect(v, `${n.playerId}.${axis}`).toBeLessThanOrEqual(1)
       }
+    }
+  })
+
+  /**
+   * A zoom of 0 would crop nothing at all, and above 1 would ask for more
+   * picture than the source holds. Both fail silently rather than loudly.
+   */
+  it('every zoom keeps a real fraction of the source', () => {
+    for (const n of nudges()) {
+      if (n.zoom === undefined) continue
+      expect(n.zoom, `${n.playerId}.zoom`).toBeGreaterThan(0)
+      expect(n.zoom, `${n.playerId}.zoom`).toBeLessThanOrEqual(1)
+    }
+  })
+
+  /** Zooming crops away pixels, so it needs a centre worth zooming to. */
+  it('a zoom names where to zoom to', () => {
+    for (const n of nudges()) {
+      if (n.zoom === undefined || n.zoom === 1) continue
+      expect(
+        n.x !== undefined || n.y !== undefined,
+        `${n.playerId} zooms but gives no centre, so it just crops the middle`,
+      ).toBe(true)
     }
   })
 

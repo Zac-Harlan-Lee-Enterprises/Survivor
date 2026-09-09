@@ -21,6 +21,17 @@
       "medium": "headshots/bradley-riedell-medium.webp"
     }
   },
+  "cindy-mendoza": {
+    "from": "CindyMendoza.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 31476,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/cindy-mendoza-thumb.webp",
+      "medium": "headshots/cindy-mendoza-medium.webp"
+    }
+  },
   "corey-cowell": {
     "from": "CoreyCowell.jpeg",
     "contentType": "image/webp",
@@ -52,6 +63,17 @@
     "variants": {
       "thumb": "headshots/dominic-green-thumb.webp",
       "medium": "headshots/dominic-green-medium.webp"
+    }
+  },
+  "don-turner": {
+    "from": "DonTurner.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 14852,
+    "width": 200,
+    "height": 200,
+    "variants": {
+      "thumb": "headshots/don-turner-thumb.webp",
+      "medium": "headshots/don-turner-medium.webp"
     }
   },
   "james-parker": {
