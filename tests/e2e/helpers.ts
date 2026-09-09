@@ -44,9 +44,19 @@ export async function setDemoClock(page: Page, utcMinute: string): Promise<void>
  */
 const fixture = JSON.parse(
   readFileSync(new URL('../../src/data/demo/fixtures/demo-season.json', import.meta.url), 'utf8'),
-) as { memberships: { status: string }[] }
+) as { memberships: { status: string }[]; games: { week: number }[] }
 
 export const ROSTER_SIZE = fixture.memberships.filter((m) => m.status === 'active').length
+
+/**
+ * How many games a week has, and how many teams sit it out. Derived from the
+ * seeded schedule so a schedule refresh cannot leave these numbers lying.
+ * Byes are always even: 32 teams, two per game.
+ */
+export function weekShape(week: number): { games: number; byes: number } {
+  const games = fixture.games.filter((g) => g.week === week).length
+  return { games, byes: 32 - games * 2 }
+}
 
 export const PLAYER = 'Maya Israel'
 export const COMMISSIONER = 'Zac Harlan'

@@ -480,6 +480,15 @@
     "passes": true
   },
   {
+    "id": "week-selector-and-byes",
+    "category": "functional",
+    "description": "The header's week control lists every week of the season and drives the league home slate, which names the teams on bye for that week. The selection lives in the URL (?week=N), so a week is shareable and survives a reload; an out-of-range week falls back to the current one. The hero keeps reporting the live week, not the week being browsed.",
+    "verification": "npx vitest run src/domain/rules/engine.test.ts >/dev/null 2>&1 && grep -q 'export function teamsOnBye' src/domain/rules/engine.ts && grep -q '<WeekSelect' src/app/Layout.tsx && grep -q 'useSelectedWeek' src/components/WeekSelect.tsx && grep -q 'teamsOnBye' src/features/league-home/LeagueHome.tsx",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
     "id": "connected-mode-deployed",
     "category": "functional",
     "description": "The AWS backend is deployed and reachable; the static site is rebuilt with VITE_DATA_MODE=connected (see docs/aws-connected-mode.md).",

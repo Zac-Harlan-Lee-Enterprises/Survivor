@@ -1,4 +1,5 @@
 import type {
+  NFLTeam,
   LeagueGameOverride,
   LeagueMembership,
   LeagueSettings,
@@ -7,7 +8,7 @@ import type {
   PickOutcome,
   SeasonSnapshot,
 } from '../models'
-import { ALL_TEAM_IDS } from '../teams'
+import { ALL_TEAM_IDS, NFL_TEAMS } from '../teams'
 import { maxDate, minDate, toDate } from '../time'
 
 /**
@@ -125,6 +126,29 @@ export function applyGameOverrides(games: NFLGame[], overrides: LeagueGameOverri
       updatedAt: o.createdAt,
     }
   })
+}
+
+/**
+ * Teams with no game in a week: on bye, and so unpickable that week.
+ *
+ * Derived from the schedule rather than a bye table, because two lists of the
+ * same fact drift — a rescheduled game would leave a team shown as both
+ * playing and on bye. A week with no schedule at all returns nothing: that is
+ * missing data, not thirty-two byes.
+ *
+ * Sorted by name so callers render a stable list.
+ */
+export function teamsOnBye(games: NFLGame[], seasonYear: number, week: number): NFLTeam[] {
+  const playing = new Set<string>()
+  for (const g of games) {
+    if (g.seasonYear !== seasonYear || g.week !== week) continue
+    playing.add(g.homeTeamId)
+    playing.add(g.awayTeamId)
+  }
+  if (playing.size === 0) return []
+  return NFL_TEAMS.filter((t) => !playing.has(t.id)).toSorted((a, b) =>
+    a.fullName.localeCompare(b.fullName),
+  )
 }
 
 export function gameInvolves(game: NFLGame, teamId: string): boolean {

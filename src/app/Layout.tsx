@@ -16,6 +16,7 @@ import { useEffect } from 'react'
 import { useLeagueContext, useServices, useSession } from './hooks'
 import { Button } from '@/components/ui/button'
 import { Headshot } from '@/components/Headshot'
+import { WeekSelect } from '@/components/WeekSelect'
 import { cn } from '@/lib/cn'
 import { getConfig } from '@/config/env'
 
@@ -29,7 +30,7 @@ const ALL_NAV = [
 ]
 
 export function Layout() {
-  const { league, evaluation, viewer, profileOf } = useLeagueContext()
+  const { league, viewer, profileOf } = useLeagueContext()
   const services = useServices()
   const session = useSession()
   const location = useLocation()
@@ -64,9 +65,7 @@ export function Layout() {
               {league.name}
             </span>
           </NavLink>
-          <span className="hidden rounded-full border border-white/10 bg-white/5 px-3 py-1 font-display text-sm font-bold uppercase tracking-widest text-ink-200 md:inline">
-            Week {evaluation.currentWeek}
-          </span>
+          <WeekSelect className="hidden md:inline-flex" />
           <nav className="ml-auto hidden items-center gap-1 md:flex" aria-label="Primary">
             {NAV.map(({ to, label, icon: Icon, end }) => (
               <NavLink

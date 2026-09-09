@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { evaluateSeason, findStanding, weekSummary } from './engine'
+import { evaluateSeason, findStanding, teamsOnBye, weekSummary } from './engine'
 import { kickoffFor, scenario } from '../testing/scenario'
 
 // "now" defaults to the Tuesday after week 3 — weeks 1–3 resolved, week 4 open.
@@ -491,5 +491,43 @@ describe('standings order and inactive members', () => {
     const b = evaluateSeason(structuredClone(snap), { now: AFTER_WEEK_3 })
     expect(a).toEqual(b)
     expect(weekSummary(a, 1)?.gamesTotal).toBe(15)
+  })
+})
+
+describe('teams on bye', () => {
+  const snap = scenario()
+    .players('ann')
+    .game(1, 'GB', 'CHI')
+    .game(1, 'KC', 'DEN')
+    .game(2, 'GB', 'KC')
+    .build()
+
+  it('names every team without a game that week', () => {
+    const bye = teamsOnBye(snap.games, snap.season.year, 2).map((t) => t.id)
+    expect(bye).toContain('CHI')
+    expect(bye).toContain('DEN')
+    expect(bye).not.toContain('GB')
+    expect(bye).not.toContain('KC')
+    // 32 teams, two of them playing.
+    expect(bye).toHaveLength(30)
+  })
+
+  it('counts a team as playing whichever side it is on', () => {
+    const bye = teamsOnBye(snap.games, snap.season.year, 1).map((t) => t.id)
+    for (const id of ['GB', 'CHI', 'KC', 'DEN']) expect(bye).not.toContain(id)
+  })
+
+  /** A provider outage is missing data, not a league-wide bye week. */
+  it('returns nothing for a week with no schedule at all', () => {
+    expect(teamsOnBye(snap.games, snap.season.year, 9)).toEqual([])
+  })
+
+  it('ignores games from another season', () => {
+    expect(teamsOnBye(snap.games, snap.season.year + 1, 1)).toEqual([])
+  })
+
+  it('is sorted by name, so the list does not reshuffle between renders', () => {
+    const names = teamsOnBye(snap.games, snap.season.year, 2).map((t) => t.fullName)
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)))
   })
 })

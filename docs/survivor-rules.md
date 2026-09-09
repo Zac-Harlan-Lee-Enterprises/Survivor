@@ -25,6 +25,7 @@ All rules live in `src/domain/rules/` and are covered by `src/domain/rules/*.tes
 - No pick while the week is open → `pending`. No pick once the deadline passed → `missing` → one life (`missingPickCountsAsMiss`).
 - A week with **no schedule data** (provider outage) is `not_required`: nobody is struck by a data problem.
 - A week whose games are **all cancelled** requires nothing.
+- Teams on **bye** play no game that week and cannot be picked. The league page lists them under the week's slate; use the week selector to look ahead.
 
 ## Game situations
 

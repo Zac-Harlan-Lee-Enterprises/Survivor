@@ -1,8 +1,10 @@
 import { Link } from 'react-router'
-import { Crown, Flame, Skull, Zap } from 'lucide-react'
+import { CalendarOff, Crown, Flame, Skull, Zap } from 'lucide-react'
 import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useSession } from '@/app/hooks'
-import { getTeam, weekSummary, type NFLGame, type PlayerStanding } from '@/domain'
+import { useSelectedWeek } from '@/app/useSelectedWeek'
+import { WeekSelect } from '@/components/WeekSelect'
+import { getTeam, teamsOnBye, weekSummary, type NFLGame, type PlayerStanding } from '@/domain'
 import { Headshot } from '@/components/Headshot'
 import { PlayerCard } from '@/components/PlayerCard'
 import { TeamMonogram } from '@/components/TeamMonogram'
@@ -29,10 +31,17 @@ export function LeagueHome() {
   const recentOut = graveyard.filter(
     (s) => s.eliminatedWeek !== null && s.eliminatedWeek >= evaluation.currentWeek - 1,
   )
-  const games = snapshot.games
+  // The hero reports the LIVE week — next kickoff, deadline, whether picks are
+  // open — so it must not follow the week someone is browsing.
+  const currentWeekGames = snapshot.games
     .filter((g) => g.week === evaluation.currentWeek)
     .sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))
-  const nextKickoff = games.find(
+  const { week: viewedWeek } = useSelectedWeek()
+  const slate = snapshot.games
+    .filter((g) => g.week === viewedWeek)
+    .sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))
+  const byes = teamsOnBye(snapshot.games, snapshot.season.year, viewedWeek)
+  const nextKickoff = currentWeekGames.find(
     (g) =>
       g.status === 'scheduled' &&
       new Date(g.kickoffAt).getTime() > new Date(evaluation.evaluatedAt).getTime(),
@@ -244,21 +253,44 @@ export function LeagueHome() {
         </section>
       )}
 
-      {/* This week's slate */}
+      {/* The slate, for whichever week is being viewed */}
       <section aria-labelledby="slate-title">
-        <h2 id="slate-title" className="mb-4 text-3xl text-ink-50">
-          This week’s slate
-        </h2>
-        {games.length === 0 ? (
-          <p className="text-ink-300">No games loaded for week {evaluation.currentWeek}.</p>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 id="slate-title" className="text-3xl text-ink-50">
+            {viewedWeek === evaluation.currentWeek
+              ? 'This week’s slate'
+              : `Week ${viewedWeek} slate`}
+          </h2>
+          {/* The header carries this control on desktop; here it is within
+              reach of the thing it changes on a phone. */}
+          <WeekSelect className="inline-flex shrink-0 md:hidden" />
+        </div>
+        {slate.length === 0 ? (
+          <p className="text-ink-300">No games loaded for week {viewedWeek}.</p>
         ) : (
           <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {games.map((g) => (
+            {slate.map((g) => (
               <li key={g.id}>
                 <GameRow game={g} />
               </li>
             ))}
           </ul>
+        )}
+        {byes.length > 0 && (
+          <div className="mt-4 rounded-xl border border-white/8 bg-white/[0.03] p-4">
+            <h3 className="eyebrow flex items-center gap-2">
+              <CalendarOff className="h-4 w-4" aria-hidden="true" /> On bye · {byes.length} teams
+            </h3>
+            <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
+              {byes.map((team) => (
+                <li key={team.id} className="flex items-center gap-2 text-sm text-ink-300">
+                  <TeamMonogram teamId={team.id} size="sm" muted />
+                  <span className="font-display font-bold uppercase">{team.name}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-xs text-ink-400">A team on bye cannot be picked this week.</p>
+          </div>
         )}
       </section>
 
