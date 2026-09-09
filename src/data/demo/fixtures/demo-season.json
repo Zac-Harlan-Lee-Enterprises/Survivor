@@ -245,6 +245,15 @@
       "joinedAt": "2026-08-15T14:00:00.000Z"
     },
     {
+      "id": "m-cindy-mendoza",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "cindy-mendoza",
+      "role": "player",
+      "status": "active",
+      "joinedAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
       "id": "m-zac-harlan",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -374,6 +383,11 @@
       "playerId": "don-turner",
       "displayName": "Don Turner",
       "imageId": "img-don-turner"
+    },
+    {
+      "playerId": "cindy-mendoza",
+      "displayName": "Cindy Mendoza",
+      "imageId": "img-cindy-mendoza"
     },
     {
       "playerId": "zac-harlan",
@@ -678,6 +692,19 @@
       "variants": {
         "thumb": "headshots/don-turner-thumb.webp",
         "medium": "headshots/don-turner-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-cindy-mendoza",
+      "playerId": "cindy-mendoza",
+      "contentType": "image/webp",
+      "sizeBytes": 31476,
+      "width": 400,
+      "height": 400,
+      "variants": {
+        "thumb": "headshots/cindy-mendoza-thumb.webp",
+        "medium": "headshots/cindy-mendoza-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },
@@ -1005,6 +1032,19 @@
       "gameId": "2026-w01-ATL-at-PIT",
       "submittedAt": "2026-09-10T18:00:00.000Z",
       "updatedAt": "2026-09-10T18:00:00.000Z",
+      "version": 1,
+      "source": "import"
+    },
+    {
+      "id": "pick-cindy-mendoza-1",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "cindy-mendoza",
+      "week": 1,
+      "teamId": "JAX",
+      "gameId": "2026-w01-CLE-at-JAX",
+      "submittedAt": "2026-09-12T01:00:00.000Z",
+      "updatedAt": "2026-09-12T01:00:00.000Z",
       "version": 1,
       "source": "import"
     },
