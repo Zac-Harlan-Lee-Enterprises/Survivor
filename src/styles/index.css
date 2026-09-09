@@ -44,6 +44,7 @@
   --animate-pulse-soft: pulse-soft 2.4s ease-in-out infinite;
   --animate-shake: shake 0.5s ease-in-out both;
   --animate-stamp: stamp 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+  --animate-score-bump: score-bump 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 
   @keyframes rise {
     from {
@@ -81,6 +82,22 @@
     40%,
     60% {
       transform: translateX(3px);
+    }
+  }
+  /* A score just moved. Brief, and only on the number that changed. */
+  @keyframes score-bump {
+    0% {
+      transform: scale(1);
+      color: var(--color-ink-50);
+    }
+    18% {
+      transform: scale(1.35);
+      color: var(--color-gold-300);
+      text-shadow: 0 0 18px rgba(251, 191, 36, 0.75);
+    }
+    100% {
+      transform: scale(1);
+      color: var(--color-ink-50);
     }
   }
   @keyframes stamp {

@@ -655,13 +655,18 @@ export function createDemoNFLProvider(
         }
       })
 
+      // Only record a sync that did something. The league page polls itself
+      // while games are on, so auditing every no-op would bury the real
+      // entries under hundreds of "nothing happened" lines by Sunday evening.
       const viewer = ctx.viewer()
-      store.audit({
-        at,
-        actorPlayerId: viewer.playerId,
-        type: 'results.synced',
-        summary: `Week ${week} synced from ${parsed.week.source === 'provider' ? 'ESPN' : 'the provider'}: ${merged.changed.length} changed, ${created} added${relinkedPicks ? `, ${relinkedPicks} picks re-linked` : ''}`,
-      })
+      if (merged.changed.length > 0 || created > 0) {
+        store.audit({
+          at,
+          actorPlayerId: viewer.playerId,
+          type: 'results.synced',
+          summary: `Week ${week} synced from ${parsed.week.source === 'provider' ? 'ESPN' : 'the provider'}: ${merged.changed.length} changed, ${created} added${relinkedPicks ? `, ${relinkedPicks} picks re-linked` : ''}`,
+        })
+      }
 
       return {
         changed: merged.changed.length,
@@ -669,6 +674,7 @@ export function createDemoNFLProvider(
         created,
         relinkedPicks,
         orphanedPicks,
+        liveDetail: parsed.liveDetail,
         provider: 'ESPN public scoreboard',
         observedAt: at,
       }

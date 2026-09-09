@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { RefreshCw } from 'lucide-react'
 import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useServices } from '@/app/hooks'
 import { useInvalidateSeason } from '@/app/queries'
+import { useLiveScores } from '@/app/useLiveScores'
 import { applyGameOverrides, getTeam, lookupTeam, type NFLGame } from '@/domain'
 import { TeamMonogram } from '@/components/TeamMonogram'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,15 @@ import { formatKickoff } from '@/lib/time'
  * provider is down, or clear a correction. Corrections are league-scoped
  * overrides and win over later provider updates.
  */
+/** Raw enum values were being printed at people ("in_progress"). */
+const STATUS_LABEL: Record<NFLGame['status'], string> = {
+  scheduled: 'Scheduled',
+  in_progress: 'In progress',
+  final: 'Final',
+  postponed: 'Postponed',
+  cancelled: 'Cancelled',
+}
+
 export function ResultsPanel() {
   const tz = useLeagueTimeZone()
   const { snapshot, evaluation } = useLeagueContext()
@@ -34,7 +44,6 @@ export function ResultsPanel() {
   const weekSource =
     snapshot.weeks.find((w) => w.seasonYear === snapshot.season.year && w.week === week)?.source ??
     'synthetic'
-  const hasLiveGame = games.some((g) => g.status === 'in_progress')
 
   const sync = async () => {
     if (!nfl.syncResults) return
@@ -63,18 +72,10 @@ export function ResultsPanel() {
     }
   }
 
-  // While a game is actually being played, keep the scores fresh on their own.
-  // The ref keeps the interval stable without re-subscribing on every render;
-  // it is written in an effect because refs must not be touched during render.
-  const syncRef = useRef(sync)
-  useEffect(() => {
-    syncRef.current = sync
-  })
-  useEffect(() => {
-    if (!hasLiveGame || !nfl.syncResults) return
-    const id = window.setInterval(() => void syncRef.current(), 60_000)
-    return () => window.clearInterval(id)
-  }, [hasLiveGame, week, nfl])
+  // Live refresh is shared with the league page (useLiveScores), so this panel
+  // no longer runs an interval of its own. Its old condition waited for a game
+  // to be in_progress, which only a sync could ever make true.
+  const { detail: liveDetail } = useLiveScores(snapshot.season.year, week, games)
 
   return (
     <div className="space-y-4">
@@ -127,7 +128,9 @@ export function ResultsPanel() {
               <span className="ml-auto font-display tabular-nums">
                 {g.status === 'final'
                   ? `${g.awayScore}–${g.homeScore} · ${g.winnerTeamId === null ? 'TIE' : `${g.winnerTeamId} win`}`
-                  : g.status}
+                  : g.status === 'in_progress'
+                    ? `${g.awayScore ?? 0}–${g.homeScore ?? 0} · ${liveDetail[g.id] ?? 'in progress'}`
+                    : STATUS_LABEL[g.status]}
               </span>
               {overridden.has(g.id) && (
                 <span className="rounded-full bg-gold-400/20 px-2 py-0.5 text-xs text-gold-300">

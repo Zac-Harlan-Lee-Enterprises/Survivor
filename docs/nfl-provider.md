@@ -10,6 +10,10 @@ getWeeks(seasonYear)            getTeams()        recordManualResult?()   syncRe
 ```
 
 - **Demo/static**: `createDemoNFLProvider` serves the seeded fixture, whose schedule is the REAL one (cached by `npm run schedule:fetch`), and calls ESPN directly for live scores via `src/data/nfl/espnClient.ts`. The endpoint answers with `access-control-allow-origin: *`, so this works on GitHub Pages with no backend.
+
+  **Who polls.** `useLiveScores` runs on the league page for every reader, so the published site refreshes itself. It arms from kickoff times (`weekIsLive`), never from stored status — a poll waiting for a game to be `in_progress` would be waiting for the very fact the fetch exists to discover. It pauses on a hidden tab, backs off after a failure, and stays silent when it fails: the tiles keep showing the last thing known to be true. In demo mode each viewer's browser writes only its own `localStorage`, so nothing is shared until the commissioner commits the league.
+
+  **Where a game is up to** ("3rd 5:21") rides back on `SyncSummary.liveDetail` and is deliberately never stored. It moves every few seconds, so persisting it would either bump `resultVersion` on every tick or serve a stale clock between syncs.
 - **Connected**: `createApiNFLProvider` calls `/nfl/*` on the API. External providers are implemented **server-side only** (`backend/src/providers/`), so keys never reach the bundle.
 
 ## Server-side providers (`ExternalNFLProvider`)

@@ -489,6 +489,15 @@
     "passes": true
   },
   {
+    "id": "live-scores-on-the-slate",
+    "category": "functional",
+    "description": "The league page shows scores as games are played, with where each game is up to ('3rd 5:21'), and pulses the score that just changed. Polling is driven by kickoff times (weekIsLive) rather than stored status, and runs for every reader \u2014 so the published GitHub Pages site refreshes itself instead of only the commissioner's machine. The live clock rides on SyncSummary.liveDetail and is never persisted.",
+    "verification": "npx vitest run src/domain/rules/live.test.ts src/features/league-home/GameRow.test.tsx src/data/demo/sync.test.ts >/dev/null 2>&1 && grep -q 'export function weekIsLive' src/domain/rules/live.ts && grep -q 'useLiveScores(snapshot' src/features/league-home/LeagueHome.tsx && grep -q 'animate-score-bump' src/features/league-home/LeagueHome.tsx && grep -q 'score-bump' src/styles/index.css && ! grep -q 'statusDetail' src/domain/models.ts",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
     "id": "connected-mode-deployed",
     "category": "functional",
     "description": "The AWS backend is deployed and reachable; the static site is rebuilt with VITE_DATA_MODE=connected (see docs/aws-connected-mode.md).",
