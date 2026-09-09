@@ -187,3 +187,12 @@ NEXT   : Open/merge the PR.
 BLOCKED: none.
 NOTE   : cropNudges.test.ts caps the list at 3 entries and it is now full. A fourth is a
          deliberate decision, not a routine edit — prefer a better original.
+
+--- 2026-09-09  Claude (feat/add-collins-childers) ---
+DONE   : Added Phyllis Collins (SEA) and Wesley Childers (DET), both with photos. League is 28.
+         Neither needed a crop nudge (list still at its cap of 3). Phyllis's original is only
+         239x231 and dark, so her headshot is 231px — the dark edges are in the source, not the
+         crop. Chloe Bourque remains the only player with no photo at all.
+TESTS  : vitest 226 passing, playwright 89 passing / 2 skipped, validate green, sweep clean.
+NEXT   : Open/merge the PR.
+BLOCKED: none.
