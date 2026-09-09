@@ -29,15 +29,21 @@ interface EspnCompetitor {
   winner?: boolean | null
   team?: { abbreviation?: string; displayName?: string }
 }
+/** ESPN reports where a game is up to: "3rd 5:21", "Halftime", "End of 2nd". */
+interface EspnStatus {
+  displayClock?: string
+  period?: number
+  type?: { name?: string; shortDetail?: string }
+}
 interface EspnCompetition {
   date?: string
   competitors?: EspnCompetitor[]
-  status?: { type?: { name?: string } }
+  status?: EspnStatus
 }
 interface EspnEvent {
   id?: string
   date?: string
-  status?: { type?: { name?: string } }
+  status?: EspnStatus
   competitions?: EspnCompetition[]
 }
 export interface EspnScoreboard {
@@ -93,12 +99,44 @@ function toScore(raw: string | number | undefined): number | undefined {
   return Number.isFinite(n) ? n : undefined
 }
 
+/** Longest live label the tiles will show; anything odder is dropped. */
+const MAX_DETAIL = 24
+
+/**
+ * Where an in-progress game is up to, as short display text.
+ *
+ * ESPN's own `shortDetail` ("3rd 5:21", "Halftime") is preferred because it is
+ * built for exactly this and already handles overtime and period ends. Period
+ * and clock are the fallback when it is missing.
+ *
+ * Deliberately empty for every other status: a scheduled game shows its kickoff
+ * in the league's timezone, and a final one already says who won.
+ */
+export function liveDetailFor(status: GameStatus, espn: EspnStatus | undefined): string | null {
+  if (status !== 'in_progress') return null
+  const short = espn?.type?.shortDetail?.trim()
+  if (short && short.length <= MAX_DETAIL) return short
+  const clock = espn?.displayClock?.trim()
+  const period = espn?.period
+  if (period && clock) return `Q${period} ${clock}`
+  if (period) return `Q${period}`
+  return null
+}
+
 export interface ParsedScoreboard {
   seasonYear: number
   week: NFLWeek
   games: NFLGame[]
   /** Events that could not be understood (unknown team, missing date). */
   skipped: number
+  /**
+   * Game id → where it is up to right now ("3rd 5:21").
+   *
+   * EPHEMERAL, and deliberately not part of NFLGame: this changes every few
+   * seconds, so persisting it would either bump resultVersion on every tick or
+   * go stale between syncs. It is display detail from this observation only.
+   */
+  liveDetail: Record<string, string>
 }
 
 export function parseScoreboard(
@@ -113,6 +151,7 @@ export function parseScoreboard(
   }
 
   const games: NFLGame[] = []
+  const liveDetail: Record<string, string> = {}
   let skipped = 0
   for (const ev of data.events ?? []) {
     const comp = ev.competitions?.[0]
@@ -143,8 +182,11 @@ export function parseScoreboard(
         continue
       }
     }
+    const id = gameIdFor(seasonYear, weekNumber, awayTeamId, homeTeamId)
+    const detail = liveDetailFor(status, comp?.status ?? ev.status)
+    if (detail) liveDetail[id] = detail
     games.push({
-      id: gameIdFor(seasonYear, weekNumber, awayTeamId, homeTeamId),
+      id,
       seasonYear,
       week: weekNumber,
       homeTeamId,
@@ -172,5 +214,6 @@ export function parseScoreboard(
     },
     games,
     skipped,
+    liveDetail,
   }
 }

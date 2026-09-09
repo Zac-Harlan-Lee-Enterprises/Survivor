@@ -62,7 +62,7 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 
 **Published vs local.** `AppConfig.readOnly` is true for a demo build served from anything but localhost. It strips every write affordance (sign-in, Pick/Me nav, pick CTAs) and redirects write routes home, so the published site never invites a pick that could not reach anyone. Force it with `VITE_READ_ONLY`; the `published` Playwright project tests a real read-only bundle. Connected mode is never read-only.
 
-**Runtime modes** (build-time `VITE_DATA_MODE`): `demo` runs entirely from static files with a pinned demo clock (2026-09-09 16:00Z, week 1 open, nothing kicked off). The roster, the picks and the **schedule are all real** (the schedule is cached from ESPN by `npm run schedule:fetch`); no results are seeded, and live scores refresh from ESPN in the browser. `connected` talks to the API. Selection happens in exactly two files: `src/main.tsx` and `src/data/index.ts`.
+**Runtime modes** (build-time `VITE_DATA_MODE`): `demo` runs entirely from static files with a pinned demo clock (2026-09-09 16:00Z, week 1 open, nothing kicked off). The roster, the picks and the **schedule are all real** (the schedule is cached from ESPN by `npm run schedule:fetch`); no results are seeded, and live scores refresh from ESPN in the browser (`useLiveScores`, polling only while a week is actually being played). `connected` talks to the API. Selection happens in exactly two files: `src/main.tsx` and `src/data/index.ts`.
 
 **Layer rules** (enforced by `tests/architecture/layers.test.ts`, not by trust):
 
@@ -118,6 +118,8 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | `src/features/pick/PickPage.tsx` | The most important screen: weekly pick cards. |
 | `src/features/rules/RulesPage.tsx` | `/rules` — renders `docs/survivor-rules.md` in the app, linked from the nav and footer. |
 | `src/app/useSelectedWeek.ts` | Which week the league view shows, held in the URL (`?week=N`); `WeekSelect` renders it. |
+| `src/app/useLiveScores.ts` | Polls the provider while a week is live, for every reader — not just the commissioner. |
+| `src/domain/rules/live.ts` | `weekIsLive` (poll on kickoff times, never on stored status) and `changedScores`. |
 | `src/lib/markdown.ts` | Small Markdown subset the rules page renders; `extractMarkedRegion` picks the player-facing slice. |
 | `src/features/commissioner/*` | Players/headshots, picks, results, settings, import, audit. |
 | `scripts/generate-demo-fixtures.ts` | Seeds the league: real roster, week 1 picks, real cached schedule, no results. `npm run fixtures:generate`. |

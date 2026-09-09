@@ -34,7 +34,7 @@ function withScores(games: NFLGame[], edits: Record<string, Partial<NFLGame>>): 
   return games.map((g) => (edits[g.id] ? { ...g, ...edits[g.id] } : g))
 }
 
-function harness(games: NFLGame[], snapshot = base()) {
+function harness(games: NFLGame[], snapshot = base(), liveDetail: Record<string, string> = {}) {
   const store = new DemoStore(snapshot, null)
   const espn: EspnClient = {
     fetchWeek: vi.fn(async () => ({
@@ -48,6 +48,7 @@ function harness(games: NFLGame[], snapshot = base()) {
       },
       games,
       skipped: 0,
+      liveDetail,
     })),
   }
   const ctx = {
@@ -112,6 +113,42 @@ describe('demo live-score sync — established league (ships with the real sched
     ).toBe(1)
   })
 
+  /**
+   * Where a game is up to is display detail, not a result: it moves every few
+   * seconds, so it rides back on the summary and is never written to a game.
+   */
+  it('hands back the live clock without storing it on the game', async () => {
+    const live = withScores(realWeek1(), {
+      '2026-w01-NO-at-DET': { status: 'in_progress', homeScore: 14, awayScore: 10 },
+    })
+    const scored = harness(live, base(), { '2026-w01-NO-at-DET': '3rd 5:21' })
+    const r = await scored.provider.syncResults!(SEASON, WEEK)
+
+    expect(r.liveDetail).toEqual({ '2026-w01-NO-at-DET': '3rd 5:21' })
+    const stored = scored.store.snapshot().games.find((g) => g.id === '2026-w01-NO-at-DET')
+    expect(stored).toMatchObject({ status: 'in_progress', homeScore: 14, awayScore: 10 })
+    expect(JSON.stringify(stored)).not.toContain('5:21')
+  })
+
+  /**
+   * The league page polls itself while games are on. Auditing a poll that
+   * changed nothing would bury the real entries by Sunday evening.
+   */
+  it('records an audit entry only when the sync actually changed something', async () => {
+    const before = h.store.get().audit.length
+    await h.provider.syncResults!(SEASON, WEEK)
+    expect(h.store.get().audit.length, 'a no-op poll writes nothing').toBe(before)
+
+    const scored = harness(
+      withScores(realWeek1(), {
+        '2026-w01-NO-at-DET': { status: 'in_progress', homeScore: 7, awayScore: 0 },
+      }),
+    )
+    const was = scored.store.get().audit.length
+    await scored.provider.syncResults!(SEASON, WEEK)
+    expect(scored.store.get().audit.length).toBe(was + 1)
+  })
+
   it('costs a life when a picked team loses, without touching anyone else', async () => {
     const live = withScores(realWeek1(), {
       '2026-w01-NO-at-DET': { status: 'final', homeScore: 13, awayScore: 27, winnerTeamId: 'NO' },
@@ -161,6 +198,7 @@ describe('demo live-score sync — established league (ships with the real sched
           },
           games: contradicting,
           skipped: 0,
+          liveDetail: {},
         }),
       },
     )

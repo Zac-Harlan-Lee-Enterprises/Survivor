@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { espnWeekUrl, mapEspnStatus, parseScoreboard, type EspnScoreboard } from './espn'
+import {
+  espnWeekUrl,
+  liveDetailFor,
+  mapEspnStatus,
+  parseScoreboard,
+  type EspnScoreboard,
+} from './espn'
 import realWeek1 from './__fixtures__/espn-2026-week1.json'
 
 const OBSERVED = '2026-09-14T04:00:00.000Z'
@@ -149,5 +155,94 @@ describe('parseScoreboard result handling', () => {
 
   it('refuses a payload with no identifiable week', () => {
     expect(() => parseScoreboard({ events: [] }, OBSERVED)).toThrow(/season year and week/)
+  })
+})
+
+/**
+ * Where a game is up to, for the slate tiles. This is display detail only — it
+ * never reaches NFLGame, because a clock that ticks every few seconds would
+ * either bump resultVersion constantly or be shown stale between syncs.
+ */
+describe('live detail', () => {
+  const espnStatus = (over: Record<string, unknown> = {}) => ({
+    displayClock: '5:21',
+    period: 3,
+    type: { name: 'STATUS_IN_PROGRESS', shortDetail: '3rd 5:21' },
+    ...over,
+  })
+
+  it('prefers ESPN’s own short label, which already handles OT and period ends', () => {
+    expect(liveDetailFor('in_progress', espnStatus())).toBe('3rd 5:21')
+    expect(
+      liveDetailFor('in_progress', espnStatus({ type: { shortDetail: 'Halftime' } })),
+    ).toBe('Halftime')
+  })
+
+  it('falls back to the period and clock when no label is given', () => {
+    expect(liveDetailFor('in_progress', espnStatus({ type: {} }))).toBe('Q3 5:21')
+    expect(liveDetailFor('in_progress', espnStatus({ type: {}, displayClock: undefined }))).toBe(
+      'Q3',
+    )
+  })
+
+  it('says nothing when there is nothing to say', () => {
+    expect(liveDetailFor('in_progress', undefined)).toBeNull()
+    expect(liveDetailFor('in_progress', { type: {} })).toBeNull()
+  })
+
+  /** A scheduled game shows its kickoff; a final one already says who won. */
+  it('is empty for every status but in-progress', () => {
+    for (const status of ['scheduled', 'final', 'postponed', 'cancelled'] as const) {
+      expect(liveDetailFor(status, espnStatus()), status).toBeNull()
+    }
+  })
+
+  it('drops a label long enough to break the tile', () => {
+    const shouty = { type: { shortDetail: 'x'.repeat(80) }, period: 2, displayClock: '1:00' }
+    expect(liveDetailFor('in_progress', shouty)).toBe('Q2 1:00')
+  })
+
+  it('is keyed by game id, and only for games actually under way', () => {
+    const { games, liveDetail } = parseScoreboard(
+      {
+        season: { year: 2026, type: 2 },
+        week: { number: 5 },
+        events: [
+          {
+            date: '2026-10-11T17:00Z',
+            competitions: [
+              {
+                date: '2026-10-11T17:00Z',
+                status: espnStatus(),
+                competitors: [
+                  { homeAway: 'home', score: '14', team: { abbreviation: 'DET' } },
+                  { homeAway: 'away', score: '10', team: { abbreviation: 'NO' } },
+                ],
+              },
+            ],
+          },
+          {
+            date: '2026-10-11T17:00Z',
+            competitions: [
+              {
+                date: '2026-10-11T17:00Z',
+                status: { type: { name: 'STATUS_SCHEDULED' } },
+                competitors: [
+                  { homeAway: 'home', score: '0', team: { abbreviation: 'KC' } },
+                  { homeAway: 'away', score: '0', team: { abbreviation: 'DEN' } },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      OBSERVED,
+    )
+    expect(games).toHaveLength(2)
+    expect(liveDetail).toEqual({ '2026-w05-NO-at-DET': '3rd 5:21' })
+  })
+
+  it('reports nothing for the seeded week, where no game has kicked off', () => {
+    expect(parseScoreboard(realWeek1 as EspnScoreboard, OBSERVED).liveDetail).toEqual({})
   })
 })

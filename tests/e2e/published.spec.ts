@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { ROSTER_SIZE } from './helpers'
+import { ROSTER_SIZE, stubEspnOffline } from './helpers'
 
 /**
  * The bundle exactly as GitHub Pages serves it.
@@ -11,6 +11,8 @@ import { ROSTER_SIZE } from './helpers'
  */
 test.describe('published site offers no way to pick', () => {
   test.beforeEach(async ({ page }) => {
+    // This project runs on the real clock, so a live week would really poll.
+    await stubEspnOffline(page)
     await page.goto('./')
     await page.evaluate(() => localStorage.clear())
     await page.reload()
