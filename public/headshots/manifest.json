@@ -76,6 +76,17 @@
       "medium": "headshots/jason-snook-medium.webp"
     }
   },
+  "joanna-moss": {
+    "from": "JoannaMoss.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 28550,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/joanna-moss-thumb.webp",
+      "medium": "headshots/joanna-moss-medium.webp"
+    }
+  },
   "joseph-tomczuk": {
     "from": "JosephTomczuk.jpeg",
     "contentType": "image/webp",

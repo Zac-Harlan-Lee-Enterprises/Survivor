@@ -159,3 +159,11 @@ NEXT   : Open/merge the PR.
 BLOCKED: none.
 NOTE   : e2e MUST keep ESPN stubbed. resetDemo now aborts every call to the feed; without it the
          suite fires real requests that hang, once per page view, doubled by retry: 1.
+
+--- 2026-09-09  Claude (feat/add-joanna-moss) ---
+DONE   : Added Joanna Moss (DAL) with her photo — the first and only player on the Cowboys.
+         League is 23. Chloe Bourque remains the only player without a photo.
+TESTS  : after merging main (live scores): vitest 224 passing, playwright 89 passing / 2 skipped,
+         validate green, sweep clean.
+NEXT   : Open/merge the PR.
+BLOCKED: none.
