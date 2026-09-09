@@ -10,6 +10,17 @@
       "medium": "headshots/bradley-riedell-medium.webp"
     }
   },
+  "corey-cowell": {
+    "from": "CoreyCowell.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 28660,
+    "width": 512,
+    "height": 512,
+    "variants": {
+      "thumb": "headshots/corey-cowell-thumb.webp",
+      "medium": "headshots/corey-cowell-medium.webp"
+    }
+  },
   "dave-johnson": {
     "from": "DaveJohnson.jpeg",
     "contentType": "image/webp",
@@ -43,6 +54,61 @@
       "medium": "headshots/james-parker-medium.webp"
     }
   },
+  "jared-marks": {
+    "from": "JaredMarks.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 26340,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/jared-marks-thumb.webp",
+      "medium": "headshots/jared-marks-medium.webp"
+    }
+  },
+  "jason-snook": {
+    "from": "JasonSnook.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 24972,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/jason-snook-thumb.webp",
+      "medium": "headshots/jason-snook-medium.webp"
+    }
+  },
+  "joseph-tomczuk": {
+    "from": "JosephTomczuk.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 18546,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/joseph-tomczuk-thumb.webp",
+      "medium": "headshots/joseph-tomczuk-medium.webp"
+    }
+  },
+  "kc-walker": {
+    "from": "KCWalker.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 70902,
+    "width": 512,
+    "height": 512,
+    "variants": {
+      "thumb": "headshots/kc-walker-thumb.webp",
+      "medium": "headshots/kc-walker-medium.webp"
+    }
+  },
+  "matt-hadley": {
+    "from": "MattHadley.jpg",
+    "contentType": "image/webp",
+    "sizeBytes": 46464,
+    "width": 512,
+    "height": 512,
+    "variants": {
+      "thumb": "headshots/matt-hadley-thumb.webp",
+      "medium": "headshots/matt-hadley-medium.webp"
+    }
+  },
   "maya-israel": {
     "from": "MayaIsrael.jpeg",
     "contentType": "image/webp",
@@ -52,6 +118,28 @@
     "variants": {
       "thumb": "headshots/maya-israel-thumb.webp",
       "medium": "headshots/maya-israel-medium.webp"
+    }
+  },
+  "melanie-moeller": {
+    "from": "MelanieMoeller.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 13266,
+    "width": 309,
+    "height": 309,
+    "variants": {
+      "thumb": "headshots/melanie-moeller-thumb.webp",
+      "medium": "headshots/melanie-moeller-medium.webp"
+    }
+  },
+  "mike-lancaster": {
+    "from": "MikeLancaster.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 15900,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/mike-lancaster-thumb.webp",
+      "medium": "headshots/mike-lancaster-medium.webp"
     }
   },
   "nate-adams": {

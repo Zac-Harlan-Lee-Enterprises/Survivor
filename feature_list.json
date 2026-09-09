@@ -410,8 +410,8 @@
   {
     "id": "headshots-real-photos",
     "category": "visual",
-    "description": "Every player has a real headshot, imported from the commissioner's photos by npm run headshots:import (EXIF-aware, face-aware square crop, 128px + 512px WebP). A player without a photo falls back to the neutral default avatar \u2014 no generated stand-in ever poses as someone's face.",
-    "verification": "test -f public/headshots/default.svg && test -f public/headshots/manifest.json && jq -e '[.images[] | select(.contentType==\"image/webp\")] | length >= 9' src/data/demo/fixtures/demo-season.json >/dev/null && jq -e '[.profiles[] | select(.imageId == null)] | length == 0' src/data/demo/fixtures/demo-season.json",
+    "description": "Players' headshots are real photos, imported from the commissioner's photos by npm run headshots:import (EXIF-aware, face-aware square crop, 128px + 512px WebP). A player with no photo carries no image and falls back to the neutral default avatar \u2014 no generated stand-in ever poses as someone's face, and no profile ever points at an image that is not there.",
+    "verification": "test -f public/headshots/default.svg && test -f public/headshots/manifest.json && jq -e '[.images[] | select(.contentType != \"image/webp\")] | length == 0' src/data/demo/fixtures/demo-season.json >/dev/null && jq -e '[.images[]] | length >= 9' src/data/demo/fixtures/demo-season.json >/dev/null && jq -e '([.profiles[] | select(.imageId != null) | .imageId] - [.images[].id]) | length == 0' src/data/demo/fixtures/demo-season.json",
     "priority": 2,
     "hermetic": true,
     "passes": true

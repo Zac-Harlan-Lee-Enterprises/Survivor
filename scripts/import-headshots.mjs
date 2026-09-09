@@ -12,6 +12,9 @@
  * and writes two WebP variants (128px thumb, 512px medium) into
  * public/headshots/, plus a manifest the fixture generator reads.
  *
+ * A photo whose automatic crop lands badly can be nudged by hand — see
+ * CROP_NUDGES below.
+ *
  * Files are matched to players by name. Anything ambiguous or unmatched is
  * REPORTED, never guessed — the same rule the CSV import follows.
  */
@@ -29,6 +32,27 @@ const OUT = resolve(process.cwd(), 'public/headshots')
 const GENERATOR = resolve(process.cwd(), 'scripts/generate-demo-fixtures.ts')
 const DRY = args.includes('--dry-run')
 const VARIANTS = { thumb: 128, medium: 512 }
+
+/**
+ * Per-player crop nudges, for the occasional photo the attention strategy
+ * reads wrong. A wide landscape selfie is the usual culprit: a bright sky and
+ * a busy horizon can outscore the face, leaving the person low in the frame
+ * under a band of cloud.
+ *
+ * `y` positions the square down the source as a fraction of the leftover
+ * height — 0 is flush to the top, 0.5 centred, 1 flush to the bottom. `x` does
+ * the same across the width. A larger `y` moves the crop DOWN the photo, which
+ * moves the subject UP in the finished headshot.
+ *
+ * Values are expressed against the image after EXIF rotation, so they mean
+ * what they look like rather than however the camera happened to store it.
+ * Anything not listed here uses the attention strategy, which is right nearly
+ * always. Keep this list short: a better original beats a nudge.
+ */
+const CROP_NUDGES = {
+  // Wide mountain selfie — the sky outscored his face.
+  'kc-walker': { y: 0.85 },
+}
 const ACCEPTED = new Set(['.jpg', '.jpeg', '.png', '.webp'])
 
 if (!existsSync(SRC)) {
@@ -132,6 +156,20 @@ for (const file of files) {
   }
 
   const meta = await sharp(src).metadata()
+  const nudge = CROP_NUDGES[playerId]
+  // A nudged photo is rotated ONCE up front, so the offsets are measured
+  // against the image as a person sees it rather than as the camera stored it.
+  const oriented = nudge ? await sharp(src).rotate().toBuffer({ resolveWithObject: true }) : null
+  let square = null
+  if (oriented) {
+    const edge = Math.min(oriented.info.width, oriented.info.height)
+    square = {
+      left: Math.round((oriented.info.width - edge) * (nudge.x ?? 0.5)),
+      top: Math.round((oriented.info.height - edge) * (nudge.y ?? 0.5)),
+      width: edge,
+      height: edge,
+    }
+  }
   const variants = {}
   let mediumBytes = 0
   let mediumEdge = 0
@@ -139,11 +177,10 @@ for (const file of files) {
     const rel = `headshots/${playerId}-${variant}.webp`
     // rotate() applies EXIF orientation; attention crop keeps the face in frame;
     // withoutEnlargement avoids faking detail a small original does not have.
-    const buf = await sharp(src)
-      .rotate()
+    const buf = await (oriented ? sharp(oriented.data).extract(square) : sharp(src).rotate())
       .resize(size, size, {
         fit: 'cover',
-        position: sharp.strategy.attention,
+        ...(oriented ? {} : { position: sharp.strategy.attention }),
         withoutEnlargement: true,
       })
       .webp({ quality: 88 })
@@ -152,7 +189,9 @@ for (const file of files) {
     variants[variant] = rel
     if (variant === 'medium') {
       mediumBytes = buf.length
-      mediumEdge = Math.min(size, meta.width ?? size, meta.height ?? size)
+      mediumEdge = square
+        ? Math.min(size, square.width)
+        : Math.min(size, meta.width ?? size, meta.height ?? size)
     }
   }
   manifest[playerId] = {
