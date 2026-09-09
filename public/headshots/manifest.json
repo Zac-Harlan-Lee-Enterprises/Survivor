@@ -1,4 +1,15 @@
 {
+  "bradley-riedell": {
+    "from": "BradleyRiedell.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 20690,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/bradley-riedell-thumb.webp",
+      "medium": "headshots/bradley-riedell-medium.webp"
+    }
+  },
   "dave-johnson": {
     "from": "DaveJohnson.jpeg",
     "contentType": "image/webp",
