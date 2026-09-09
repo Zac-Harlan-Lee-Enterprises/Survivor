@@ -208,6 +208,17 @@
       "medium": "headshots/paul-lim-medium.webp"
     }
   },
+  "phyllis-collins": {
+    "from": "PhyllisCollins.png",
+    "contentType": "image/webp",
+    "sizeBytes": 6376,
+    "width": 231,
+    "height": 231,
+    "variants": {
+      "thumb": "headshots/phyllis-collins-thumb.webp",
+      "medium": "headshots/phyllis-collins-medium.webp"
+    }
+  },
   "shahid-ali": {
     "from": "ShahidAli.jpeg",
     "contentType": "image/webp",
@@ -261,6 +272,17 @@
     "variants": {
       "thumb": "headshots/tracy-nelson-thumb.webp",
       "medium": "headshots/tracy-nelson-medium.webp"
+    }
+  },
+  "wesley-childers": {
+    "from": "WesleyChilders.png",
+    "contentType": "image/webp",
+    "sizeBytes": 40056,
+    "width": 414,
+    "height": 414,
+    "variants": {
+      "thumb": "headshots/wesley-childers-thumb.webp",
+      "medium": "headshots/wesley-childers-medium.webp"
     }
   },
   "zac-harlan": {

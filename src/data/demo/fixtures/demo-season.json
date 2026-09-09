@@ -254,6 +254,24 @@
       "joinedAt": "2026-08-15T14:00:00.000Z"
     },
     {
+      "id": "m-phyllis-collins",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "phyllis-collins",
+      "role": "player",
+      "status": "active",
+      "joinedAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "m-wesley-childers",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "wesley-childers",
+      "role": "player",
+      "status": "active",
+      "joinedAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
       "id": "m-zac-harlan",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -388,6 +406,16 @@
       "playerId": "cindy-mendoza",
       "displayName": "Cindy Mendoza",
       "imageId": "img-cindy-mendoza"
+    },
+    {
+      "playerId": "phyllis-collins",
+      "displayName": "Phyllis Collins",
+      "imageId": "img-phyllis-collins"
+    },
+    {
+      "playerId": "wesley-childers",
+      "displayName": "Wesley Childers",
+      "imageId": "img-wesley-childers"
     },
     {
       "playerId": "zac-harlan",
@@ -705,6 +733,32 @@
       "variants": {
         "thumb": "headshots/cindy-mendoza-thumb.webp",
         "medium": "headshots/cindy-mendoza-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-phyllis-collins",
+      "playerId": "phyllis-collins",
+      "contentType": "image/webp",
+      "sizeBytes": 6376,
+      "width": 231,
+      "height": 231,
+      "variants": {
+        "thumb": "headshots/phyllis-collins-thumb.webp",
+        "medium": "headshots/phyllis-collins-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-wesley-childers",
+      "playerId": "wesley-childers",
+      "contentType": "image/webp",
+      "sizeBytes": 40056,
+      "width": 414,
+      "height": 414,
+      "variants": {
+        "thumb": "headshots/wesley-childers-thumb.webp",
+        "medium": "headshots/wesley-childers-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },
@@ -1049,6 +1103,32 @@
       "source": "import"
     },
     {
+      "id": "pick-phyllis-collins-1",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "phyllis-collins",
+      "week": 1,
+      "teamId": "SEA",
+      "gameId": "2026-w01-NE-at-SEA",
+      "submittedAt": "2026-09-08T08:20:00.000Z",
+      "updatedAt": "2026-09-08T08:20:00.000Z",
+      "version": 1,
+      "source": "import"
+    },
+    {
+      "id": "pick-wesley-childers-1",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "wesley-childers",
+      "week": 1,
+      "teamId": "DET",
+      "gameId": "2026-w01-NO-at-DET",
+      "submittedAt": "2026-09-12T10:00:00.000Z",
+      "updatedAt": "2026-09-12T10:00:00.000Z",
+      "version": 1,
+      "source": "import"
+    },
+    {
       "id": "pick-zac-harlan-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1056,8 +1136,8 @@
       "week": 1,
       "teamId": "LAC",
       "gameId": "2026-w01-ARI-at-LAC",
-      "submittedAt": "2026-09-12T04:25:00.000Z",
-      "updatedAt": "2026-09-12T04:25:00.000Z",
+      "submittedAt": "2026-09-09T22:25:00.000Z",
+      "updatedAt": "2026-09-09T22:25:00.000Z",
       "version": 1,
       "source": "import"
     }

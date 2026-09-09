@@ -96,6 +96,8 @@ const PEOPLE: Person[] = [
   { id: 'allison-petty', name: 'Allison Petty', role: 'player' },
   { id: 'don-turner', name: 'Don Turner', role: 'player' },
   { id: 'cindy-mendoza', name: 'Cindy Mendoza', role: 'player' },
+  { id: 'phyllis-collins', name: 'Phyllis Collins', role: 'player' },
+  { id: 'wesley-childers', name: 'Wesley Childers', role: 'player' },
   // Commissioner: runs the league and holds the admin tools.
   { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner' },
 ]
@@ -134,6 +136,8 @@ const STORY: Story = {
   'allison-petty': { 1: ['DET', 'P'] },
   'don-turner': { 1: ['PIT', 'P'] },
   'cindy-mendoza': { 1: ['JAX', 'P'] },
+  'phyllis-collins': { 1: ['SEA', 'P'] },
+  'wesley-childers': { 1: ['DET', 'P'] },
   'zac-harlan': { 1: ['LAC', 'P'] },
 }
 
