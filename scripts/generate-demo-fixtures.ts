@@ -90,6 +90,8 @@ const PEOPLE: Person[] = [
   { id: 'matt-hadley', name: 'Matt Hadley', role: 'player' },
   { id: 'mike-lancaster', name: 'Mike Lancaster', role: 'player' },
   { id: 'kc-walker', name: 'KC Walker', role: 'player' },
+  { id: 'paul-lim', name: 'Paul Lim', role: 'player' },
+  { id: 'tony-canody', name: 'Tony Canody', role: 'player' },
   // Commissioner: runs the league and holds the admin tools.
   { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner' },
 ]
@@ -121,6 +123,8 @@ const STORY: Story = {
   'matt-hadley': { 1: ['GB', 'P'] },
   'mike-lancaster': { 1: ['SEA', 'P'] },
   'kc-walker': { 1: ['JAX', 'P'] },
+  'paul-lim': { 1: ['JAX', 'P'] },
+  'tony-canody': { 1: ['LAC', 'P'] },
   'zac-harlan': { 1: ['LAC', 'P'] },
 }
 

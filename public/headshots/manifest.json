@@ -153,6 +153,17 @@
       "medium": "headshots/nate-adams-medium.webp"
     }
   },
+  "paul-lim": {
+    "from": "PaulLim.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 23714,
+    "width": 400,
+    "height": 400,
+    "variants": {
+      "thumb": "headshots/paul-lim-thumb.webp",
+      "medium": "headshots/paul-lim-medium.webp"
+    }
+  },
   "shahid-ali": {
     "from": "ShahidAli.jpeg",
     "contentType": "image/webp",
@@ -184,6 +195,17 @@
     "variants": {
       "thumb": "headshots/stacey-markendorff-thumb.webp",
       "medium": "headshots/stacey-markendorff-medium.webp"
+    }
+  },
+  "tony-canody": {
+    "from": "TonyCanody.jpg",
+    "contentType": "image/webp",
+    "sizeBytes": 56438,
+    "width": 487,
+    "height": 487,
+    "variants": {
+      "thumb": "headshots/tony-canody-thumb.webp",
+      "medium": "headshots/tony-canody-medium.webp"
     }
   },
   "tracy-nelson": {
