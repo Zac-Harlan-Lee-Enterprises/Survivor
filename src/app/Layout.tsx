@@ -176,7 +176,9 @@ function DemoBanner({ synthetic }: { synthetic: boolean }) {
   return (
     <div className="bg-sky-400/15 px-4 py-1.5 text-center text-xs text-sky-400" role="note">
       <strong className="font-display uppercase tracking-widest">Demo mode</strong> —{' '}
-      {synthetic ? 'synthetic schedule and sample players. ' : ''}
+      {synthetic
+        ? 'the matchups and kickoff times are placeholders, not the real NFL schedule. '
+        : ''}
       Changes are saved in this browser only, not shared with other users.
     </div>
   )

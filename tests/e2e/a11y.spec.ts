@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
-import { COMMISSIONER, resetDemo, signInAs } from './helpers'
+import { COMMISSIONER, PLAYER, resetDemo, signInAs } from './helpers'
 
 /** WCAG 2.x A/AA automated checks (axe-core) on the primary screens. */
 
@@ -8,11 +8,11 @@ const ROUTES = [
   { name: 'league home', path: './', signIn: null },
   { name: 'leaderboard', path: './#/leaderboard', signIn: null },
   { name: 'season grid', path: './#/grid', signIn: null },
-  { name: 'player profile', path: './#/players/marcus-bell', signIn: null },
+  { name: 'player profile', path: './#/players/maya-israel', signIn: null },
   { name: 'sign in', path: './#/sign-in', signIn: null },
-  { name: 'player dashboard', path: './#/me', signIn: 'Emily Chen' },
-  { name: 'pick page', path: './#/pick', signIn: 'Emily Chen' },
-  { name: 'my season', path: './#/my-season', signIn: 'Emily Chen' },
+  { name: 'player dashboard', path: './#/me', signIn: PLAYER },
+  { name: 'pick page', path: './#/pick', signIn: PLAYER },
+  { name: 'my season', path: './#/my-season', signIn: PLAYER },
   { name: 'commissioner players', path: './#/commissioner/players', signIn: COMMISSIONER },
   { name: 'commissioner results', path: './#/commissioner/results', signIn: COMMISSIONER },
 ]

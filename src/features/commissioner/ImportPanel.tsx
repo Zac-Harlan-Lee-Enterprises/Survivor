@@ -8,9 +8,10 @@ import { Label, Textarea } from '@/components/ui/input'
 import { Notice } from '@/components/Notice'
 import { errorMessage } from '@/lib/errors'
 
-const SAMPLE = `Player,Week 1,Week 2,Week 3
-Marcus Bell,Chiefs,Eagles,Ravens
-Priya Raman,Bills,49ers*,Lions
+const SAMPLE = `Player,Week 1
+Maya Israel,Jaguars
+Shahid Ali,Ravens
+Dave Johnson,Lions*
 `
 
 /**

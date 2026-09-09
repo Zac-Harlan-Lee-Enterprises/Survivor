@@ -13,18 +13,18 @@ test.describe('GitHub Pages subpath hosting', () => {
       if (r.status() >= 400) failed.push(`${r.status()} ${r.url()}`)
     })
     await resetDemo(page)
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(/week 4/i)
-    await expect(page.getByRole('img', { name: /headshot of marcus bell/i }).first()).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/week 1/i)
+    await expect(page.getByRole('img', { name: /headshot of maya israel/i }).first()).toBeVisible()
     expect(failed, 'no asset may 404 under the subpath').toEqual([])
   })
 
   test('refreshing a nested hash route keeps the page', async ({ page }) => {
     await resetDemo(page)
-    await page.goto('./#/players/marcus-bell')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(/marcus bell/i)
+    await page.goto('./#/players/maya-israel')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/maya israel/i)
     await page.reload()
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(/marcus bell/i)
-    expect(page.url()).toContain('/Survivor/#/players/marcus-bell')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/maya israel/i)
+    expect(page.url()).toContain('/Survivor/#/players/maya-israel')
   })
 
   test('a clean deep link is rewritten by 404.html into the hash route', async ({ page }) => {

@@ -9,7 +9,7 @@ GitHub Pages is a static host: no Node, no server rendering, no API routes, no r
 - `build/githubPagesPlugin.ts` emits:
   - `404.html` with the base baked in — Pages serves it (HTTP 404) for any path that is not a file; it rewrites `/<base>/leaderboard?x=1` to `/<base>/?x=1#/leaderboard`.
   - `.nojekyll` so Pages serves every file verbatim.
-- Routing is **hash-based** (`react-router` `HashRouter`), so refreshing `/Survivor/#/players/marcus-bell` requests `/Survivor/` — always a real file.
+- Routing is **hash-based** (`react-router` `HashRouter`), so refreshing `/Survivor/#/players/maya-israel` requests `/Survivor/` — always a real file.
 
 ## Local verification identical to Pages
 

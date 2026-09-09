@@ -295,9 +295,7 @@
     "priority": 2,
     "hermetic": true,
     "passes": true,
-    "depends_on": [
-      "build-static-output"
-    ]
+    "depends_on": ["build-static-output"]
   },
   {
     "id": "e2e-pages-subpath-refresh",
@@ -363,13 +361,13 @@
     "passes": true
   },
   {
-    "id": "import-real-league-from-screenshot",
+    "id": "league-seeded-real-roster",
     "category": "functional",
-    "description": "Seed the real league from the commissioner's picks. data/import/league.csv now holds week 1 (9 players, supplied in chat, not from the screenshot \u2014 that was never attached). The CSV parses clean, but 0 of 9 picks are committable until those 9 people are league members: the demo fixture still has the fictional sample cast. Add them (Commissioner -> Players, or reseed) then import.",
-    "verification": "test -f data/import/league.csv && npm run -s import:report -- data/import/league.csv --out docs/import-report.generated.md",
+    "description": "The league is seeded with the real roster and their real week 1 picks (nine players, Zac Harlan as commissioner). No results are seeded, because none were supplied: every pick is pending and everyone holds three lives. The schedule stays synthetic and flagged. Source picks live in data/import/league.csv (gitignored: real names).",
+    "verification": "jq -e '(.memberships | length) >= 9 and ([.memberships[] | select(.role==\"commissioner\")] | length) == 1 and ([.games[] | select(.status==\"final\")] | length) == 0 and (.picks | length) >= 9' src/data/demo/fixtures/demo-season.json",
     "priority": 2,
     "hermetic": true,
-    "passes": false
+    "passes": true
   },
   {
     "id": "ci-workflows-valid",
@@ -424,8 +422,6 @@
     "priority": 3,
     "hermetic": false,
     "passes": false,
-    "depends_on": [
-      "connected-mode-deployed"
-    ]
+    "depends_on": ["connected-mode-deployed"]
   }
 ]

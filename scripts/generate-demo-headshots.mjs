@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Generates the sample headshots used by demo mode: deterministic SVG
-// avatars (initials on a team-colour gradient). Real leagues upload real
-// photos in connected mode; these are placeholders so the demo has faces.
+// Generates placeholder headshots for the league roster: deterministic SVG
+// avatars (initials on a team-colour gradient). They exist so every player has
+// a face before real photos are uploaded (Commissioner → Players, or connected
+// mode). Slugs must match the player ids in generate-demo-fixtures.ts.
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -9,16 +10,18 @@ const OUT = resolve(process.cwd(), 'public/headshots')
 mkdirSync(OUT, { recursive: true })
 
 const PEOPLE = [
-  ['marcus-bell', 'MB', '#E31837', '#FFB81C'],
-  ['priya-raman', 'PR', '#00338D', '#C60C30'],
-  ['danny-okafor', 'DO', '#041E42', '#869397'],
-  ['sofia-reyes', 'SR', '#203731', '#FFB612'],
-  ['tom-lindqvist', 'TL', '#125740', '#0b1020'],
-  ['jada-whitfield', 'JW', '#004C54', '#A5ACAD'],
-  ['luis-herrera', 'LH', '#AA0000', '#B3995D'],
-  ['emily-chen', 'EC', '#241773', '#9E7C0C'],
-  ['kwame-mensah', 'KM', '#FB4F14', '#0b1020'],
-  ['hannah-obrien', 'HO', '#0076B6', '#B0B7BC'],
+  // [slug, initials, colour A, colour B] — distinct pairs so faces stay
+  // tellable apart at thumbnail size. Placeholders only: the commissioner
+  // replaces these with real photos in Commissioner → Players.
+  ['maya-israel', 'MI', '#006778', '#D7A22A'],
+  ['shahid-ali', 'SA', '#241773', '#9E7C0C'],
+  ['dave-johnson', 'DJ', '#0076B6', '#B0B7BC'],
+  ['james-parker', 'JP', '#004C54', '#A5ACAD'],
+  ['nate-adams', 'NA', '#0080C6', '#FFC20E'],
+  ['stacey-markendorff', 'SM', '#AA0000', '#B3995D'],
+  ['sheila-acker', 'SA', '#002244', '#69BE28'],
+  ['dominic-green', 'DG', '#203731', '#FFB612'],
+  ['zac-harlan', 'ZH', '#E31837', '#FFB81C'],
 ]
 
 function svg(initials, a, b, opts = {}) {

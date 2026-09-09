@@ -42,7 +42,7 @@ NEXT   : 1) Human: review + commit the sensitive paths left UNCOMMITTED on purpo
             Actions), then run: bash harden-github.sh <owner>/<repo>
          3) Export the real league spreadsheet to data/import/league.csv and run
               npm run import:report -- data/import/league.csv --out docs/import-report.generated.md
-            then import via Commissioner → Import (registry: import-real-league-from-screenshot).
+            then import via Commissioner → Import (registry: league-seeded-real-roster).
          4) Connected mode when wanted: docs/aws-connected-mode.md (sam deploy is a human action).
 BLOCKED: The spreadsheet screenshot referenced in the brief was NOT attached to the session; no real league
          data was seeded (docs/import-report.md). SAM CLI is not installed locally, so `sam validate --lint`

@@ -1,12 +1,12 @@
 import type { Clock } from '../interfaces'
 
 /**
- * Demo clock. Pinned to a fixed instant by default so the demo season always
- * shows the same "live" week (results for weeks 1–3, week 4 open) no matter
- * when someone opens the GitHub Pages site. The commissioner dashboard can
- * move it or release it to real time.
+ * Demo clock. Pinned to a fixed instant so the season always opens in the same
+ * state no matter when someone loads the GitHub Pages site: week 1 open, every
+ * pick already in and still changeable, nothing kicked off yet. The
+ * commissioner dashboard can move it forward or release it to real time.
  */
-export const DEMO_NOW = '2026-10-04T15:30:00.000Z' // Sunday of week 4, 11:30am ET
+export const DEMO_NOW = '2026-09-09T16:00:00.000Z' // Wed before week 1, ahead of every kickoff
 
 const KEY = 'survivor:demo:clock:v1'
 

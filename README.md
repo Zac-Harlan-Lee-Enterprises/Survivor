@@ -6,21 +6,21 @@ A responsive React + TypeScript survivor-pool app that replaces the commissioner
 
 | Mode | Hosting | Data | Who it's for |
 |------|---------|------|--------------|
-| **Demo / static** (default) | GitHub Pages only | seeded synthetic season + localStorage overlay (this browser only, not shared) | demos, UI development, trying the rules |
+| **Demo / static** (default) | GitHub Pages only | real roster + week 1 picks, synthetic schedule, localStorage overlay (this browser only, not shared) | trying the rules, UI development, sharing a link |
 | **Connected** | GitHub Pages + AWS (API Gateway, Lambda, DynamoDB, S3, Cognito) | authoritative, multi-user, audited | the real league |
 
 ## What's in the box
 
 - **League Home** — who's still standing at a glance: headshot grid, lives, the bubble, the graveyard, this week's slate, countdown to the next kickoff.
 - **Player Dashboard** — big headshot, *Still Alive / On the Bubble / Eliminated / Champion*, lives meter, current pick, countdown, mini leaderboard.
-- **Weekly Pick** — polished team cards (opponent, home/away, kickoff, availability), explicit *"You are riding with Green Bay in week 4."* confirmation, change until kickoff, huge tap targets on phones.
+- **Weekly Pick** — polished team cards (opponent, home/away, kickoff, availability), explicit *"You are riding with Green Bay in week 1."* confirmation, change until kickoff, huge tap targets on phones.
 - **Leaderboard** — survivors first, then the desaturated **Survivor Graveyard**; champion spotlight with confetti.
 - **Season Grid** — the spreadsheet reborn: players × weeks, cells coloured by win/loss/tie/pending/no-pick, elimination markers, hidden picks as locks; expandable cards on mobile.
 - **My Season** — available / used / unavailable teams, pick history with outcomes, strategy nudges.
 - **Player Profile** — a sports card: headshot, nickname, status, weeks survived, teams remaining.
 - **Commissioner** — players & headshots (drag-drop, crop, replace, remove), enter/correct any pick, correct any result, manual schedule entry, league rules, champion decisions, CSV import with a blocking report, full audit log — every change recorded.
 
-Rules engine, import, API and UI are covered by 120+ unit/API tests, 27 Playwright critical-path tests (desktop + mobile) and axe WCAG A/AA checks on every screen.
+Rules engine, import, API and UI are covered by 120+ unit/API tests and 51 Playwright critical-path tests (desktop + mobile), including axe WCAG A/AA checks on every screen.
 
 ## Local development
 
@@ -32,7 +32,7 @@ bash init.sh --with-pages    # + production build served exactly like GitHub Pag
 bash init.sh --stop
 ```
 
-Sign in as any sample player (no passwords in demo mode); **Danny Okafor** is the commissioner. The demo clock is pinned to Sunday of week 4 so the season always looks alive; the commissioner's Settings tab can move it, and *Reset demo data* wipes localStorage.
+Sign in as any league member (no passwords in demo mode); **Zac Harlan** is the commissioner. The demo clock is pinned to the Wednesday before week 1, so the season always opens in the same state: every pick in, nothing kicked off. The commissioner's Settings tab can move the clock forward, and *Reset demo data* wipes localStorage.
 
 Useful scripts (`npm run …`): `dev`, `build`, `lint`, `typecheck`, `test`, `test:e2e`, `validate` (all of CI), `fixtures:generate`, `import:report`, `api:build`, `knip`.
 
@@ -52,7 +52,7 @@ Every `VITE_*` value is compiled into the public bundle. **No secrets ever go th
 
 ## NFL data
 
-Demo mode uses a **synthetic** schedule (flagged `isSynthetic`) — it is not the real NFL schedule. Connected mode polls a provider on a schedule (`espn` unofficial public scoreboard, or your own implementation of `ExternalNFLProvider`) with idempotent, versioned result processing, and the commissioner can always enter schedules and results by hand. See [docs/nfl-provider.md](docs/nfl-provider.md).
+Demo mode ships the real roster and their real week 1 picks, but the **schedule is synthetic** (flagged `isSynthetic`) — the matchups and kickoff times are placeholders, not the real NFL fixture list, and no results are recorded until you enter them. Connected mode polls a provider on a schedule (`espn` unofficial public scoreboard, or your own implementation of `ExternalNFLProvider`) with idempotent, versioned result processing, and the commissioner can always enter schedules and results by hand. See [docs/nfl-provider.md](docs/nfl-provider.md).
 
 ## Migrating from the spreadsheet
 

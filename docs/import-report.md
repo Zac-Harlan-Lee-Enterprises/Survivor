@@ -1,16 +1,23 @@
 # Spreadsheet import report
 
-## Status of the attached screenshot
+## Where the league data came from
 
-**The spreadsheet screenshot referenced in the brief did not reach this session** — no image was attached and none was found in the project directory (the only image nearby was unrelated and was not used). Per the brief's own instruction not to guess unreadable data, **no real league data was seeded**. The demo league uses clearly fictional sample players and a synthetic schedule.
+The spreadsheet screenshot referenced in the original brief **never reached the session** — no image was attached. Nothing was guessed from it.
 
-What exists instead, ready for the real data:
+Instead the commissioner supplied the week 1 picks directly, and those are what the app is seeded with:
 
-1. `data/import/sample-league.csv` — the expected CSV shape (players × weeks, `*` marks a losing/red cell).
-2. `npm run import:report -- <sheet.csv> --out report.md` — validates against the season's schedule and rules and writes the report.
-3. Commissioner → **Import** tab — paste/upload the CSV, review the report, commit picks (blocked while errors remain).
+- `data/import/league.csv` holds them in import format (gitignored: it names real people).
+- `scripts/generate-demo-fixtures.ts` seeds the same nine players and picks into the league.
+- **No results are seeded.** None were supplied, so none were invented; every pick is pending and everyone holds three lives until real results are entered.
+- The **schedule remains synthetic**. The real NFL fixture list is not known here, so matchups and kickoff times are placeholders and the season stays flagged `isSynthetic`.
 
-Registry entry `import-real-league-from-screenshot` stays `passes: false` until **data/import/league.csv** exists (gitignored by default because it holds real names).
+To load more weeks, add columns to the CSV and import it again (Commissioner → Import), or run the report from the command line:
+
+```bash
+npm run import:report -- data/import/league.csv --out report.md
+```
+
+`data/import/sample-league.csv` is a format example with placeholder names, kept for documentation and covered by the `import-report-sample` registry entry.
 
 ## What the report flags
 

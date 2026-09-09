@@ -1,10 +1,15 @@
 /**
- * Generates src/data/demo/fixtures/demo-season.json — the seed for demo mode.
+ * Generates src/data/demo/fixtures/demo-season.json — the seed the app loads
+ * in demo mode.
  *
- * EVERYTHING here is synthetic: sample players, a made-up schedule and
- * made-up results. It is deterministic (seeded PRNG) so the demo, the tests
- * and the screenshots always agree. It is NOT the real NFL schedule; real
- * data comes from a provider in connected mode.
+ * REAL: the roster and their week 1 picks, supplied by the commissioner.
+ * SYNTHETIC: the schedule (matchups, kickoff times, bye weeks). The real NFL
+ * fixture list is not known here and is never invented as fact — the season
+ * is flagged isSynthetic so the UI says so.
+ * ABSENT: results. None were supplied, so none are fabricated; every pick is
+ * pending and every player still holds all three lives.
+ *
+ * Deterministic (seeded PRNG) so the app, the tests and the screenshots agree.
  *
  * Run: npm run fixtures:generate
  */
@@ -109,7 +114,17 @@ function kickoff(week: number, slot: Slot): string {
 }
 
 // ---------------------------------------------------------------------------
-// The cast (fictional) and the story the demo tells
+// The roster (real league members) and the state of the season
+//
+// The PEOPLE and their week 1 picks are REAL, supplied by the commissioner.
+// The SCHEDULE below is still synthetic — the real NFL fixture list is not
+// known here and is never invented as fact, which is why the season carries
+// isSynthetic: true and the app shows a banner saying so.
+//
+// No results are recorded, because none were supplied. Every week 1 pick is
+// pending, every player has all three lives, and nothing has been fabricated
+// about how anyone is doing. Enter real results in Commissioner → Results
+// (or connect a provider) and the standings compute themselves.
 // ---------------------------------------------------------------------------
 const SEASON_YEAR = 2026
 const LEAGUE_ID = 'demo-league'
@@ -119,111 +134,49 @@ const CREATED = '2026-08-15T14:00:00.000Z'
 interface Person {
   id: string
   name: string
-  nickname: string
-  tagline: string
+  /** Left unset on purpose: inventing nicknames or personality for real people
+   *  would be fabrication. The commissioner can add them in the app. */
+  nickname?: string
+  tagline?: string
   role: LeagueMembership['role']
   hasImage: boolean
 }
 const PEOPLE: Person[] = [
-  {
-    id: 'marcus-bell',
-    name: 'Marcus Bell',
-    nickname: 'The Closer',
-    tagline: 'Never picks a road dog.',
-    role: 'player',
-    hasImage: true,
-  },
-  {
-    id: 'priya-raman',
-    name: 'Priya Raman',
-    nickname: 'Ice',
-    tagline: 'Two-time champ. Allegedly.',
-    role: 'player',
-    hasImage: true,
-  },
-  {
-    id: 'danny-okafor',
-    name: 'Danny Okafor',
-    nickname: 'Commish',
-    tagline: 'Runs the league. Loses in it.',
-    role: 'commissioner',
-    hasImage: true,
-  },
-  {
-    id: 'sofia-reyes',
-    name: 'Sofia Reyes',
-    nickname: 'Sunday Sofia',
-    tagline: 'Picks with her heart.',
-    role: 'player',
-    hasImage: true,
-  },
-  {
-    id: 'tom-lindqvist',
-    name: 'Tom Lindqvist',
-    nickname: 'Big Tom',
-    tagline: 'Went 0-3. Still smiling.',
-    role: 'player',
-    hasImage: true,
-  },
-  {
-    id: 'jada-whitfield',
-    name: 'Jada Whitfield',
-    nickname: 'J-Dub',
-    tagline: 'Spreadsheet in one hand, wings in the other.',
-    role: 'player',
-    hasImage: true,
-  },
-  {
-    id: 'luis-herrera',
-    name: 'Luis Herrera',
-    nickname: 'Lucky Luis',
-    tagline: 'Survived a tie. Barely.',
-    role: 'player',
-    hasImage: true,
-  },
-  {
-    id: 'emily-chen',
-    name: 'Emily Chen',
-    nickname: 'The Analyst',
-    tagline: 'Has a model. Won’t share it.',
-    role: 'player',
-    hasImage: true,
-  },
-  {
-    id: 'kwame-mensah',
-    name: 'Kwame Mensah',
-    nickname: 'K-Money',
-    tagline: 'Lives on the bubble.',
-    role: 'player',
-    hasImage: false,
-  },
-  {
-    id: 'hannah-obrien',
-    name: "Hannah O'Brien",
-    nickname: 'Hurricane Hannah',
-    tagline: 'Forgot to pick once. Never again.',
-    role: 'player',
-    hasImage: true,
-  },
+  { id: 'maya-israel', name: 'Maya Israel', role: 'player', hasImage: true },
+  { id: 'shahid-ali', name: 'Shahid Ali', role: 'player', hasImage: true },
+  { id: 'dave-johnson', name: 'Dave Johnson', role: 'player', hasImage: true },
+  { id: 'james-parker', name: 'James Parker', role: 'player', hasImage: true },
+  { id: 'nate-adams', name: 'Nate Adams', role: 'player', hasImage: true },
+  { id: 'stacey-markendorff', name: 'Stacey Markendorff', role: 'player', hasImage: true },
+  { id: 'sheila-acker', name: 'Sheila Acker', role: 'player', hasImage: true },
+  { id: 'dominic-green', name: 'Dominic Green', role: 'player', hasImage: true },
+  // Commissioner: runs the league and holds the admin tools.
+  { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner', hasImage: true },
 ]
 
-/** [team, outcome]. W = win, L = loss, T = tie, P = pending (week open). null = no pick. */
+/** [team, outcome]. W = win, L = loss, T = tie, P = pending. null = no pick. */
 type Outcome = 'W' | 'L' | 'T' | 'P'
 type Story = Record<string, Record<number, [string, Outcome] | null>>
+
+/** Week 1 picks exactly as supplied. Every outcome is pending: no result is invented. */
 const STORY: Story = {
-  'marcus-bell': { 1: ['KC', 'W'], 2: ['PHI', 'W'], 3: ['BAL', 'W'], 4: ['DET', 'P'] },
-  'priya-raman': { 1: ['BUF', 'W'], 2: ['SF', 'L'], 3: ['DET', 'W'], 4: ['KC', 'W'] },
-  'danny-okafor': { 1: ['DAL', 'L'], 2: ['BUF', 'W'], 3: ['SF', 'W'], 4: ['GB', 'P'] },
-  'sofia-reyes': { 1: ['GB', 'L'], 2: ['KC', 'W'], 3: ['DAL', 'L'], 4: null },
-  'tom-lindqvist': { 1: ['NYJ', 'L'], 2: ['CAR', 'L'], 3: ['ARI', 'L'], 4: null },
-  'jada-whitfield': { 1: ['PHI', 'W'], 2: ['BAL', 'W'], 3: ['KC', 'W'], 4: ['SF', 'P'] },
-  'luis-herrera': { 1: ['SF', 'W'], 2: ['DEN', 'T'], 3: ['PHI', 'W'], 4: ['MIN', 'P'] },
-  'emily-chen': { 1: ['BAL', 'W'], 2: ['KC', 'W'], 3: ['GB', 'W'], 4: ['PHI', 'P'] },
-  'kwame-mensah': { 1: ['CIN', 'L'], 2: ['MIA', 'L'], 3: ['HOU', 'W'], 4: null },
-  'hannah-obrien': { 1: ['DET', 'W'], 2: null, 3: ['LAC', 'W'], 4: null },
+  'maya-israel': { 1: ['JAX', 'P'] },
+  'shahid-ali': { 1: ['BAL', 'P'] },
+  'dave-johnson': { 1: ['DET', 'P'] },
+  'james-parker': { 1: ['DET', 'P'] },
+  'nate-adams': { 1: ['LAC', 'P'] },
+  'stacey-markendorff': { 1: ['LAC', 'P'] },
+  'sheila-acker': { 1: ['SEA', 'P'] },
+  'dominic-green': { 1: ['BAL', 'P'] },
+  'zac-harlan': { 1: ['LAC', 'P'] },
 }
-const RESOLVED_WEEKS = new Set([1, 2, 3])
-const CURRENT_WEEK = 4
+
+/**
+ * Weeks whose results should be seeded as final. EMPTY on purpose: no results
+ * were supplied, so none are invented. Add a week number here only alongside
+ * real outcomes in STORY (W/L/T), or better, enter results in the app.
+ */
+const RESOLVED_WEEKS = new Set<number>()
 
 // ---------------------------------------------------------------------------
 // Schedule
@@ -259,13 +212,7 @@ for (let week = 1; week <= 18; week++) {
   }
   if (others.length !== 0) throw new Error(`week ${week}: odd team count`)
 
-  // Slots: keep the week-4 KC game on Thursday so one pick is already locked
-  // and final when the demo opens (Sunday morning of week 4).
-  let ordered = shuffle(pairs)
-  if (week === CURRENT_WEEK) {
-    const kc = ordered.find((p) => p.includes('KC'))!
-    ordered = [kc, ...ordered.filter((p) => p !== kc)]
-  }
+  const ordered = shuffle(pairs)
   const slots: Slot[] = ordered.map((_, i) =>
     i === 0 ? 'TNF' : i === 1 ? 'SNF' : i === 2 ? 'MNF' : i <= 5 ? 'SUN_LATE' : 'SUN_EARLY',
   )
@@ -284,7 +231,7 @@ for (let week = 1; week <= 18; week++) {
       resultVersion: 0,
       updatedAt: CREATED,
     }
-    const decideFinal = RESOLVED_WEEKS.has(week) || (week === CURRENT_WEEK && slot === 'TNF')
+    const decideFinal = RESOLVED_WEEKS.has(week)
     if (decideFinal) {
       const wantHome = wanted.get(home)
       const wantAway = wanted.get(away)
@@ -383,6 +330,7 @@ const snapshot: SeasonSnapshot = SeasonSnapshotSchema.parse({
     id: LEAGUE_ID,
     name: 'The Sunday Survivors',
     tagline: 'One pick. Three lives. No mercy.',
+    // Name and tagline are placeholders — rename in Commissioner → Settings.
     createdAt: CREATED,
     settings: {
       defaultLives: 3,
@@ -399,13 +347,15 @@ const snapshot: SeasonSnapshot = SeasonSnapshotSchema.parse({
     id: SEASON_ID,
     leagueId: LEAGUE_ID,
     year: SEASON_YEAR,
-    label: '2026 Demo Season',
+    label: '2026 Season',
     startWeek: 1,
     endWeek: 18,
     status: 'active',
     isSynthetic: true,
     notes:
-      'Synthetic schedule, results and sample players for demonstration only. Not real NFL data.',
+      'Real roster and real week 1 picks. The schedule (matchups, kickoff times, byes) is synthetic ' +
+      'and is NOT the real NFL fixture list. No results are recorded: enter them in Commissioner → ' +
+      'Results, or connect a provider, and the standings compute themselves.',
   },
   memberships,
   profiles,

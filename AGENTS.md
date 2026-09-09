@@ -60,7 +60,7 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 └──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Runtime modes** (build-time `VITE_DATA_MODE`): `demo` runs entirely from static files with a pinned demo clock (2026-10-04 15:30Z, week 4 open) and a **synthetic** schedule — never real NFL data; `connected` talks to the API. Selection happens in exactly two files: `src/main.tsx` and `src/data/index.ts`.
+**Runtime modes** (build-time `VITE_DATA_MODE`): `demo` runs entirely from static files with a pinned demo clock (2026-09-09 16:00Z, week 1 open, nothing kicked off). The roster and week 1 picks are real; the **schedule is synthetic** and no results are seeded, so nothing about anyone's standing is fabricated. `connected` talks to the API. Selection happens in exactly two files: `src/main.tsx` and `src/data/index.ts`.
 
 **Layer rules** (enforced by `tests/architecture/layers.test.ts`, not by trust):
 
@@ -115,7 +115,7 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | `src/app/router.tsx` | HashRouter + routes; GitHub-Pages-safe routing. |
 | `src/features/pick/PickPage.tsx` | The most important screen: weekly pick cards. |
 | `src/features/commissioner/*` | Players/headshots, picks, results, settings, import, audit. |
-| `scripts/generate-demo-fixtures.ts` | Deterministic synthetic season (seeded PRNG). `npm run fixtures:generate`. |
+| `scripts/generate-demo-fixtures.ts` | Seeds the league: real roster + week 1 picks, synthetic schedule, no results. `npm run fixtures:generate`. |
 | `scripts/serve-static.mjs` | GitHub Pages look-alike server (real 404s, base-only). |
 | `build/githubPagesPlugin.ts` | Emits base-aware `404.html` + `.nojekyll` at build time. |
 | `backend/src/app.ts` | Lambda router; `/public/*` anonymous GETs, everything else JWT. |

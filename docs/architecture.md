@@ -31,8 +31,8 @@ backend/src/routes  →  backend/src/lib  →  domain
 | **Presigned S3 POST for headshots, browser-side resize** | No credentials in the browser, no Lambda image processing, S3 enforces type and size; the API re-verifies on finalize. |
 | **Cognito Authorization Code + PKCE** | Browser-only OAuth with no client secret; callbacks land on the Pages base URL; API Gateway validates the JWT, the API checks roles in DynamoDB. |
 | **`/public/*` anonymous read routes** | HTTP API JWT authorizers reject missing tokens, so read-only routes get a second, unauthenticated path; writes there are refused with 405. |
-| **Demo clock pinned** | The demo season always looks the same (week 4 open, weeks 1–3 resolved) for screenshots and tests; the commissioner can move it. |
-| **Synthetic demo schedule, flagged** | Real schedules/results are never fabricated. The fixture says `isSynthetic: true` and the UI shows a banner. |
+| **Demo clock pinned** | The season always opens in the same state (week 1 open, every pick in, nothing kicked off) for screenshots and tests; the commissioner can move it forward. |
+| **Synthetic schedule, flagged; real roster** | The roster and week 1 picks are real. Schedules and results are never fabricated: the matchups are placeholders (`isSynthetic: true`, banner in the UI) and no result is seeded at all. |
 
 ## Data flow
 
