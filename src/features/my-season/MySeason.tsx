@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router'
-import { useLeagueContext } from '@/app/hooks'
+import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useServices, useSession } from '@/app/hooks'
 import { getTeam, getTeamOptions, type TeamOption } from '@/domain'
 import { Headshot } from '@/components/Headshot'
@@ -12,6 +12,7 @@ import { formatKickoff } from '@/lib/time'
 import { cn } from '@/lib/cn'
 
 export function MySeason() {
+  const tz = useLeagueTimeZone()
   const session = useSession()
   const { snapshot, evaluation, profileOf } = useLeagueContext()
   const { clock } = useServices()
@@ -126,7 +127,7 @@ export function MySeason() {
                         }
                         {h.game.status === 'final'
                           ? ` · ${h.game.awayScore}-${h.game.homeScore}`
-                          : ` · ${formatKickoff(h.game.kickoffAt)}`}
+                          : ` · ${formatKickoff(h.game.kickoffAt, { timeZone: tz })}`}
                       </span>
                     )}
                   </>
@@ -168,6 +169,7 @@ function TeamBucket({
   note?: string
   link?: string
 }) {
+  const tz = useLeagueTimeZone()
   return (
     <section aria-labelledby={`bucket-${title}`}>
       <div className="mb-2 flex items-baseline gap-3">
@@ -200,7 +202,7 @@ function TeamBucket({
                 o.usedWeek
                   ? `Used week ${o.usedWeek}`
                   : o.kickoffAt
-                    ? formatKickoff(o.kickoffAt)
+                    ? formatKickoff(o.kickoffAt, { timeZone: tz })
                     : 'Bye'
               }
             >

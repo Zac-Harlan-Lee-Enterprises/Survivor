@@ -51,3 +51,12 @@ export function useLeagueContext(): LeagueContextValue {
   if (!v) throw new Error('useLeagueContext must be used inside <LeagueProvider>')
   return v
 }
+
+/**
+ * The league's canonical timezone. Kickoffs and deadlines are shown in it (with
+ * the zone abbreviation) so every member quotes the same clock no matter where
+ * they are. Timestamps themselves are always stored in UTC.
+ */
+export function useLeagueTimeZone(): string {
+  return useLeagueContext().league.settings.displayTimeZone
+}

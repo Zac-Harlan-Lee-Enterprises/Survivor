@@ -28,6 +28,12 @@ export const LeagueSettingsSchema = z.object({
   /** No pick by the week deadline consumes a life. */
   missingPickCountsAsMiss: z.boolean().default(true),
   /**
+   * Minutes before the week's FIRST kickoff at which every pick locks.
+   * The whole league locks together at one deadline, so nobody can watch an
+   * early result before committing. 0 would lock exactly at first kickoff.
+   */
+  pickLockMinutesBeforeFirstKickoff: z.number().int().min(0).max(10_080).default(5),
+  /**
    * A cancelled game (never played) either voids the pick — no life lost and
    * the team returns to the pool — or counts as a miss.
    */
@@ -42,8 +48,12 @@ export const LeagueSettingsSchema = z.object({
     .default('co-champions'),
   /** Other players' picks stay hidden until the picked game kicks off. */
   hidePicksUntilLocked: z.boolean().default(true),
-  /** Fallback zone for server-rendered text (email, exports). */
-  displayTimeZone: z.string().default('America/New_York'),
+  /**
+   * The league's canonical timezone. Kickoffs and deadlines are rendered in it
+   * (with the zone abbreviation) so everyone quotes the same clock, wherever
+   * they happen to be. Timestamps themselves are always stored in UTC.
+   */
+  displayTimeZone: z.string().default('America/Chicago'),
 })
 export type LeagueSettings = z.infer<typeof LeagueSettingsSchema>
 

@@ -13,9 +13,8 @@
  *
  * Run: npm run fixtures:generate
  */
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { ALL_TEAM_IDS } from '../src/domain/teams'
 import {
   SeasonSnapshotSchema,
   type LeagueMembership,
@@ -28,7 +27,8 @@ import {
 } from '../src/domain/models'
 
 // ---------------------------------------------------------------------------
-// Deterministic randomness
+// Deterministic randomness (pick timestamps only — nothing about the schedule
+// or anyone's results is generated)
 // ---------------------------------------------------------------------------
 function mulberry32(seed: number) {
   let a = seed >>> 0
@@ -41,77 +41,7 @@ function mulberry32(seed: number) {
   }
 }
 const rand = mulberry32(20260910)
-function shuffle<T>(arr: readonly T[]): T[] {
-  const out = [...arr]
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1))
-    ;[out[i], out[j]] = [out[j]!, out[i]!]
-  }
-  return out
-}
 const between = (lo: number, hi: number) => lo + Math.floor(rand() * (hi - lo + 1))
-
-// ---------------------------------------------------------------------------
-// Time: kickoffs are expressed in US Eastern and stored in UTC.
-// ---------------------------------------------------------------------------
-const TZ = 'America/New_York'
-function tzOffsetMs(utcMs: number): number {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: TZ,
-    hourCycle: 'h23',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).formatToParts(new Date(utcMs))
-  const get = (t: string) => Number(parts.find((p) => p.type === t)?.value)
-  const asUtc = Date.UTC(
-    get('year'),
-    get('month') - 1,
-    get('day'),
-    get('hour'),
-    get('minute'),
-    get('second'),
-  )
-  return asUtc - Math.floor(utcMs / 1000) * 1000
-}
-function easternToUtc(y: number, m: number, d: number, h: number, min: number): string {
-  const naive = Date.UTC(y, m - 1, d, h, min)
-  let guess = naive
-  for (let i = 0; i < 3; i++) guess = naive - tzOffsetMs(guess)
-  return new Date(guess).toISOString()
-}
-/** Sunday of week N (week 1 = 13 Sep 2026). */
-function sundayOf(week: number): [number, number, number] {
-  const d = new Date(Date.UTC(2026, 8, 13 + (week - 1) * 7))
-  return [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()]
-}
-function dayOffset([y, m, d]: [number, number, number], days: number): [number, number, number] {
-  const x = new Date(Date.UTC(y, m - 1, d + days))
-  return [x.getUTCFullYear(), x.getUTCMonth() + 1, x.getUTCDate()]
-}
-type Slot = 'TNF' | 'SUN_EARLY' | 'SUN_LATE' | 'SNF' | 'MNF'
-function kickoff(week: number, slot: Slot): string {
-  const sun = sundayOf(week)
-  switch (slot) {
-    case 'TNF': {
-      const [y, m, d] = dayOffset(sun, -3)
-      return easternToUtc(y, m, d, 20, 15)
-    }
-    case 'SUN_EARLY':
-      return easternToUtc(...sun, 13, 0)
-    case 'SUN_LATE':
-      return easternToUtc(...sun, 16, 25)
-    case 'SNF':
-      return easternToUtc(...sun, 20, 20)
-    case 'MNF': {
-      const [y, m, d] = dayOffset(sun, 1)
-      return easternToUtc(y, m, d, 20, 15)
-    }
-  }
-}
 
 // ---------------------------------------------------------------------------
 // The roster (real league members) and the state of the season
@@ -139,22 +69,21 @@ interface Person {
   nickname?: string
   tagline?: string
   role: LeagueMembership['role']
-  hasImage: boolean
 }
 const PEOPLE: Person[] = [
-  { id: 'maya-israel', name: 'Maya Israel', role: 'player', hasImage: true },
-  { id: 'shahid-ali', name: 'Shahid Ali', role: 'player', hasImage: true },
-  { id: 'dave-johnson', name: 'Dave Johnson', role: 'player', hasImage: true },
-  { id: 'james-parker', name: 'James Parker', role: 'player', hasImage: true },
-  { id: 'nate-adams', name: 'Nate Adams', role: 'player', hasImage: true },
-  { id: 'stacey-markendorff', name: 'Stacey Markendorff', role: 'player', hasImage: true },
-  { id: 'sheila-acker', name: 'Sheila Acker', role: 'player', hasImage: true },
-  { id: 'dominic-green', name: 'Dominic Green', role: 'player', hasImage: true },
+  { id: 'maya-israel', name: 'Maya Israel', role: 'player' },
+  { id: 'shahid-ali', name: 'Shahid Ali', role: 'player' },
+  { id: 'dave-johnson', name: 'Dave Johnson', role: 'player' },
+  { id: 'james-parker', name: 'James Parker', role: 'player' },
+  { id: 'nate-adams', name: 'Nate Adams', role: 'player' },
+  { id: 'stacey-markendorff', name: 'Stacey Markendorff', role: 'player' },
+  { id: 'sheila-acker', name: 'Sheila Acker', role: 'player' },
+  { id: 'dominic-green', name: 'Dominic Green', role: 'player' },
   // Commissioner: runs the league and holds the admin tools.
-  { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner', hasImage: true },
+  { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner' },
 ]
 
-/** [team, outcome]. W = win, L = loss, T = tie, P = pending. null = no pick. */
+/** [team, outcome]. Outcomes are informational only: real results come from the provider. */
 type Outcome = 'W' | 'L' | 'T' | 'P'
 type Story = Record<string, Record<number, [string, Outcome] | null>>
 
@@ -171,100 +100,33 @@ const STORY: Story = {
   'zac-harlan': { 1: ['LAC', 'P'] },
 }
 
-/**
- * Weeks whose results should be seeded as final. EMPTY on purpose: no results
- * were supplied, so none are invented. Add a week number here only alongside
- * real outcomes in STORY (W/L/T), or better, enter results in the app.
- */
-const RESOLVED_WEEKS = new Set<number>()
+// ---------------------------------------------------------------------------
+// Schedule — the REAL fixture list, cached by `npm run schedule:fetch`
+//
+// Reading a committed cache (rather than calling ESPN here) keeps fixture
+// generation deterministic and offline-capable. If the cache is missing the
+// build fails loudly instead of quietly inventing matchups: a made-up schedule
+// shown as real is exactly the failure this project must not have.
+// ---------------------------------------------------------------------------
+interface CachedSchedule {
+  seasonYear: number
+  source: string
+  fetchedAt: string
+  weeks: Array<{ week: NFLWeek; games: NFLGame[] }>
+}
 
-// ---------------------------------------------------------------------------
-// Schedule
-// ---------------------------------------------------------------------------
-const byeOrder = shuffle(ALL_TEAM_IDS)
-const BYE_WEEKS = [5, 6, 7, 8, 9, 10, 11, 12]
-const byes = new Map<number, string[]>()
-BYE_WEEKS.forEach((w, i) => byes.set(w, byeOrder.slice(i * 4, i * 4 + 4)))
+const schedulePath = resolve(process.cwd(), 'scripts/data', `nfl-${SEASON_YEAR}-schedule.json`)
+if (!existsSync(schedulePath)) {
+  console.error(`Missing ${schedulePath}. Run: npm run schedule:fetch`)
+  process.exit(1)
+}
+const cached = JSON.parse(readFileSync(schedulePath, 'utf8')) as CachedSchedule
 
 const games: NFLGame[] = []
 const weeks: NFLWeek[] = []
-
-for (let week = 1; week <= 18; week++) {
-  const byeTeams = byes.get(week) ?? []
-  const wanted = new Map<string, Outcome>()
-  for (const story of Object.values(STORY)) {
-    const entry = story[week]
-    if (entry) wanted.set(entry[0], entry[1])
-  }
-  const playing = ALL_TEAM_IDS.filter((t) => !byeTeams.includes(t))
-  const picked = playing.filter((t) => wanted.has(t))
-  const others = shuffle(playing.filter((t) => !wanted.has(t)))
-  const pairs: Array<[string, string]> = []
-  for (const team of picked) {
-    const opp = others.pop()
-    if (!opp) throw new Error(`week ${week}: not enough opponents`)
-    pairs.push(rand() < 0.5 ? [team, opp] : [opp, team])
-  }
-  while (others.length >= 2) {
-    const a = others.pop()!
-    const b = others.pop()!
-    pairs.push([a, b])
-  }
-  if (others.length !== 0) throw new Error(`week ${week}: odd team count`)
-
-  const ordered = shuffle(pairs)
-  const slots: Slot[] = ordered.map((_, i) =>
-    i === 0 ? 'TNF' : i === 1 ? 'SNF' : i === 2 ? 'MNF' : i <= 5 ? 'SUN_LATE' : 'SUN_EARLY',
-  )
-
-  ordered.forEach(([home, away], i) => {
-    const slot = slots[i]!
-    const id = `${SEASON_YEAR}-w${String(week).padStart(2, '0')}-${away}-at-${home}`
-    const base: NFLGame = {
-      id,
-      seasonYear: SEASON_YEAR,
-      week,
-      homeTeamId: home,
-      awayTeamId: away,
-      kickoffAt: kickoff(week, slot),
-      status: 'scheduled',
-      resultVersion: 0,
-      updatedAt: CREATED,
-    }
-    const decideFinal = RESOLVED_WEEKS.has(week)
-    if (decideFinal) {
-      const wantHome = wanted.get(home)
-      const wantAway = wanted.get(away)
-      let winner: string | null
-      if (wantHome === 'T' || wantAway === 'T') winner = null
-      else if (wantHome === 'W' || wantAway === 'L') winner = home
-      else if (wantAway === 'W' || wantHome === 'L') winner = away
-      else winner = rand() < 0.55 ? home : away
-      let homeScore: number
-      let awayScore: number
-      if (winner === null) {
-        homeScore = awayScore = between(17, 27)
-      } else {
-        const win = between(17, 38)
-        const lose = between(3, win - 3)
-        ;[homeScore, awayScore] = winner === home ? [win, lose] : [lose, win]
-      }
-      games.push({
-        ...base,
-        status: 'final',
-        homeScore,
-        awayScore,
-        winnerTeamId: winner,
-        resultVersion: 1,
-        resultSource: 'provider',
-        updatedAt: new Date(new Date(base.kickoffAt).getTime() + 3.5 * 3_600_000).toISOString(),
-      })
-    } else {
-      games.push(base)
-    }
-  })
-
-  weeks.push({ seasonYear: SEASON_YEAR, week, label: `Week ${week}`, byeTeamIds: byeTeams })
+for (const entry of cached.weeks) {
+  weeks.push(entry.week)
+  games.push(...entry.games)
 }
 
 // ---------------------------------------------------------------------------
@@ -279,22 +141,48 @@ const memberships: LeagueMembership[] = PEOPLE.map((p) => ({
   status: 'active',
   joinedAt: CREATED,
 }))
+/**
+ * Real headshots, imported from the commissioner's photo folder by
+ * `npm run headshots:import` (which writes public/headshots/manifest.json).
+ * A player with no photo simply has no image record and falls back to the
+ * default avatar — nothing stands in for a real person's face.
+ */
+interface ManifestEntry {
+  contentType: PlayerImage['contentType']
+  sizeBytes: number
+  width: number
+  height: number
+  variants: { thumb: string; medium: string }
+}
+const manifestPath = resolve(process.cwd(), 'public/headshots/manifest.json')
+const manifest: Record<string, ManifestEntry> = existsSync(manifestPath)
+  ? (JSON.parse(readFileSync(manifestPath, 'utf8')) as Record<string, ManifestEntry>)
+  : {}
+
+const images: PlayerImage[] = PEOPLE.flatMap((p) => {
+  const entry = manifest[p.id]
+  if (!entry) return []
+  return [
+    {
+      id: `img-${p.id}`,
+      playerId: p.id,
+      contentType: entry.contentType,
+      sizeBytes: entry.sizeBytes,
+      width: entry.width,
+      height: entry.height,
+      variants: entry.variants,
+      createdAt: CREATED,
+    },
+  ]
+})
+const withPhoto = new Set(images.map((i) => i.playerId))
+
 const profiles: PlayerProfile[] = PEOPLE.map((p) => ({
   playerId: p.id,
   displayName: p.name,
   nickname: p.nickname,
   tagline: p.tagline,
-  imageId: p.hasImage ? `img-${p.id}` : null,
-}))
-const images: PlayerImage[] = PEOPLE.filter((p) => p.hasImage).map((p) => ({
-  id: `img-${p.id}`,
-  playerId: p.id,
-  contentType: 'image/svg+xml',
-  sizeBytes: 1200,
-  width: 256,
-  height: 256,
-  variants: { thumb: `headshots/${p.id}.svg`, medium: `headshots/${p.id}.svg` },
-  createdAt: CREATED,
+  imageId: withPhoto.has(p.id) ? `img-${p.id}` : null,
 }))
 
 const picks: Pick[] = []
@@ -306,9 +194,17 @@ for (const [playerId, story] of Object.entries(STORY)) {
     const game = games.find(
       (g) => g.week === week && (g.homeTeamId === teamId || g.awayTeamId === teamId),
     )
-    if (!game) throw new Error(`no game for ${teamId} week ${week}`)
-    const [y, m, d] = dayOffset(sundayOf(week), -4) // Wednesday
-    const submittedAt = easternToUtc(y, m, d, 12 + between(0, 9), between(0, 59))
+    if (!game) {
+      throw new Error(
+        `${playerId} picked ${teamId} in week ${week}, but that team has no game in the real schedule. ` +
+          'Check the pick, or refresh the cache with: npm run schedule:fetch',
+      )
+    }
+    // Submitted at a deterministic moment before that game's real kickoff, so
+    // the seeded history is plausible without inventing a calendar.
+    const submittedAt = new Date(
+      new Date(game.kickoffAt).getTime() - (24 + between(6, 72)) * 3_600_000,
+    ).toISOString()
     picks.push({
       id: `pick-${playerId}-${week}`,
       leagueId: LEAGUE_ID,
@@ -339,7 +235,7 @@ const snapshot: SeasonSnapshot = SeasonSnapshotSchema.parse({
       cancelledGamePolicy: 'void',
       simultaneousEliminationPolicy: 'co-champions',
       hidePicksUntilLocked: true,
-      displayTimeZone: 'America/New_York',
+      displayTimeZone: 'America/Chicago',
     },
     currentSeasonId: SEASON_ID,
   },
@@ -351,11 +247,11 @@ const snapshot: SeasonSnapshot = SeasonSnapshotSchema.parse({
     startWeek: 1,
     endWeek: 18,
     status: 'active',
-    isSynthetic: true,
+    isSynthetic: false,
     notes:
-      'Real roster and real week 1 picks. The schedule (matchups, kickoff times, byes) is synthetic ' +
-      'and is NOT the real NFL fixture list. No results are recorded: enter them in Commissioner → ' +
-      'Results, or connect a provider, and the standings compute themselves.',
+      `Real roster, real week 1 picks, and the real NFL schedule (${cached.source}, cached ${cached.fetchedAt}). ` +
+      'Live scores refresh from the same provider in Commissioner → Results; the commissioner can ' +
+      'always enter or correct a result by hand.',
   },
   memberships,
   profiles,

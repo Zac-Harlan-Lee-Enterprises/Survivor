@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 import { Crown, Flame, Skull, Zap } from 'lucide-react'
-import { useLeagueContext } from '@/app/hooks'
+import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useSession } from '@/app/hooks'
 import { getTeam, weekSummary, type NFLGame, type PlayerStanding } from '@/domain'
 import { Headshot } from '@/components/Headshot'
@@ -13,6 +13,7 @@ import { formatKickoff } from '@/lib/time'
 import { cn } from '@/lib/cn'
 
 export function LeagueHome() {
+  const tz = useLeagueTimeZone()
   const { league, snapshot, evaluation, profileOf, viewer } = useLeagueContext()
   const session = useSession()
   const week = weekSummary(evaluation, evaluation.currentWeek)
@@ -74,7 +75,7 @@ export function LeagueHome() {
                 <Countdown to={nextKickoff.kickoffAt} className="text-2xl text-ink-50" prefix="" />
                 <span className="ml-2 text-sm text-ink-300">
                   {getTeam(nextKickoff.awayTeamId)?.name} at {getTeam(nextKickoff.homeTeamId)?.name}{' '}
-                  · {formatKickoff(nextKickoff.kickoffAt)}
+                  · {formatKickoff(nextKickoff.kickoffAt, { timeZone: tz })}
                 </span>
               </>
             ) : week?.phase === 'locked' ? (
@@ -89,7 +90,7 @@ export function LeagueHome() {
             )}
             {week?.deadlineAt && week.phase === 'open' && (
               <p className="mt-1 text-xs text-ink-400">
-                Pick deadline: last kickoff {formatKickoff(week.deadlineAt)}
+                Picks lock {formatKickoff(week.deadlineAt, { timeZone: tz })}
               </p>
             )}
           </div>
@@ -314,6 +315,7 @@ function Stat({
 }
 
 export function GameRow({ game }: { game: NFLGame }) {
+  const tz = useLeagueTimeZone()
   const away = getTeam(game.awayTeamId)
   const home = getTeam(game.homeTeamId)
   const final = game.status === 'final'
@@ -342,8 +344,8 @@ export function GameRow({ game }: { game: NFLGame }) {
           : game.status === 'cancelled'
             ? 'Cancelled'
             : game.status === 'postponed'
-              ? `Postponed · ${formatKickoff(game.kickoffAt)}`
-              : `${away?.abbreviation} at ${home?.abbreviation} · ${formatKickoff(game.kickoffAt)}`}
+              ? `Postponed · ${formatKickoff(game.kickoffAt, { timeZone: tz })}`
+              : `${away?.abbreviation} at ${home?.abbreviation} · ${formatKickoff(game.kickoffAt, { timeZone: tz })}`}
         {game.resultSource === 'commissioner' && ' · corrected by commissioner'}
       </p>
     </div>

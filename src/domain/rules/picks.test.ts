@@ -55,24 +55,24 @@ describe('validatePick', () => {
     expect(codes(result)).toEqual(['TEAM_NOT_PLAYING'])
   })
 
-  it('rejects a team whose game has kicked off', () => {
+  it('locks EVERY team once the deadline passes, including later games', () => {
     const snap = base().build()
     const now = kickoffFor(2, 1)
-    const result = validatePick(
+    const started = validatePick(
       snap,
       evaluateSeason(snap, { now }),
       { playerId: 'ann', week: 2, teamId: 'KC' },
       now,
     )
-    expect(codes(result)).toContain('GAME_STARTED')
-    // Later game still open.
-    const ok = validatePick(
+    expect(codes(started)).toContain('WEEK_LOCKED')
+    // The Cowboys do not kick off for hours, but the league locked together.
+    const later = validatePick(
       snap,
       evaluateSeason(snap, { now }),
       { playerId: 'ann', week: 2, teamId: 'DAL' },
       now,
     )
-    expect(ok.ok).toBe(true)
+    expect(codes(later)).toContain('WEEK_LOCKED')
   })
 
   it('rejects a cancelled game', () => {
@@ -99,9 +99,10 @@ describe('validatePick', () => {
     expect(codes(result)).toContain('EXISTING_PICK_LOCKED')
   })
 
-  it('a pick can change right up to kickoff', () => {
+  it('a pick can change right up to the deadline', () => {
     const snap = base().pick('ann', 2, 'KC').build()
-    const now = kickoffFor(2, -0.001)
+    // Deadline is five minutes before the first kickoff; this is just inside it.
+    const now = kickoffFor(2, -6 / 60)
     const result = validatePick(
       snap,
       evaluateSeason(snap, { now }),
@@ -175,8 +176,8 @@ describe('validatePick', () => {
 })
 
 describe('getTeamOptions', () => {
-  it('classifies every team as available / selected / used / bye / locked / cancelled', () => {
-    const snap = scenario()
+  const optionScenario = () =>
+    scenario()
       .players('ann')
       .game(1, 'GB', 'CHI', { final: 'GB' })
       .game(2, 'KC', 'DEN', { kickoff: kickoffFor(2, 0) })
@@ -185,12 +186,15 @@ describe('getTeamOptions', () => {
       .pick('ann', 1, 'GB')
       .pick('ann', 2, 'DAL')
       .build()
-    const now = kickoffFor(2, 1)
+
+  it('classifies every team while the week is open', () => {
+    const snap = optionScenario()
+    const now = kickoffFor(2, -1)
     const options = getTeamOptions(snap, evaluateSeason(snap, { now }), 'ann', 2, now)
     const state = (id: string) => options.find((o) => o.team.id === id)!
     expect(state('GB').state).toBe('used')
     expect(state('GB').usedWeek).toBe(1)
-    expect(state('KC').state).toBe('locked')
+    expect(state('KC').state).toBe('available')
     expect(state('DAL').state).toBe('selected')
     expect(state('PHI').state).toBe('available')
     expect(state('PHI').opponentId).toBe('DAL')
@@ -198,6 +202,19 @@ describe('getTeamOptions', () => {
     expect(state('SF').state).toBe('cancelled')
     expect(state('MIA').state).toBe('bye')
     expect(options).toHaveLength(32)
+  })
+
+  it('marks every playable team locked once the deadline passes', () => {
+    const snap = optionScenario()
+    const now = kickoffFor(2, 1)
+    const options = getTeamOptions(snap, evaluateSeason(snap, { now }), 'ann', 2, now)
+    const state = (id: string) => options.find((o) => o.team.id === id)!
+    expect(state('KC').state).toBe('locked')
+    // Not yet kicked off, but the league is locked.
+    expect(state('PHI').state).toBe('locked')
+    expect(state('DAL').state).toBe('selected')
+    expect(state('GB').state).toBe('used')
+    expect(state('MIA').state).toBe('bye')
   })
 })
 
@@ -212,13 +229,28 @@ describe('pick visibility', () => {
   const game = (id: string) => snap.games.find((g) => g.id === id)!
   const annPick = snap.picks[0]!
 
-  it('hides other players’ picks until kickoff', () => {
+  it('hides other players’ picks until the pick deadline', () => {
     const viewer = { playerId: 'bob', isCommissioner: false }
+    const deadline = kickoffFor(1, -5 / 60)
     expect(
-      isPickVisible(annPick, game(annPick.gameId), viewer, kickoffFor(1, -1), snap.league.settings),
+      isPickVisible(
+        annPick,
+        game(annPick.gameId),
+        viewer,
+        kickoffFor(1, -1),
+        snap.league.settings,
+        deadline,
+      ),
     ).toBe(false)
     expect(
-      isPickVisible(annPick, game(annPick.gameId), viewer, kickoffFor(1, 0), snap.league.settings),
+      isPickVisible(
+        annPick,
+        game(annPick.gameId),
+        viewer,
+        deadline,
+        snap.league.settings,
+        deadline,
+      ),
     ).toBe(true)
   })
 
@@ -243,17 +275,18 @@ describe('pick visibility', () => {
     ).toBe(true)
   })
 
-  it('redactPicks returns only what the viewer may see', () => {
-    const visibleToBob = redactPicks(
+  it('redactPicks reveals the whole league at the deadline, not game by game', () => {
+    // Bob picked the late KC game; after the deadline his pick is public too.
+    const afterDeadline = redactPicks(
       snap,
-      { playerId: 'bob', isCommissioner: false },
-      kickoffFor(1, 1),
+      { playerId: 'ann', isCommissioner: false },
+      kickoffFor(1, -4 / 60),
     )
-    expect(visibleToBob.map((p) => p.playerId).sort()).toEqual(['ann', 'bob'])
+    expect(afterDeadline.map((p) => p.playerId).sort()).toEqual(['ann', 'bob'])
     const early = redactPicks(snap, { playerId: 'bob', isCommissioner: false }, kickoffFor(1, -1))
     expect(early.map((p) => p.playerId)).toEqual(['bob'])
-    const anon = redactPicks(snap, { playerId: null, isCommissioner: false }, kickoffFor(1, 1))
-    expect(anon.map((p) => p.playerId)).toEqual(['ann'])
+    const anon = redactPicks(snap, { playerId: null, isCommissioner: false }, kickoffFor(1, -1))
+    expect(anon).toEqual([])
   })
 
   it('shows everything when the league turns off hiding', () => {

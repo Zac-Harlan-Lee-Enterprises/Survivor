@@ -137,8 +137,44 @@
   {
     "id": "rules-no-change-after-kickoff",
     "category": "functional",
-    "description": "A pick cannot change once its game kicked off, but can change right up to kickoff.",
-    "verification": "npx vitest run src/domain/rules/picks.test.ts -t 'kick'",
+    "description": "A pick cannot change once the week's shared deadline passes, but can change right up to it.",
+    "verification": "npx vitest run src/domain/rules/picks.test.ts -t 'deadline'",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "demo-clock-real-time",
+    "category": "functional",
+    "description": "The app runs on real time by default so countdowns and lock states match reality; the commissioner can still pin the clock, and tests pin it for determinism.",
+    "verification": "grep -q 'let pinned: Date | null = null' src/data/demo/clock.ts && grep -q 'survivor:demo:clock:v1' tests/e2e/helpers.ts",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "team-logos",
+    "category": "visual",
+    "description": "All 32 team logos are served from public/team-logos/ (fetched from ESPN's CDN by npm run logos:fetch) instead of two-letter monograms; a missing or broken logo falls back to the team-coloured monogram.",
+    "verification": "test \"$(ls public/team-logos/*.png | wc -l | tr -d ' ')\" -eq 32 && grep -q 'team-logos/' src/components/TeamMonogram.tsx && grep -q 'setFailed(true)' src/components/TeamMonogram.tsx",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "times-in-league-timezone",
+    "category": "visual",
+    "description": "Kickoffs and deadlines render in the league's own timezone (displayTimeZone, America/Chicago) with the zone abbreviation, so every member quotes the same clock. Timestamps stay UTC in storage.",
+    "verification": "jq -e '.league.settings.displayTimeZone == \"America/Chicago\"' src/data/demo/fixtures/demo-season.json >/dev/null && ! grep -rn 'formatKickoff([^,)]*)' src/features --include='*.tsx' | grep -v timeZone",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "rules-shared-pick-deadline",
+    "category": "functional",
+    "description": "The whole league locks at ONE deadline, a configurable lead before the week's first kickoff (default 5 minutes). A Monday-night pick is as locked as a Sunday-morning one, missing picks are struck from that moment, and every pick becomes public then. Enforced in the domain and again on the API with the server clock.",
+    "verification": "npx vitest run src/domain/rules backend/src/routes/routes.test.ts --reporter=dot",
     "priority": 1,
     "hermetic": true,
     "passes": true
@@ -221,6 +257,15 @@
     "description": "The Lambda results sync uses the SAME domain ESPN parser as the browser (skipping unknown teams rather than guessing); commissioners can enter schedules/results manually when the provider is down (503 surfaced).",
     "verification": "npx vitest run backend/src/sync.test.ts",
     "priority": 2,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "schedule-is-real",
+    "category": "functional",
+    "description": "The app ships the REAL NFL schedule (272 games, 18 weeks) cached from ESPN, not invented matchups: every week is provider-sourced and every seeded pick resolves to a real game. Refresh it with npm run schedule:fetch.",
+    "verification": "jq -e '(.season.isSynthetic == false) and ([.weeks[] | select(.source != \"provider\")] | length == 0) and ((.games | length) == 272)' src/data/demo/fixtures/demo-season.json >/dev/null && node -e 'const s=require(\"./src/data/demo/fixtures/demo-season.json\");const ids=new Set(s.games.map(g=>g.id));const bad=s.picks.filter(p=>!ids.has(p.gameId));if(bad.length){console.error(\"picks not linked to a real game:\",bad.map(p=>p.playerId));process.exit(1)}'",
+    "priority": 1,
     "hermetic": true,
     "passes": true
   },
@@ -347,17 +392,17 @@
   {
     "id": "demo-fixtures-deterministic",
     "category": "quality",
-    "description": "The synthetic demo season regenerates byte-identically (seeded PRNG) and is flagged isSynthetic.",
-    "verification": "cp src/data/demo/fixtures/demo-season.json node_modules/.tmp/fixture.before.json && npm run -s fixtures:generate >/dev/null && cmp -s node_modules/.tmp/fixture.before.json src/data/demo/fixtures/demo-season.json && jq -e '.season.isSynthetic==true' src/data/demo/fixtures/demo-season.json >/dev/null",
+    "description": "The seeded season regenerates byte-identically from the committed schedule cache, so fixture generation never depends on the network.",
+    "verification": "cp src/data/demo/fixtures/demo-season.json node_modules/.tmp/fixture.before.json && npm run -s fixtures:generate >/dev/null && cmp -s node_modules/.tmp/fixture.before.json src/data/demo/fixtures/demo-season.json",
     "priority": 2,
     "hermetic": true,
     "passes": true
   },
   {
-    "id": "headshots-sample-assets",
+    "id": "headshots-real-photos",
     "category": "visual",
-    "description": "Sample headshots (SVG placeholders) and a default avatar ship as static assets for demo mode.",
-    "verification": "test -f public/headshots/default.svg && test \"$(ls public/headshots/*.svg | wc -l | tr -d ' ')\" -ge 10",
+    "description": "Every player has a real headshot, imported from the commissioner's photos by npm run headshots:import (EXIF-aware, face-aware square crop, 128px + 512px WebP). A player without a photo falls back to the neutral default avatar \u2014 no generated stand-in ever poses as someone's face.",
+    "verification": "test -f public/headshots/default.svg && test -f public/headshots/manifest.json && jq -e '[.images[] | select(.contentType==\"image/webp\")] | length >= 9' src/data/demo/fixtures/demo-season.json >/dev/null && jq -e '[.profiles[] | select(.imageId == null)] | length == 0' src/data/demo/fixtures/demo-season.json",
     "priority": 2,
     "hermetic": true,
     "passes": true

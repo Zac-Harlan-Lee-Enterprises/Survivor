@@ -1,9 +1,10 @@
-import { useLeagueContext } from '@/app/hooks'
+import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useAudit, useOverrides } from '@/app/queries'
 import { LoadingState } from '@/components/states'
 import { formatDateTime } from '@/lib/time'
 
 export function AuditPanel() {
+  const tz = useLeagueTimeZone()
   const { league, snapshot, profileOf } = useLeagueContext()
   const audit = useAudit(league.id)
   const overrides = useOverrides(snapshot.season.id)
@@ -26,7 +27,7 @@ export function AuditPanel() {
               <li key={e.id} className="p-3">
                 <p className="text-ink-100">{e.summary}</p>
                 <p className="text-xs text-ink-400">
-                  {formatDateTime(e.at)} · {name(e.actorPlayerId)} ·{' '}
+                  {formatDateTime(e.at, tz)} · {name(e.actorPlayerId)} ·{' '}
                   <span className="font-mono">{e.type}</span>
                 </p>
               </li>
@@ -49,7 +50,7 @@ export function AuditPanel() {
                   {o.targetId} — {o.reason}
                 </p>
                 <p className="text-xs text-ink-400">
-                  {formatDateTime(o.createdAt)} · {name(o.actorPlayerId)}
+                  {formatDateTime(o.createdAt, tz)} · {name(o.actorPlayerId)}
                 </p>
                 <details className="mt-1 text-xs text-ink-300">
                   <summary className="cursor-pointer">Before / after</summary>

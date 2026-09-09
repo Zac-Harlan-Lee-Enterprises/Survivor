@@ -36,7 +36,11 @@ export interface WeekSummary {
   isCurrent: boolean
   firstKickoffAt: string | null
   lastKickoffAt: string | null
-  /** The pick deadline: once the last game has kicked off no pick can be made. */
+  /**
+   * The single deadline for the whole league: a fixed lead time before the
+   * week's FIRST kickoff. Every pick locks together here, so nobody can see an
+   * early game's result before committing.
+   */
   deadlineAt: string | null
   gamesTotal: number
   gamesFinal: number
@@ -194,22 +198,29 @@ function isResolved(outcome: PickOutcome): boolean {
   return outcome !== 'pending'
 }
 
+export function deadlineFor(firstKickoff: Date | null, lockLeadMinutes: number): Date | null {
+  if (!firstKickoff) return null
+  return new Date(firstKickoff.getTime() - lockLeadMinutes * 60_000)
+}
+
 export function summarizeWeek(
   week: number,
   games: NFLGame[],
   now: Date,
+  lockLeadMinutes: number,
 ): Omit<WeekSummary, 'isCurrent' | 'settled'> {
   const live = games.filter((g) => g.status !== 'cancelled')
   const kickoffs = live.map((g) => g.kickoffAt)
   const first = minDate(kickoffs)
   const last = maxDate(kickoffs)
+  const deadline = deadlineFor(first, lockLeadMinutes)
   const gamesFinal = games.filter((g) => g.status === 'final').length
   const gamesCancelled = games.filter((g) => g.status === 'cancelled').length
 
   let phase: WeekPhase
   if (games.length === 0) phase = 'no-data'
   else if (live.length === 0 || gamesFinal === live.length) phase = 'final'
-  else if (last && now.getTime() >= last.getTime()) phase = 'locked'
+  else if (deadline && now.getTime() >= deadline.getTime()) phase = 'locked'
   else phase = 'open'
 
   return {
@@ -217,7 +228,7 @@ export function summarizeWeek(
     phase,
     firstKickoffAt: first ? first.toISOString() : null,
     lastKickoffAt: last ? last.toISOString() : null,
-    deadlineAt: last ? last.toISOString() : null,
+    deadlineAt: deadline ? deadline.toISOString() : null,
     gamesTotal: games.length,
     gamesFinal,
     gamesCancelled,
@@ -249,7 +260,10 @@ export function evaluateSeason(
   const weekNumbers: number[] = []
   for (let w = season.startWeek; w <= season.endWeek; w++) weekNumbers.push(w)
 
-  const baseWeeks = weekNumbers.map((w) => summarizeWeek(w, gamesByWeek.get(w) ?? [], now))
+  const lockLead = settings.pickLockMinutesBeforeFirstKickoff
+  const baseWeeks = weekNumbers.map((w) =>
+    summarizeWeek(w, gamesByWeek.get(w) ?? [], now, lockLead),
+  )
 
   // Current week: first week that is not final. Weeks with no data still count
   // as "current" so the UI can say the schedule has not loaded, rather than
@@ -347,7 +361,12 @@ export function evaluateSeason(
         outcome = outcomeForGame(game, pick.teamId, settings)
       }
 
-      const locked = game ? isPickLocked(game, now) : ws.phase === 'locked' || ws.phase === 'final'
+      // The whole league locks at one deadline, so a Monday-night pick is just
+      // as locked as a Sunday-morning one. A game that somehow kicked off
+      // earlier still counts as locked, which covers reschedules.
+      const locked =
+        (ws.deadlineAt !== null && now.getTime() >= toDate(ws.deadlineAt).getTime()) ||
+        (game ? isPickLocked(game, now) : ws.phase === 'locked' || ws.phase === 'final')
       const consumedLife = outcomeCostsLife(outcome, settings)
       if (consumedLife) a.strikes += 1
       const eliminatedHere = consumedLife && a.strikes >= a.livesTotal

@@ -29,7 +29,10 @@
     "api:build": "node backend/build.mjs",
     "api:test": "vitest run backend",
     "validate": "npm run lint && npm run typecheck && npm run test && npm run build",
-    "api:seed": "esbuild scripts/seed-league.ts --bundle --platform=node --format=esm --packages=external --outfile=node_modules/.tmp/seed-league.mjs --log-level=warning && node node_modules/.tmp/seed-league.mjs"
+    "api:seed": "esbuild scripts/seed-league.ts --bundle --platform=node --format=esm --packages=external --outfile=node_modules/.tmp/seed-league.mjs --log-level=warning && node node_modules/.tmp/seed-league.mjs",
+    "headshots:import": "node scripts/import-headshots.mjs",
+    "schedule:fetch": "node scripts/fetch-nfl-schedule.mjs",
+    "logos:fetch": "node scripts/fetch-team-logos.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
@@ -73,6 +76,7 @@
     "jsdom": "^30.0.1",
     "knip": "^6.34.0",
     "prettier": "^3.9.6",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.70.0",

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { useLeagueContext } from '@/app/hooks'
+import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useServices } from '@/app/hooks'
 import { useInvalidateSeason } from '@/app/queries'
 import { LeagueSettingsSchema } from '@/domain'
@@ -10,6 +10,7 @@ import { errorMessage } from '@/lib/errors'
 import { formatDateTime } from '@/lib/time'
 
 export function SettingsPanel() {
+  const tz = useLeagueTimeZone()
   const { league, snapshot, evaluation, profileOf } = useLeagueContext()
   const services = useServices()
   const invalidate = useInvalidateSeason()
@@ -209,7 +210,7 @@ export function SettingsPanel() {
           <p className="text-sm text-gold-300">
             Current decision:{' '}
             {snapshot.decision.championPlayerIds.map((id) => profileOf(id).displayName).join(', ')}{' '}
-            — “{snapshot.decision.reason}” ({formatDateTime(snapshot.decision.decidedAt)})
+            — “{snapshot.decision.reason}” ({formatDateTime(snapshot.decision.decidedAt, tz)})
           </p>
         )}
         <fieldset>

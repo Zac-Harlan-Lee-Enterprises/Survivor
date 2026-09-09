@@ -1,49 +1,32 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { evaluateSeason, findStanding, type NFLGame, type SeasonSnapshot } from '@/domain'
-import { SeasonSnapshotSchema } from '@/domain'
+import { evaluateSeason, findStanding, SeasonSnapshotSchema, type NFLGame } from '@/domain'
 import fixture from './fixtures/demo-season.json'
 import type { EspnClient } from '../nfl/espnClient'
 import { createDemoNFLProvider } from './repositories'
 import { DemoStore } from './store'
 
 /**
- * Live-score sync in demo mode: replaces the placeholder schedule with the
- * provider's real slate, re-links picks, and stays idempotent on repeat runs.
+ * Live-score sync in demo mode. Two starting points matter:
+ *   - an established league whose schedule already came from the provider
+ *     (what the app ships), where syncing only moves scores; and
+ *   - a league still on a placeholder schedule, where the first sync replaces
+ *     the slate and must re-link picks to the real games.
  */
 
 const SEASON = 2026
 const WEEK = 1
 const OBSERVED = new Date('2026-09-13T21:00:00.000Z')
+const base = () => SeasonSnapshotSchema.parse(fixture)
 
-function realGame(home: string, away: string, over: Partial<NFLGame> = {}): NFLGame {
-  return {
-    id: `2026-w01-${away}-at-${home}`,
-    seasonYear: SEASON,
-    week: WEEK,
-    homeTeamId: home,
-    awayTeamId: away,
-    kickoffAt: '2026-09-13T17:00:00.000Z',
-    status: 'scheduled',
-    resultVersion: 0,
-    resultSource: 'provider',
-    updatedAt: OBSERVED.toISOString(),
-    ...over,
-  }
+/** The real week 1 games the seeded picks depend on. */
+const realWeek1 = () => base().games.filter((g) => g.week === WEEK)
+
+function withScores(games: NFLGame[], edits: Record<string, Partial<NFLGame>>): NFLGame[] {
+  return games.map((g) => (edits[g.id] ? { ...g, ...edits[g.id] } : g))
 }
 
-/** The real week 1 pairings for the teams this league picked. */
-const REAL_SLATE = [
-  realGame('JAX', 'CLE'),
-  realGame('IND', 'BAL'),
-  realGame('DET', 'NO'),
-  realGame('LAC', 'ARI'),
-  realGame('SEA', 'NE'),
-]
-
-function harness(games: NFLGame[]) {
-  const snapshot = SeasonSnapshotSchema.parse(fixture) as SeasonSnapshot
+function harness(games: NFLGame[], snapshot = base()) {
   const store = new DemoStore(snapshot, null)
-  const clock = { now: () => OBSERVED, isPinned: () => true }
   const espn: EspnClient = {
     fetchWeek: vi.fn(async () => ({
       seasonYear: SEASON,
@@ -60,101 +43,97 @@ function harness(games: NFLGame[]) {
   }
   const ctx = {
     store,
-    clock,
+    clock: { now: () => OBSERVED, isPinned: () => true },
     viewer: () => ({ playerId: 'zac-harlan', isCommissioner: true }),
     assetBase: '/',
   }
-  return { store, provider: createDemoNFLProvider(ctx, espn), espn, snapshot }
+  return { store, provider: createDemoNFLProvider(ctx, espn), espn }
 }
 
-describe('demo live-score sync', () => {
+describe('demo live-score sync — established league (ships with the real schedule)', () => {
   let h: ReturnType<typeof harness>
   beforeEach(() => {
-    h = harness(REAL_SLATE)
+    h = harness(realWeek1())
   })
 
-  it('replaces the placeholder slate with the provider schedule', async () => {
-    const before = h.store.snapshot().weeks.find((w) => w.week === WEEK)
-    expect(before?.source).toBe('synthetic')
-
+  it('adds nothing and changes nothing when the provider repeats what we hold', async () => {
     const r = await h.provider.syncResults!(SEASON, WEEK)
-    expect(r.created).toBe(REAL_SLATE.length)
-    const after = h.store.snapshot()
-    expect(after.weeks.find((w) => w.week === WEEK)?.source).toBe('provider')
-    const week1 = after.games.filter((g) => g.week === WEEK)
-    expect(week1).toHaveLength(REAL_SLATE.length)
-    expect(week1.map((g) => g.id).sort()).toEqual(REAL_SLATE.map((g) => g.id).sort())
-  })
-
-  it('re-links every pick to the real game so none is orphaned', async () => {
-    const r = await h.provider.syncResults!(SEASON, WEEK)
+    expect(r.created).toBe(0)
+    expect(r.changed).toBe(0)
+    expect(r.relinkedPicks).toBe(0)
     expect(r.orphanedPicks).toEqual([])
-    expect(r.relinkedPicks).toBe(9)
-    const snap = h.store.snapshot()
-    const ids = new Set(snap.games.filter((g) => g.week === WEEK).map((g) => g.id))
-    for (const pick of snap.picks.filter((p) => p.week === WEEK)) {
-      expect(ids.has(pick.gameId), `${pick.playerId} -> ${pick.gameId}`).toBe(true)
-    }
-    // Maya rode the Jaguars; her pick must point at the real CLE @ JAX game.
-    expect(snap.picks.find((p) => p.playerId === 'maya-israel')?.gameId).toBe('2026-w01-CLE-at-JAX')
+    expect(r.skipped).toBe(realWeek1().length)
   })
 
-  it('reports picks whose team is absent from the provider slate instead of dropping them', async () => {
-    const partial = harness(REAL_SLATE.filter((g) => g.homeTeamId !== 'SEA'))
-    const r = await partial.provider.syncResults!(SEASON, WEEK)
-    expect(r.orphanedPicks).toEqual(['Sheila Acker (SEA)'])
-  })
-
-  it('applies live scores and finals, and is idempotent on a repeat sync', async () => {
-    const live = [
-      realGame('DET', 'NO', { status: 'in_progress', homeScore: 14, awayScore: 10 }),
-      realGame('LAC', 'ARI', {
+  it('applies live scores and finals, then is idempotent on a repeat sync', async () => {
+    const live = withScores(realWeek1(), {
+      '2026-w01-NO-at-DET': { status: 'in_progress', homeScore: 14, awayScore: 10 },
+      '2026-w01-ARI-at-LAC': {
         status: 'final',
         homeScore: 27,
         awayScore: 20,
         winnerTeamId: 'LAC',
-      }),
-      ...REAL_SLATE.filter((g) => !['DET', 'LAC'].includes(g.homeTeamId)),
-    ]
+      },
+    })
     const scored = harness(live)
     const first = await scored.provider.syncResults!(SEASON, WEEK)
     expect(first.changed).toBe(2)
 
-    const stored = scored.store.snapshot().games
-    expect(stored.find((g) => g.id === '2026-w01-ARI-at-LAC')).toMatchObject({
-      status: 'final',
-      winnerTeamId: 'LAC',
-      resultVersion: 1,
-    })
+    expect(scored.store.snapshot().games.find((g) => g.id === '2026-w01-ARI-at-LAC')).toMatchObject(
+      {
+        status: 'final',
+        winnerTeamId: 'LAC',
+        resultVersion: 1,
+      },
+    )
 
-    // Chargers backers survive; the Lions game is still pending.
+    // All three Chargers backers survive; the Lions game is still pending.
     const ev = evaluateSeason(scored.store.snapshot(), { now: OBSERVED })
-    expect(findStanding(ev, 'zac-harlan')?.livesRemaining).toBe(3)
+    for (const id of ['zac-harlan', 'nate-adams', 'stacey-markendorff']) {
+      expect(findStanding(ev, id)?.livesRemaining, id).toBe(3)
+      expect(findStanding(ev, id)?.currentOutcome, id).toBe('win')
+    }
     expect(findStanding(ev, 'dave-johnson')?.currentOutcome).toBe('pending')
 
     const second = await scored.provider.syncResults!(SEASON, WEEK)
     expect(second.changed).toBe(0)
-    expect(second.created).toBe(0)
     expect(second.skipped).toBe(live.length)
     expect(
       scored.store.snapshot().games.find((g) => g.id === '2026-w01-ARI-at-LAC')?.resultVersion,
     ).toBe(1)
   })
 
+  it('costs a life when a picked team loses, without touching anyone else', async () => {
+    const live = withScores(realWeek1(), {
+      '2026-w01-NO-at-DET': { status: 'final', homeScore: 13, awayScore: 27, winnerTeamId: 'NO' },
+    })
+    const scored = harness(live)
+    await scored.provider.syncResults!(SEASON, WEEK)
+    const ev = evaluateSeason(scored.store.snapshot(), { now: OBSERVED })
+    // Dave Johnson and James Parker both rode the Lions.
+    expect(findStanding(ev, 'dave-johnson')?.livesRemaining).toBe(2)
+    expect(findStanding(ev, 'james-parker')?.livesRemaining).toBe(2)
+    expect(findStanding(ev, 'sheila-acker')?.livesRemaining).toBe(3)
+  })
+
   it('never overwrites a result the commissioner entered by hand', async () => {
-    await h.provider.syncResults!(SEASON, WEEK)
     h.store.update((d) => {
       const g = d.snapshot.games.find((x) => x.id === '2026-w01-ARI-at-LAC')!
-      g.status = 'final'
-      g.homeScore = 30
-      g.awayScore = 3
-      g.winnerTeamId = 'LAC'
-      g.resultSource = 'commissioner'
-      g.resultVersion = 5
+      Object.assign(g, {
+        status: 'final',
+        homeScore: 30,
+        awayScore: 3,
+        winnerTeamId: 'LAC',
+        resultSource: 'commissioner',
+        resultVersion: 5,
+      })
     })
-    const contradicting = harness(REAL_SLATE)
-    // Point the second harness at the same store, then feed a different final.
-    const provider = createDemoNFLProvider(
+    const contradicting = withScores(realWeek1(), {
+      '2026-w01-ARI-at-LAC': { status: 'final', homeScore: 10, awayScore: 24, winnerTeamId: 'ARI' },
+    })
+    const provider = harness(contradicting, h.store.snapshot()).provider
+    // Point the new provider at the same store as the edit above.
+    const same = createDemoNFLProvider(
       {
         store: h.store,
         clock: { now: () => OBSERVED },
@@ -171,31 +150,71 @@ describe('demo live-score sync', () => {
             byeTeamIds: [],
             source: 'provider' as const,
           },
-          games: [
-            realGame('LAC', 'ARI', {
-              status: 'final',
-              homeScore: 10,
-              awayScore: 24,
-              winnerTeamId: 'ARI',
-            }),
-          ],
+          games: contradicting,
           skipped: 0,
         }),
       },
     )
-    void contradicting
-    await provider.syncResults!(SEASON, WEEK)
+    void provider
+    await same.syncResults!(SEASON, WEEK)
     const g = h.store.snapshot().games.find((x) => x.id === '2026-w01-ARI-at-LAC')!
     expect(g.winnerTeamId, 'commissioner result must win').toBe('LAC')
     expect(g.homeScore).toBe(30)
   })
 
-  it('surfaces provider failures instead of corrupting the schedule', async () => {
-    const failing = harness(REAL_SLATE)
-    failing.espn.fetchWeek = vi.fn(async () => {
+  it('surfaces provider failures without corrupting the schedule', async () => {
+    h.espn.fetchWeek = vi.fn(async () => {
       throw new Error('offline')
     })
-    await expect(failing.provider.syncResults!(SEASON, WEEK)).rejects.toThrow(/offline/)
-    expect(failing.store.snapshot().weeks.find((w) => w.week === WEEK)?.source).toBe('synthetic')
+    const before = h.store.snapshot().games.filter((g) => g.week === WEEK).length
+    await expect(h.provider.syncResults!(SEASON, WEEK)).rejects.toThrow(/offline/)
+    expect(h.store.snapshot().games.filter((g) => g.week === WEEK)).toHaveLength(before)
+  })
+})
+
+describe('demo live-score sync — league still on a placeholder schedule', () => {
+  /** A league seeded before the real fixtures were available. */
+  function placeholderSnapshot() {
+    const snap = base()
+    snap.weeks = snap.weeks.map((w) => (w.week === WEEK ? { ...w, source: 'synthetic' } : w))
+    // Replace week 1 with invented matchups carrying different ids.
+    snap.games = [
+      ...snap.games.filter((g) => g.week !== WEEK),
+      ...realWeek1().map((g, i) => ({
+        ...g,
+        id: `placeholder-${i}`,
+        kickoffAt: '2026-09-13T17:00:00.000Z',
+      })),
+    ]
+    snap.picks = snap.picks.map((p) =>
+      p.week === WEEK ? { ...p, gameId: `placeholder-stale-${p.playerId}` } : p,
+    )
+    return snap
+  }
+
+  it('replaces the placeholder slate and re-links every pick to the real game', async () => {
+    const h = harness(realWeek1(), placeholderSnapshot())
+    expect(h.store.snapshot().weeks.find((w) => w.week === WEEK)?.source).toBe('synthetic')
+
+    const r = await h.provider.syncResults!(SEASON, WEEK)
+    expect(r.created).toBe(realWeek1().length)
+    expect(r.relinkedPicks).toBe(9)
+    expect(r.orphanedPicks).toEqual([])
+
+    const snap = h.store.snapshot()
+    expect(snap.weeks.find((w) => w.week === WEEK)?.source).toBe('provider')
+    const ids = new Set(snap.games.filter((g) => g.week === WEEK).map((g) => g.id))
+    expect(ids.has('placeholder-0')).toBe(false)
+    for (const pick of snap.picks.filter((p) => p.week === WEEK)) {
+      expect(ids.has(pick.gameId), `${pick.playerId} -> ${pick.gameId}`).toBe(true)
+    }
+    expect(snap.picks.find((p) => p.playerId === 'maya-israel')?.gameId).toBe('2026-w01-CLE-at-JAX')
+  })
+
+  it('reports a pick whose team is absent from the provider slate instead of dropping it', async () => {
+    const partial = realWeek1().filter((g) => g.homeTeamId !== 'SEA' && g.awayTeamId !== 'SEA')
+    const h = harness(partial, placeholderSnapshot())
+    const r = await h.provider.syncResults!(SEASON, WEEK)
+    expect(r.orphanedPicks).toEqual(['Sheila Acker (SEA)'])
   })
 })

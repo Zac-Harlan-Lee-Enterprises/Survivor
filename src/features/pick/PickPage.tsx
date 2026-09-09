@@ -1,10 +1,10 @@
 import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { Check, Lock, Search } from 'lucide-react'
-import { useLeagueContext } from '@/app/hooks'
+import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useServices, useSession } from '@/app/hooks'
 import { useSubmitPick } from '@/app/queries'
-import { getTeam, getTeamOptions, readableTextColor, weekSummary, type TeamOption } from '@/domain'
+import { getTeam, getTeamOptions, weekSummary, type TeamOption } from '@/domain'
 import { DataError, type RuleViolation } from '@/data'
 import { TeamMonogram } from '@/components/TeamMonogram'
 import { Countdown } from '@/components/Countdown'
@@ -16,6 +16,7 @@ import { formatKickoff } from '@/lib/time'
 import { cn } from '@/lib/cn'
 
 export function PickPage() {
+  const tz = useLeagueTimeZone()
   const session = useSession()
   const { snapshot, evaluation } = useLeagueContext()
   const { clock } = useServices()
@@ -117,7 +118,9 @@ export function PickPage() {
           </p>
         </div>
         {summary?.deadlineAt && summary.phase === 'open' && (
-          <p className="text-sm text-ink-300">Last kickoff {formatKickoff(summary.deadlineAt)}</p>
+          <p className="text-sm text-ink-300">
+            Picks lock {formatKickoff(summary.deadlineAt, { timeZone: tz })}
+          </p>
         )}
       </header>
 
@@ -141,7 +144,7 @@ export function PickPage() {
             {selected?.kickoffAt && (
               <p className="text-sm text-ink-300">
                 {selected.isHome ? 'vs' : 'at'} {getTeam(selected.opponentId ?? '')?.name} ·{' '}
-                {formatKickoff(selected.kickoffAt)} ·{' '}
+                {formatKickoff(selected.kickoffAt, { timeZone: tz })} ·{' '}
                 {currentLocked ? (
                   <span className="text-gold-300">Locked</span>
                 ) : (
@@ -151,7 +154,7 @@ export function PickPage() {
             )}
             {!currentLocked && (
               <p className="mt-1 text-xs text-ink-400">
-                You can change this until kickoff. Tap any available team below.
+                You can change this until the deadline. Tap any available team below.
               </p>
             )}
           </div>
@@ -218,7 +221,7 @@ export function PickPage() {
         {candidate && (
           <DialogContent
             title="Lock it in?"
-            description={`Week ${week}. You can still change your mind until kickoff.`}
+            description={`Week ${week}. You can still change your mind until the deadline.`}
             onOpenAutoFocus={(e) => {
               e.preventDefault()
               confirmRef.current?.focus()
@@ -232,7 +235,8 @@ export function PickPage() {
                 </p>
                 <p className="text-sm text-ink-300">
                   {candidate.isHome ? 'vs' : 'at'} {getTeam(candidate.opponentId ?? '')?.fullName}
-                  {candidate.kickoffAt && ` · ${formatKickoff(candidate.kickoffAt)}`}
+                  {candidate.kickoffAt &&
+                    ` · ${formatKickoff(candidate.kickoffAt, { timeZone: tz })}`}
                 </p>
               </div>
             </div>
@@ -289,6 +293,7 @@ function TeamPickCard({
   option: TeamOption
   onSelect?: (o: TeamOption) => void
 }) {
+  const tz = useLeagueTimeZone()
   const { team, state, opponentId, isHome, kickoffAt, usedWeek } = option
   const opponent = opponentId ? getTeam(opponentId) : null
   const selectable = !!onSelect && (state === 'available' || state === 'selected')
@@ -333,7 +338,9 @@ function TeamPickCard({
         <span className="opacity-90">
           {opponent ? `${isHome ? 'vs' : 'at'} ${opponent.abbreviation}` : 'No game'}
         </span>
-        <span className="opacity-90">{kickoffAt ? formatKickoff(kickoffAt) : label}</span>
+        <span className="opacity-90">
+          {kickoffAt ? formatKickoff(kickoffAt, { timeZone: tz }) : label}
+        </span>
       </div>
       <span
         className={cn(
@@ -349,11 +356,13 @@ function TeamPickCard({
       </span>
     </>
   )
+  // A tint of the team's colour, dark enough for the crest and the white text
+  // to stay legible on top (the full-strength gradient fought the logo).
   const style =
     selectable && state !== 'selected'
       ? {
-          background: `linear-gradient(135deg, ${team.colors.primary}, ${team.colors.primary}cc 60%, ${team.colors.secondary})`,
-          color: readableTextColor(team.colors.primary),
+          background: `linear-gradient(135deg, ${team.colors.primary}33, ${team.colors.secondary}22)`,
+          borderColor: `${team.colors.primary}88`,
         }
       : undefined
   const classes = cn(
@@ -371,7 +380,7 @@ function TeamPickCard({
         style={style}
         onClick={() => onSelect?.(option)}
         aria-pressed={state === 'selected'}
-        aria-label={`${team.fullName}, ${opponent ? `${isHome ? 'home vs' : 'away at'} ${opponent.fullName}` : ''}, ${kickoffAt ? formatKickoff(kickoffAt) : ''}, ${label}`}
+        aria-label={`${team.fullName}, ${opponent ? `${isHome ? 'home vs' : 'away at'} ${opponent.fullName}` : ''}, ${kickoffAt ? formatKickoff(kickoffAt, { timeZone: tz }) : ''}, ${label}`}
       >
         {body}
       </button>

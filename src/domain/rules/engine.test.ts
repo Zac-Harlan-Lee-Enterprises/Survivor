@@ -122,16 +122,16 @@ describe('missing picks', () => {
     expect(s.strikes).toBe(0)
   })
 
-  it('no pick once the last game of the week has kicked off is a miss', () => {
+  it('no pick once the deadline passes is a miss, and the deadline is before the FIRST kickoff', () => {
     const snap = scenario()
       .players('ann')
       .game(1, 'GB', 'CHI', { kickoff: kickoffFor(1, 0) })
       .game(1, 'KC', 'DEN', { kickoff: kickoffFor(1, 7) })
       .build()
-    // After the 1pm game but before the 8pm game: still pending.
-    expect(standingOf(snap, 'ann', kickoffFor(1, 3)).history[0]?.outcome).toBe('pending')
-    // After the last kickoff: missing, one life gone.
-    const s = standingOf(snap, 'ann', kickoffFor(1, 8))
+    // Ten minutes before the first kickoff: still open (default lead is 5 min).
+    expect(standingOf(snap, 'ann', kickoffFor(1, -10 / 60)).history[0]?.outcome).toBe('pending')
+    // Four minutes before it: the deadline has passed, so it is a miss.
+    const s = standingOf(snap, 'ann', kickoffFor(1, -4 / 60))
     expect(s.history[0]?.outcome).toBe('missing')
     expect(s.livesRemaining).toBe(2)
   })
@@ -226,7 +226,7 @@ describe('teams used and remaining', () => {
 })
 
 describe('week phases and current week', () => {
-  it('reports open, locked and final phases from kickoffs and results', () => {
+  it('reports open, locked and final phases, with the deadline five minutes before the first kickoff', () => {
     const snap = scenario()
       .players('ann')
       .game(1, 'GB', 'CHI', { final: 'GB' })
@@ -237,9 +237,41 @@ describe('week phases and current week', () => {
     const ev = evaluateSeason(snap, { now: kickoffFor(2, 8) })
     expect(weekSummary(ev, 1)?.phase).toBe('final')
     expect(weekSummary(ev, 2)?.phase).toBe('locked')
-    expect(weekSummary(ev, 2)?.deadlineAt).toBe(kickoffFor(2, 7))
+    expect(weekSummary(ev, 2)?.firstKickoffAt).toBe(kickoffFor(2, 0))
+    expect(weekSummary(ev, 2)?.lastKickoffAt).toBe(kickoffFor(2, 7))
+    expect(weekSummary(ev, 2)?.deadlineAt).toBe(kickoffFor(2, -5 / 60))
     expect(weekSummary(ev, 3)?.phase).toBe('upcoming')
     expect(ev.currentWeek).toBe(2)
+  })
+
+  it('locks the whole league at once: a Monday-night pick cannot change after the Sunday deadline', () => {
+    const snap = scenario()
+      .players('ann')
+      .game(2, 'KC', 'DEN', { kickoff: kickoffFor(2, 0) })
+      .game(2, 'DAL', 'PHI', { kickoff: kickoffFor(2, 30) })
+      .pick('ann', 2, 'DAL')
+      .build()
+    // An hour after the first kickoff, the Cowboys have not played yet — but
+    // the deadline passed before that first kickoff, so the pick is locked.
+    const ev = evaluateSeason(snap, { now: kickoffFor(2, 1) })
+    const h = findStanding(ev, 'ann')!.history.find((x) => x.week === 2)!
+    expect(h.locked).toBe(true)
+    expect(h.outcome).toBe('pending')
+  })
+
+  it('honours a league that locks at a different lead time', () => {
+    const build = (lead: number) =>
+      scenario()
+        .withSettings({ pickLockMinutesBeforeFirstKickoff: lead })
+        .players('ann')
+        .game(1, 'GB', 'CHI', { kickoff: kickoffFor(1, 0) })
+        .build()
+    expect(evaluateSeason(build(60), { now: kickoffFor(1, -2) }).weeks[0]?.deadlineAt).toBe(
+      kickoffFor(1, -1),
+    )
+    expect(evaluateSeason(build(0), { now: kickoffFor(1, -2) }).weeks[0]?.deadlineAt).toBe(
+      kickoffFor(1, 0),
+    )
   })
 
   it('a week whose games are all cancelled is final and requires nothing', () => {

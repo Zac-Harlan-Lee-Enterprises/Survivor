@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { RefreshCw } from 'lucide-react'
-import { useLeagueContext } from '@/app/hooks'
+import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useServices } from '@/app/hooks'
 import { useInvalidateSeason } from '@/app/queries'
 import { applyGameOverrides, getTeam, lookupTeam, type NFLGame } from '@/domain'
@@ -19,6 +19,7 @@ import { formatKickoff } from '@/lib/time'
  * overrides and win over later provider updates.
  */
 export function ResultsPanel() {
+  const tz = useLeagueTimeZone()
   const { snapshot, evaluation } = useLeagueContext()
   const { nfl } = useServices()
   const invalidate = useInvalidateSeason()
@@ -122,7 +123,7 @@ export function ResultsPanel() {
                 <span className="text-ink-400">at</span>{' '}
                 <TeamMonogram teamId={g.homeTeamId} size="xs" /> {g.homeTeamId}
               </span>
-              <span className="text-ink-400">{formatKickoff(g.kickoffAt)}</span>
+              <span className="text-ink-400">{formatKickoff(g.kickoffAt, { timeZone: tz })}</span>
               <span className="ml-auto font-display tabular-nums">
                 {g.status === 'final'
                   ? `${g.awayScore}–${g.homeScore} · ${g.winnerTeamId === null ? 'TIE' : `${g.winnerTeamId} win`}`
@@ -279,6 +280,7 @@ function ResultDialog({
   overridden: boolean
   onDone: () => void
 }) {
+  const tz = useLeagueTimeZone()
   const { snapshot } = useLeagueContext()
   const { leagues } = useServices()
   const invalidate = useInvalidateSeason()
@@ -336,7 +338,7 @@ function ResultDialog({
   return (
     <DialogContent
       title={`${getTeam(game.awayTeamId)?.name} at ${getTeam(game.homeTeamId)?.name}`}
-      description={`Week ${game.week} · ${formatKickoff(game.kickoffAt)}`}
+      description={`Week ${game.week} · ${formatKickoff(game.kickoffAt, { timeZone: tz })}`}
     >
       <form onSubmit={(e) => void submit(e)} className="space-y-3">
         <div>

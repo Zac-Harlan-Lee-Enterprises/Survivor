@@ -23,4 +23,3 @@ export function toResultUpdates(games: NFLGame[], observedAt: string): GameResul
     observedAt,
   }))
 }
-

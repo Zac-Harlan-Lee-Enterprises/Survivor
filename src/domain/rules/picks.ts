@@ -7,6 +7,7 @@ import {
   gameInvolves,
   hasKickedOff,
   opponentOf,
+  summarizeWeek,
   weekSummary,
   type SeasonEvaluation,
 } from './engine'
@@ -27,6 +28,7 @@ export type PickViolationCode =
   | 'TEAM_NOT_PLAYING'
   | 'GAME_CANCELLED'
   | 'GAME_STARTED'
+  | 'WEEK_LOCKED'
   | 'TEAM_ALREADY_USED'
   | 'EXISTING_PICK_LOCKED'
   | 'VERSION_CONFLICT'
@@ -98,15 +100,17 @@ export function validatePick(
     })
   }
   const ws = weekSummary(evaluation, request.week)
+  const pastDeadline = ws?.deadlineAt != null && now.getTime() >= toDate(ws.deadlineAt).getTime()
   if (!ws || ws.phase === 'no-data') {
     violations.push({
       code: 'NO_SCHEDULE',
       message: 'The schedule for this week has not loaded yet.',
     })
-  } else if (ws.phase === 'locked' || ws.phase === 'final') {
+  } else if (pastDeadline || ws.phase === 'locked' || ws.phase === 'final') {
+    // One deadline for the whole league, a set lead before the first kickoff.
     violations.push({
-      code: 'WEEK_NOT_OPEN',
-      message: 'Every game this week has already kicked off.',
+      code: 'WEEK_LOCKED',
+      message: 'Picks for this week are locked — the deadline passed before the first kickoff.',
     })
   }
 
@@ -187,6 +191,9 @@ export function getTeamOptions(
   nowInput: Date | string,
 ): TeamOption[] {
   const now = toDate(nowInput)
+  // One deadline for the league: past it, nothing is selectable.
+  const deadline = weekSummary(evaluation, week)?.deadlineAt ?? null
+  const weekLocked = deadline !== null && now.getTime() >= toDate(deadline).getTime()
   const standing = findStanding(evaluation, playerId)
   const games = applyGameOverrides(snapshot.games, snapshot.gameOverrides ?? []).filter(
     (g) => g.seasonYear === snapshot.season.year && g.week === week,
@@ -208,7 +215,7 @@ export function getTeamOptions(
     else if (!game) state = 'bye'
     else if (game.status === 'cancelled') state = 'cancelled'
     else if (game.status === 'postponed' && hasKickedOff(game, now)) state = 'postponed'
-    else if (hasKickedOff(game, now)) state = 'locked'
+    else if (weekLocked || hasKickedOff(game, now)) state = 'locked'
     else state = 'available'
 
     return {
@@ -238,19 +245,46 @@ export function isPickVisible(
   viewer: Viewer,
   nowInput: Date | string,
   settings: LeagueSettings,
+  /** The week's shared deadline; picks become public once it passes. */
+  deadlineAt?: string | null,
 ): boolean {
   if (viewer.isCommissioner) return true
   if (viewer.playerId && viewer.playerId === pick.playerId) return true
   if (!settings.hidePicksUntilLocked) return true
+  const now = toDate(nowInput)
+  if (deadlineAt != null && now.getTime() >= toDate(deadlineAt).getTime()) return true
   if (!game) return false
-  return hasKickedOff(game, toDate(nowInput))
+  return hasKickedOff(game, now)
 }
 
 /** Server-side redaction: strips picks the viewer must not see yet. */
+/** The shared deadline for each week, derived straight from the schedule. */
+function deadlinesByWeek(snapshot: SeasonSnapshot, now: Date | string): Map<number, string | null> {
+  const lead = snapshot.league.settings.pickLockMinutesBeforeFirstKickoff
+  const byWeek = new Map<number, NFLGame[]>()
+  for (const g of snapshot.games) {
+    if (g.seasonYear !== snapshot.season.year) continue
+    byWeek.set(g.week, [...(byWeek.get(g.week) ?? []), g])
+  }
+  const out = new Map<number, string | null>()
+  for (const [week, games] of byWeek) {
+    out.set(week, summarizeWeek(week, games, toDate(now), lead).deadlineAt)
+  }
+  return out
+}
+
 export function redactPicks(snapshot: SeasonSnapshot, viewer: Viewer, now: Date | string): Pick[] {
   const games = new Map(snapshot.games.map((g) => [g.id, g]))
+  const deadlines = deadlinesByWeek(snapshot, now)
   return snapshot.picks.filter((p) =>
-    isPickVisible(p, games.get(p.gameId) ?? null, viewer, now, snapshot.league.settings),
+    isPickVisible(
+      p,
+      games.get(p.gameId) ?? null,
+      viewer,
+      now,
+      snapshot.league.settings,
+      deadlines.get(p.week) ?? null,
+    ),
   )
 }
 

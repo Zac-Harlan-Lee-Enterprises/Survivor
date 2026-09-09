@@ -1,21 +1,22 @@
 import type { Clock } from '../interfaces'
 
 /**
- * Demo clock. Pinned to a fixed instant so the season always opens in the same
- * state no matter when someone loads the GitHub Pages site: week 1 open, every
- * pick already in and still changeable, nothing kicked off yet. The
- * commissioner dashboard can move it forward or release it to real time.
+ * Demo clock. Runs on REAL time by default: the schedule is the real NFL one,
+ * so countdowns, the pick deadline and lock states must match the actual clock.
+ * A pinned instant would make every "next kickoff in ..." fictional.
+ *
+ * The commissioner dashboard can still pin it (useful for demos and for
+ * watching a week play out), and tests pin it for determinism.
  */
-export const DEMO_NOW = '2026-09-09T16:00:00.000Z' // Wed before week 1, ahead of every kickoff
+export const DEMO_NOW = '2026-09-09T16:00:00.000Z' // Wed before week 1 — used by tests and demos
 
 const KEY = 'survivor:demo:clock:v1'
 
 export function createDemoClock(storage: Storage | null): Clock {
-  let pinned: Date | null = new Date(DEMO_NOW)
+  let pinned: Date | null = null
   try {
     const stored = storage?.getItem(KEY)
-    if (stored === 'real') pinned = null
-    else if (stored) pinned = new Date(stored)
+    if (stored && stored !== 'real') pinned = new Date(stored)
   } catch {
     /* storage unavailable (private mode, SSR) — keep default */
   }

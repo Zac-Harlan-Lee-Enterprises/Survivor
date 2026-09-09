@@ -29,7 +29,10 @@ export default defineConfig({
   webServer: {
     command: `npm run build:e2e && node scripts/serve-static.mjs --dir dist-e2e --base ${BASE} --port ${PORT}`,
     url: `http://localhost:${PORT}${BASE}`,
-    reuseExistingServer: !process.env.CI,
+    // NEVER reuse a running server. The command below rebuilds the bundle, so
+    // reusing one would skip that build and silently test STALE code — which is
+    // exactly how a "my change did nothing" bug hides. Rebuilding costs ~1s.
+    reuseExistingServer: false,
     timeout: 240_000,
   },
 })

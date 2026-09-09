@@ -1,6 +1,6 @@
 import { Link } from 'react-router'
 import { Zap } from 'lucide-react'
-import { useLeagueContext } from '@/app/hooks'
+import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useSession } from '@/app/hooks'
 import { getTeam, weekSummary } from '@/domain'
 import { Headshot } from '@/components/Headshot'
@@ -15,6 +15,7 @@ import { formatKickoff } from '@/lib/time'
 import { cn } from '@/lib/cn'
 
 export function PlayerDashboard() {
+  const tz = useLeagueTimeZone()
   const session = useSession()
   const { evaluation, profileOf } = useLeagueContext()
   const playerId = session!.actor.playerId
@@ -119,7 +120,7 @@ export function PlayerDashboard() {
                   <p className="text-ink-300">
                     {game.homeTeamId === team.id ? 'vs' : 'at'}{' '}
                     {getTeam(game.homeTeamId === team.id ? game.awayTeamId : game.homeTeamId)?.name}{' '}
-                    · {formatKickoff(game.kickoffAt)}
+                    · {formatKickoff(game.kickoffAt, { timeZone: tz })}
                   </p>
                 )}
                 <div className="mt-2 flex items-center gap-3">
@@ -134,7 +135,9 @@ export function PlayerDashboard() {
           ) : (
             <p className="mt-3 text-ink-200">
               No pick yet.{' '}
-              {week?.deadlineAt ? `Last kickoff is ${formatKickoff(week.deadlineAt)}.` : ''}
+              {week?.deadlineAt
+                ? `Picks lock ${formatKickoff(week.deadlineAt, { timeZone: tz })}.`
+                : ''}
             </p>
           )}
           {me.status === 'alive' && week?.phase === 'open' && (

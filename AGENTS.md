@@ -60,14 +60,14 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 └──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Runtime modes** (build-time `VITE_DATA_MODE`): `demo` runs entirely from static files with a pinned demo clock (2026-09-09 16:00Z, week 1 open, nothing kicked off). The roster and week 1 picks are real; the **schedule is synthetic** and no results are seeded, so nothing about anyone's standing is fabricated. `connected` talks to the API. Selection happens in exactly two files: `src/main.tsx` and `src/data/index.ts`.
+**Runtime modes** (build-time `VITE_DATA_MODE`): `demo` runs entirely from static files with a pinned demo clock (2026-09-09 16:00Z, week 1 open, nothing kicked off). The roster, the picks and the **schedule are all real** (the schedule is cached from ESPN by `npm run schedule:fetch`); no results are seeded, and live scores refresh from ESPN in the browser. `connected` talks to the API. Selection happens in exactly two files: `src/main.tsx` and `src/data/index.ts`.
 
 **Layer rules** (enforced by `tests/architecture/layers.test.ts`, not by trust):
 
 | Rule | Why | Test |
 |------|-----|------|
 | `src/domain` imports only zod + domain; no React/DOM/data/env/`Date.now()` | rules must be a pure function of `(snapshot, now)`, shared with Lambda | `domain layer is pure` |
-| `fetch()` only in `src/data/api/http.ts` | one place for auth headers, error mapping, response validation | `network access is confined` |
+| `fetch()` only in `src/data/api/http.ts` and `src/data/nfl/espnClient.ts` | each upstream owns one module, so errors map to one type and callers stay mockable | `network access is confined` |
 | `src/features`, `src/components`, `src/app` never import `src/data/demo` or `src/data/api` | UI must be identical in both modes | `UI depends on ports` |
 | no `@aws-sdk/*`, `node:*`, or `VITE_*SECRET*` in `src/` | the Pages bundle is public | `secrets never reach the browser bundle` |
 | backend never recomputes strikes/lives; imports `@domain` | one rules engine | `backend shares the domain` |
@@ -80,17 +80,17 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 |-----------|---------|-------|
 | Pick wins | no life lost | `engine.ts` `outcomeForGame` |
 | Pick loses **or ties** | one life lost (`tieCountsAsMiss`) | same |
-| No pick when the week's **last** game kicks off | one life lost (`missingPickCountsAsMiss`) | `summarizeWeek` → `deadlineAt` |
+| No pick by the deadline (5 min before the week's **first** kickoff) | one life lost (`missingPickCountsAsMiss`) | `summarizeWeek` → `deadlineAt` |
 | Third miss | eliminated that week; later weeks `not_required` | `evaluateSeason` loop |
 | Team already used (locked/resolved earlier week) | rejected `TEAM_ALREADY_USED` | `picks.ts` `validatePick` |
 | Team on bye / game kicked off / cancelled | rejected `TEAM_NOT_PLAYING` / `GAME_STARTED` / `GAME_CANCELLED` | same |
-| Change pick | allowed until *that game's* kickoff; version-checked | same + `backend/src/routes/picks.ts` (409 on race) |
+| Change pick | allowed until the week's shared deadline; version-checked | same + `backend/src/routes/picks.ts` (409 on race) |
 | Cancelled game | pick `void`, team returns to pool (`cancelledGamePolicy`) | `outcomeForGame` |
 | Postponed game | stays `pending`; week not settled | same |
 | Week with no schedule data | `not_required` — nobody is struck by a data outage | `evaluateSeason` |
 | Last one standing (week settled) | champion | crown logic in `evaluateSeason` |
 | Everyone out same week / several survive week 18 | co-champions or tied finalists → commissioner `SeasonDecision` | `simultaneousEliminationPolicy` |
-| Other players' picks | hidden until kickoff (`redactSnapshot`, server-side too) | `src/domain/rules/picks.ts`, `backend/src/routes/picks.ts` |
+| Other players' picks | hidden until the shared deadline (`redactSnapshot`, server-side too) | `src/domain/rules/picks.ts`, `backend/src/routes/picks.ts` |
 | Result observations | idempotent, versioned, commissioner-locked | `results.ts`, `backend/src/sync.ts` |
 
 ---
@@ -115,7 +115,11 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | `src/app/router.tsx` | HashRouter + routes; GitHub-Pages-safe routing. |
 | `src/features/pick/PickPage.tsx` | The most important screen: weekly pick cards. |
 | `src/features/commissioner/*` | Players/headshots, picks, results, settings, import, audit. |
-| `scripts/generate-demo-fixtures.ts` | Seeds the league: real roster + week 1 picks, synthetic schedule, no results. `npm run fixtures:generate`. |
+| `scripts/generate-demo-fixtures.ts` | Seeds the league: real roster, week 1 picks, real cached schedule, no results. `npm run fixtures:generate`. |
+| `scripts/fetch-nfl-schedule.mjs` | Caches the real NFL schedule from ESPN. `npm run schedule:fetch`. |
+| `scripts/import-headshots.mjs` | Turns `photos/` into cropped headshot variants. `npm run headshots:import`. |
+| `src/domain/nfl/espn.ts` | Pure ESPN scoreboard parser, shared by browser and Lambda. |
+| `src/data/nfl/espnClient.ts` | Browser fetch for live scores (one of two network modules). |
 | `scripts/serve-static.mjs` | GitHub Pages look-alike server (real 404s, base-only). |
 | `build/githubPagesPlugin.ts` | Emits base-aware `404.html` + `.nojekyll` at build time. |
 | `backend/src/app.ts` | Lambda router; `/public/*` anonymous GETs, everything else JWT. |
@@ -153,7 +157,9 @@ All frontend variables are **public** (compiled into the bundle). Values in `.en
 | End-to-end (builds under `/Survivor/`, serves like Pages, runs desktop + mobile + axe) | `npm run test:e2e` |
 | Everything CI runs | `npm run validate` |
 | Static build (Pages) | `npm run build` → `dist/` (`VITE_BASE_PATH=/Survivor/` or derived) |
-| Regenerate demo season / headshots | `npm run fixtures:generate` · `npm run headshots:generate` |
+| Regenerate season / default avatar | `npm run fixtures:generate` · `npm run headshots:generate` |
+| Refresh the real NFL schedule | `npm run schedule:fetch` |
+| Import real player photos from `photos/` | `npm run headshots:import` |
 | Spreadsheet import report | `npm run import:report -- data/import/sample-league.csv --out report.md` |
 | Bundle Lambda handlers | `npm run api:build` |
 | Dead code | `npm run knip` |

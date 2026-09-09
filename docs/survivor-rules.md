@@ -13,7 +13,7 @@ All rules live in `src/domain/rules/` and are covered by `src/domain/rules/*.tes
 
 ## Weeks, deadlines, missing picks
 
-- A week's **deadline is the kickoff of its last non-cancelled game**. Picks for the current week are allowed for any team whose own game has not kicked off.
+- A week's **deadline is a fixed lead time before its FIRST non-cancelled kickoff** (`pickLockMinutesBeforeFirstKickoff`, default 5 minutes). The whole league locks at that one moment, so nobody can watch an early result before committing — a Monday-night pick is as locked as a Sunday-morning one.
 - Only the **current week** (first week that is not final) accepts picks.
 - No pick while the week is open → `pending`. No pick once the deadline passed → `missing` → one life (`missingPickCountsAsMiss`).
 - A week with **no schedule data** (provider outage) is `not_required`: nobody is struck by a data problem.
@@ -43,13 +43,19 @@ Kickoff changes are result observations; a rescheduled game keeps its id (`<year
 ## Visibility
 
 - Your own pick is always visible to you; the commissioner sees everything.
-- Other players' picks are hidden until their game kicks off (`hidePicksUntilLocked`). The UI shows "Locked in 🔒" instead of the team. Enforced in the demo adapter and on the API (`redactSnapshot`).
+- Other players' picks are hidden until the week's deadline passes (`hidePicksUntilLocked`), at which point the whole league is revealed at once. The UI shows "Locked in 🔒" until then. Enforced in the demo adapter and on the API (`redactSnapshot`).
 
 ## Results processing
 
 - Observations (provider or commissioner) pass through `applyGameResult`: identical observations are no-ops, any accepted change bumps `resultVersion` once, a commissioner-sourced result locks the game against provider updates until explicitly released.
 - Commissioner **league overrides** (`LeagueGameOverride`) sit on top of the stored game and win.
 - Everything re-evaluates from picks + results, so a correction never leaves stale strikes behind.
+
+## Time and timezone
+
+Every timestamp is stored in UTC. Kickoffs and deadlines are rendered in the
+league's own timezone (`displayTimeZone`, currently `America/Chicago`) with the
+zone abbreviation shown, so everyone quotes the same clock wherever they are.
 
 ## Determinism
 

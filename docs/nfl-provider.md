@@ -9,7 +9,7 @@ getSchedule(seasonYear, week)   getGame(gameId)   getFinalResults(seasonYear, we
 getWeeks(seasonYear)            getTeams()        recordManualResult?()   syncResults?()   putSchedule?()
 ```
 
-- **Demo**: `createDemoNFLProvider` serves the synthetic fixture (`src/data/demo/fixtures/demo-season.json`, flagged `isSynthetic`). It is not the NFL schedule.
+- **Demo/static**: `createDemoNFLProvider` serves the seeded fixture, whose schedule is the REAL one (cached by `npm run schedule:fetch`), and calls ESPN directly for live scores via `src/data/nfl/espnClient.ts`. The endpoint answers with `access-control-allow-origin: *`, so this works on GitHub Pages with no backend.
 - **Connected**: `createApiNFLProvider` calls `/nfl/*` on the API. External providers are implemented **server-side only** (`backend/src/providers/`), so keys never reach the bundle.
 
 ## Server-side providers (`ExternalNFLProvider`)

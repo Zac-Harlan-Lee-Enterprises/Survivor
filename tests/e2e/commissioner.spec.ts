@@ -29,13 +29,14 @@ test.describe('commissioner workflow (demo mode)', () => {
   test('entering a real result costs the losing players a life and recalculates standings', async ({
     page,
   }) => {
-    // Dave Johnson and James Parker both ride the Lions; make that game a loss.
+    // Dave Johnson and James Parker both ride the Lions (NO at DET in the real
+    // week 1 schedule); make that game a loss for Detroit.
     await page.goto('./#/commissioner/results')
     const row = page.getByRole('listitem').filter({ hasText: /DET/ }).first()
     await row.getByRole('button', { name: /enter result/i }).click()
     const dialog = page.getByRole('dialog')
     await dialog.getByLabel(/^DET score/).fill('13')
-    await dialog.getByLabel(/^TB score/).fill('27')
+    await dialog.getByLabel(/^NO score/).fill('27')
     await dialog.getByLabel(/reason/i).fill('final score from the broadcast')
     await dialog.getByRole('button', { name: /record result/i }).click()
     await expect(dialog.getByRole('status')).toContainText(/standings recalculated/i)

@@ -131,17 +131,25 @@ describe('PUT /seasons/:id/picks/:week (player)', () => {
     expect(r.body.violations.map((v: { code: string }) => v.code)).toContain('TEAM_ALREADY_USED')
   })
 
-  it('refuses a pick after kickoff using the SERVER clock', async () => {
-    h.clock.now = new Date(kickoffFor(2, 0.1))
+  it('refuses a pick after the deadline using the SERVER clock, for every game', async () => {
+    // Just past the deadline (five minutes before the week's first kickoff).
+    h.clock.now = new Date(kickoffFor(2, -4 / 60))
     const r = await h.call('PUT', '/seasons/season-1/picks/2', { ...ann, body: { teamId: 'KC' } })
     expect(r.status).toBe(422)
-    expect(r.body.violations.map((v: { code: string }) => v.code)).toContain('GAME_STARTED')
-    // A later game is still fine.
+    expect(r.body.violations.map((v: { code: string }) => v.code)).toContain('WEEK_LOCKED')
+    // A game hours later is locked too: the whole league locks together.
     const later = await h.call('PUT', '/seasons/season-1/picks/2', {
       ...ann,
       body: { teamId: 'SF' },
     })
-    expect(later.status).toBe(200)
+    expect(later.status).toBe(422)
+    expect(later.body.violations.map((v: { code: string }) => v.code)).toContain('WEEK_LOCKED')
+  })
+
+  it('still accepts a pick a minute before the deadline', async () => {
+    h.clock.now = new Date(kickoffFor(2, -6 / 60))
+    const r = await h.call('PUT', '/seasons/season-1/picks/2', { ...ann, body: { teamId: 'KC' } })
+    expect(r.status).toBe(200)
   })
 
   it('refuses a bye team and unknown teams', async () => {

@@ -70,30 +70,25 @@ test.describe('player workflow (demo mode, no backend)', () => {
     await expect(page.getByText(/philadelphia eagles/i).first()).toBeVisible()
   })
 
-  test('a pick locks once its own game kicks off, while a later game stays open', async ({
-    page,
-  }) => {
+  test('the whole league locks at one deadline, and picks become public', async ({ page }) => {
     await signInAs(page, COMMISSIONER)
     await setDemoClock(page, SUNDAY_AFTERNOON)
 
-    // Zac rides the Chargers, who kicked off at 17:00Z — locked.
+    // Zac rides the Chargers, who do not kick off until 20:25Z — but the
+    // deadline passed before the first game, so his pick is locked too.
     await page.goto('./#/pick')
-    await expect(page.getByText(/kicked off .* locked/i)).toBeVisible()
+    await expect(page.getByText(/locked/i).first()).toBeVisible()
     await expect(page.getByRole('button', { name: /^detroit lions/i })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /^los angeles chargers/i })).toHaveCount(0)
 
-    // Maya rides the Jaguars, who kick off later — still changeable.
-    await page.getByRole('button', { name: /sign out/i }).click()
-    await signInAs(page, PLAYER)
-    await page.goto('./#/pick')
-    await expect(page.getByRole('status')).toContainText(/jacksonville jaguars/i)
-    await expect(page.getByRole('heading', { name: /already kicked off/i })).toBeVisible()
-    await expect(page.getByLabel(/detroit lions: kicked off/i)).toBeVisible()
-
-    // Locked picks are now public to everyone.
+    // Maya's pick is locked as well, and every pick is now public.
     await page.getByRole('button', { name: /sign out/i }).click()
     await page.goto('./')
     await expect(page.getByRole('link', { name: /dave johnson: /i }).first()).toContainText(
       /riding lions/i,
+    )
+    await expect(page.getByRole('link', { name: /zac harlan: /i }).first()).toContainText(
+      /riding chargers/i,
     )
   })
 

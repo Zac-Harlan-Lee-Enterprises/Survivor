@@ -35,3 +35,7 @@ infra/samconfig.toml
 infra/seed.json
 data/import/league.csv
 docs/import-report.generated.md
+
+# Original full-resolution headshots. The derived variants in
+# public/headshots/ are what the app ships; originals stay local.
+photos/
