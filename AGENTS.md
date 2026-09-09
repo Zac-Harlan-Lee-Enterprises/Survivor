@@ -117,6 +117,7 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | `src/app/router.tsx` | HashRouter + routes; GitHub-Pages-safe routing. |
 | `src/features/pick/PickPage.tsx` | The most important screen: weekly pick cards. |
 | `src/features/rules/RulesPage.tsx` | `/rules` — renders `docs/survivor-rules.md` in the app, linked from the nav and footer. |
+| `src/app/useSelectedWeek.ts` | Which week the league view shows, held in the URL (`?week=N`); `WeekSelect` renders it. |
 | `src/lib/markdown.ts` | Small Markdown subset the rules page renders; `extractMarkedRegion` picks the player-facing slice. |
 | `src/features/commissioner/*` | Players/headshots, picks, results, settings, import, audit. |
 | `scripts/generate-demo-fixtures.ts` | Seeds the league: real roster, week 1 picks, real cached schedule, no results. `npm run fixtures:generate`. |
