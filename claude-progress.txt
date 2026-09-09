@@ -176,7 +176,8 @@ NEXT   : Open/merge the PR.
 BLOCKED: none.
 
 --- 2026-09-09  Claude (feat/add-don-turner) ---
-DONE   : Added Don Turner (PIT) — second on the Steelers. League is 25. His square source had no
+DONE   : Added Don Turner (PIT, second on the Steelers) and Cindy Mendoza (JAX, seventh on the
+         Jaguars). League is 26. His square source had no
          crop slack, so CROP_NUDGES gained an optional `zoom` (keep a smaller square centred on
          a point). x/y were unified to mean the crop CENTRE as a fraction of the image; the two
          existing entries were re-expressed and proved byte-identical. Don's medium variant is
