@@ -48,10 +48,14 @@ yamls=$(ls .github/workflows/*.yml infra/*.yaml 2>/dev/null || true)
 if [[ -n "$yamls" ]]; then
   if node scripts/validate-yaml.mjs $yamls >/dev/null 2>&1; then ok "workflow + infra YAML parse"; else fail "YAML syntax error → node scripts/validate-yaml.mjs $yamls"; fi
 fi
-if jq -e '.season.isSynthetic == true' src/data/demo/fixtures/demo-season.json >/dev/null 2>&1; then
-  ok "demo fixture is flagged synthetic (never mistaken for real NFL data)"
+# The seeded schedule must either BE the real one (every week sourced from a
+# provider) or be flagged synthetic. What must never happen is invented
+# matchups presented as real.
+if jq -e '(.season.isSynthetic == true) or ([.weeks[] | select(.source != "provider")] | length == 0)' \
+     src/data/demo/fixtures/demo-season.json >/dev/null 2>&1; then
+  ok "seeded schedule is either provider-sourced or flagged synthetic"
 else
-  fail "demo fixture must set season.isSynthetic=true"
+  fail "fixture has non-provider weeks but is not flagged isSynthetic — invented fixtures must never look real"
 fi
 
 # ---------------------------------------------------------------------------

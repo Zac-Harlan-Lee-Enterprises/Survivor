@@ -42,7 +42,8 @@ done
 section "Demo fixture"
 # ---------------------------------------------------------------------------
 if [[ -f src/data/demo/fixtures/demo-season.json ]]; then
-  jq -r '"  season: \(.season.label) (synthetic=\(.season.isSynthetic))  players: \(.memberships|length)  picks: \(.picks|length)  games: \(.games|length)  finals: \([.games[]|select(.status=="final")]|length)"' src/data/demo/fixtures/demo-season.json
+  jq -r '"  season: \(.season.label)  players: \(.memberships|length)  picks: \(.picks|length)  games: \(.games|length)  finals: \([.games[]|select(.status=="final")]|length)"' src/data/demo/fixtures/demo-season.json
+  jq -r '"  schedule: \([.weeks[].source]|unique|join(", "))  (isSynthetic=\(.season.isSynthetic))"' src/data/demo/fixtures/demo-season.json
   echo "  demo clock pinned at: $(grep -oE "DEMO_NOW = '[^']+'" src/data/demo/clock.ts | cut -d"'" -f2)"
 else
   echo "  fixture missing → npm run fixtures:generate"
