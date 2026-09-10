@@ -21,6 +21,17 @@
       "medium": "headshots/bradley-riedell-medium.webp"
     }
   },
+  "chloe-bourque": {
+    "from": "ChloeBourque.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 34992,
+    "width": 512,
+    "height": 512,
+    "variants": {
+      "thumb": "headshots/chloe-bourque-thumb.webp",
+      "medium": "headshots/chloe-bourque-medium.webp"
+    }
+  },
   "cindy-mendoza": {
     "from": "CindyMendoza.jpeg",
     "contentType": "image/webp",
