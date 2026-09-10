@@ -335,7 +335,7 @@
     {
       "playerId": "chloe-bourque",
       "displayName": "Chloe Bourque",
-      "imageId": null
+      "imageId": "img-chloe-bourque"
     },
     {
       "playerId": "jared-marks",
@@ -551,6 +551,19 @@
       "variants": {
         "thumb": "headshots/bradley-riedell-thumb.webp",
         "medium": "headshots/bradley-riedell-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-chloe-bourque",
+      "playerId": "chloe-bourque",
+      "contentType": "image/webp",
+      "sizeBytes": 34992,
+      "width": 512,
+      "height": 512,
+      "variants": {
+        "thumb": "headshots/chloe-bourque-thumb.webp",
+        "medium": "headshots/chloe-bourque-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },
