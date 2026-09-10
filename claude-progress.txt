@@ -206,3 +206,10 @@ TESTS  : vitest 226 passing, playwright 93 passing / 2 skipped (new league-messa
 NEXT   : Make the note commissioner-editable (settings panel + fixture field) if it is wanted
          every week; right now writing one is a code change.
 BLOCKED: none.
+
+--- 2026-09-10  Claude (feat/chloe-bourque-photo) ---
+DONE   : Imported Chloe Bourque's photo — the last player on the default avatar. All 28 players
+         now have a real headshot. No crop nudge needed (list still at its cap of 3).
+TESTS  : vitest 226 passing, playwright 93 passing / 2 skipped, validate green, sweep clean.
+NEXT   : Open/merge the PR.
+BLOCKED: none.
