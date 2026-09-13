@@ -272,6 +272,15 @@
       "joinedAt": "2026-08-15T14:00:00.000Z"
     },
     {
+      "id": "m-tina-bush",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tina-bush",
+      "role": "player",
+      "status": "active",
+      "joinedAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
       "id": "m-zac-harlan",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -416,6 +425,11 @@
       "playerId": "wesley-childers",
       "displayName": "Wesley Childers",
       "imageId": "img-wesley-childers"
+    },
+    {
+      "playerId": "tina-bush",
+      "displayName": "Tina Bush",
+      "imageId": "img-tina-bush"
     },
     {
       "playerId": "zac-harlan",
@@ -772,6 +786,19 @@
       "variants": {
         "thumb": "headshots/wesley-childers-thumb.webp",
         "medium": "headshots/wesley-childers-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-tina-bush",
+      "playerId": "tina-bush",
+      "contentType": "image/webp",
+      "sizeBytes": 3032,
+      "width": 116,
+      "height": 116,
+      "variants": {
+        "thumb": "headshots/tina-bush-thumb.webp",
+        "medium": "headshots/tina-bush-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },
@@ -1142,6 +1169,19 @@
       "source": "import"
     },
     {
+      "id": "pick-tina-bush-1",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tina-bush",
+      "week": 1,
+      "teamId": "DET",
+      "gameId": "2026-w01-NO-at-DET",
+      "submittedAt": "2026-09-09T19:00:00.000Z",
+      "updatedAt": "2026-09-09T19:00:00.000Z",
+      "version": 1,
+      "source": "import"
+    },
+    {
       "id": "pick-zac-harlan-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1149,8 +1189,8 @@
       "week": 1,
       "teamId": "LAC",
       "gameId": "2026-w01-ARI-at-LAC",
-      "submittedAt": "2026-09-09T22:25:00.000Z",
-      "updatedAt": "2026-09-09T22:25:00.000Z",
+      "submittedAt": "2026-09-12T10:25:00.000Z",
+      "updatedAt": "2026-09-12T10:25:00.000Z",
       "version": 1,
       "source": "import"
     }

@@ -263,6 +263,17 @@
       "medium": "headshots/stacey-markendorff-medium.webp"
     }
   },
+  "tina-bush": {
+    "from": "Tina_Busch.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 3032,
+    "width": 116,
+    "height": 116,
+    "variants": {
+      "thumb": "headshots/tina-bush-thumb.webp",
+      "medium": "headshots/tina-bush-medium.webp"
+    }
+  },
   "tony-canody": {
     "from": "TonyCanody.jpg",
     "contentType": "image/webp",
