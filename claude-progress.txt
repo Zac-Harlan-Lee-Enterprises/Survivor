@@ -208,8 +208,11 @@ NEXT   : Make the note commissioner-editable (settings panel + fixture field) if
 BLOCKED: none.
 
 --- 2026-09-10  Claude (feat/chloe-bourque-photo) ---
-DONE   : Imported Chloe Bourque's photo — the last player on the default avatar. All 28 players
-         now have a real headshot. No crop nudge needed (list still at its cap of 3).
+DONE   : Imported Chloe Bourque's photo — the last player on the default avatar — and added
+         Tina Bush (DET). League is 29, all with real headshots. No crop nudge needed.
+         Open questions for the commissioner: her photo file is Tina_Busch.jpeg vs the roster's
+         "Tina Bush"; and that source is only 116x116, so her headshot is softer than the rest.
+         She was also added AFTER the week 1 deadline, with the DET game already in progress.
 TESTS  : vitest 226 passing, playwright 93 passing / 2 skipped, validate green, sweep clean.
 NEXT   : Open/merge the PR.
 BLOCKED: none.
