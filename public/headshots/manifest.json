@@ -21,6 +21,17 @@
       "medium": "headshots/bradley-riedell-medium.webp"
     }
   },
+  "chloe-bourque": {
+    "from": "ChloeBourque.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 34992,
+    "width": 512,
+    "height": 512,
+    "variants": {
+      "thumb": "headshots/chloe-bourque-thumb.webp",
+      "medium": "headshots/chloe-bourque-medium.webp"
+    }
+  },
   "cindy-mendoza": {
     "from": "CindyMendoza.jpeg",
     "contentType": "image/webp",
@@ -250,6 +261,17 @@
     "variants": {
       "thumb": "headshots/stacey-markendorff-thumb.webp",
       "medium": "headshots/stacey-markendorff-medium.webp"
+    }
+  },
+  "tina-bush": {
+    "from": "Tina_Busch.jpeg",
+    "contentType": "image/webp",
+    "sizeBytes": 3032,
+    "width": 116,
+    "height": 116,
+    "variants": {
+      "thumb": "headshots/tina-bush-thumb.webp",
+      "medium": "headshots/tina-bush-medium.webp"
     }
   },
   "tony-canody": {
