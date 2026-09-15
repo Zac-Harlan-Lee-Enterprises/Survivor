@@ -228,3 +228,15 @@ DONE   : Replaced the commissioner's note with a week 1 review, researched again
 TESTS  : vitest 226 passing, playwright 93 passing / 2 skipped, validate green, sweep clean.
 NEXT   : Write the week 2 note once week 2 picks are in; remove the week 1 key then.
 BLOCKED: none.
+
+--- 2026-09-15  Claude (feat/funnier-commish-note) ---
+DONE   : Rewrote the week 1 note for comedy (facts unchanged, all still checked). Replaced the
+         closing joke, which the commissioner reported did not land, with one resting on a
+         verified fact: SEA-NE 13-10 was week 1's lowest-scoring game, 23 points, ten clear of
+         the next. Added a gold CALLOUT for the week 2 instruction — DM picks on Teams, lock at
+         7:10 PM Thursday (5 min before DET at BUF, the deadline the engine enforces). It is set
+         apart from the banter because an instruction buried in jokes gets skimmed.
+TESTS  : vitest 226 passing, playwright 95 passing / 2 skipped (new callout assertions),
+         validate green, sweep clean.
+NEXT   : Write the week 2 review once week 2 is played; drop the week 1 key then.
+BLOCKED: none.
