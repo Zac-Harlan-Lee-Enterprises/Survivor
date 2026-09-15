@@ -1,4 +1,4 @@
-import { Megaphone } from 'lucide-react'
+import { Megaphone, Send } from 'lucide-react'
 
 /**
  * The commissioner's note to the league, between the scoreboard and the
@@ -22,15 +22,18 @@ import { Megaphone } from 'lucide-react'
 const WEEK_1_REVIEW = {
   heading: 'Word from the commissioner',
   lines: [
-    'Last week this column observed that calling the Jaguars a sure thing has never once ended well — Trevor Lawrence then went 18 of 23 for four touchdowns, Jacksonville led 24–0 at the half, and all seven of you may consider the record corrected.',
-    'The six who took the Chargers instead watched Jacoby Brissett outplay Justin Herbert in Herbert’s own stadium, while Arizona held the ball for thirty-seven minutes and won 26–14; your commissioner was one of the six, so there will be no further commentary on that game.',
-    'Detroit’s six led 21–0, then surrendered scores on five of the Saints’ last six drives and survived 31–30 only because a two-point conversion in overtime fell incomplete.',
-    'We did ask whether Joanna on the Cowboys and Matt on the Packers were the two sharpest minds here or the only two who had not read the group chat — the Giants and the Vikings have filed their answer.',
-    'Twenty-one of you come through unmarked, eight are down to two lives, and the Seahawks four have the quietest 13–10 in football to thank for it.',
+    'Seven of you called the Jaguars a lock, this column called that famous last words, and Trevor Lawrence answered with four touchdowns and a 24–0 lead by halftime. Noted. Filed. Never to be spoken of again.',
+    'The six on the Chargers lost at home to Jacoby Brissett, a career journeyman who has changed jerseys more often than most of you have changed jobs. Arizona held the ball for thirty-seven minutes while the Chargers offence watched like it had bought a ticket. Your commissioner was one of the six, so understand that this paragraph is being typed through tears.',
+    'Detroit’s six went up 21–0 and then spent two hours learning what a panic attack feels like, surviving 31–30 only because New Orleans went for two in overtime and threw it approximately nowhere.',
+    'We did wonder whether Joanna on the Cowboys and Matt on the Packers were the two sharpest minds in the league or the only two who had not read the group chat. The Giants and the Vikings have reviewed the evidence and returned a verdict.',
+    'Twenty-one of you are unscathed, eight are limping, and nobody is out. The four on Seattle came through the lowest-scoring game of the week — 13–10, which they are calling defensive football and the rest of us are calling a nap.',
   ],
+  // Deliberately not one of the jokes: this is the bit people must not skim.
+  callout:
+    'DM me your week 2 pick on Teams before Thursday’s kickoff. Picks lock at 7:10 PM Thursday, five minutes before Detroit at Buffalo — and a missing pick costs a life, which is the one rule I cannot bend for you.',
 }
 
-const NOTES: Record<number, { heading: string; lines: string[] }> = {
+const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {
   1: WEEK_1_REVIEW,
   2: WEEK_1_REVIEW,
 }
@@ -55,6 +58,14 @@ export function LeagueMessage({ week }: { week: number }) {
           </p>
         ))}
       </div>
+      {note.callout && (
+        // Set apart from the banter on purpose: an instruction buried in a
+        // joke is an instruction somebody misses, and missing costs a life.
+        <p className="mt-4 flex max-w-3xl items-start gap-3 rounded-xl border border-gold-400/40 bg-gold-400/10 p-4 font-medium text-ink-100">
+          <Send className="mt-0.5 h-4 w-4 shrink-0 text-gold-300" aria-hidden="true" />
+          <span>{note.callout}</span>
+        </p>
+      )}
     </section>
   )
 }

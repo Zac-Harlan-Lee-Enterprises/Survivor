@@ -27,6 +27,18 @@ test.describe('word from the commissioner', () => {
     expect(message).toBeLessThan(standing)
   })
 
+  /**
+   * The pick instruction is the one line that costs someone a life if they
+   * miss it, so it is asserted separately from the banter around it.
+   */
+  test('spells out how and by when to send a pick', async ({ page }) => {
+    await resetDemo(page)
+    const note = page.locator('section[aria-labelledby="league-message-title"]')
+    await expect(note).toContainText(/DM me your week 2 pick on Teams/i)
+    await expect(note).toContainText(/7:10 PM Thursday/i)
+    await expect(note).toContainText(/costs a life/i)
+  })
+
   test('reads on a phone too, and is announced as a section', async ({ page }) => {
     await resetDemo(page)
     await expect(
