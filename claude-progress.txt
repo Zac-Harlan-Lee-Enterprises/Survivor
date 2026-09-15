@@ -216,3 +216,15 @@ DONE   : Imported Chloe Bourque's photo — the last player on the default avata
 TESTS  : vitest 226 passing, playwright 93 passing / 2 skipped, validate green, sweep clean.
 NEXT   : Open/merge the PR.
 BLOCKED: none.
+
+--- 2026-09-14  Claude (feat/week1-review-note) ---
+DONE   : Replaced the commissioner's note with a week 1 review, researched against the live ESPN
+         scoreboard plus contemporary reports (Cardinals 26-14 at SoFi, Lawrence 4 TD / 24-0
+         half, Lions 31-30 OT decided by a failed two-point try). Mapped to weeks 1 AND 2: week
+         1 is not final until the Monday night game syncs, so a week-2-only key would show a
+         preview of games already played.
+         League after week 1: 21 unmarked; 8 down to two lives (the six on LAC, Joanna on DAL,
+         Matt on GB). Nobody eliminated.
+TESTS  : vitest 226 passing, playwright 93 passing / 2 skipped, validate green, sweep clean.
+NEXT   : Write the week 2 note once week 2 picks are in; remove the week 1 key then.
+BLOCKED: none.
