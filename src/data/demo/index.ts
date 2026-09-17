@@ -16,6 +16,8 @@ import fixture from './fixtures/demo-season.json'
 export interface DemoOptions {
   storage?: Storage | null
   assetBase: string
+  /** See Ctx.revealAllPicks in ./repositories. Defaults to off. */
+  revealAllPicks?: boolean
 }
 
 export function createDemoServices(options: DemoOptions): Services {
@@ -23,15 +25,21 @@ export function createDemoServices(options: DemoOptions): Services {
   const snapshot = SeasonSnapshotSchema.parse(fixture)
   // A reseeded fixture must win over whatever this browser saved last time,
   // otherwise the app appears not to update no matter how often it restarts.
-  resetDemoStorageIfStale(snapshot, storage)
-  const store = new DemoStore(snapshot, storage)
+  const { sessionPlayerId } = resetDemoStorageIfStale(snapshot, storage)
+  const store = new DemoStore(snapshot, storage, sessionPlayerId)
   const clock = createDemoClock(storage)
   const auth = createDemoAuth(store)
   const viewer = () => {
     const s = auth.getSession()
     return { playerId: s?.actor.playerId ?? null, isCommissioner: s?.actor.isCommissioner ?? false }
   }
-  const ctx = { store, clock, viewer, assetBase: options.assetBase }
+  const ctx = {
+    store,
+    clock,
+    viewer,
+    assetBase: options.assetBase,
+    revealAllPicks: options.revealAllPicks ?? false,
+  }
   return {
     mode: 'demo',
     leagues: createDemoLeagueRepository(ctx),

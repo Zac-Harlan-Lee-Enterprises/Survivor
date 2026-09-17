@@ -27,14 +27,19 @@ test.describe('player workflow (demo mode, no backend)', () => {
     await expect(page.getByRole('heading', { name: /graves|graveyard/i })).toHaveCount(0)
   })
 
-  test('the commissioner does not see rivals’ picks before the deadline (regression)', async ({
+  test('a player does not see rivals’ picks before the deadline (regression)', async ({
     page,
     isMobile,
   }) => {
-    // Reported bug: the season grid showed everyone's pick to the commissioner
-    // while the week was still open. The commissioner also competes, so that
-    // was an information advantage, not just a display slip.
-    await signInAs(page, COMMISSIONER)
+    // Reported bug: the season grid showed everyone's pick while the week was
+    // still open — an information advantage, not just a display slip.
+    //
+    // This asserts it for a PLAYER, which is the case that must hold wherever
+    // the league is hosted. The commissioner is deliberately exempt in local
+    // commissioner mode (one browser, their own machine, readable by nobody
+    // else); see the local-reveal tests in src/data/demo/reveal.test.ts, which
+    // pin both sides of that gate, and the admin-panel test below.
+    await signInAs(page, PLAYER)
     await page.goto('./#/grid')
 
     // Both layouts sit in the DOM and only one is shown, so scope to the
@@ -58,44 +63,53 @@ test.describe('player workflow (demo mode, no backend)', () => {
     await expect(row).not.toContainText(/DET/)
   })
 
-  test('the admin picks panel conceals picks until the commissioner deliberately reveals them', async ({
+  test('the admin picks panel shows picks by default in local commissioner mode, and still toggles', async ({
     page,
   }) => {
+    // Local mode is one browser on the commissioner's own machine: nobody else
+    // can read this league, so collapsing the panel protects no one and only
+    // adds a click to transcribing the week's replies. A deployed league keeps
+    // the collapse — see the grid regression test above, which still asserts
+    // that nothing leaks into any player-facing view.
     await signInAs(page, COMMISSIONER)
     await page.goto('./#/commissioner/picks')
     const daveRow = page.getByRole('listitem').filter({ hasText: 'Dave Johnson' }).first()
-    await expect(daveRow).toContainText(/pick in/i)
+    await expect(daveRow).toContainText(/detroit lions/i)
+    await expect(page.getByRole('alert')).toContainText(/only in this browser/i)
+
+    // The toggle still works in both directions.
+    await page.getByRole('button', { name: /hide picks/i }).click()
     await expect(daveRow).not.toContainText(/detroit lions/i)
     await expect(page.getByRole('status')).toContainText(/picks stay concealed here too/i)
 
     await page.getByRole('button', { name: /reveal picks/i }).click()
     await expect(daveRow).toContainText(/detroit lions/i)
-    await expect(page.getByRole('alert')).toContainText(/you are still alive this week/i)
-
-    await page.getByRole('button', { name: /hide picks/i }).click()
-    await expect(daveRow).not.toContainText(/detroit lions/i)
   })
 
-  test('other players’ picks stay hidden until the deadline, for every viewer', async ({
-    page,
-  }) => {
+  test('signing in as a player shows that player exactly what they may see', async ({ page }) => {
     const card = (name: string) =>
       page.getByRole('link', { name: new RegExp(`${name}: `, 'i') }).first()
-    // Signed out: every pick is locked in but concealed.
-    await expect(card(PLAYER)).toContainText(/locked in/i)
-    await expect(card(PLAYER)).not.toContainText(/jaguars/i)
 
+    // These run in LOCAL commissioner mode, where signed out and commissioner
+    // are both the operator looking at their own machine, so both see
+    // everything. Concealment for those two is asserted against the published
+    // build in src/data/demo/reveal.test.ts, where the flag is off.
+    await expect(card(PLAYER)).toContainText(/riding jaguars/i)
+
+    // Signing in AS A PLAYER is the deliberate question "what does this person
+    // see?", and the honest answer conceals their rivals. That is the
+    // guarantee that has to hold wherever the league is hosted.
     await signInAs(page, PLAYER)
     await page.goto('./')
     await expect(card(PLAYER)).toContainText(/riding jaguars/i)
     await expect(card('Sheila Acker')).toContainText(/locked in/i)
+    await expect(card('Sheila Acker')).not.toContainText(/buccaneers|riding/i)
 
     await page.getByRole('button', { name: /sign out/i }).click()
     await signInAs(page, COMMISSIONER)
     await page.goto('./')
-    // Not even the commissioner: concealment is league-wide until the deadline.
-    await expect(card('Sheila Acker')).toContainText(/locked in/i)
-    await expect(card('Dominic Green')).toContainText(/locked in/i)
+    await expect(card('Sheila Acker')).toContainText(/riding/i)
+    await expect(card('Dominic Green')).toContainText(/riding/i)
   })
 
   test('a player reviews and changes a pick before kickoff', async ({ page }) => {

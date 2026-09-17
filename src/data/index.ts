@@ -8,5 +8,11 @@ export * from './interfaces'
 /** Chooses the runtime data mode from build-time configuration. */
 export function createServices(config: AppConfig): Services {
   if (config.mode === 'connected') return createConnectedServices(config)
-  return createDemoServices({ assetBase: config.basePath })
+  return createDemoServices({
+    assetBase: config.basePath,
+    // Local commissioner mode — the same gate the Layout banner uses. The
+    // published demo build is read-only and keeps concealment; connected mode
+    // never reaches here and redacts server-side regardless.
+    revealAllPicks: !config.readOnly,
+  })
 }

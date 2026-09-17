@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Eye, EyeOff } from 'lucide-react'
 import { useLeagueContext, useNow } from '@/app/hooks'
 import { useServices } from '@/app/hooks'
+import { getConfig } from '@/config/env'
 import { useInvalidateSeason } from '@/app/queries'
 import { getTeam, toDate, weekSummary, type Pick, type PlayerStanding } from '@/domain'
 import { Headshot } from '@/components/Headshot'
@@ -22,13 +23,21 @@ import { errorMessage } from '@/lib/errors'
  * still open they stay collapsed behind a deliberate reveal: a commissioner who
  * is also competing would otherwise gain an information advantage simply by
  * opening the admin screen.
+ *
+ * Local commissioner mode is the exception. There the league lives in one
+ * browser on the commissioner's own machine and nobody else can read it, so
+ * the collapse protects no one and only adds a click to transcribing the
+ * week's replies. Same gate as the Layout banner (demo AND not read-only), so
+ * a deployed league — connected mode included — keeps the collapse.
  */
 export function PicksPanel() {
   const { snapshot, evaluation, profileOf, viewer } = useLeagueContext()
   const { picks: pickRepo } = useServices()
   const [week, setWeek] = useState(evaluation.currentWeek)
   const [target, setTarget] = useState<{ standing: PlayerStanding } | null>(null)
-  const [revealed, setRevealed] = useState(false)
+  const config = getConfig()
+  const isLocalCommissionerMode = config.mode === 'demo' && !config.readOnly
+  const [revealed, setRevealed] = useState(isLocalCommissionerMode)
   const now = useNow(30_000)
   const rows = evaluation.standings.filter((s) => s.status !== 'inactive')
   const weekGames = snapshot.games
@@ -88,7 +97,9 @@ export function PicksPanel() {
         <Notice tone={revealed && commissionerIsCompeting ? 'error' : 'success'}>
           {revealed
             ? commissionerIsCompeting
-              ? 'These picks are hidden from everyone else until the deadline — and you are still alive this week, so seeing them is information your rivals do not have. Your own pick is still changeable.'
+              ? isLocalCommissionerMode
+                ? 'Shown by default because this league lives only in this browser. These picks are hidden from every player until the deadline, and you are still alive this week — so treat what you see here as something your rivals do not have. Your own pick is still changeable.'
+                : 'These picks are hidden from everyone else until the deadline — and you are still alive this week, so seeing them is information your rivals do not have. Your own pick is still changeable.'
               : 'These picks are hidden from every player until the deadline. You are not competing this week, so nothing is at stake in seeing them.'
             : 'Week not locked yet, so picks stay concealed here too. You can still set or correct any pick without looking.'}
         </Notice>

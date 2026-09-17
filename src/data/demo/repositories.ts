@@ -50,6 +50,36 @@ interface Ctx {
   clock: Clock
   viewer: () => { playerId: string | null; isCommissioner: boolean }
   assetBase: string
+  /**
+   * Local commissioner mode: show the commissioner every pick immediately,
+   * without waiting for the deadline.
+   *
+   * This league then lives in one browser on the commissioner's own machine.
+   * Nobody else can read it, so concealment protects no one and only obstructs
+   * the person transcribing the week's replies. It is set solely by
+   * createServices (demo AND not read-only), so the published demo build and
+   * connected mode are untouched — and connected mode redacts on the SERVER
+   * (backend/src/routes/picks.ts), which this flag cannot reach.
+   */
+  revealAllPicks?: boolean
+}
+
+/**
+ * See Ctx.revealAllPicks. Only ever true on the commissioner's own machine.
+ *
+ * Signed out counts. Local demo mode has no other audience — it is one browser
+ * on one machine, with no server and no other reader — and requiring a sign-in
+ * first meant every reseed, which clears the overlay and the session inside it,
+ * dropped the viewer into the state that sees least. That reads as "the new
+ * picks did not load", which is the opposite of true.
+ *
+ * Signed in AS A PLAYER still conceals: that is the deliberate act of asking
+ * what one player sees, and answering it honestly is the point of demo mode.
+ */
+function localRevealActive(ctx: Ctx): boolean {
+  if (ctx.revealAllPicks !== true) return false
+  const viewer = ctx.viewer()
+  return viewer.playerId === null || viewer.isCommissioner
 }
 
 function slugify(name: string): string {
@@ -96,6 +126,7 @@ export function createDemoLeagueRepository(ctx: Ctx): LeagueRepository {
       const snap = store.snapshot()
       if (snap.season.id !== seasonId)
         throw new DataError('NOT_FOUND', `Season ${seasonId} not found`, { status: 404 })
+      if (localRevealActive(ctx)) return delay(snap)
       const redacted: SeasonSnapshot = redactSnapshot(snap, ctx.viewer(), ctx.clock.now())
       return delay(redacted)
     },
@@ -393,6 +424,7 @@ export function createDemoPickRepository(ctx: Ctx): PickRepository {
     async listPicks(seasonId) {
       const snap = store.snapshot()
       if (snap.season.id !== seasonId) return []
+      if (localRevealActive(ctx)) return delay(snap.picks)
       return delay(redactPicks(snap, ctx.viewer(), ctx.clock.now()))
     },
     async listAllPicks(seasonId) {

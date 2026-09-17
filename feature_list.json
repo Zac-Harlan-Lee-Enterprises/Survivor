@@ -236,7 +236,7 @@
   {
     "id": "rules-pick-visibility",
     "category": "functional",
-    "description": "Picks are hidden from every viewer until the week's shared deadline \u2014 the commissioner included, since a competing commissioner would otherwise see rivals' picks while their own was still changeable. Own picks always visible. Administration uses a separate commissioner-only route, and the admin panel keeps picks collapsed behind a deliberate reveal.",
+    "description": "Picks are hidden from every viewer until the week's shared deadline \u2014 the commissioner included, since a competing commissioner would otherwise see rivals' picks while their own was still changeable. Own picks always visible. Administration uses a separate commissioner-only route. In local commissioner mode (demo AND not read-only \u2014 one browser on one machine, readable by nobody else) the operator sees every pick immediately, signed out or as commissioner, in the grid and league views as well as the admin panel, whose toggle still hides them on demand. Signing in AS A PLAYER still conceals their rivals, so asking what one player sees is answered honestly. The published read-only build and connected mode (which redacts server-side, beyond any browser flag) conceal from everyone until the deadline.",
     "verification": "npx vitest run src/domain/rules/picks.test.ts backend/src/routes/routes.test.ts -t 'visib|redact|admin route' --reporter=dot && npx playwright test --project=chromium -g 'rivals'",
     "priority": 1,
     "hermetic": false,
@@ -428,7 +428,7 @@
   {
     "id": "league-seeded-real-roster",
     "category": "functional",
-    "description": "The league is seeded with the real roster and their real week 1 picks (nine players, Zac Harlan as commissioner). No results are seeded, because none were supplied: every pick is pending and everyone holds three lives. The schedule stays synthetic and flagged. Source picks live in data/import/league.csv (gitignored: real names).",
+    "description": "The league is seeded with the real roster (29 players, Zac Harlan as commissioner) and their real picks: week 1 imported from the commissioner's spreadsheet, week 2 transcribed from the Teams and Outlook replies (18 of 29 answered). No results are seeded, because none were supplied: every pick is pending and everyone holds three lives. The schedule is the real cached ESPN one. Source picks live in data/import/league.csv (gitignored: real names).",
     "verification": "jq -e '(.memberships | length) >= 9 and ([.memberships[] | select(.role==\"commissioner\")] | length) == 1 and ([.games[] | select(.status==\"final\")] | length) == 0 and (.picks | length) >= 9' src/data/demo/fixtures/demo-season.json",
     "priority": 2,
     "hermetic": true,

@@ -103,44 +103,62 @@ const PEOPLE: Person[] = [
   { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner' },
 ]
 
-/** [team, outcome]. Outcomes are informational only: real results come from the provider. */
+/**
+ * [team, outcome] or [team, outcome, submittedAt].
+ *
+ * Outcomes are informational only: real results come from the provider. The
+ * third element is the REAL moment the pick reached the commissioner, used
+ * where it is known. Without it a plausible time is derived from kickoff,
+ * which is fine for a backfilled week but wrong for a week whose deadline has
+ * a real answer.
+ */
 type Outcome = 'W' | 'L' | 'T' | 'P'
-type Story = Record<string, Record<number, [string, Outcome] | null>>
+type StoryEntry = [string, Outcome] | [string, Outcome, string]
+type Story = Record<string, Record<number, StoryEntry | null>>
 
-/** Week 1 picks exactly as supplied. Every outcome is pending: no result is invented. */
+/**
+ * Picks exactly as supplied. Every outcome is pending: no result is invented.
+ *
+ * Week 1 was imported from the commissioner's spreadsheet. Week 2 was collected
+ * over Teams and Outlook and transcribed, so those carry their real submission
+ * date.
+ *
+ * `2: null` means asked and silent by the deadline — a different fact from
+ * unrecorded, and the one that costs a life. Two of the 29 stand that way.
+ */
 const STORY: Story = {
-  'maya-israel': { 1: ['JAX', 'P'] },
-  'shahid-ali': { 1: ['BAL', 'P'] },
-  'dave-johnson': { 1: ['DET', 'P'] },
-  'james-parker': { 1: ['DET', 'P'] },
-  'nate-adams': { 1: ['LAC', 'P'] },
-  'stacey-markendorff': { 1: ['LAC', 'P'] },
-  'sheila-acker': { 1: ['SEA', 'P'] },
-  'dominic-green': { 1: ['BAL', 'P'] },
+  'maya-israel': { 1: ['JAX', 'P'], 2: ['BAL', 'P', '2026-09-15T15:00:00.000Z'] },
+  'shahid-ali': { 1: ['BAL', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'] },
+  'dave-johnson': { 1: ['DET', 'P'], 2: ['BAL', 'P', '2026-09-17T15:00:00.000Z'] },
+  'james-parker': { 1: ['DET', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
+  'nate-adams': { 1: ['LAC', 'P'], 2: ['TB', 'P', '2026-09-15T15:00:00.000Z'] },
+  'stacey-markendorff': { 1: ['LAC', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'] },
+  'sheila-acker': { 1: ['SEA', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
+  'dominic-green': { 1: ['BAL', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
   // Same team as Sheila Acker — different players may ride the same team.
-  'tracy-nelson': { 1: ['SEA', 'P'] },
+  'tracy-nelson': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-16T15:00:00.000Z'] },
   // Third player on the Lions, alongside Dave Johnson and James Parker.
-  'bradley-riedell': { 1: ['DET', 'P'] },
-  'chloe-bourque': { 1: ['JAX', 'P'] },
-  'jared-marks': { 1: ['LAC', 'P'] },
-  'joseph-tomczuk': { 1: ['JAX', 'P'] },
-  'corey-cowell': { 1: ['PIT', 'P'] },
-  'melanie-moeller': { 1: ['LAC', 'P'] },
-  'jason-snook': { 1: ['JAX', 'P'] },
-  'matt-hadley': { 1: ['GB', 'P'] },
-  'mike-lancaster': { 1: ['SEA', 'P'] },
-  'kc-walker': { 1: ['JAX', 'P'] },
-  'paul-lim': { 1: ['JAX', 'P'] },
-  'tony-canody': { 1: ['LAC', 'P'] },
+  'bradley-riedell': { 1: ['DET', 'P'], 2: ['CHI', 'P', '2026-09-15T15:00:00.000Z'] },
+  'chloe-bourque': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-16T15:00:00.000Z'] },
+  'jared-marks': { 1: ['LAC', 'P'], 2: null },
+  'joseph-tomczuk': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
+  'corey-cowell': { 1: ['PIT', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
+  'melanie-moeller': { 1: ['LAC', 'P'], 2: ['PHI', 'P', '2026-09-17T15:00:00.000Z'] },
+  'jason-snook': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'] },
+  'matt-hadley': { 1: ['GB', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
+  'mike-lancaster': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
+  'kc-walker': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-15T15:00:00.000Z'] },
+  'paul-lim': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
+  'tony-canody': { 1: ['LAC', 'P'], 2: ['CLE', 'P', '2026-09-15T15:00:00.000Z'] },
   // First player on the Cowboys.
-  'joanna-moss': { 1: ['DAL', 'P'] },
-  'allison-petty': { 1: ['DET', 'P'] },
-  'don-turner': { 1: ['PIT', 'P'] },
-  'cindy-mendoza': { 1: ['JAX', 'P'] },
-  'phyllis-collins': { 1: ['SEA', 'P'] },
-  'wesley-childers': { 1: ['DET', 'P'] },
-  'tina-bush': { 1: ['DET', 'P'] },
-  'zac-harlan': { 1: ['LAC', 'P'] },
+  'joanna-moss': { 1: ['DAL', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'] },
+  'allison-petty': { 1: ['DET', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'] },
+  'don-turner': { 1: ['PIT', 'P'], 2: ['BAL', 'P', '2026-09-15T15:00:00.000Z'] },
+  'cindy-mendoza': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'] },
+  'phyllis-collins': { 1: ['SEA', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'] },
+  'wesley-childers': { 1: ['DET', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
+  'tina-bush': { 1: ['DET', 'P'], 2: null },
+  'zac-harlan': { 1: ['LAC', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
 }
 
 // ---------------------------------------------------------------------------
@@ -233,7 +251,7 @@ for (const [playerId, story] of Object.entries(STORY)) {
   for (const [weekStr, entry] of Object.entries(story)) {
     if (!entry) continue
     const week = Number(weekStr)
-    const [teamId] = entry
+    const [teamId, , suppliedAt] = entry
     const game = games.find(
       (g) => g.week === week && (g.homeTeamId === teamId || g.awayTeamId === teamId),
     )
@@ -243,11 +261,15 @@ for (const [playerId, story] of Object.entries(STORY)) {
           'Check the pick, or refresh the cache with: npm run schedule:fetch',
       )
     }
-    // Submitted at a deterministic moment before that game's real kickoff, so
-    // the seeded history is plausible without inventing a calendar.
-    const submittedAt = new Date(
-      new Date(game.kickoffAt).getTime() - (24 + between(6, 72)) * 3_600_000,
-    ).toISOString()
+    // Use the real submission time where it is known. Otherwise derive a
+    // deterministic one, anchored on the week's FIRST kickoff rather than this
+    // game's: the deadline is shared by the whole week, so anchoring on a late
+    // Sunday or Monday game invents picks submitted after it had passed.
+    const weekOpensAt = Math.min(
+      ...games.filter((g) => g.week === week).map((g) => new Date(g.kickoffAt).getTime()),
+    )
+    const submittedAt =
+      suppliedAt ?? new Date(weekOpensAt - (6 + between(1, 66)) * 3_600_000).toISOString()
     picks.push({
       id: `pick-${playerId}-${week}`,
       leagueId: LEAGUE_ID,
@@ -259,7 +281,9 @@ for (const [playerId, story] of Object.entries(STORY)) {
       submittedAt,
       updatedAt: submittedAt,
       version: 1,
-      source: week === 1 ? 'import' : 'player',
+      // Week 1 came from the spreadsheet import; later weeks were collected by
+      // the commissioner over Teams and Outlook, not entered by players.
+      source: week === 1 ? 'import' : 'commissioner',
     })
   }
 }

@@ -240,3 +240,69 @@ TESTS  : vitest 226 passing, playwright 95 passing / 2 skipped (new callout asse
          validate green, sweep clean.
 NEXT   : Write the week 2 review once week 2 is played; drop the week 1 key then.
 BLOCKED: none.
+
+--- 2026-09-17  Claude Opus 5 (feat/week2-picks) ---
+DONE   : Recorded week 2 picks. 27 of 29 answered over Teams and Outlook; each carries its real
+         submission date (day granularity is all that was supplied, so times are 15:00Z). The
+         other 2 are explicit `2: null` in STORY — asked and silent, not merely unrecorded.
+         Picks: SF 9 (Shahid, James, Stacey, Dominic, Tracy, Jason, Matt, Mike, Cindy), TB 7
+         (Nate, Sheila, Chloe, Joseph, Corey, KC, Paul), BAL 3 (Maya, Dave, Don), CHI 1
+         (Bradley), CLE 1 (Tony), BUF 3 (Allison, Phyllis, Joanna), PHI 1 (Melanie). SF is 11 with
+         Wesley and Zac — nearly half the league on one team.
+         Note Tony on CLE is opposite the seven on TB in the same game — that one settles both.
+         Allison and Phyllis on BUF ride the Thursday opener, so theirs lock first.
+         All 27 checked against the real schedule: no reuse of a week 1 team, no byes, no dupes.
+         Source is 'commissioner', not 'player': these were transcribed, not entered in the app.
+FIXED  : Seeded submittedAt could land AFTER the week's deadline — 20 of 29 week 1 picks did.
+         The generator anchored on each pick's own game kickoff, but the deadline is 5 min
+         before the week's FIRST kickoff, so anyone on a late Sunday or Monday game got an
+         impossible timestamp. Now anchored on the week's first kickoff. Caught by the new test,
+         not by eye.
+ADDED  : src/data/demo/fixtures.test.ts — the invariants validatePick would have enforced had
+         these arrived through the app, applied to the seed instead: every pick resolves to a
+         real game that week in which the team plays, no player reuses a team or double-picks a
+         week, and nothing is submitted after its deadline. Guards future weeks, not just this
+         transcription.
+TESTS  : vitest 238 passing (12 new across fixtures.test.ts, reveal.test.ts and seed.test.ts),
+         playwright 95
+         passing / 2 skipped, validate green, sweep clean, init.sh HTTP 200. Registry: demo-fixtures-deterministic, real-schedule and
+         league-seeded-real-roster all re-verified; updated the last one's stale description
+         (it still claimed nine players and a synthetic schedule).
+CHANGED: In LOCAL commissioner mode the commissioner now sees every pick immediately —
+         everywhere, not just the admin panel. Asked for twice: the panel default first, then
+         the grid, which still showed dots. The gate is the one the Layout banner already uses
+         (demo AND not read-only), threaded as ctx.revealAllPicks from createServices — the
+         single place modes are chosen — into the demo adapter's getSeasonSnapshot/listPicks.
+         The domain redactSnapshot is UNTOUCHED, so connected mode still redacts on the server
+         where no browser flag can reach it, and the published read-only build still conceals.
+         Players never see rivals' picks in any mode. The panel toggle still hides on demand.
+         This deliberately narrows a safeguard that a past regression test protected, so both
+         sides are pinned in src/data/demo/reveal.test.ts and the e2e regression was retargeted
+         from the commissioner to a plain player, which is the case that must hold everywhere.
+         Note the panel computes `commissionerIsCompeting` and uses it only for wording, never
+         for the concealment decision; that asymmetry is unchanged but worth a look if
+         revisited.
+FIXED  : Signed out now counts as the operator in local mode. The reveal originally required
+         isCommissioner, and a session is exactly what a reseed clears — so the commissioner
+         refreshed, saw dots, and reported "still not seeing them" three times while the data
+         was correct the whole way. Two bugs wearing one costume: the session was being dropped
+         (below) AND the state it dropped into was the one that sees least. Signing in as a
+         PLAYER still conceals, so demo mode can still answer "what does she see?" honestly.
+         LESSON for the next session: Playwright starts with an empty browser and signs in
+         explicitly, so it never reproduced the reported state. When a user says they cannot
+         see something, reproduce THEIR browser — stale storage, signed out — before trusting
+         a green driver run.
+FIXED  : A reseed signed the viewer out. The session lives inside the overlay blob, so
+         resetDemoStorageIfStale wiped it along with the stale data — and since a signed-out
+         viewer sees the least, regenerating the fixture looked exactly like the new picks had
+         failed to load. Reported as "still not seeing them" twice before the cause was found,
+         which is the tell: it was never the data, it was who the browser thought you were.
+         resetDemoStorageIfStale now returns the previous sessionPlayerId and DemoStore carries
+         it into the first load. An explicit reset() still signs out — that is what it is for.
+VERIFIED: Drove the running app with Playwright (sign in as commissioner → /commissioner/picks
+         → week 2) and read the rendered rows: every pick shows with the right team and logo,
+         and the silent ones show "no pick". Screenshots in the session scratchpad.
+NEXT   : Write the week 2 commissioner note once week 2 is played, and drop the week 1 key.
+         Only Jared Marks and Tina Bush are still silent; each loses a life at the 00:10Z
+         Thursday deadline if they stay that way. Worth a nudge before then.
+BLOCKED: none. Branch is local; pushing and the PR are yours to approve.
