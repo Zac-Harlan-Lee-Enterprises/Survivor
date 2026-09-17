@@ -9,33 +9,35 @@ import { Megaphone, Send } from 'lucide-react'
  * moves on and nobody has written the next one, the section simply is not
  * there rather than shouting about a week gone by.
  *
- * Every number below is from the real week 1 result, checked against the ESPN
- * scoreboard and contemporary reports — a made-up stat in a note addressed to
- * the whole league would be found out by Sunday lunchtime.
+ * Every number below is checked: the pick counts and matchups come from the
+ * seeded season and the real cached schedule, and the week 1 results are the
+ * ones this column already reported. A made-up stat in a note addressed to the
+ * whole league would be found out by Sunday lunchtime.
  */
 
 /**
- * Mapped to both weeks on purpose: week 1 is not final until Monday night's
- * game is synced, so keying this to week 2 alone would leave the league reading
- * a preview of games that had already been played.
+ * Mapped to both weeks on purpose. Week 1 has no recorded result, so the engine
+ * still calls it the current week, but every week 1 game has been played and
+ * week 2 locks on Thursday — so the league needs the preview under either key.
  */
-const WEEK_1_REVIEW = {
+const WEEK_2_PREVIEW = {
   heading: 'Word from the commissioner',
   lines: [
-    'Seven of you called the Jaguars a lock, this column called that famous last words, and Trevor Lawrence answered with four touchdowns and a 24–0 lead by halftime. Noted. Filed. Never to be spoken of again.',
-    'The six on the Chargers lost at home to Jacoby Brissett, a career journeyman who has changed jerseys more often than most of you have changed jobs. Arizona held the ball for thirty-seven minutes while the Chargers offence watched like it had bought a ticket. Your commissioner was one of the six, so understand that this paragraph is being typed through tears.',
-    'Detroit’s six went up 21–0 and then spent two hours learning what a panic attack feels like, surviving 31–30 only because New Orleans went for two in overtime and threw it approximately nowhere.',
-    'We did wonder whether Joanna on the Cowboys and Matt on the Packers were the two sharpest minds in the league or the only two who had not read the group chat. The Giants and the Vikings have reviewed the evidence and returned a verdict.',
-    'Twenty-one of you are unscathed, eight are limping, and nobody is out. The four on Seattle came through the lowest-scoring game of the week — 13–10, which they are calling defensive football and the rest of us are calling a nap.',
+    'Week 2 has no byes. All thirty-two teams are available, which is the widest menu this league will ever be handed. Eleven of you looked at that menu, considered every option, and independently ordered San Francisco. Eleven. That is not a consensus. That is a group chat.',
+    'Here is the fixture I will be watching. Seven of you are on Tampa Bay. Tony is on Cleveland. Cleveland play at Tampa Bay, Sunday at noon. Eight of you are in the same football game on opposite sides, and by about three o’clock one of those positions will look like genius and the other will be explaining itself in the group chat.',
+    'Joanna, Allison and Phyllis are on Buffalo, so their week is decided before most of you have finished dinner. Worth noting that Allison’s week 1 pick was Detroit, who kept her alive by surviving 31–30 in overtime, and she has repaid them by backing the team trying to ruin their Thursday. Cold. Possibly correct. Still cold.',
+    'Twenty-five of the twenty-seven picks in so far are on home teams. The only two of you willing to leave the house are Melanie, who has Philadelphia at Tennessee, and Tony, whose situation we have already covered. Melanie is the one person here who looked at a road game and felt fine about it.',
+    'Joanna and Matt were the two who went off-script in week 1 — the Cowboys and the Packers — and were punished for it in full view of everyone. Both have now rejoined the herd, Joanna on Buffalo and Matt on San Francisco. One week. That is all it took.',
+    'The graveyard of spent teams is filling nicely: Jacksonville gone for seven of you, Detroit and the Chargers for six apiece, Seattle for four. Bradley has now burned Detroit and Chicago in consecutive weeks, working down the NFC North like a man reading a menu top to bottom. And your commissioner, one of the six buried by the Chargers, has joined the San Francisco pile — which should tell you exactly how much I learned.',
   ],
   // Deliberately not one of the jokes: this is the bit people must not skim.
   callout:
-    'DM me your week 2 pick on Teams before Thursday’s kickoff. Picks lock at 7:10 PM Thursday, five minutes before Detroit at Buffalo — and a missing pick costs a life, which is the one rule I cannot bend for you.',
+    'Jared and Tina — I still do not have your pick. DM me your week 2 pick on Teams. Picks lock at 7:10 PM Thursday, five minutes before Detroit at Buffalo, and a missing pick costs a life, which is the one rule I cannot bend for you.',
 }
 
 const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {
-  1: WEEK_1_REVIEW,
-  2: WEEK_1_REVIEW,
+  1: WEEK_2_PREVIEW,
+  2: WEEK_2_PREVIEW,
 }
 
 export function LeagueMessage({ week }: { week: number }) {

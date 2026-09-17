@@ -11,7 +11,11 @@ test.describe('word from the commissioner', () => {
     const note = page.locator('section[aria-labelledby="league-message-title"]')
     await expect(note).toBeVisible()
     await expect(note).toContainText(/word from the commissioner/i)
-    await expect(note).toContainText(/jaguars/i)
+    // Body, not just a heading. Naming one joke here would mean rewriting this
+    // test every week; the note's factual claims are checked against the season
+    // in tests/unit/leagueMessageFacts.test.ts instead.
+    await expect(note.locator('p')).not.toHaveCount(0)
+    await expect(note).toContainText(/tampa bay/i)
 
     // Order on the page: hero, then the note, then Still standing. Measured
     // through locators so the spec needs no DOM types.

@@ -306,3 +306,28 @@ NEXT   : Write the week 2 commissioner note once week 2 is played, and drop the 
          Only Jared Marks and Tina Bush are still silent; each loses a life at the 00:10Z
          Thursday deadline if they stay that way. Worth a nudge before then.
 BLOCKED: none. Branch is local; pushing and the PR are yours to approve.
+
+--- 2026-09-17  Claude Opus 5 (feat/week2-picks, cont.) ---
+DONE   : Replaced the week 1 review with a week 2 PREVIEW, written for Thursday's deadline.
+         Keyed to weeks 1 and 2 as before: week 1 has no recorded result so the engine still
+         calls it current, but every week 1 game has been played.
+         Every counted claim is drawn from the fixture and the real cached schedule — no byes
+         (32 teams playing), 11 on SF, 7 on TB against Tony alone on CLE in that one game, 3 on
+         BUF in the Thursday opener, 25 of 27 on home teams, the week 1 burn counts, Allison
+         picking against the Detroit team that saved her, Joanna and Matt both back with the
+         herd after being punished for going it alone.
+ADDED  : tests/unit/leagueMessageFacts.test.ts — 12 assertions, one per counted claim, checked
+         against the season the note describes. When a pick lands and "eleven of you" becomes
+         twelve, these fail and the note gets rewritten. That is the signal working. It reads
+         the fixture from disk like cropNudges.test.ts next door, because tests/unit compiles
+         under tsconfig.node.json which does not include src — and the architecture rules
+         forbid anything under src/features importing a data adapter, test file or not.
+CHANGED: The league-message e2e no longer asserts on a specific joke (/jaguars/i), which would
+         need editing every week. It asserts the section renders with body copy; the facts are
+         the unit test's job and the pick instruction keeps its own dedicated test.
+TESTS  : vitest 250 passing (12 new), playwright 95 passing / 2 skipped, validate green, sweep
+         clean.
+NEXT   : Write the week 2 REVIEW once week 2 is played, and drop the preview then. Jared Marks
+         and Tina Bush are still silent — the note now names them, but a nudge before 7:10 PM
+         Thursday is worth more than a paragraph they may not read.
+BLOCKED: none. Branch is local; pushing and the PR are yours to approve.
