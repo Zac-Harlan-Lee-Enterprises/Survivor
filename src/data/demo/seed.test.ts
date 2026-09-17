@@ -57,7 +57,7 @@ describe('demo seed fingerprint', () => {
     storage.setItem('survivor:demo:state:v1', '{"stale":true}')
     storage.setItem('survivor:demo:clock:v1', '2026-10-04T15:30:00.000Z')
     storage.setItem('unrelated-app-key', 'keep me')
-    expect(resetDemoStorageIfStale(fixtureA, storage)).toBe(true)
+    expect(resetDemoStorageIfStale(fixtureA, storage).reset).toBe(true)
     expect(storage.getItem('survivor:demo:state:v1')).toBeNull()
     expect(storage.getItem('survivor:demo:clock:v1')).toBeNull()
     expect(storage.getItem('unrelated-app-key')).toBe('keep me')
@@ -67,11 +67,30 @@ describe('demo seed fingerprint', () => {
   it('is a no-op on the next load with an unchanged fixture, so edits survive', () => {
     resetDemoStorageIfStale(fixtureA, storage)
     storage.setItem('survivor:demo:state:v1', '{"my":"pick"}')
-    expect(resetDemoStorageIfStale(fixtureA, storage)).toBe(false)
+    expect(resetDemoStorageIfStale(fixtureA, storage).reset).toBe(false)
     expect(storage.getItem('survivor:demo:state:v1')).toBe('{"my":"pick"}')
   })
 
+  it('carries the signed-in player across a reseed, instead of signing them out', () => {
+    // The session lives inside the overlay blob, so dropping the overlay used
+    // to sign the viewer out on every reseed — which looked exactly like the
+    // new seed had failed to load, because signed out sees the least.
+    storage.setItem(
+      'survivor:demo:state:v1',
+      JSON.stringify({ sessionPlayerId: 'zac-harlan', snapshot: {} }),
+    )
+    const outcome = resetDemoStorageIfStale(fixtureA, storage)
+    expect(outcome.reset).toBe(true)
+    expect(outcome.sessionPlayerId).toBe('zac-harlan')
+    expect(storage.getItem('survivor:demo:state:v1')).toBeNull()
+  })
+
+  it('reports nobody to restore when the overlay was signed out or corrupt', () => {
+    storage.setItem('survivor:demo:state:v1', 'not json at all')
+    expect(resetDemoStorageIfStale(fixtureA, storage).sessionPlayerId).toBeNull()
+  })
+
   it('tolerates storage being unavailable', () => {
-    expect(resetDemoStorageIfStale(fixtureA, null)).toBe(false)
+    expect(resetDemoStorageIfStale(fixtureA, null).reset).toBe(false)
   })
 })

@@ -36,10 +36,23 @@ export class DemoStore {
   private readonly fixture: SeasonSnapshot
   private readonly storage: Storage | null
 
-  constructor(fixture: SeasonSnapshot, storage: Storage | null) {
+  /**
+   * `carriedSessionPlayerId` signs the previous viewer back in after a reseed
+   * dropped the overlay they were stored in. It applies to this first load
+   * only — an explicit reset() still signs out, which is what it is for.
+   */
+  constructor(
+    fixture: SeasonSnapshot,
+    storage: Storage | null,
+    carriedSessionPlayerId: string | null = null,
+  ) {
     this.fixture = fixture
     this.storage = storage
-    this.state = this.load()
+    const loaded = this.load()
+    this.state =
+      carriedSessionPlayerId !== null && loaded.sessionPlayerId === null
+        ? { ...loaded, sessionPlayerId: carriedSessionPlayerId }
+        : loaded
   }
 
   private fresh(): DemoState {
