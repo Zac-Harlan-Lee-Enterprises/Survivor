@@ -57,12 +57,12 @@ describe('the commissioner’s week 2 note states only true things', () => {
     expect(playing.size).toBe(32)
   })
 
-  it('“Twelve of you … ordered San Francisco”', () => {
-    expect(countOn('SF')).toBe(12)
+  it('“Eleven of you … ordered San Francisco”', () => {
+    expect(countOn('SF')).toBe(11)
   })
 
-  it('“Eight of you are on Tampa Bay. Tony is on Cleveland” — and it is one game', () => {
-    expect(countOn('TB')).toBe(8)
+  it('“Seven of you are on Tampa Bay. Tony is on Cleveland” — and it is one game', () => {
+    expect(countOn('TB')).toBe(7)
     const tony = pickBy('Tony Canody')
     expect(tony?.teamId).toBe('CLE')
     // The joke only works if they are in the same fixture, on opposite sides.
@@ -70,8 +70,8 @@ describe('the commissioner’s week 2 note states only true things', () => {
     expect(tony?.gameId).toBe(tb?.gameId)
     const game = gamesById.get(tony?.gameId ?? '')
     expect([game?.homeTeamId, game?.awayTeamId].sort()).toEqual(['CLE', 'TB'])
-    // "Nine of you are in the same football game on opposite sides."
-    expect(picks.filter((p) => p.gameId === tony?.gameId)).toHaveLength(9)
+    // "Eight of you are in the same football game on opposite sides."
+    expect(picks.filter((p) => p.gameId === tony?.gameId)).toHaveLength(8)
   })
 
   it('“Joanna, Allison and Phyllis are on Buffalo”, decided Thursday', () => {
@@ -95,11 +95,24 @@ describe('the commissioner’s week 2 note states only true things', () => {
     expect([game?.homeTeamId, game?.awayTeamId]).toContain('DET')
   })
 
-  it('“Twenty-seven of the twenty-nine picks … on home teams”, exceptions Melanie and Tony', () => {
-    expect(picks).toHaveLength(29)
+  it('“Twenty-five of the twenty-seven picks … on home teams”, exceptions Melanie and Tony', () => {
+    expect(picks).toHaveLength(27)
     const away = picks.filter((p) => gamesById.get(p.gameId)?.awayTeamId === p.teamId)
     expect(away.map((p) => nameOf(p.playerId)).sort()).toEqual(['Melanie Moeller', 'Tony Canody'])
-    expect(picks.length - away.length).toBe(27)
+    expect(picks.length - away.length).toBe(25)
+  })
+
+  it('Jared and Tina are recorded as misses, not picks', () => {
+    // They answered on Friday, after the lock and after the opener had been
+    // played. Recorded as absent so the deadline does what it says: the engine
+    // resolves each to `missing` and takes a life once week 2 stops being
+    // "upcoming", which needs week 1's result to land from the live sync.
+    const answered = new Set(picks.map((p) => p.playerId))
+    const silent = season.profiles
+      .filter((p) => !answered.has(p.playerId))
+      .map((p) => p.displayName)
+      .sort()
+    expect(silent).toEqual(['Jared Marks', 'Tina Bush'])
   })
 
   it('“Melanie … has Philadelphia at Tennessee”', () => {
