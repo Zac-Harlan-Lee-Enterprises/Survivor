@@ -34,16 +34,25 @@ test.describe('word from the commissioner', () => {
   /**
    * The pick instruction is the one line that costs someone a life if they
    * miss it, so it is asserted separately from the banter around it.
+   *
+   * Right now the note carries no instruction: week 2 is locked with all
+   * twenty-nine picks in, so there is nothing for anyone to act on, and an
+   * instruction shown when none is owed is how a real one gets ignored later.
+   *
+   * WHEN THE CALLOUT COMES BACK — with the week 2 review, chasing week 3 —
+   * this test fails, and the fix is to restore the three assertions it is
+   * guarding, not to delete it:
+   *     await expect(note).toContainText(/pick on Teams/i)
+   *     await expect(note).toContainText(/\d\d?:\d\d (AM|PM)/i)
+   *     await expect(note).toContainText(/costs a life/i)
+   * Where to send it, when it locks, what missing costs.
    */
-  test('spells out how and by when to send a pick', async ({ page }) => {
+  test('shows no pick instruction while the week is locked', async ({ page }) => {
     await resetDemo(page)
     const note = page.locator('section[aria-labelledby="league-message-title"]')
-    // Week-agnostic on purpose: the week number moves, the obligation does not.
-    // What must survive every rewrite is where to send a pick, when it locks,
-    // and what it costs to miss — the three things that cost someone a life.
-    await expect(note).toContainText(/pick on Teams/i)
-    await expect(note).toContainText(/7:10 PM Thursday/i)
-    await expect(note).toContainText(/costs a life/i)
+    await expect(note).toBeVisible()
+    await expect(note).not.toContainText(/costs a life/i)
+    await expect(note).not.toContainText(/pick on Teams/i)
   })
 
   test('reads on a phone too, and is announced as a section', async ({ page }) => {

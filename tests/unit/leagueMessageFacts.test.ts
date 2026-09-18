@@ -136,27 +136,9 @@ describe('the commissioner’s week 2 note states only true things', () => {
     expect(pickBy(name)?.teamId).toBe('SF')
   })
 
-  it('“All twenty-nine picks are in … nobody missed”', () => {
-    const answered = new Set(picks.map((p) => p.playerId))
-    const silent = season.profiles.filter((p) => !answered.has(p.playerId))
-    expect(silent).toEqual([])
-    expect(answered.size).toBe(season.profiles.length)
-  })
-
-  it('“they locked at 7:10 PM Thursday, five minutes before Detroit at Buffalo”', () => {
-    const [opener] = season.games
-      .filter((g) => g.week === WEEK)
-      .sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))
-    if (!opener) throw new Error(`week ${WEEK} has no games`)
-    expect([opener.awayTeamId, opener.homeTeamId]).toEqual(['DET', 'BUF'])
-    const lock = new Date(new Date(opener.kickoffAt).getTime() - 5 * 60_000)
-    const shown = lock.toLocaleString('en-US', {
-      timeZone: 'America/Chicago',
-      weekday: 'long',
-      hour: 'numeric',
-      minute: '2-digit',
-    })
-    expect(shown).toContain('Thursday')
-    expect(shown).toContain('7:10')
-  })
+  // The note's callout was removed while week 2 is played — every pick is in
+  // and locked, so there is nothing to act on. Its two claims ("all twenty-nine
+  // picks are in", "they locked at 7:10 PM Thursday") were asserted here and
+  // have gone with it. They come back when the week 2 review does: this file
+  // mirrors what the note actually says, or it is not doing its job.
 })

@@ -30,9 +30,11 @@ const WEEK_2_PREVIEW = {
     'Joanna and Matt were the two who went off-script in week 1 — the Cowboys and the Packers — and were punished for it in full view of everyone. Both have now rejoined the herd, Joanna on Buffalo and Matt on San Francisco. One week. That is all it took.',
     'The graveyard of spent teams is filling nicely: Jacksonville gone for seven of you, Detroit and the Chargers for six apiece, Seattle for four. Bradley has now burned Detroit and Chicago in consecutive weeks, working down the NFC North like a man reading a menu top to bottom. And your commissioner, one of the six buried by the Chargers, has joined the San Francisco pile — which should tell you exactly how much I learned.',
   ],
-  // Deliberately not one of the jokes: this is the bit people must not skim.
-  callout:
-    'All twenty-nine picks are in. They locked at 7:10 PM Thursday, five minutes before Detroit at Buffalo, and nobody missed — a first for this league. Week 3 works exactly the same way: DM me your pick on Teams before the lock, because a missing pick costs a life, and that is the one rule I cannot bend for you.',
+  // No callout while week 2 is being played: every pick is in and locked, so
+  // there is nothing for anyone to act on. The next one belongs in the week 2
+  // review, once the slate is final and week 3 is the thing to chase — and it
+  // is `callout` that renders it set apart from the banter, because an
+  // instruction buried in jokes is an instruction somebody misses.
 }
 
 const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {
