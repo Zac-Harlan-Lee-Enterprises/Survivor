@@ -1117,19 +1117,6 @@
       "source": "import"
     },
     {
-      "id": "pick-jared-marks-2",
-      "leagueId": "demo-league",
-      "seasonId": "demo-2026",
-      "playerId": "jared-marks",
-      "week": 2,
-      "teamId": "SF",
-      "gameId": "2026-w02-MIA-at-SF",
-      "submittedAt": "2026-09-17T15:00:00.000Z",
-      "updatedAt": "2026-09-17T15:00:00.000Z",
-      "version": 1,
-      "source": "commissioner"
-    },
-    {
       "id": "pick-joseph-tomczuk-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1531,19 +1518,6 @@
       "updatedAt": "2026-09-07T02:20:00.000Z",
       "version": 1,
       "source": "import"
-    },
-    {
-      "id": "pick-tina-bush-2",
-      "leagueId": "demo-league",
-      "seasonId": "demo-2026",
-      "playerId": "tina-bush",
-      "week": 2,
-      "teamId": "TB",
-      "gameId": "2026-w02-CLE-at-TB",
-      "submittedAt": "2026-09-17T15:00:00.000Z",
-      "updatedAt": "2026-09-17T15:00:00.000Z",
-      "version": 1,
-      "source": "commissioner"
     },
     {
       "id": "pick-zac-harlan-1",

@@ -378,3 +378,24 @@ NEXT   : THE CALLOUT COMES BACK with the week 2 review, once the slate is final 
          Also still open: no week 2 result is recorded (DET at BUF has been played), so
          standings show 29 alive at 3/3 until the live ESPN sync lands.
 BLOCKED: none. PR #18 open; #17 already merged. Merging stays with the commissioner.
+
+--- 2026-09-18  Claude Opus 5 (fix/week2-missed-picks) ---
+DONE   : REVERSED the earlier call on Jared Marks and Tina Bush. The commissioner first said
+         both had sent before the 7:10 PM Thursday lock and were only relayed late; he has now
+         decided they missed the cut-off. Both are back to `2: null` for week 2 — recorded as
+         misses, not picks. Week 2 is 27 of 29.
+         Note numbers follow: SF twelve → eleven, TB eight → seven, the CLE-at-TB game nine →
+         eight, home teams twenty-seven of twenty-nine → twenty-five of twenty-seven. Prose
+         untouched, callout still absent.
+VERIFIED: The engine does NOT yet show the lives lost, and that is not a bug. `currentWeek` is
+         the first week whose phase is not 'final' (engine.ts ~295). No week 1 result is
+         recorded, so week 1 is still current, week 2 is forced to 'upcoming' (~304), and every
+         week 2 outcome is 'pending' — nobody can be struck by a deadline in a week the engine
+         considers unplayed. Simulated week 1 going final and re-evaluated: both resolve to
+         'missing' with consumedLife true. So the miss is correctly RECORDED now and will BITE
+         when the live ESPN sync lands week 1's results. Standings will keep showing 29 alive at
+         3/3 until then — expect a question about it.
+NEXT   : The note does not mention the two misses. Prose was left alone deliberately; the
+         commissioner may want a line about it in the week 2 review, where the callout also
+         returns (see the two waiting guards in the previous entry).
+BLOCKED: none. PR #19 stacks on #18, which stacks on merged #17. Merge in order.
