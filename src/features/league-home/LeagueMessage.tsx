@@ -23,16 +23,18 @@ import { Megaphone, Send } from 'lucide-react'
 const WEEK_2_PREVIEW = {
   heading: 'Word from the commissioner',
   lines: [
-    'Week 2 has no byes. All thirty-two teams are available, which is the widest menu this league will ever be handed. Eleven of you looked at that menu, considered every option, and independently ordered San Francisco. Eleven. That is not a consensus. That is a group chat.',
-    'Here is the fixture I will be watching. Seven of you are on Tampa Bay. Tony is on Cleveland. Cleveland play at Tampa Bay, Sunday at noon. Eight of you are in the same football game on opposite sides, and by about three o’clock one of those positions will look like genius and the other will be explaining itself in the group chat.',
+    'Week 2 has no byes. All thirty-two teams are available, which is the widest menu this league will ever be handed. Twelve of you looked at that menu, considered every option, and independently ordered San Francisco. Twelve. That is not a consensus. That is a group chat.',
+    'Here is the fixture I will be watching. Eight of you are on Tampa Bay. Tony is on Cleveland. Cleveland play at Tampa Bay, Sunday at noon. Nine of you are in the same football game on opposite sides, and by about three o’clock one of those positions will look like genius and the other will be explaining itself in the group chat.',
     'Joanna, Allison and Phyllis are on Buffalo, so their week is decided before most of you have finished dinner. Worth noting that Allison’s week 1 pick was Detroit, who kept her alive by surviving 31–30 in overtime, and she has repaid them by backing the team trying to ruin their Thursday. Cold. Possibly correct. Still cold.',
-    'Twenty-five of the twenty-seven picks in so far are on home teams. The only two of you willing to leave the house are Melanie, who has Philadelphia at Tennessee, and Tony, whose situation we have already covered. Melanie is the one person here who looked at a road game and felt fine about it.',
+    'Twenty-seven of the twenty-nine picks are on home teams. The only two of you willing to leave the house are Melanie, who has Philadelphia at Tennessee, and Tony, whose situation we have already covered. Melanie is the one person here who looked at a road game and felt fine about it.',
     'Joanna and Matt were the two who went off-script in week 1 — the Cowboys and the Packers — and were punished for it in full view of everyone. Both have now rejoined the herd, Joanna on Buffalo and Matt on San Francisco. One week. That is all it took.',
     'The graveyard of spent teams is filling nicely: Jacksonville gone for seven of you, Detroit and the Chargers for six apiece, Seattle for four. Bradley has now burned Detroit and Chicago in consecutive weeks, working down the NFC North like a man reading a menu top to bottom. And your commissioner, one of the six buried by the Chargers, has joined the San Francisco pile — which should tell you exactly how much I learned.',
   ],
-  // Deliberately not one of the jokes: this is the bit people must not skim.
-  callout:
-    'Jared and Tina — I still do not have your pick. DM me your week 2 pick on Teams. Picks lock at 7:10 PM Thursday, five minutes before Detroit at Buffalo, and a missing pick costs a life, which is the one rule I cannot bend for you.',
+  // No callout while week 2 is being played: every pick is in and locked, so
+  // there is nothing for anyone to act on. The next one belongs in the week 2
+  // review, once the slate is final and week 3 is the thing to chase — and it
+  // is `callout` that renders it set apart from the banter, because an
+  // instruction buried in jokes is an instruction somebody misses.
 }
 
 const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {

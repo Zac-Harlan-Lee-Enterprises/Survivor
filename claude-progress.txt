@@ -331,3 +331,50 @@ NEXT   : Write the week 2 REVIEW once week 2 is played, and drop the preview the
          and Tina Bush are still silent — the note now names them, but a nudge before 7:10 PM
          Thursday is worth more than a paragraph they may not read.
 BLOCKED: none. Branch is local; pushing and the PR are yours to approve.
+
+--- 2026-09-18  Claude Opus 5 (feat/week2-picks, cont.) ---
+DONE   : Recorded the last two week 2 picks — Jared Marks on SF, Tina Bush on TB — taking the
+         league to 29 of 29. STORY now has no `2: null` entries.
+         IMPORTANT: these were relayed on Friday morning, 8h46m AFTER the 7:10 PM Thursday lock,
+         and after DET at BUF had been played. Asked the commissioner before recording, because
+         a pick made with Thursday's result already public is exactly what the shared deadline
+         exists to prevent, and because the alternative cost two real people a life each. He
+         confirmed both were SENT before the lock and only relayed late, so they are recorded
+         as on-time at the usual 15:00Z day-granularity, no override, no life lost. If that
+         confirmation was wrong the fix is a commissioner override with a reason, NOT a
+         backdated submittedAt — the fixture test would catch the latter anyway.
+CHANGED: Updated the note's numbers only, per instruction — prose and jokes untouched. SF
+         eleven → twelve, TB seven → eight, the CLE-at-TB game eight → nine, home teams
+         twenty-five of twenty-seven → twenty-seven of twenty-nine. The callout had to change
+         beyond a number: it named Jared and Tina as missing, which is now false, so it reports
+         the clean sweep and carries the same obligation forward to week 3.
+         leagueMessageFacts.test.ts caught all four stale claims by name before I touched
+         anything — the guard doing exactly its job one commit after being written.
+         The league-message e2e no longer pins the callout to "week 2"; it asserts the three
+         things that must survive every rewrite: where to send, when it locks, what missing
+         costs.
+TESTS  : vitest 251 passing (13 fact assertions, one new for the lock time), playwright 95
+         passing / 2 skipped, validate green, sweep clean.
+NEXT   : Week 2 is under way and DET at BUF is played, but no result is recorded — results come
+         from the live ESPN sync, so the standings still show 29 alive at 3/3. Write the week 2
+         review once the slate is final, and drop the preview then.
+BLOCKED: none. PR #17 is open; merging stays with the commissioner.
+
+--- 2026-09-18  Claude Opus 5 (feat/week2-picks, cont.) ---
+DONE   : Removed the note's callout at the commissioner's request. Week 2 is locked with all 29
+         picks in, so there is nothing for anyone to act on, and an instruction shown when none
+         is owed is how a real one gets ignored later. The note now ends on the spent-teams
+         paragraph. `callout` stays optional on the note type and the component still renders it
+         set apart — only this week's copy went.
+NEXT   : THE CALLOUT COMES BACK with the week 2 review, once the slate is final and week 3 is
+         the thing to chase. Two guards are waiting for it and both are designed to fail then,
+         which is the reminder:
+           - tests/e2e/league-message.spec.ts 'shows no pick instruction while the week is
+             locked' — its comment carries the three assertions to restore verbatim (where to
+             send, when it locks, what missing costs). Restore them; do not delete the test.
+           - tests/unit/leagueMessageFacts.test.ts — the two retired assertions ("all twenty-nine
+             picks are in", "they locked at 7:10 PM Thursday") go back alongside whatever the
+             new callout claims.
+         Also still open: no week 2 result is recorded (DET at BUF has been played), so
+         standings show 29 alive at 3/3 until the live ESPN sync lands.
+BLOCKED: none. PR #18 open; #17 already merged. Merging stays with the commissioner.
