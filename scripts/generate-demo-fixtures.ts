@@ -124,7 +124,9 @@ type Story = Record<string, Record<number, StoryEntry | null>>
  * date.
  *
  * `2: null` means asked and silent by the deadline — a different fact from
- * unrecorded, and the one that costs a life. Two of the 29 stand that way.
+ * unrecorded, and the one that costs a life. Week 2 has none: all 29 answered
+ * before the 7:10 PM Thursday lock, the last two relayed to the commissioner
+ * afterwards but sent in time.
  */
 const STORY: Story = {
   'maya-israel': { 1: ['JAX', 'P'], 2: ['BAL', 'P', '2026-09-15T15:00:00.000Z'] },
@@ -140,7 +142,7 @@ const STORY: Story = {
   // Third player on the Lions, alongside Dave Johnson and James Parker.
   'bradley-riedell': { 1: ['DET', 'P'], 2: ['CHI', 'P', '2026-09-15T15:00:00.000Z'] },
   'chloe-bourque': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-16T15:00:00.000Z'] },
-  'jared-marks': { 1: ['LAC', 'P'], 2: null },
+  'jared-marks': { 1: ['LAC', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
   'joseph-tomczuk': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
   'corey-cowell': { 1: ['PIT', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
   'melanie-moeller': { 1: ['LAC', 'P'], 2: ['PHI', 'P', '2026-09-17T15:00:00.000Z'] },
@@ -157,7 +159,7 @@ const STORY: Story = {
   'cindy-mendoza': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'] },
   'phyllis-collins': { 1: ['SEA', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'] },
   'wesley-childers': { 1: ['DET', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
-  'tina-bush': { 1: ['DET', 'P'], 2: null },
+  'tina-bush': { 1: ['DET', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
   'zac-harlan': { 1: ['LAC', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
 }
 

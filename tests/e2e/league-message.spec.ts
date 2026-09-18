@@ -38,7 +38,10 @@ test.describe('word from the commissioner', () => {
   test('spells out how and by when to send a pick', async ({ page }) => {
     await resetDemo(page)
     const note = page.locator('section[aria-labelledby="league-message-title"]')
-    await expect(note).toContainText(/DM me your week 2 pick on Teams/i)
+    // Week-agnostic on purpose: the week number moves, the obligation does not.
+    // What must survive every rewrite is where to send a pick, when it locks,
+    // and what it costs to miss — the three things that cost someone a life.
+    await expect(note).toContainText(/pick on Teams/i)
     await expect(note).toContainText(/7:10 PM Thursday/i)
     await expect(note).toContainText(/costs a life/i)
   })
