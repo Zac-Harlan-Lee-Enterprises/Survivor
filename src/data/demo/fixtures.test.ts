@@ -14,7 +14,7 @@ describe('demo fixture', () => {
   const gamesById = new Map(snapshot.games.map((g) => [g.id, g]))
 
   it('parses as a season snapshot', () => {
-    expect(snapshot.profiles).toHaveLength(29)
+    expect(snapshot.profiles).toHaveLength(30)
     expect(snapshot.picks.length).toBeGreaterThan(0)
   })
 

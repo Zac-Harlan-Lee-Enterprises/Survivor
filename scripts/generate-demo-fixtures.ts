@@ -99,6 +99,7 @@ const PEOPLE: Person[] = [
   { id: 'phyllis-collins', name: 'Phyllis Collins', role: 'player' },
   { id: 'wesley-childers', name: 'Wesley Childers', role: 'player' },
   { id: 'tina-bush', name: 'Tina Bush', role: 'player' },
+  { id: 'craig-mowers', name: 'Craig Mowers', role: 'player' },
   // Commissioner: runs the league and holds the admin tools.
   { id: 'zac-harlan', name: 'Zac Harlan', role: 'commissioner' },
 ]
@@ -129,6 +130,7 @@ type Story = Record<string, Record<number, StoryEntry | null>>
  * after the 7:10 PM Thursday lock and after Detroit at Buffalo had been played,
  * so they are misses. Recording them would have handed two people a choice the
  * other twenty-seven did not get — the opener's result was already public.
+ * Craig Mowers is the third miss, and a simpler one: he sent no week 2 pick.
  */
 const STORY: Story = {
   'maya-israel': { 1: ['JAX', 'P'], 2: ['BAL', 'P', '2026-09-15T15:00:00.000Z'] },
@@ -162,6 +164,9 @@ const STORY: Story = {
   'phyllis-collins': { 1: ['SEA', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'] },
   'wesley-childers': { 1: ['DET', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
   'tina-bush': { 1: ['DET', 'P'], 2: null },
+  // Seventh player on the Chargers. Sent nothing for week 2, so it is a miss
+  // of the plain kind: no late answer to weigh, just silence at the lock.
+  'craig-mowers': { 1: ['LAC', 'P'], 2: null },
   'zac-harlan': { 1: ['LAC', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
 }
 

@@ -54,6 +54,17 @@
       "medium": "headshots/corey-cowell-medium.webp"
     }
   },
+  "craig-mowers": {
+    "from": "Craig Mowers headshot.png",
+    "contentType": "image/webp",
+    "sizeBytes": 15740,
+    "width": 498,
+    "height": 498,
+    "variants": {
+      "thumb": "headshots/craig-mowers-thumb.webp",
+      "medium": "headshots/craig-mowers-medium.webp"
+    }
+  },
   "dave-johnson": {
     "from": "DaveJohnson.jpeg",
     "contentType": "image/webp",
