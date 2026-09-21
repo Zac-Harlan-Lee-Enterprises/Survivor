@@ -399,3 +399,25 @@ NEXT   : The note does not mention the two misses. Prose was left alone delibera
          commissioner may want a line about it in the week 2 review, where the callout also
          returns (see the two waiting guards in the previous entry).
 BLOCKED: none. PR #19 stacks on #18, which stacks on merged #17. Merge in order.
+
+--- 2026-09-21  Claude Fable 5.1 (feat/add-craig-mowers) ---
+DONE   : Added Craig Mowers. Week 1 on the Chargers, week 2 `null` — he sent no pick, so it is
+         a miss like Jared's and Tina's, minus the late-answer history. The league is thirty;
+         week 2 is 27 of 30. His photo was already in photos/ ("Craig Mowers headshot.png",
+         498x619); the importer matched it by name and the attention crop is centred on his
+         face, so no CROP_NUDGES entry. No other headshot changed.
+         He is the SEVENTH Charger in week 1, which made two of the note's claims false, so
+         the numbers moved and nothing else: "Jacksonville and the Chargers gone for seven of
+         you apiece, Detroit for six, Seattle for four", and the commissioner is now "one of
+         the seven buried by the Chargers". Week 2 counts (11 SF, 7 TB, 8 in CLE-at-TB, 25 of
+         27 at home) are untouched because he has no week 2 pick.
+VERIFIED: npm run validate green; npm run test:e2e 95 passed / 2 skipped; bash init.sh → 200 on
+         5891; quality-sweep exits 0. leagueMessageFacts pins the three misses by name and LAC
+         at seven; fixtures.test pins thirty profiles. feature_list.json
+         league-seeded-real-roster description updated (30 players, 27 of 30) and its
+         verification re-run.
+NEXT   : Unchanged from the previous entry — no week 1 or week 2 result is recorded, so all
+         thirty still show 3/3 and the three misses bite only when results land. The week 2
+         review should bring the callout back (two guards are waiting) and may want a line
+         about the misses; week 3 picks will need collecting.
+BLOCKED: none. Merging stays with the commissioner.

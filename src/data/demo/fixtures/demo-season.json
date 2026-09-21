@@ -281,6 +281,15 @@
       "joinedAt": "2026-08-15T14:00:00.000Z"
     },
     {
+      "id": "m-craig-mowers",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "craig-mowers",
+      "role": "player",
+      "status": "active",
+      "joinedAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
       "id": "m-zac-harlan",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -430,6 +439,11 @@
       "playerId": "tina-bush",
       "displayName": "Tina Bush",
       "imageId": "img-tina-bush"
+    },
+    {
+      "playerId": "craig-mowers",
+      "displayName": "Craig Mowers",
+      "imageId": "img-craig-mowers"
     },
     {
       "playerId": "zac-harlan",
@@ -799,6 +813,19 @@
       "variants": {
         "thumb": "headshots/tina-bush-thumb.webp",
         "medium": "headshots/tina-bush-medium.webp"
+      },
+      "createdAt": "2026-08-15T14:00:00.000Z"
+    },
+    {
+      "id": "img-craig-mowers",
+      "playerId": "craig-mowers",
+      "contentType": "image/webp",
+      "sizeBytes": 15740,
+      "width": 498,
+      "height": 498,
+      "variants": {
+        "thumb": "headshots/craig-mowers-thumb.webp",
+        "medium": "headshots/craig-mowers-medium.webp"
       },
       "createdAt": "2026-08-15T14:00:00.000Z"
     },
@@ -1520,6 +1547,19 @@
       "source": "import"
     },
     {
+      "id": "pick-craig-mowers-1",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "craig-mowers",
+      "week": 1,
+      "teamId": "LAC",
+      "gameId": "2026-w01-ARI-at-LAC",
+      "submittedAt": "2026-09-09T13:20:00.000Z",
+      "updatedAt": "2026-09-09T13:20:00.000Z",
+      "version": 1,
+      "source": "import"
+    },
+    {
       "id": "pick-zac-harlan-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1527,8 +1567,8 @@
       "week": 1,
       "teamId": "LAC",
       "gameId": "2026-w01-ARI-at-LAC",
-      "submittedAt": "2026-09-09T13:20:00.000Z",
-      "updatedAt": "2026-09-09T13:20:00.000Z",
+      "submittedAt": "2026-09-08T12:20:00.000Z",
+      "updatedAt": "2026-09-08T12:20:00.000Z",
       "version": 1,
       "source": "import"
     },

@@ -428,7 +428,7 @@
   {
     "id": "league-seeded-real-roster",
     "category": "functional",
-    "description": "The league is seeded with the real roster (29 players, Zac Harlan as commissioner) and their real picks: week 1 imported from the commissioner's spreadsheet, week 2 transcribed from the Teams and Outlook replies (18 of 29 answered). No results are seeded, because none were supplied: every pick is pending and everyone holds three lives. The schedule is the real cached ESPN one. Source picks live in data/import/league.csv (gitignored: real names).",
+    "description": "The league is seeded with the real roster (30 players, Zac Harlan as commissioner) and their real picks: week 1 imported from the commissioner's spreadsheet, week 2 transcribed from the Teams and Outlook replies (27 of 30 answered; Jared Marks, Tina Bush and Craig Mowers are recorded as misses). No results are seeded, because none were supplied: every pick is pending and everyone holds three lives. The schedule is the real cached ESPN one. Source picks live in data/import/league.csv (gitignored: real names).",
     "verification": "jq -e '(.memberships | length) >= 9 and ([.memberships[] | select(.role==\"commissioner\")] | length) == 1 and ([.games[] | select(.status==\"final\")] | length) == 0 and (.picks | length) >= 9' src/data/demo/fixtures/demo-season.json",
     "priority": 2,
     "hermetic": true,

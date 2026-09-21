@@ -102,17 +102,18 @@ describe('the commissioner’s week 2 note states only true things', () => {
     expect(picks.length - away.length).toBe(25)
   })
 
-  it('Jared and Tina are recorded as misses, not picks', () => {
+  it('Jared, Tina and Craig are recorded as misses, not picks', () => {
     // They answered on Friday, after the lock and after the opener had been
     // played. Recorded as absent so the deadline does what it says: the engine
     // resolves each to `missing` and takes a life once week 2 stops being
     // "upcoming", which needs week 1's result to land from the live sync.
+    // Craig is the plain case: nothing arrived from him at all.
     const answered = new Set(picks.map((p) => p.playerId))
     const silent = season.profiles
       .filter((p) => !answered.has(p.playerId))
       .map((p) => p.displayName)
       .sort()
-    expect(silent).toEqual(['Jared Marks', 'Tina Bush'])
+    expect(silent).toEqual(['Craig Mowers', 'Jared Marks', 'Tina Bush'])
   })
 
   it('“Melanie … has Philadelphia at Tennessee”', () => {
@@ -128,12 +129,12 @@ describe('the commissioner’s week 2 note states only true things', () => {
     expect(pickBy('Matt Hadley')?.teamId).toBe('SF')
   })
 
-  it('“Jacksonville gone for seven … Detroit and the Chargers for six apiece, Seattle for four”', () => {
+  it('“Jacksonville and the Chargers gone for seven … apiece, Detroit for six, Seattle for four”', () => {
     const week1 = season.picks.filter((p) => p.week === 1)
     const used = (teamId: string) => week1.filter((p) => p.teamId === teamId).length
     expect(used('JAX')).toBe(7)
     expect(used('DET')).toBe(6)
-    expect(used('LAC')).toBe(6)
+    expect(used('LAC')).toBe(7)
     expect(used('SEA')).toBe(4)
   })
 
