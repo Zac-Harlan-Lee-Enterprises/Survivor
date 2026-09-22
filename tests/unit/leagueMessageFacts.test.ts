@@ -141,6 +141,10 @@ describe('the commissioner’s week 2 review states only true things', () => {
     expect(lost(sf)).toBe(false)
   })
 
+  it('“a better completion rate than this league managed on sending its picks in” — Purdy 20 of 22', () => {
+    expect(20 / 22).toBeGreaterThan(picks.length / season.profiles.length)
+  })
+
   it('“Seven of you were on the Buccaneers at home to Cleveland” — 23–19, and Tony alone on the Browns', () => {
     const tb = picks.filter((p) => p.teamId === 'TB')
     expect(tb).toHaveLength(7)
@@ -185,13 +189,14 @@ describe('the commissioner’s week 2 review states only true things', () => {
     expect(home.filter(lost)).toHaveLength(11)
   })
 
-  it('“Joanna, Allison and Phyllis were on Buffalo” — 41–31; Allison’s week 1 team was Detroit', () => {
+  it('“Joanna, Allison and Phyllis were on Buffalo” — 41–31; Allison’s Detroit are 0–1 since she left', () => {
     const buf = picks.filter((p) => p.teamId === 'BUF')
     expect(firstNames(buf)).toEqual(['Allison', 'Joanna', 'Phyllis'])
     expect(FINALS[buf[0]!.gameId]).toEqual([31, 41])
     expect(buf.every(lost)).toBe(false)
     expect(week1PickOf('Allison Petty')?.teamId).toBe('DET')
     expect(gamesById.get(buf[0]!.gameId)?.awayTeamId).toBe('DET')
+    expect(winnerOf('2026-w02-DET-at-BUF')).not.toBe('DET')
   })
 
   it('“Three picks did not arrive … Jared, Tina and Craig”', () => {
