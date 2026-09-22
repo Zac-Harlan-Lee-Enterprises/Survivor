@@ -421,3 +421,52 @@ NEXT   : Unchanged from the previous entry — no week 1 or week 2 result is rec
          review should bring the callout back (two guards are waiting) and may want a line
          about the misses; week 3 picks will need collecting.
 BLOCKED: none. Merging stays with the commissioner.
+
+--- 2026-09-22  Claude Fable 5.1 (feat/week2-review-note) ---
+DONE   : Rewrote the commissioner's note as the WEEK 2 REVIEW, chasing week 3. Every fact was
+         checked against the ESPN scoreboard and the ESPN game recaps on 2026-09-22 (not
+         recalled): SF 35-13 with TDs on the first five drives and Purdy 20 of 22; CLE 23-19 at
+         TB after a 2h12m lightning delay, Whiteheart go-ahead TD, Mayfield 4th-down incomplete
+         from the 20, TB's 9 first-half points all field goals; NO 24-17 at BAL on a Shough
+         4th-down sneak at 1:28 after BAL led 14-3 at the half, replay "could not prove he did
+         not break the plane"; MIN 9-3 at CHI with no TDs, Swift fumble at the 1, blocked 23-yd
+         FG; PHI 24-20 at TEN on a 3-yd TD with 9 seconds left (Cooper's first career TD, turf
+         157F); BUF 41-31, Allen 5 total TDs, 21-0 with 11:48 left in Q2, first game at the new
+         stadium; LAC lost 26-14 twice (ARI, LV), Harbaugh 0-2 first time college or pro;
+         CAR 34-3 at ATL. League math: 14 lost a life in week 2 (7 TB, 3 BAL, Bradley CHI, 3
+         misses); 10 at three lives, 17 at two, 3 at one (Nate, Jared, Craig); nobody out.
+         The CALLOUT IS BACK: DM on Teams, locks 7:10 PM Thursday (Central; 5 min before ATL at
+         GB, 2026-09-25T00:15Z), missing costs a life. Note is keyed to weeks 1, 2 AND 3.
+         tests/unit/leagueMessageFacts.test.ts now pins every week 1 and 2 final (keyed by the
+         seed's game ids) and derives lives from picks + finals, so the note's outcome claims
+         are asserted, not just its pick counts. The e2e guard's three callout assertions are
+         restored ('tells everyone where to send a pick, when it locks, and what missing costs').
+TRIED  : Seeding real results into the fixture via `npm run schedule:fetch` (the cache carries
+         scores) + fixtures:generate. Engine then gives the right standings, but the whole e2e
+         baseline assumes "Wednesday before week 1, nothing kicked off, everyone 3/3", and
+         reveal/sync unit tests assume a seed with no finals — 4 unit failures before e2e.
+         REVERTED; out of scope for a note change.
+NEXT   : STANDINGS STILL SAY 30 AT 3/3 under a note that says fourteen lost a life. Pre-existing
+         (see 09-18 entry) and now visible on one screen. useLiveScores polls only while a week
+         is live, so on the published site weeks 1-2 never land unless a browser had the page
+         open during games. Fix options: (a) sync every non-final week whose games have kicked
+         off, once, on load; (b) seed results and move the e2e baseline forward. (a) is smaller.
+         Week 3 picks need collecting by 7:10 PM Thursday 9/24.
+BLOCKED: none. Merging stays with the commissioner.
+
+--- 2026-09-22  Claude Fable 5.1 (feat/week2-review-note, cont.) ---
+CORRECTION: THE STANDINGS ALREADY AGREE WITH THE NOTE ON THE PUBLISHED SITE. The "results never
+         land on Pages" belief (09-18 entry, and my own NEXT above) came from headless probes.
+         ESPN's scoreboard answers 403 from Akamai, with no access-control-allow-origin, to
+         every headless engine (Playwright chromium old/new headless, channel 'chrome' headless,
+         curl with a Chrome UA). Plain curl and a HEADED Chrome get 200 with ACAO *. Verified in
+         headed Chrome against the live site today: it fetched week 1, then week 2, the hero
+         moved to WEEK 3, and the standings read 10 at three lives / 17 at two / 3 at one —
+         exactly the note's numbers. The existing useLiveScores poll chains through played
+         weeks on load: a kicked-off game still marked scheduled counts as live, and
+         currentWeek advances after each sync. NO CODE CHANGE NEEDED. A catch-up hook was built,
+         found redundant, and thrown away unpushed.
+VERIFIED: chromium.launch({ channel: 'chrome', headless: false }) is the only way to see the
+         feed work from a script. CI and headless probes will always show 3/3 — do not chase it.
+NEXT   : Week 3 picks by 7:10 PM Thursday 9/24; then the week 3 review. Nothing else open.
+BLOCKED: none. PR #21 awaits the commissioner's merge.
