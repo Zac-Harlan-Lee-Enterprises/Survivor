@@ -453,3 +453,20 @@ NEXT   : STANDINGS STILL SAY 30 AT 3/3 under a note that says fourteen lost a li
          off, once, on load; (b) seed results and move the e2e baseline forward. (a) is smaller.
          Week 3 picks need collecting by 7:10 PM Thursday 9/24.
 BLOCKED: none. Merging stays with the commissioner.
+
+--- 2026-09-22  Claude Fable 5.1 (feat/week2-review-note, cont.) ---
+CORRECTION: THE STANDINGS ALREADY AGREE WITH THE NOTE ON THE PUBLISHED SITE. The "results never
+         land on Pages" belief (09-18 entry, and my own NEXT above) came from headless probes.
+         ESPN's scoreboard answers 403 from Akamai, with no access-control-allow-origin, to
+         every headless engine (Playwright chromium old/new headless, channel 'chrome' headless,
+         curl with a Chrome UA). Plain curl and a HEADED Chrome get 200 with ACAO *. Verified in
+         headed Chrome against the live site today: it fetched week 1, then week 2, the hero
+         moved to WEEK 3, and the standings read 10 at three lives / 17 at two / 3 at one —
+         exactly the note's numbers. The existing useLiveScores poll chains through played
+         weeks on load: a kicked-off game still marked scheduled counts as live, and
+         currentWeek advances after each sync. NO CODE CHANGE NEEDED. A catch-up hook was built,
+         found redundant, and thrown away unpushed.
+VERIFIED: chromium.launch({ channel: 'chrome', headless: false }) is the only way to see the
+         feed work from a script. CI and headless probes will always show 3/3 — do not chase it.
+NEXT   : Week 3 picks by 7:10 PM Thursday 9/24; then the week 3 review. Nothing else open.
+BLOCKED: none. PR #21 awaits the commissioner's merge.
