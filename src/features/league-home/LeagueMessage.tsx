@@ -10,36 +10,41 @@ import { Megaphone, Send } from 'lucide-react'
  * there rather than shouting about a week gone by.
  *
  * Every number below is checked: the pick counts and matchups come from the
- * seeded season and the real cached schedule, and the week 1 results are the
- * ones this column already reported. A made-up stat in a note addressed to the
- * whole league would be found out by Sunday lunchtime.
+ * seeded season and the real cached schedule, and the results are the ones on
+ * the ESPN scoreboard and in the game recaps, pinned in
+ * tests/unit/leagueMessageFacts.test.ts. A made-up stat in a note addressed to
+ * the whole league would be found out by Sunday lunchtime.
  */
 
 /**
- * Mapped to both weeks on purpose. Week 1 has no recorded result, so the engine
- * still calls it the current week, but every week 1 game has been played and
- * week 2 locks on Thursday — so the league needs the preview under either key.
+ * Mapped to weeks 1 through 3 on purpose. The seed carries no results, so the
+ * engine still calls week 1 current until the live sync lands them, at which
+ * point week 3 is — and the league needs the review under whichever key it is
+ * shown.
  */
-const WEEK_2_PREVIEW = {
+const WEEK_2_REVIEW = {
   heading: 'Word from the commissioner',
   lines: [
-    'Week 2 has no byes. All thirty-two teams are available, which is the widest menu this league will ever be handed. Eleven of you looked at that menu, considered every option, and independently ordered San Francisco. Eleven. That is not a consensus. That is a group chat.',
-    'Here is the fixture I will be watching. Seven of you are on Tampa Bay. Tony is on Cleveland. Cleveland play at Tampa Bay, Sunday at noon. Eight of you are in the same football game on opposite sides, and by about three o’clock one of those positions will look like genius and the other will be explaining itself in the group chat.',
-    'Joanna, Allison and Phyllis are on Buffalo, so their week is decided before most of you have finished dinner. Worth noting that Allison’s week 1 pick was Detroit, who kept her alive by surviving 31–30 in overtime, and she has repaid them by backing the team trying to ruin their Thursday. Cold. Possibly correct. Still cold.',
-    'Twenty-five of the twenty-seven picks are on home teams. The only two of you willing to leave the house are Melanie, who has Philadelphia at Tennessee, and Tony, whose situation we have already covered. Melanie is the one person here who looked at a road game and felt fine about it.',
-    'Joanna and Matt were the two who went off-script in week 1 — the Cowboys and the Packers — and were punished for it in full view of everyone. Both have now rejoined the herd, Joanna on Buffalo and Matt on San Francisco. One week. That is all it took.',
-    'The graveyard of spent teams is filling nicely: Jacksonville and the Chargers gone for seven of you apiece, Detroit for six, Seattle for four. Bradley has now burned Detroit and Chicago in consecutive weeks, working down the NFC North like a man reading a menu top to bottom. And your commissioner, one of the seven buried by the Chargers, has joined the San Francisco pile — which should tell you exactly how much I learned.',
+    'Week 2 is in the books and fourteen of you are a life lighter. Nobody is out. Ten of you are still holding all three, seventeen are on two, and three of you are down to your last one in September, which is a pace. We will get to who.',
+    'Eleven of you ordered San Francisco, and San Francisco delivered: touchdowns on its first five drives, 35–13, and Brock Purdy threw twenty-two passes and missed two of them. Christian McCaffrey scored the hundredth touchdown of his career and eleven of you nodded along as if you had planned it. You did not plan it. You saw a menu with thirty-two options and ordered the special.',
+    'Then there is Tampa Bay. Seven of you were on the Buccaneers at home to Cleveland, and I said one side of that game would be explaining itself by about three o’clock. I was wrong about the time. Lightning stopped play for two hours and twelve minutes, so it was after five when Deshaun Watson found Blake Whiteheart for the go-ahead score and Baker Mayfield’s fourth-down pass from the twenty fell incomplete. Cleveland 23, Tampa Bay 19. Chloe, Corey, Joseph, KC, Nate, Paul and Sheila: you spent a life and an entire afternoon on a team that scored nine points in the first half, all of them field goals. Tony, alone on the Browns, has now beaten seven of you single-handedly and would like that noted.',
+    'Dave, Don and Maya took Baltimore at home, watched them lead 14–3 at the half, and lost 24–17 to a fourth-down quarterback sneak by Tyler Shough with 1:28 left. The league’s replay office reviewed it and announced that it could not prove he did not break the plane. Three of you lost a life on a play the NFL could not see clearly either.',
+    'Bradley took Chicago and received three points, a fumble on the one-yard line and a blocked twenty-three-yard field goal, in the rain, in a game with no touchdowns in it. Minnesota 9, Chicago 3. He has now burned Detroit and Chicago in consecutive weeks, working through the NFC North like a man reading a menu top to bottom, and the two he has left, Minnesota and Green Bay, are the two that actually won this week.',
+    'Only two of you left the house. Melanie took Philadelphia at Tennessee and was repaid with a game-winning touchdown pass with nine seconds left, to a receiver catching the first touchdown of his career, on a turf surface measured at 157 degrees. Tony, we have covered. Both road picks won. Eleven of the twenty-five home picks did not. Draw your own conclusions about the comforts of home.',
+    'Joanna, Allison and Phyllis were on Buffalo, where Josh Allen scored five touchdowns in the first game at the new stadium and the Bills led 21–0 before the second quarter was four minutes old. Allison’s week 1 team gave up forty-one points to Allison’s week 2 team. She has picked two winners and I remain slightly afraid of her.',
+    'Three picks did not arrive by Thursday’s lock: Jared, Tina and Craig. A missing pick costs exactly what a losing one does, and the rules do not have a box marked “meant to”. Jared and Craig were also among the seven of us buried by the Chargers in week 1, so along with Nate — the Chargers, then Tampa Bay — they are the three down to a single life. As for the Chargers: 26–14 to Arizona in week 1, 26–14 to the Raiders in week 2, which is not a slump so much as a policy. Jim Harbaugh is 0–2 for the first time in his coaching career, college or pro. Seven of you own a piece of that.',
+    'Week 3 has no byes either, so all thirty-two are back on the menu. The Chargers visit Buffalo, for those of you who enjoy watching things you have already paid for. Arizona, the team that started the Chargers’ 26–14 habit, visits San Francisco, which eleven of you can no longer use. Thursday night is Atlanta at Green Bay. Atlanta lost 34–3 to Carolina on Sunday. You may draw your own conclusions; I am not allowed to draw them for you.',
   ],
-  // No callout while week 2 is being played: every pick is in and locked, so
-  // there is nothing for anyone to act on. The next one belongs in the week 2
-  // review, once the slate is final and week 3 is the thing to chase — and it
-  // is `callout` that renders it set apart from the banter, because an
-  // instruction buried in jokes is an instruction somebody misses.
+  // Set apart from the banter, because an instruction buried in jokes is an
+  // instruction somebody misses — and this week three people did.
+  callout:
+    'DM me your week 3 pick on Teams before Thursday’s kickoff. Picks lock at 7:10 PM Thursday, five minutes before Atlanta at Green Bay — and a missing pick costs a life, as three of you can now confirm.',
 }
 
 const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {
-  1: WEEK_2_PREVIEW,
-  2: WEEK_2_PREVIEW,
+  1: WEEK_2_REVIEW,
+  2: WEEK_2_REVIEW,
+  3: WEEK_2_REVIEW,
 }
 
 export function LeagueMessage({ week }: { week: number }) {
