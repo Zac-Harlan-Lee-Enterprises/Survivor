@@ -1261,6 +1261,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-chloe-bourque-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "chloe-bourque",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-jared-marks-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1348,6 +1361,19 @@
       "gameId": "2026-w02-CLE-at-TB",
       "submittedAt": "2026-09-17T15:00:00.000Z",
       "updatedAt": "2026-09-17T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-corey-cowell-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "corey-cowell",
+      "week": 3,
+      "teamId": "SEA",
+      "gameId": "2026-w03-SEA-at-WAS",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -1612,6 +1638,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-tony-canody-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tony-canody",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-joanna-moss-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1818,6 +1857,19 @@
       "updatedAt": "2026-09-07T02:20:00.000Z",
       "version": 1,
       "source": "import"
+    },
+    {
+      "id": "pick-tina-bush-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tina-bush",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
     },
     {
       "id": "pick-craig-mowers-1",

@@ -146,17 +146,17 @@ const STORY: Story = {
   'tracy-nelson': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-16T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
   // Third player on the Lions, alongside Dave Johnson and James Parker.
   'bradley-riedell': { 1: ['DET', 'P'], 2: ['CHI', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'] },
-  'chloe-bourque': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-16T15:00:00.000Z'] },
+  'chloe-bourque': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-16T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
   'jared-marks': { 1: ['LAC', 'P'], 2: null, 3: ['BUF', 'P', '2026-09-22T15:00:00.000Z'] },
   'joseph-tomczuk': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'], 3: ['PHI', 'P', '2026-09-24T15:00:00.000Z'] },
-  'corey-cowell': { 1: ['PIT', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
+  'corey-cowell': { 1: ['PIT', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'], 3: ['SEA', 'P', '2026-09-24T15:00:00.000Z'] },
   'melanie-moeller': { 1: ['LAC', 'P'], 2: ['PHI', 'P', '2026-09-17T15:00:00.000Z'], 3: ['SF', 'P', '2026-09-24T15:00:00.000Z'] },
   'jason-snook': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'], 3: ['DET', 'P', '2026-09-24T15:00:00.000Z'] },
   'matt-hadley': { 1: ['GB', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
   'mike-lancaster': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
   'kc-walker': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'] },
   'paul-lim': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
-  'tony-canody': { 1: ['LAC', 'P'], 2: ['CLE', 'P', '2026-09-15T15:00:00.000Z'] },
+  'tony-canody': { 1: ['LAC', 'P'], 2: ['CLE', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
   // First player on the Cowboys.
   'joanna-moss': { 1: ['DAL', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['SEA', 'P', '2026-09-23T15:00:00.000Z'] },
   'allison-petty': { 1: ['DET', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'] },
@@ -164,7 +164,7 @@ const STORY: Story = {
   'cindy-mendoza': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-23T15:00:00.000Z'] },
   'phyllis-collins': { 1: ['SEA', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'] },
   'wesley-childers': { 1: ['DET', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
-  'tina-bush': { 1: ['DET', 'P'], 2: null },
+  'tina-bush': { 1: ['DET', 'P'], 2: null, 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
   // Seventh player on the Chargers. Sent nothing for week 2, so it is a miss
   // of the plain kind: no late answer to weigh, just silence at the lock.
   'craig-mowers': { 1: ['LAC', 'P'], 2: null, 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'] },
