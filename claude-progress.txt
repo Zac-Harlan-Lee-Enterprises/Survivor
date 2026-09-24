@@ -497,3 +497,8 @@ NEXT   : Remaining picks before 7:10 PM tonight.
 --- 2026-09-24  Claude Opus 5.5 (feat/week3-stragglers) ---
 DONE   : Week 3 stragglers, after #23 merged with 23 of 30. Chloe Bourque KC, Tony Canody KC, Tina Bush KC, Corey Cowell SEA. Twenty-seven of thirty.
 NEXT   : Still owed before 7:10 PM tonight: Allison Petty, Phyllis Collins, Wesley Childers.
+
+--- 2026-09-24  Claude Opus 5.5 (feat/week3-last-picks) ---
+DONE   : After #24 merged with 27 of 30. Wesley Childers KC, Phyllis Collins GB (vs ATL, Thursday night).
+         Twenty-nine of thirty.
+NEXT   : Still owed before 7:10 PM tonight: Allison Petty.
