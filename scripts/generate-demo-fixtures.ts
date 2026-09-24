@@ -138,12 +138,12 @@ const STORY: Story = {
   'shahid-ali': { 1: ['BAL', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'] },
   'dave-johnson': { 1: ['DET', 'P'], 2: ['BAL', 'P', '2026-09-17T15:00:00.000Z'] },
   'james-parker': { 1: ['DET', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
-  'nate-adams': { 1: ['LAC', 'P'], 2: ['TB', 'P', '2026-09-15T15:00:00.000Z'] },
+  'nate-adams': { 1: ['LAC', 'P'], 2: ['TB', 'P', '2026-09-15T15:00:00.000Z'], 3: ['SF', 'P', '2026-09-24T15:00:00.000Z'] },
   'stacey-markendorff': { 1: ['LAC', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'] },
   'sheila-acker': { 1: ['SEA', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
   'dominic-green': { 1: ['BAL', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
   // Same team as Sheila Acker — different players may ride the same team.
-  'tracy-nelson': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-16T15:00:00.000Z'] },
+  'tracy-nelson': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-16T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
   // Third player on the Lions, alongside Dave Johnson and James Parker.
   'bradley-riedell': { 1: ['DET', 'P'], 2: ['CHI', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'] },
   'chloe-bourque': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-16T15:00:00.000Z'] },
@@ -151,7 +151,7 @@ const STORY: Story = {
   'joseph-tomczuk': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
   'corey-cowell': { 1: ['PIT', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'] },
   'melanie-moeller': { 1: ['LAC', 'P'], 2: ['PHI', 'P', '2026-09-17T15:00:00.000Z'] },
-  'jason-snook': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'] },
+  'jason-snook': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'], 3: ['DET', 'P', '2026-09-24T15:00:00.000Z'] },
   'matt-hadley': { 1: ['GB', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
   'mike-lancaster': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
   'kc-walker': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'] },

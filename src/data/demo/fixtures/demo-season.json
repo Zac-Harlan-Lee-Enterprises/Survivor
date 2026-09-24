@@ -988,6 +988,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-nate-adams-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "nate-adams",
+      "week": 3,
+      "teamId": "SF",
+      "gameId": "2026-w03-ARI-at-SF",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-stacey-markendorff-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1101,6 +1114,19 @@
       "gameId": "2026-w02-MIA-at-SF",
       "submittedAt": "2026-09-16T15:00:00.000Z",
       "updatedAt": "2026-09-16T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-tracy-nelson-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tracy-nelson",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -1296,6 +1322,19 @@
       "gameId": "2026-w02-MIA-at-SF",
       "submittedAt": "2026-09-15T15:00:00.000Z",
       "updatedAt": "2026-09-15T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-jason-snook-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "jason-snook",
+      "week": 3,
+      "teamId": "DET",
+      "gameId": "2026-w03-NYJ-at-DET",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
       "version": 1,
       "source": "commissioner"
     },
