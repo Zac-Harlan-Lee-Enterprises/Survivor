@@ -493,3 +493,8 @@ VERIFIED: validate green; sweep clean.
          Then Mike Lancaster KC, James Parker SEA (at WAS), Matt Hadley KC, Paul Lim KC.
          Then Dominic Green KC, Shahid Ali KC, Joseph Tomczuk PHI (at CHI, Monday), Sheila Acker KC, Dave Johnson KC, Don Turner SEA, Melanie Moeller SF. Twenty-three of thirty.
 NEXT   : Remaining picks before 7:10 PM tonight.
+
+--- 2026-09-24  Claude Opus 5.5 (feat/week3-stragglers) ---
+DONE   : Week 3 stragglers, after #23 merged with 23 of 30. Chloe Bourque KC. Twenty-four of thirty.
+NEXT   : Still owed before 7:10 PM tonight: Corey Cowell, Tony Canody, Allison Petty, Phyllis
+         Collins, Wesley Childers, Tina Bush.
