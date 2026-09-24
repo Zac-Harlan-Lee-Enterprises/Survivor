@@ -490,4 +490,5 @@ BLOCKED: none. Merging stays with the commissioner.
 DONE   : Three more week 3 picks: Jason Snook DET (vs NYJ), Tracy Nelson KC (at MIA), Nate Adams
          SF (vs ARI). None reuses a team. Twelve of thirty in. Note untouched — it names nobody.
 VERIFIED: validate green; sweep clean.
+         Then Mike Lancaster KC, James Parker SEA (at WAS), Matt Hadley KC. Fifteen of thirty.
 NEXT   : Remaining picks before 7:10 PM tonight.
