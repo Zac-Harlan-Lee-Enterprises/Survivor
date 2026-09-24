@@ -1495,6 +1495,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-paul-lim-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "paul-lim",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-tony-canody-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
