@@ -83,16 +83,8 @@ const FINALS: Record<string, [number, number]> = {
   '2026-w02-NYG-at-LAR': [6, 28],
 }
 
-const WEEK = 2
-const picks = season.picks.filter((p) => p.week === WEEK)
+const WEEK = 3
 const gamesById = new Map(season.games.map((g) => [g.id, g]))
-const countOn = (teamId: string) => picks.filter((p) => p.teamId === teamId).length
-const nameOf = (playerId: string) =>
-  season.profiles.find((p) => p.playerId === playerId)?.displayName ?? playerId
-const firstNames = (list: Pick[]) => list.map((p) => nameOf(p.playerId).split(' ')[0]).sort()
-const pickBy = (displayName: string) => picks.find((p) => nameOf(p.playerId) === displayName) ?? null
-const week1PickOf = (displayName: string) =>
-  season.picks.find((p) => p.week === 1 && nameOf(p.playerId) === displayName) ?? null
 
 const winnerOf = (gameId: string) => {
   const game = gamesById.get(gameId)
@@ -101,153 +93,41 @@ const winnerOf = (gameId: string) => {
   const [away, home] = final
   return away > home ? game.awayTeamId : game.homeTeamId
 }
-/** True when the pick's team lost. No ties in either week, so this is the whole question. */
-const lost = (p: Pick) => winnerOf(p.gameId) !== p.teamId
-const isHome = (p: Pick) => gamesById.get(p.gameId)?.homeTeamId === p.teamId
 
-/** Lives after week 2, from picks and the pinned finals: three, minus a life per loss or silence. */
-const livesAfterWeek2 = () => {
-  const byPlayer = new Map<string, number>()
-  for (const profile of season.profiles) {
-    let lives = 3
-    for (const week of [1, 2]) {
-      const pick = season.picks.find((p) => p.playerId === profile.playerId && p.week === week)
-      if (!pick || lost(pick)) lives -= 1
-    }
-    byPlayer.set(profile.displayName, lives)
+/** A team's record over the pinned finals, from the schedule. */
+const record = (teamId: string) => {
+  let wins = 0
+  let losses = 0
+  for (const [id] of Object.entries(FINALS)) {
+    const g = gamesById.get(id)
+    if (!g || (g.homeTeamId !== teamId && g.awayTeamId !== teamId)) continue
+    if (winnerOf(id) === teamId) wins += 1
+    else losses += 1
   }
-  return byPlayer
+  return `${wins}-${losses}`
 }
 
-describe('the commissioner’s week 2 review states only true things', () => {
-  it('“fourteen of you are a life lighter … ten … all three, seventeen … two, three … last one”', () => {
-    const lives = livesAfterWeek2()
-    const tally = (n: number) => [...lives.values()].filter((l) => l === n).length
-    expect(tally(3)).toBe(10)
-    expect(tally(2)).toBe(17)
-    expect(tally(1)).toBe(3)
-    expect(tally(0)).toBe(0) // "Nobody is out."
-    const lostThisWeek = season.profiles.filter((profile) => {
-      const pick = picks.find((p) => p.playerId === profile.playerId)
-      return !pick || lost(pick)
-    })
-    expect(lostThisWeek).toHaveLength(14)
+const note = readFileSync(
+  new URL('../../src/features/league-home/LeagueMessage.tsx', import.meta.url),
+  'utf8',
+)
+
+describe('the commissioner’s week 3 preview states only true things', () => {
+  it('names nobody: picks are hidden until the first kickoff, so the preview may not hint at them', () => {
+    const body = note.slice(note.indexOf('const WEEK_3_PREVIEW'), note.indexOf('const NOTES'))
+    for (const { displayName } of season.profiles) {
+      const first = displayName.split(' ')[0]!
+      // "KC" is also a team abbreviation; the note never uses the abbreviation.
+      expect(body, `the preview mentions ${displayName}`).not.toMatch(new RegExp(`\\b${first}\\b`))
+    }
+    expect(body).not.toMatch(/\b(picked|are on|is on)\b/i)
   })
 
-  it('“Eleven of you ordered San Francisco” — and they won 35–13', () => {
-    expect(countOn('SF')).toBe(11)
-    const sf = picks.find((p) => p.teamId === 'SF')!
-    expect(FINALS[sf.gameId]).toEqual([13, 35])
-    expect(lost(sf)).toBe(false)
-  })
-
-  it('“a better completion rate than this league managed on sending its picks in” — Purdy 20 of 22', () => {
-    expect(20 / 22).toBeGreaterThan(picks.length / season.profiles.length)
-  })
-
-  it('“Seven of you were on the Buccaneers at home to Cleveland” — 23–19, and Tony alone on the Browns', () => {
-    const tb = picks.filter((p) => p.teamId === 'TB')
-    expect(tb).toHaveLength(7)
-    expect(firstNames(tb)).toEqual(['Chloe', 'Corey', 'Joseph', 'KC', 'Nate', 'Paul', 'Sheila'])
-    expect(tb.every(isHome)).toBe(true)
-    expect(tb.every(lost)).toBe(true)
-    const tony = pickBy('Tony Canody')!
-    expect(tony.teamId).toBe('CLE')
-    expect(tony.gameId).toBe(tb[0]!.gameId)
-    expect(FINALS[tony.gameId]).toEqual([23, 19])
-    expect(picks.filter((p) => p.teamId === 'CLE')).toHaveLength(1)
-  })
-
-  it('“Dave, Don and Maya took Baltimore at home … lost 24–17”', () => {
-    const bal = picks.filter((p) => p.teamId === 'BAL')
-    expect(firstNames(bal)).toEqual(['Dave', 'Don', 'Maya'])
-    expect(bal.every(isHome)).toBe(true)
-    expect(FINALS[bal[0]!.gameId]).toEqual([24, 17])
-    expect(bal.every(lost)).toBe(true)
-  })
-
-  it('“Bradley took Chicago … Minnesota 9, Chicago 3”, Detroit before it, Minnesota and Green Bay both won', () => {
-    const bradley = pickBy('Bradley Riedell')!
-    expect(bradley.teamId).toBe('CHI')
-    expect(FINALS[bradley.gameId]).toEqual([9, 3])
-    expect(lost(bradley)).toBe(true)
-    expect(week1PickOf('Bradley Riedell')?.teamId).toBe('DET')
-    expect(winnerOf('2026-w02-MIN-at-CHI')).toBe('MIN')
-    expect(winnerOf('2026-w02-GB-at-NYJ')).toBe('GB')
-  })
-
-  it('“Only two of you left the house” — Melanie and Tony, both won; “Eleven of the twenty-five home picks did not”', () => {
-    const away = picks.filter((p) => !isHome(p))
-    expect(firstNames(away)).toEqual(['Melanie', 'Tony'])
-    expect(away.some(lost)).toBe(false)
-    const melanie = pickBy('Melanie Moeller')!
-    expect(melanie.teamId).toBe('PHI')
-    expect(gamesById.get(melanie.gameId)?.homeTeamId).toBe('TEN')
-    expect(FINALS[melanie.gameId]).toEqual([24, 20])
-    const home = picks.filter(isHome)
-    expect(home).toHaveLength(25)
-    expect(home.filter(lost)).toHaveLength(11)
-  })
-
-  it('“Joanna, Allison and Phyllis were on Buffalo” — 41–31; Allison’s Detroit are 0–1 since she left', () => {
-    const buf = picks.filter((p) => p.teamId === 'BUF')
-    expect(firstNames(buf)).toEqual(['Allison', 'Joanna', 'Phyllis'])
-    expect(FINALS[buf[0]!.gameId]).toEqual([31, 41])
-    expect(buf.every(lost)).toBe(false)
-    expect(week1PickOf('Allison Petty')?.teamId).toBe('DET')
-    expect(gamesById.get(buf[0]!.gameId)?.awayTeamId).toBe('DET')
-    expect(winnerOf('2026-w02-DET-at-BUF')).not.toBe('DET')
-  })
-
-  it('“Three picks did not arrive … Jared, Tina and Craig”', () => {
-    const answered = new Set(picks.map((p) => p.playerId))
-    const silent = season.profiles
-      .filter((p) => !answered.has(p.playerId))
-      .map((p) => p.displayName.split(' ')[0])
-      .sort()
-    expect(silent).toEqual(['Craig', 'Jared', 'Tina'])
-  })
-
-  it('“Jared and Craig … the Chargers in week 1 … along with Nate … the three down to a single life”', () => {
-    const lives = livesAfterWeek2()
-    const onOne = [...lives.entries()].filter(([, l]) => l === 1).map(([name]) => name.split(' ')[0])
-    expect(onOne.sort()).toEqual(['Craig', 'Jared', 'Nate'])
-    expect(week1PickOf('Jared Marks')?.teamId).toBe('LAC')
-    expect(week1PickOf('Craig Mowers')?.teamId).toBe('LAC')
-    expect(week1PickOf('Nate Adams')?.teamId).toBe('LAC')
-    expect(pickBy('Nate Adams')?.teamId).toBe('TB')
-  })
-
-  it('“the seven of us buried by the Chargers … 26–14 to Arizona … 26–14 to the Raiders”', () => {
-    const week1 = season.picks.filter((p) => p.week === 1)
-    const chargers = week1.filter((p) => p.teamId === 'LAC')
-    expect(chargers).toHaveLength(7)
-    const commissioner = season.memberships.find((m) => m.role === 'commissioner')!
-    expect(chargers.map((p) => p.playerId)).toContain(commissioner.playerId)
-    expect(FINALS['2026-w01-ARI-at-LAC']).toEqual([26, 14])
-    expect(FINALS['2026-w02-LV-at-LAC']).toEqual([26, 14])
-    expect(chargers.every(lost)).toBe(true)
-  })
-
-  it('“Week 3 has no byes either … The Chargers visit Buffalo … Arizona … visits San Francisco … Thursday night is Atlanta at Green Bay”', () => {
-    const week3 = season.games.filter((g) => g.week === 3)
-    expect(new Set(week3.flatMap((g) => [g.homeTeamId, g.awayTeamId])).size).toBe(32)
-    const fixture = (away: string, home: string) =>
-      week3.find((g) => g.awayTeamId === away && g.homeTeamId === home)
-    expect(fixture('LAC', 'BUF')).toBeDefined()
-    expect(fixture('ARI', 'SF')).toBeDefined()
-    const opener = [...week3].sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))[0]!
-    expect(opener.awayTeamId).toBe('ATL')
-    expect(opener.homeTeamId).toBe('GB')
-    // "Atlanta lost 34–3 to Carolina on Sunday."
-    expect(FINALS['2026-w02-CAR-at-ATL']).toEqual([34, 3])
-    expect(gamesById.get('2026-w02-CAR-at-ATL')?.kickoffAt.startsWith('2026-09-20')).toBe(true)
-  })
-
-  it('“Picks lock at 7:10 PM Thursday, five minutes before Atlanta at Green Bay” — in the commissioner’s Central time', () => {
+  it('“Week 3 locks at 7:10 tonight” — Thursday, five minutes before Atlanta at Green Bay, Central time', () => {
     const opener = season.games
-      .filter((g) => g.week === 3)
+      .filter((g) => g.week === WEEK)
       .sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))[0]!
+    expect([opener.awayTeamId, opener.homeTeamId]).toEqual(['ATL', 'GB'])
     const lock = new Date(new Date(opener.kickoffAt).getTime() - 5 * 60_000)
     const central = new Intl.DateTimeFormat('en-US', {
       timeZone: 'America/Chicago',
@@ -256,5 +136,49 @@ describe('the commissioner’s week 2 review states only true things', () => {
       minute: '2-digit',
     }).format(lock)
     expect(central).toBe('Thursday 7:10 PM')
+  })
+
+  it('“Three of you found out last week what a missing pick costs”', () => {
+    const answered = new Set(season.picks.filter((p) => p.week === 2).map((p) => p.playerId))
+    expect(season.profiles.filter((p) => !answered.has(p.playerId))).toHaveLength(3)
+  })
+
+  it('“Kansas City are 2–0 and visit Miami, who have scored exactly thirteen … in each of their two games”', () => {
+    const week3 = season.games.filter((g) => g.week === WEEK)
+    expect(week3.some((g) => g.awayTeamId === 'KC' && g.homeTeamId === 'MIA')).toBe(true)
+    expect(record('KC')).toBe('2-0')
+    const miami = Object.entries(FINALS)
+      .filter(([id]) => id.includes('MIA'))
+      .map(([id, [away, home]]) => (gamesById.get(id)?.awayTeamId === 'MIA' ? away : home))
+    expect(miami).toEqual([13, 13])
+  })
+
+  it('“Seattle … 2–0 … visit Washington. Washington are 0–2 … this is their home opener”', () => {
+    const week3 = season.games.filter((g) => g.week === WEEK)
+    expect(week3.some((g) => g.awayTeamId === 'SEA' && g.homeTeamId === 'WAS')).toBe(true)
+    expect(record('SEA')).toBe('2-0')
+    expect(record('WAS')).toBe('0-2')
+    expect(season.games.filter((g) => g.week < WEEK && g.homeTeamId === 'WAS')).toHaveLength(0)
+  })
+
+  it('“The Chargers visit Buffalo … 26–14 in each … Buffalo scored forty-one … Seven of you used the Chargers in week 1”', () => {
+    const week3 = season.games.filter((g) => g.week === WEEK)
+    expect(week3.some((g) => g.awayTeamId === 'LAC' && g.homeTeamId === 'BUF')).toBe(true)
+    expect(FINALS['2026-w01-ARI-at-LAC']).toEqual([26, 14])
+    expect(FINALS['2026-w02-LV-at-LAC']).toEqual([26, 14])
+    expect(FINALS['2026-w02-DET-at-BUF']![1]).toBe(41)
+    expect(season.picks.filter((p) => p.week === 1 && p.teamId === 'LAC')).toHaveLength(7)
+  })
+
+  it('“Atlanta lost 34–3 at home to Carolina … Green Bay beat the Jets by three”', () => {
+    expect(FINALS['2026-w02-CAR-at-ATL']).toEqual([34, 3])
+    const [gb, nyj] = FINALS['2026-w02-GB-at-NYJ']!
+    expect(gb - nyj).toBe(3)
+  })
+
+  it('“the eleven of you who rode San Francisco last week, the seven on Tampa Bay”', () => {
+    const week2 = season.picks.filter((p) => p.week === 2)
+    expect(week2.filter((p) => p.teamId === 'SF')).toHaveLength(11)
+    expect(week2.filter((p) => p.teamId === 'TB')).toHaveLength(7)
   })
 })

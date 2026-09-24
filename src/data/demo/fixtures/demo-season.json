@@ -871,6 +871,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-maya-israel-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "maya-israel",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-22T15:00:00.000Z",
+      "updatedAt": "2026-09-22T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-shahid-ali-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1001,6 +1014,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-stacey-markendorff-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "stacey-markendorff",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-22T15:00:00.000Z",
+      "updatedAt": "2026-09-22T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-sheila-acker-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1105,6 +1131,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-bradley-riedell-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "bradley-riedell",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-22T15:00:00.000Z",
+      "updatedAt": "2026-09-22T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-chloe-bourque-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1142,6 +1181,19 @@
       "updatedAt": "2026-09-07T01:20:00.000Z",
       "version": 1,
       "source": "import"
+    },
+    {
+      "id": "pick-jared-marks-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "jared-marks",
+      "week": 3,
+      "teamId": "BUF",
+      "gameId": "2026-w03-LAC-at-BUF",
+      "submittedAt": "2026-09-22T15:00:00.000Z",
+      "updatedAt": "2026-09-22T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
     },
     {
       "id": "pick-joseph-tomczuk-1",
@@ -1326,6 +1378,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-kc-walker-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "kc-walker",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-22T15:00:00.000Z",
+      "updatedAt": "2026-09-22T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-paul-lim-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1400,6 +1465,19 @@
       "gameId": "2026-w02-DET-at-BUF",
       "submittedAt": "2026-09-17T15:00:00.000Z",
       "updatedAt": "2026-09-17T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-joanna-moss-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "joanna-moss",
+      "week": 3,
+      "teamId": "SEA",
+      "gameId": "2026-w03-SEA-at-WAS",
+      "submittedAt": "2026-09-23T15:00:00.000Z",
+      "updatedAt": "2026-09-23T15:00:00.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -1482,6 +1560,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-cindy-mendoza-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "cindy-mendoza",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-23T15:00:00.000Z",
+      "updatedAt": "2026-09-23T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-phyllis-collins-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1560,6 +1651,19 @@
       "source": "import"
     },
     {
+      "id": "pick-craig-mowers-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "craig-mowers",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-22T15:00:00.000Z",
+      "updatedAt": "2026-09-22T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-zac-harlan-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1582,6 +1686,19 @@
       "gameId": "2026-w02-MIA-at-SF",
       "submittedAt": "2026-09-17T15:00:00.000Z",
       "updatedAt": "2026-09-17T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-zac-harlan-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "zac-harlan",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
       "version": 1,
       "source": "commissioner"
     }

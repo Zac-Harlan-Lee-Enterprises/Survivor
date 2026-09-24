@@ -470,3 +470,18 @@ VERIFIED: chromium.launch({ channel: 'chrome', headless: false }) is the only wa
          feed work from a script. CI and headless probes will always show 3/3 — do not chase it.
 NEXT   : Week 3 picks by 7:10 PM Thursday 9/24; then the week 3 review. Nothing else open.
 BLOCKED: none. PR #21 awaits the commissioner's merge.
+
+--- 2026-09-24  Claude Opus 5.5 (feat/week3-picks-note) ---
+DONE   : Recorded the first nine week 3 picks (7 KC, Jared BUF, Joanna SEA; Zac on KC) with the
+         real dates they arrived. Note rewritten as the week 3 preview.
+RULE   : A PREVIEW NEVER REVEALS THIS WEEK'S PICKS — not who, not what, not counts per team. The
+         commissioner hides picks until the week's first kickoff and a note that hints at them
+         undoes the deadline. A first draft did exactly that and was rejected. The preview now
+         talks only about the slate and past weeks; a test in leagueMessageFacts fails if any
+         player's first name, or "picked" / "are on" / "is on", appears in WEEK_3_PREVIEW.
+VERIFIED: validate green; e2e 95 passed; sweep clean. Facts checked today: KC 2-0, MIA 13 points
+         twice, SEA 2-0 and Super Bowl LX champions, Walker (SB LX MVP) now a Chief, WAS 0-2 and
+         opening at home, LAC 26-14 twice, ATL lost 34-3 to CAR, GB beat NYJ by 3.
+NEXT   : Remaining week 3 picks as they arrive (no note changes needed — it names nobody). Week 3
+         review after Monday night, when picks are public.
+BLOCKED: none. Merging stays with the commissioner.
