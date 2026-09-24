@@ -485,3 +485,11 @@ VERIFIED: validate green; e2e 95 passed; sweep clean. Facts checked today: KC 2-
 NEXT   : Remaining week 3 picks as they arrive (no note changes needed — it names nobody). Week 3
          review after Monday night, when picks are public.
 BLOCKED: none. Merging stays with the commissioner.
+
+--- 2026-09-24  Claude Opus 5.5 (feat/week3-more-picks) ---
+DONE   : Three more week 3 picks: Jason Snook DET (vs NYJ), Tracy Nelson KC (at MIA), Nate Adams
+         SF (vs ARI). None reuses a team. Twelve of thirty in. Note untouched — it names nobody.
+VERIFIED: validate green; sweep clean.
+         Then Mike Lancaster KC, James Parker SEA (at WAS), Matt Hadley KC, Paul Lim KC.
+         Then Dominic Green KC, Shahid Ali KC, Joseph Tomczuk PHI (at CHI, Monday), Sheila Acker KC, Dave Johnson KC, Don Turner SEA, Melanie Moeller SF. Twenty-three of thirty.
+NEXT   : Remaining picks before 7:10 PM tonight.
