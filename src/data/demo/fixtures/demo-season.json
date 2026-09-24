@@ -910,6 +910,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-shahid-ali-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "shahid-ali",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-dave-johnson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1079,6 +1092,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-sheila-acker-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "sheila-acker",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-dominic-green-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1101,6 +1127,19 @@
       "gameId": "2026-w02-MIA-at-SF",
       "submittedAt": "2026-09-17T15:00:00.000Z",
       "updatedAt": "2026-09-17T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-dominic-green-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dominic-green",
+      "week": 3,
+      "teamId": "KC",
+      "gameId": "2026-w03-KC-at-MIA",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -1257,6 +1296,19 @@
       "gameId": "2026-w02-CLE-at-TB",
       "submittedAt": "2026-09-17T15:00:00.000Z",
       "updatedAt": "2026-09-17T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-joseph-tomczuk-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "joseph-tomczuk",
+      "week": 3,
+      "teamId": "PHI",
+      "gameId": "2026-w03-PHI-at-CHI",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
       "version": 1,
       "source": "commissioner"
     },
