@@ -19,32 +19,31 @@ import { Megaphone, Send } from 'lucide-react'
 /**
  * Mapped to weeks 1 through 3 on purpose. The seed carries no results, so the
  * engine still calls week 1 current until the live sync lands them, at which
- * point week 3 is — and the league needs the review under whichever key it is
+ * point week 3 is — and the league needs the preview under whichever key it is
  * shown.
  */
-const WEEK_2_REVIEW = {
+const WEEK_3_PREVIEW = {
   heading: 'Word from the commissioner',
+  // Nothing here may reveal this week's choices: they stay hidden until the
+  // week's first kickoff, and a preview that leaks them undoes the deadline.
+  // tests/unit/leagueMessageFacts.test.ts fails if a player's name appears.
   lines: [
-    'Week 2 is in the books. Fourteen of you are a life lighter, nobody is out, and three of you are down to your last life in September, which is the kind of pace that gets you cut from a nature documentary. Ten of you are still holding all three. Enjoy it. It will not last, and I say that with the warmth of a man who is on two.',
-    'Eleven of you looked at thirty-two teams and ordered San Francisco, and San Francisco did what the special does at a good restaurant: touchdowns on its first five drives, 35–13, no notes. Brock Purdy threw twenty-two passes and missed two of them, which — I checked — is a better completion rate than this league managed on sending its picks in. Christian McCaffrey scored the hundredth touchdown of his career, and eleven of you nodded as if you had planned it. You did not plan it. You saw a menu and pointed at the thing the table next to you was having.',
-    'Then there is Tampa Bay. Seven of you were on the Buccaneers at home to Cleveland, and I wrote that by about three o’clock one side of that game would be explaining itself. I apologise for the timing. Lightning stopped play for two hours and twelve minutes, so the explaining did not begin until after five, when Deshaun Watson found Blake Whiteheart for the go-ahead score and Baker Mayfield’s fourth-down pass from the twenty fell to earth like the rest of the afternoon. Cleveland 23, Tampa Bay 19. Chloe, Corey, Joseph, KC, Nate, Paul and Sheila: you gave a life and five hours of a Sunday to a team that produced nine first-half points, all of them field goals, at home, against Cleveland. Tony, alone on the Browns, has now beaten seven of you single-handedly, and there is nothing in the rules that stops him bringing it up for the rest of the season. I checked that too.',
-    'Dave, Don and Maya took Baltimore at home, watched them lead 14–3 at the half, and then watched a quarterback named Tyler Shough sneak in on fourth down with 1:28 left. 24–17. The NFL’s replay office reviewed it and announced that it could not prove he did not break the plane, which is the officiating equivalent of a shrug. Three of you lost a life on a play the league itself could not see. I would call that unlucky, except Baltimore then threw an interception with thirteen seconds left, so let us call it what it was.',
-    'Bradley took Chicago and received, in return, three points, a fumble on the one-yard line, a blocked twenty-three-yard field goal and rain. Minnesota 9, Chicago 3, in a game with no touchdowns in it. Bradley paid a life for that. Some people pay for a ticket. He has now burned Detroit and Chicago in consecutive weeks, working through the NFC North like a man reading the menu top to bottom, and the two he has left, Minnesota and Green Bay, are the two that actually won this week. The system works. It is simply working for other people.',
-    'Only two of you left the house. Melanie took Philadelphia at Tennessee and was repaid with a game-winning touchdown with nine seconds left, to a receiver catching the first touchdown of his career, on a turf surface measured at 157 degrees — hot enough that the safest place on the field was the end zone, which is eventually where the Eagles went. Tony, we have covered. Both road picks won. Eleven of the twenty-five home picks did not. The lesson, as ever in this league, is that comfort is expensive.',
-    'Joanna, Allison and Phyllis were on Buffalo, where Josh Allen scored five touchdowns in the first game at the new stadium and the Bills led 21–0 before the second quarter was four minutes old. Their week was decided before some of you had found the remote. Allison’s week 1 team, Detroit, gave up forty-one points to Allison’s week 2 team, Buffalo. Allison is two for two, and the teams she has moved on from are 0–1 since she left them. I am not saying she is the problem. I am saying I would not pick against her.',
-    'Three picks did not arrive by Thursday’s lock: Jared, Tina and Craig. A missing pick costs exactly what a losing one does, and the rulebook does not have a box marked “meant to”. I looked twice, because all three are people I like. Jared and Craig were also among the seven of us buried by the Chargers in week 1, so with Nate — the Chargers, then Tampa Bay, a double bill of grief — they are the three down to a single life. Speaking of the Chargers: 26–14 to Arizona in week 1, 26–14 to the Raiders in week 2. The same score twice. That is not a slump, that is a subscription. Jim Harbaugh is 0–2 for the first time in his coaching career, college or pro, and seven of you hold a share in the milestone.',
-    'Week 3 has no byes either, so all thirty-two teams are back on the menu, including the ones that hurt you. The Chargers visit Buffalo, for anyone who enjoys watching things they have already paid for. Arizona, the team that started the Chargers’ 26–14 habit, visits San Francisco, which eleven of you can no longer use and will now have to watch like everybody else. Thursday night is Atlanta at Green Bay. Atlanta lost 34–3 to Carolina on Sunday, at home, starting their backup quarterback. I am not allowed to make your picks for you. I am allowed to raise an eyebrow, and it is raised.',
+    'Week 3 locks at 7:10 tonight. Three of you found out last week exactly what a missing pick costs, so I will say this once up here and again at the bottom in a box, like a man who has learned something.',
+    'The menu. Kansas City are 2–0 and visit Miami, who have scored exactly thirteen points in each of their two games. That is not a slump, that is a thermostat. The Chiefs have also acquired Kenneth Walker, who was the MVP of the last Super Bowl — which he won with Seattle, who are now 2–0 and defending champions and visit Washington. Washington are 0–2 and have not yet played at home; this is their home opener. Nothing says housewarming like the champions turning up.',
+    'The Chargers visit Buffalo. The Chargers have lost 26–14 in each of their first two games, the same score twice, which is not a losing streak so much as a subscription. Buffalo scored forty-one in the first game at their new stadium. Seven of you used the Chargers in week 1 and have been paying for it ever since.',
+    'Thursday night is Atlanta at Green Bay. Atlanta lost 34–3 at home to Carolina on Sunday. Green Bay beat the Jets by three. I am not allowed to make your picks for you. I am allowed to raise an eyebrow, and it is raised.',
+    'A small reminder for the eleven of you who rode San Francisco last week, the seven on Tampa Bay, and everyone else: you cannot use them again. The menu gets shorter every Sunday. Plan accordingly, or at least plan.',
   ],
   // Set apart from the banter, because an instruction buried in jokes is an
-  // instruction somebody misses — and this week three people did.
+  // instruction somebody misses — and last week three people did.
   callout:
-    'DM me your week 3 pick on Teams before Thursday’s kickoff. Picks lock at 7:10 PM Thursday, five minutes before Atlanta at Green Bay. A missing pick costs a life — three of you can now confirm this, and I would rather it stayed three.',
+    'DM me your week 3 pick on Teams before 7:10 PM tonight, Thursday — five minutes before Atlanta at Green Bay kicks off. A missing pick costs a life, and some of you do not have one to spare.',
 }
 
 const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {
-  1: WEEK_2_REVIEW,
-  2: WEEK_2_REVIEW,
-  3: WEEK_2_REVIEW,
+  1: WEEK_3_PREVIEW,
+  2: WEEK_3_PREVIEW,
+  3: WEEK_3_PREVIEW,
 }
 
 export function LeagueMessage({ week }: { week: number }) {
