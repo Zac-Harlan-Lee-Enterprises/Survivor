@@ -163,7 +163,7 @@ const STORY: Story = {
   'don-turner': { 1: ['PIT', 'P'], 2: ['BAL', 'P', '2026-09-15T15:00:00.000Z'], 3: ['SEA', 'P', '2026-09-24T15:00:00.000Z'] },
   'cindy-mendoza': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-23T15:00:00.000Z'] },
   'phyllis-collins': { 1: ['SEA', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'] },
-  'wesley-childers': { 1: ['DET', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'] },
+  'wesley-childers': { 1: ['DET', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
   'tina-bush': { 1: ['DET', 'P'], 2: null, 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'] },
   // Seventh player on the Chargers. Sent nothing for week 2, so it is a miss
   // of the plain kind: no late answer to weigh, just silence at the lock.
