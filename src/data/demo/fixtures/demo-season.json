@@ -1365,6 +1365,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-corey-cowell-3",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "corey-cowell",
+      "week": 3,
+      "teamId": "SEA",
+      "gameId": "2026-w03-SEA-at-WAS",
+      "submittedAt": "2026-09-24T15:00:00.000Z",
+      "updatedAt": "2026-09-24T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-melanie-moeller-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
