@@ -19,36 +19,34 @@ import { Megaphone, Send } from 'lucide-react'
 /**
  * Mapped to weeks 1 through 4 on purpose. The seed carries no results, so the
  * engine calls week 1 current until the live sync lands them, at which point
- * week 4 is — and the league needs the review under whichever key it is shown.
+ * week 4 is — and the league needs the preview under whichever key it is shown.
  *
- * Week 3's picks are public now (the first kickoff has passed), so the review
- * may name them. It must say nothing about week 4 picks, which are hidden until
- * Thursday's kickoff.
+ * Week 3 is public, so it may be named. Week 4 picks are hidden until
+ * Thursday's kickoff, and this note must not give away who picked what:
+ * tests/unit/leagueMessageFacts.test.ts fails if a player is named in the same
+ * sentence as their week 4 team, or if the note counts this week's picks.
  */
-const WEEK_3_REVIEW = {
+const WEEK_4_PREVIEW = {
   heading: 'Word from the commissioner',
   lines: [
-    'Week 3 is in the books and twenty-four of thirty survived it, which by this league’s standards is a clean sheet. Nobody is out. Eight of you still hold all three lives, fifteen are on two, and seven are down to one — enough people on the ledge to form a support group, and at this rate, enough to need one.',
-    'Twenty of you took Kansas City. Two thirds of the league, one team, the least surprising event in the history of group chats. The Chiefs won 24–10, and Patrick Mahomes completed twenty passes — one for each of you, like party favours. Miami have now scored thirteen or fewer in all three games; last week I called it a thermostat, and they turned it down to ten. All twenty of you survived, and all twenty of you can never use Kansas City again, which you will be thinking about in December.',
-    'Then there is Seattle. Joanna, James, Don and Corey took the defending champions at Washington’s home opener, and I wrote that Joanna was counting on the housewarming going badly. It went beautifully, for Washington. A backup linebacker named Kain Medrano intercepted Sam Darnold and returned it fifty yards for the winning score with 3:57 left, a backup quarterback named Marcus Mariota ran for the first down that closed it out, and Washington won 33–31. Seattle had won twelve straight, including a Super Bowl. They were beaten by two backups. Four of you went down with them. Jaxon Smith-Njigba had ten catches, 128 yards and two touchdowns, and has an alibi.',
-    'Corey and Don have now picked the same team twice — Pittsburgh in week 1, Seattle in week 3 — and are both on one life, which is either friendship or a shared weakness. Joanna has never once picked the week’s most popular team, and she has one life left to show for her independence. It is a principled position. It is also an expensive one.',
-    'Phyllis was alone on Green Bay, at home on Thursday night to an Atlanta side that had lost 34–3 four days earlier. I wrote that I was allowed to raise an eyebrow. Atlanta gave Michael Penix Jr. his first start of the year, Bijan Robinson ran for 194 yards, and the Falcons won 35–14 at Lambeau, ending Green Bay’s run of thirteen straight home-opener wins. My eyebrow has been lowered. I apologise to Phyllis, who has the grace to still be on two lives.',
-    'And now, Joey. Joey is a Chicago Bears fan. Joey had the whole slate to choose from this week and chose to pick against the Chicago Bears, at Soldier Field, on Monday Night Football, with the Bears starting their backup quarterback. Case Keenum — thirty-eight years old, on his eighth NFL team, playing his first regular-season snaps since 2023 — threw two touchdowns and ran for another; the Eagles turned it over three times and forced none; Chicago won 27–7. Joey lost a life to his own team. He was the last person in the league to find out whether he survived, and we can only assume he found out in a Bears jersey, cheering for both sides and neither. Joey is now down to one life. The Bears are 2–1. Joey, we checked: you are allowed to pick your own team. You are also allowed to pick against them. You are not allowed to do the second one and then lose to them. That one stays with a man.',
-    'Other escapes. Nate and Melanie had San Francisco, where Arizona got within two with 2:51 left before Brock Purdy found George Kittle and Deebo Samuel recovered an onside kick; Nate, on his last life, survived by the width of one onside kick. Jared, also on one life, took Buffalo against the Chargers, the team that took his first — and Buffalo turned the ball over five times and still won 24–16, only the second time in franchise history they have won with five or more turnovers. Revenge, served in the most stressful way available. Jason was the only one of you on Detroit, who scored thirty-one points for the third game running and needed a go-ahead catch from Jahmyr Gibbs with 2:25 left to do it.',
-    'The eight still perfect: Allison, Cindy, Dominic, Jason, Mike, Shahid, Tracy and Wesley. Allison is among them. I remain slightly afraid of her. The Chargers, for their part, are 0–3 for the first time since 2017, and seven of us bought in back in week 1. We are no longer investors. We are a cautionary tale with a group chat.',
-    'Week 4 has no byes. Kansas City visit Las Vegas, both 3–0, and twenty of you can only watch. Miami, still stuck on the thermostat, visit 3–0 Minnesota. Green Bay visit 0–3 Tampa Bay, a fixture that has cost nine of you a life between them. The 0–3 Chargers visit Seattle, who have just been beaten by a linebacker. Indianapolis play Washington in London at 8:30 on Sunday morning our time, for anyone who wants their week settled before breakfast. And Thursday night is Pittsburgh at Cleveland, which is what locks the week.',
+    'It is Thursday, picks lock at 7:10 tonight, and before anyone does anything they will have to explain later, here is where we stand. Week 3: twenty-four of thirty survived and nobody is out. Eight of you are perfect, fifteen are on two lives, and seven are on one. Seven people on their last life, one week after this league made the most popular pick in its history. Tread carefully.',
+    'A brief moment of silence for Joey, a lifelong Bears fan, who picked against the Bears on Monday night and lost a life to them and their thirty-eight-year-old backup quarterback. He is now on one life. We will be bringing this up again.',
+    'The game of the week is Kansas City at Las Vegas, two 3–0 teams, and twenty of you are not allowed to touch it: you spent Kansas City last week, all at once, like a lottery win. San Francisco are also 3–0 and host Denver. Buffalo are 3–0 and host New England. Minnesota are 3–0 and host Miami, who have scored thirteen or fewer points in every game this season and whose thermostat, at last check, was set to ten.',
+    'Then there is the 0–3 club, which this week has five members and no waiting list: Tennessee visit Baltimore, Houston host Dallas, Tampa Bay host Green Bay, Miami we have covered, and the Chargers visit Seattle. Seven of us spent week 1 on the Chargers, and they have since lost to Arizona, Las Vegas and Buffalo in turn. You cannot fade a team that has already faded.',
+    'Scheduling notes. Pittsburgh at Cleveland tonight is the game that locks the week. Indianapolis and Washington play in London at 8:30 on Sunday morning our time, the earliest kickoff this league has seen. Detroit play Sunday night at Carolina and Atlanta play Monday night at New Orleans, for those who prefer to suffer slowly.',
+    'And last week’s lesson, for anyone who skipped it: Seattle had won twelve straight, including a Super Bowl, and lost to a backup linebacker. Atlanta had just lost 34–3 and then won 35–14 at Lambeau. The Bears started a thirty-eight-year-old on his eighth team and won by twenty. Nothing is safe. Pick anyway.',
   ],
   // Set apart from the banter, because an instruction buried in jokes is an
   // instruction somebody misses — and seven people are on their last life.
   callout:
-    'DM me your week 4 pick on Teams before 7:10 PM Thursday — five minutes before Pittsburgh at Cleveland kicks off. A missing pick costs a life, and seven of you have exactly one.',
+    'DM me your week 4 pick on Teams before 7:10 PM tonight, Thursday — five minutes before Pittsburgh at Cleveland kicks off. A missing pick costs a life, and seven of you have exactly one.',
 }
 
 const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {
-  1: WEEK_3_REVIEW,
-  2: WEEK_3_REVIEW,
-  3: WEEK_3_REVIEW,
-  4: WEEK_3_REVIEW,
+  1: WEEK_4_PREVIEW,
+  2: WEEK_4_PREVIEW,
+  3: WEEK_4_PREVIEW,
+  4: WEEK_4_PREVIEW,
 }
 
 export function LeagueMessage({ week }: { week: number }) {
