@@ -536,7 +536,7 @@ BLOCKED: none. Merging stays with the commissioner.
 --- 2026-10-01  Claude Opus 5.5 (feat/week4-picks) ---
 DONE   : 22 week 4 picks from the commissioner's list: MIN 13 (Bradley, Stacey, Jared, Cindy, KC,
          Paul, Maya, Sheila, Melanie, Jason, Joey, Tracy, Nate), BAL 6 (Tony, Matt, Chloe, Joanna,
-         Mike, Wesley), CHI 2 (Dave, Craig), DET 1 (Don, by email). submittedAt 2026-10-01 15:00Z.
+         Mike, Wesley), CHI 2 (Dave, Craig), DET 1 (Don, by email). Then James Parker MIN (23 of 30). submittedAt 2026-10-01 15:00Z.
          No reuse. Note untouched (week 3 review stays up; names no week 4 pick).
-NEXT   : Still owed before 7:10 PM Thursday 10/1: Shahid Ali, James Parker, Dominic Green, Corey
-         Cowell, Allison Petty, Phyllis Collins, Tina Bush, Zac Harlan.
+NEXT   : Still owed before 7:10 PM Thursday 10/1: Shahid Ali, Dominic Green, Corey Cowell,
+         Allison Petty, Phyllis Collins, Tina Bush, Zac Harlan.

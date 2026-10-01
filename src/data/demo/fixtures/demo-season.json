@@ -1027,6 +1027,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-james-parker-4",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "james-parker",
+      "week": 4,
+      "teamId": "MIN",
+      "gameId": "2026-w04-MIA-at-MIN",
+      "submittedAt": "2026-10-01T15:00:00.000Z",
+      "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-nate-adams-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
