@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import type { PlayerStanding } from '@/domain'
 import { causeOfDeath } from '@/lib/copy'
 import { cn } from '@/lib/cn'
@@ -32,9 +33,11 @@ export interface HeadstoneProps {
   size?: Size
   /**
    * Play the funeral: the headshot crumbles away and the stone rises in its
-   * place. Replays on every render that mounts it, by design. Under
-   * prefers-reduced-motion the global rule in index.css collapses it to the
-   * final frame, so those viewers simply see the stone.
+   * place. It waits until the stone is properly on screen — the graveyard sits
+   * well down the league page, and a funeral nobody scrolled to see is wasted —
+   * then plays once per page load. Under prefers-reduced-motion the global rule
+   * in index.css collapses it to the final frame, so those viewers simply see
+   * the stone.
    */
   funeral?: boolean
   className?: string
@@ -53,15 +56,20 @@ export function Headstone({
   const cause = causeOfDeath(standing)
   const detail = DETAIL[size]
   const label = `Headstone of ${name}, eliminated in week ${week}.${cause ? ` ${cause}` : ''}`
+  const { ref, playing } = useFuneralInView(!!funeral)
 
   return (
-    <div className={cn('relative shrink-0', SIZES[size], className)}>
+    <div
+      ref={ref}
+      className={cn('relative shrink-0', SIZES[size], className)}
+      data-funeral={funeral ? (playing ? 'playing' : 'waiting') : undefined}
+    >
       <div
         role="img"
         aria-label={label}
         className={cn(
           'headstone flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-t-full rounded-b-md px-[8%] pt-[14%] pb-[6%] text-center',
-          funeral && 'animate-stone-rise',
+          funeral && (playing ? 'animate-stone-rise' : 'opacity-0'),
         )}
       >
         <span
@@ -99,10 +107,41 @@ export function Headstone({
         )}
       </div>
       {funeral && (
-        <div aria-hidden="true" className="funeral-face absolute inset-0 animate-crumble">
+        <div
+          aria-hidden="true"
+          className={cn('funeral-face absolute inset-0', playing && 'animate-crumble')}
+        >
           <Headshot name={name} playerId={playerId} size={size} status="eliminated" />
         </div>
       )}
     </div>
   )
+}
+
+/**
+ * Starts the funeral once the stone is mostly on screen, then stops watching.
+ * Until then the face sits there, intact, with the stone hidden behind it.
+ * Without IntersectionObserver there is no way to know, so it just plays.
+ */
+function useFuneralInView(funeral: boolean) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [playing, setPlaying] = useState(
+    () => funeral && typeof IntersectionObserver === 'undefined',
+  )
+  useEffect(() => {
+    const el = ref.current
+    if (!funeral || playing || !el || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setPlaying(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.75 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [funeral, playing])
+  return { ref, playing }
 }

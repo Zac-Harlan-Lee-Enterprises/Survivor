@@ -582,3 +582,8 @@ NEXT   : When a review week first eliminates someone: pin that week's finals in 
          write their epitaph in the same PR as the review (past weeks are public, so name
          picks), and add an `it` per claim in epitaphFacts. Cheeky, never cruel.
 BLOCKED: none. Merging stays with the commissioner.
+         Commissioner feedback: the funeral played before anyone scrolled down to the graveyard,
+         and was too fast. Now it WAITS until the stone is 75% on screen (IntersectionObserver,
+         then disconnects: once per page load; plays immediately where IO is unavailable), and is
+         ~6.5s end to end (crumble 4.5s, stone rises over the last ~2.6s). data-funeral="waiting"
+         / "playing" on the stone's wrapper is the test hook. Frames checked by eye at 0/1.5/3/4.5/7s.

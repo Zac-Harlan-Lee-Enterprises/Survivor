@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { render, screen, within } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ReactNode } from 'react'
 import { LeagueContext, ServicesContext, type LeagueContextValue } from '@/app/hooks'
 import { evaluateSeason, findStanding, type PlayerStanding } from '@/domain'
@@ -84,6 +84,11 @@ describe('Headstone', () => {
     expect(document.querySelector('.animate-crumble')).toBeNull()
   })
 
+  it('without IntersectionObserver, a funeral simply plays', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    expect(document.querySelector('[data-funeral]')).toHaveAttribute('data-funeral', 'playing')
+  })
+
   it('at a funeral, the face is there to crumble — hidden from assistive tech, which hears only the stone', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
     const face = document.querySelector('.animate-crumble')
@@ -92,6 +97,57 @@ describe('Headstone', () => {
     expect(face?.querySelector('img')).not.toBeNull()
     expect(screen.getAllByRole('img')).toHaveLength(1)
     expect(screen.getByRole('img').className).toMatch(/animate-stone-rise/)
+  })
+})
+
+describe('Headstone funeral timing', () => {
+  /** A stand-in IntersectionObserver the test can scroll by hand. */
+  let fire: (visible: boolean) => void = () => {}
+  let disconnected = false
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    disconnected = false
+  })
+  function stubObserver() {
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(cb: IntersectionObserverCallback) {
+          fire = (visible) =>
+            cb([{ isIntersecting: visible } as IntersectionObserverEntry], this as never)
+        }
+        observe() {}
+        disconnect() {
+          disconnected = true
+        }
+      },
+    )
+  }
+
+  it('waits, face intact and stone hidden, until the grave is scrolled into view', () => {
+    stubObserver()
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    const grave = document.querySelector('[data-funeral]')!
+    expect(grave).toHaveAttribute('data-funeral', 'waiting')
+    expect(document.querySelector('.funeral-face')).not.toHaveClass('animate-crumble')
+    expect(screen.getByRole('img').className).toMatch(/opacity-0/)
+
+    act(() => fire(false))
+    expect(grave).toHaveAttribute('data-funeral', 'waiting')
+
+    act(() => fire(true))
+    expect(grave).toHaveAttribute('data-funeral', 'playing')
+    expect(document.querySelector('.funeral-face')).toHaveClass('animate-crumble')
+    expect(screen.getByRole('img').className).toMatch(/animate-stone-rise/)
+    // Plays once: it stops watching, so scrolling back and forth does not restart it.
+    expect(disconnected).toBe(true)
+  })
+
+  it('does not watch at all when there is no funeral', () => {
+    stubObserver()
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} />)
+    expect(document.querySelector('[data-funeral]')).toBeNull()
+    expect(screen.getByRole('img').className).not.toMatch(/opacity-0/)
   })
 })
 
@@ -112,7 +168,9 @@ describe('PlayerCard', () => {
   })
 
   it('keeps the living as faces', () => {
-    wrap(<PlayerCard standing={standings().bob} profile={profile('bob', 'Bob Example')} pickVisible />)
+    wrap(
+      <PlayerCard standing={standings().bob} profile={profile('bob', 'Bob Example')} pickVisible />,
+    )
     expect(screen.getByRole('img', { name: 'Headshot of Bob Example' })).toBeInTheDocument()
     expect(screen.queryByRole('img', { name: /Headstone/ })).toBeNull()
   })

@@ -87,6 +87,16 @@ test.describe('the graveyard', () => {
     await expect(stone).toHaveAccessibleName(
       /Died of the 49ers, week 3\. Complications: the Chargers \(wk 1\), the Buccaneers \(wk 2\)\./,
     )
+    // The funeral waits for an audience: off screen it has not started, and it
+    // plays once the grave is scrolled into view.
+    const grave = graves.locator('[data-funeral]')
+    // Measured through locators, like league-message.spec, so the spec needs no DOM types.
+    const box = await grave.boundingBox()
+    const offScreen = !!box && box.y > (page.viewportSize()?.height ?? 0)
+    if (offScreen) await expect(grave).toHaveAttribute('data-funeral', 'waiting')
+    await grave.scrollIntoViewIfNeeded()
+    await expect(grave).toHaveAttribute('data-funeral', 'playing')
+
     // His face is no longer one of the headshots on the page.
     await expect(page.getByRole('img', { name: 'Headshot of Nate Adams' })).toHaveCount(0)
 

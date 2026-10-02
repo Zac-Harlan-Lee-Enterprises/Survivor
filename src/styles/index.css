@@ -45,8 +45,8 @@
   --animate-shake: shake 0.5s ease-in-out both;
   --animate-stamp: stamp 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
   --animate-score-bump: score-bump 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  --animate-crumble: crumble 1.4s ease-in both;
-  --animate-stone-rise: stone-rise 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-crumble: crumble 4.5s ease-in-out both;
+  --animate-stone-rise: stone-rise 6.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 
   @keyframes rise {
     from {
@@ -134,7 +134,7 @@
   /* …and the stone rises out of the ground where it stood. */
   @keyframes stone-rise {
     0%,
-    55% {
+    60% {
       transform: translateY(35%);
       opacity: 0;
     }
