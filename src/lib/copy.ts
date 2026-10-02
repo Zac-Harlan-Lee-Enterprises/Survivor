@@ -1,4 +1,4 @@
-import type { PlayerStanding, SurvivorStatus } from '@/domain'
+import { getTeam, type PlayerStanding, type SurvivorStatus } from '@/domain'
 
 /** Fun survival copy — dramatic, never cruel. */
 
@@ -57,4 +57,31 @@ export function streakLine(streak: number): string | null {
   if (streak >= 5) return `${streak} straight. Heater.`
   if (streak >= 3) return `${streak} in a row.`
   return null
+}
+
+type WeekResult = PlayerStanding['history'][number]
+
+/** What cost a life that week, as it would be engraved: "the Chargers", "a missed deadline". */
+function lifeTaker(h: WeekResult): string {
+  if (!h.pick) return 'a missed deadline'
+  const team = getTeam(h.pick.teamId)
+  const name = team ? `the ${team.name}` : h.pick.teamId
+  return h.outcome === 'tie' ? `${name} (a tie)` : name
+}
+
+/**
+ * The line engraved on an eliminated player's headstone.
+ *
+ * Read straight off the engine's history: the week marked `eliminatedHere` is
+ * the cause, and every earlier week that consumed a life is a complication.
+ * Nothing is recomputed here — the engine already decided who died and when.
+ */
+export function causeOfDeath(s: PlayerStanding): string | null {
+  const fatal = s.history.find((h) => h.eliminatedHere)
+  if (!fatal) return null
+  const complications = s.history
+    .filter((h) => h.consumedLife && h.week < fatal.week)
+    .map((h) => `${lifeTaker(h)} (wk ${h.week})`)
+  const cause = `Died of ${lifeTaker(fatal)}, week ${fatal.week}.`
+  return complications.length ? `${cause} Complications: ${complications.join(', ')}.` : cause
 }

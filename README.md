@@ -19,6 +19,7 @@ A responsive React + TypeScript survivor-pool app that replaces the commissioner
 - **Season Grid** — the spreadsheet reborn: players × weeks, cells coloured by win/loss/tie/pending/no-pick, elimination markers, hidden picks as locks; expandable cards on mobile.
 - **My Season** — available / used / unavailable teams, pick history with outcomes, strategy nudges.
 - **Player Profile** — a sports card: headshot, nickname, status, weeks survived, teams remaining.
+- **Headstones** — lose your last life and your headshot becomes a headstone engraved with your cause of death (*"Died of the Seahawks, week 3. Complications: the Chargers (wk 1)…"*). Fresh graves get a funeral on the league page (the face crumbles, the stone rises), and the profile carries a hand-written, fact-checked epitaph.
 - **Commissioner** — players & headshots (drag-drop, crop, replace, remove), enter/correct any pick, correct any result, manual schedule entry, league rules, champion decisions, CSV import with a blocking report, full audit log — every change recorded.
 
 Rules engine, import, API and UI are covered by 120+ unit/API tests and 51 Playwright critical-path tests (desktop + mobile), including axe WCAG A/AA checks on every screen.

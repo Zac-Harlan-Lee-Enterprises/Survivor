@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router'
 import { useLeagueContext } from '@/app/hooks'
 import { getTeam } from '@/domain'
 import { Headshot } from '@/components/Headshot'
+import { Headstone } from '@/components/Headstone'
 import { LivesMeter } from '@/components/LivesMeter'
 import { OutcomePill } from '@/components/OutcomePill'
 import { StatusBadge } from '@/components/StatusBadge'
@@ -9,6 +10,7 @@ import { TeamMonogram } from '@/components/TeamMonogram'
 import { NotFound } from '@/features/NotFound'
 import { useConfetti } from '@/components/useConfetti'
 import { livesLine, streakLine } from '@/lib/copy'
+import { EPITAPHS } from './epitaphs'
 import { cn } from '@/lib/cn'
 
 /** A sports-card style profile: the person, their status, and their record. */
@@ -29,6 +31,8 @@ export function PlayerProfilePage() {
     (h) => h.week < evaluation.currentWeek || h.pick || h.outcome === 'missing',
   )
   const isMe = viewer.playerId === playerId
+  const out = standing.status === 'eliminated'
+  const epitaph = out ? EPITAPHS[playerId] : undefined
   const streak = streakLine(standing.streak)
 
   return (
@@ -46,13 +50,22 @@ export function PlayerProfilePage() {
           aria-hidden="true"
         />
         <div className="relative flex flex-col items-center gap-5 text-center md:flex-row md:text-left">
-          <Headshot
-            name={profile.displayName}
-            playerId={profile.playerId}
-            size="hero"
-            status={standing.status}
-            bubble={standing.livesRemaining === 1}
-          />
+          {out ? (
+            <Headstone
+              name={profile.displayName}
+              playerId={profile.playerId}
+              standing={standing}
+              size="hero"
+            />
+          ) : (
+            <Headshot
+              name={profile.displayName}
+              playerId={profile.playerId}
+              size="hero"
+              status={standing.status}
+              bubble={standing.livesRemaining === 1}
+            />
+          )}
           <div className="flex-1">
             <p className="eyebrow">Player card · #{standing.rank}</p>
             <h1 id="profile-title" className="text-4xl font-extrabold text-ink-50 md:text-6xl">
@@ -85,6 +98,26 @@ export function PlayerProfilePage() {
           <Stat label="Teams left" value={standing.teamsRemaining.length} />
         </dl>
       </section>
+
+      {out && (
+        <section
+          className="card border-white/10 bg-pitch-900/70 p-5 md:p-6"
+          aria-labelledby="epitaph-title"
+        >
+          <h2 id="epitaph-title" className="eyebrow">
+            Epitaph <span className="text-ink-400">· their season</span>
+          </h2>
+          {epitaph ? (
+            <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-100 md:text-lg">
+              {epitaph.recap}
+            </p>
+          ) : (
+            <p className="mt-3 italic text-ink-300">
+              The commissioner is still choosing his words.
+            </p>
+          )}
+        </section>
+      )}
 
       <section className="card p-5" aria-labelledby="current-title">
         <h2 id="current-title" className="text-2xl text-ink-50">

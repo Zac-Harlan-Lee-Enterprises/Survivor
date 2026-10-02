@@ -558,3 +558,50 @@ RULED  : DOMINIC GREEN listed on BAL, which he used in week 1 (BAL at IND). The 
          comment in the STORY. He drops 3 → 2 lives once week 4 settles. 29 picks + 1 miss = 30.
 NEXT   : Week 4 review after Monday night (ATL at NO). The callout comes back for week 5.
 BLOCKED: none. Merging stays with the commissioner.
+
+--- 2026-10-02  Claude Opus 5.5 (feat/graveyard-headstones) ---
+DONE   : HEADSTONES. An eliminated player's headshot becomes a granite headstone (src/components/
+         Headstone.tsx) everywhere: league "Fresh graves" grid (via PlayerCard), leaderboard
+         graveyard rows, profile hero. Engraving scales with size (RIP only on thumbnails; name,
+         "Weeks 1–N" and cause of death on the hero); the aria-label always carries all of it.
+         Cause of death = causeOfDeath() in src/lib/copy.ts, read off the engine's history
+         (eliminatedHere week is the cause, earlier consumedLife weeks are complications, a
+         missing pick is "a missed deadline", a tie says so). No survivor math recomputed.
+         FUNERAL: fresh graves (recentOut) play crumble + stone-rise on every load, as the
+         commissioner wanted; reduced motion collapses it to the stone via the global rule.
+         EPITAPHS: src/features/profile/epitaphs.ts, starts empty; profile shows "The
+         commissioner is still choosing his words." until one is written.
+         tests/unit/epitaphFacts.test.ts guards that an epitaph exists only for a player the
+         pinned finals actually eliminated, in that week (proven: planting one for living Nate
+         failed). seasonFacts.ts now shared by both fact tests.
+VERIFIED: validate (266) · e2e 101 passed incl. new graveyard.spec (real weeks 1–3 from a stubbed
+         ESPN feed + ONE test-only counterfactual, SF losing week 3, which buries Nate) with axe
+         on league/profile/leaderboard · init.sh 200 · sweep clean. Screenshots checked on
+         desktop and mobile. feature_list graveyard-headstones verified and flipped.
+NEXT   : When a review week first eliminates someone: pin that week's finals in seasonFacts,
+         write their epitaph in the same PR as the review (past weeks are public, so name
+         picks), and add an `it` per claim in epitaphFacts. Cheeky, never cruel.
+BLOCKED: none. Merging stays with the commissioner.
+         Commissioner feedback: the funeral played before anyone scrolled down to the graveyard,
+         and was too fast. Now it WAITS until the stone is 75% on screen (IntersectionObserver,
+         then disconnects: once per page load; plays immediately where IO is unavailable), and is
+         ~6.5s end to end (crumble 4.5s, stone rises over the last ~2.6s). data-funeral="waiting"
+         / "playing" on the stone's wrapper is the test hook. Frames checked by eye at 0/1.5/3/4.5/7s.
+         Commissioner: "the animation sucks… make it world class… blow my mind." Rebuilt as a
+         ~11.6s scene (src/components/Funeral.tsx, script in its header; all motion CSS keyed off
+         one `.is-playing` class in index.css): lights dim + beam + ash; captions from the
+         player's own record ("Week 3." / "The 49ers lost." / "Strike three." / "Rest in peace,
+         Nate."); colour drains over a slowing heartbeat; cracks spread from one impact point;
+         flash + jolt and the face shatters into 16 shards (one whole face until the blow — the
+         shard copies showed seams on an intact photo); dust; earth mound; the stone grinds up
+         throwing dirt; the epitaph is chiselled line by line; a glint; the ghost rises; lights
+         up, then the scene unmounts for the plain stone (phase "done"). Fresh graves now get big
+         cards (xl stone) on the league page; old graves stay compact. Stone restyled as granite
+         everywhere. Card-sized stones carry only the killing blow; the hero keeps complications.
+         Reduced motion: phase "skipped", stone only. Filmed and reviewed frame by frame on
+         desktop and mobile. validate 273 · e2e 101 · sweep clean.
+         Commissioner then set the epitaph's form: a ONE-PARAGRAPH RECAP OF THAT PLAYER'S OWN
+         SEASON — very factually accurate, super funny, a bit edgy (the style of the league recap
+         he liked; not the league recap itself). Epitaph is now `{ recap, writtenAfterWeek }`,
+         rendered as prose under "Epitaph · their season"; epitaphFacts enforces one paragraph
+         (proven with a planted two-paragraph entry). AGENTS.md row and memory updated.
