@@ -553,7 +553,8 @@ DONE   : Rest of week 4 from the commissioner's full list: Shahid MIN, Allison B
          (his list said PIT, which he used in week 1; the commissioner corrected it to MIN).
          All recorded with submittedAt 2026-10-01 15:00Z — the list arrived after the lock and
          the commissioner says these are the picks; he did not say any were late.
-OPEN   : DOMINIC GREEN is listed on BAL, which he used in week 1 (BAL at IND). NOT RECORDED —
-         the reuse rule rejects it and the fixture test would fail. Awaiting the commissioner's
-         call: miss (3 → 2 lives), a corrected pick, or an override with a stated reason.
-         29 of 30 recorded until then.
+RULED  : DOMINIC GREEN listed on BAL, which he used in week 1 (BAL at IND). The commissioner
+         ruled it a MISS ("because he already picked the ravens"): recorded `4: null`, with a
+         comment in the STORY. He drops 3 → 2 lives once week 4 settles. 29 picks + 1 miss = 30.
+NEXT   : Week 4 review after Monday night (ATL at NO). The callout comes back for week 5.
+BLOCKED: none. Merging stays with the commissioner.
