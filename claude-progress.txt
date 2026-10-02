@@ -546,3 +546,14 @@ NEXT   : Still owed before 7:10 PM Thursday 10/1: Shahid Ali, Dominic Green, Cor
          with their week 4 team (city or nickname, from src/domain/teams.ts; "Joey" counts as
          Joseph), or if the note says "picks are in / have picked / still owe" etc. Proven by
          planting "Joey likes Minnesota" — it failed — then reverting.
+
+--- 2026-10-01  Claude Opus 5.5 (feat/week4-last-picks) ---
+DONE   : Rest of week 4 from the commissioner's full list: Shahid MIN, Allison BAL, Zac BAL,
+         Phyllis PIT, Tina BUF ("Tina Busch" in his list; roster is Tina Bush), and Corey MIN
+         (his list said PIT, which he used in week 1; the commissioner corrected it to MIN).
+         All recorded with submittedAt 2026-10-01 15:00Z — the list arrived after the lock and
+         the commissioner says these are the picks; he did not say any were late.
+OPEN   : DOMINIC GREEN is listed on BAL, which he used in week 1 (BAL at IND). NOT RECORDED —
+         the reuse rule rejects it and the fixture test would fail. Awaiting the commissioner's
+         call: miss (3 → 2 lives), a corrected pick, or an override with a stated reason.
+         29 of 30 recorded until then.
