@@ -31,6 +31,13 @@ describe('epitaphs bury only the dead', () => {
     expect(keys).toEqual(carved.map((c) => c.playerId))
   })
 
+  it('writes each one as a single paragraph: their season, start to finish', () => {
+    const recaps = [...block.matchAll(/recap:\s*\n?\s*(['`])([\s\S]*?)\1,/g)].map((m) => m[2]!)
+    expect(recaps).toHaveLength(carved.length)
+    // A real line break or an escaped one in the source: either way, two paragraphs.
+    for (const recap of recaps) expect(recap).not.toMatch(/\n|\\n/)
+  })
+
   it('carves a stone only for a player the pinned results actually eliminated, in that week', () => {
     for (const { playerId, week } of carved) {
       expect(

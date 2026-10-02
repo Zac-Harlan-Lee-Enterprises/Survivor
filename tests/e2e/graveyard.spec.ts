@@ -104,7 +104,7 @@ test.describe('the graveyard', () => {
     await expect(page).toHaveURL(/#\/players\/nate-adams$/)
     await expect(page.getByRole('img', { name: /^Headstone of Nate Adams/ })).toBeVisible()
     const epitaph = page.locator('section[aria-labelledby="epitaph-title"]')
-    await expect(epitaph.getByRole('heading', { name: 'Epitaph' })).toBeVisible()
+    await expect(epitaph.getByRole('heading', { name: /^Epitaph/ })).toBeVisible()
     await expect(epitaph).toContainText(/still choosing his words/i)
   })
 

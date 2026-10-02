@@ -105,14 +105,12 @@ export function PlayerProfilePage() {
           aria-labelledby="epitaph-title"
         >
           <h2 id="epitaph-title" className="eyebrow">
-            Epitaph
+            Epitaph <span className="text-ink-400">· their season</span>
           </h2>
           {epitaph ? (
-            <div className="mt-3 space-y-2 font-display text-lg leading-relaxed text-ink-100 italic">
-              {epitaph.lines.map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-            </div>
+            <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-100 md:text-lg">
+              {epitaph.recap}
+            </p>
           ) : (
             <p className="mt-3 italic text-ink-300">
               The commissioner is still choosing his words.
