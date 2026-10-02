@@ -517,5 +517,14 @@
     "depends_on": [
       "connected-mode-deployed"
     ]
+  },
+  {
+    "id": "graveyard-headstones",
+    "category": "functional",
+    "description": "An eliminated player's headshot becomes a headstone engraved with their cause of death (from the engine's history), everywhere they appear: league graveyard, leaderboard, profile. Fresh graves play a funeral animation (collapsed under reduced motion). The stone links to the profile, which shows a hand-written epitaph or a placeholder. Epitaphs may exist only for players the pinned finals actually eliminated.",
+    "verification": "npx vitest run src/lib/copy.test.ts src/components/Headstone.test.tsx tests/unit/epitaphFacts.test.ts && npx playwright test tests/e2e/graveyard.spec.ts",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
   }
 ]

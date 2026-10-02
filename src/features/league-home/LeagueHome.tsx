@@ -336,6 +336,8 @@ export function LeagueHome() {
                   pickVisible={viewer.isCommissioner}
                   compact
                   index={i}
+                  // Fresh graves get the funeral, every visit. Old ones just stand there.
+                  funeral={recentOut.some((r) => r.playerId === s.playerId)}
                 />
               </li>
             ))}
@@ -401,10 +403,7 @@ export function GameRow({ game, detail }: { game: NFLGame; detail?: string }) {
           // Keyed on the value so the animation restarts on every change; without
           // a new key React reuses the node and the class change alone does nothing.
           key={score}
-          className={cn(
-            'ml-auto font-display text-lg tabular-nums',
-            moved && 'animate-score-bump',
-          )}
+          className={cn('ml-auto font-display text-lg tabular-nums', moved && 'animate-score-bump')}
         >
           {score ?? 0}
         </span>

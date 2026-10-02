@@ -4,6 +4,7 @@ import { getTeam } from '@/domain'
 import { livesLine } from '@/lib/copy'
 import { cn } from '@/lib/cn'
 import { Headshot } from './Headshot'
+import { Headstone } from './Headstone'
 import { LivesMeter } from './LivesMeter'
 import { OutcomePill } from './OutcomePill'
 import { StatusBadge } from './StatusBadge'
@@ -16,6 +17,8 @@ export interface PlayerCardProps {
   pickVisible: boolean
   compact?: boolean
   index?: number
+  /** Play the funeral (headshot crumbles into the headstone). Eliminated players only. */
+  funeral?: boolean
 }
 
 export function PlayerCard({
@@ -24,6 +27,7 @@ export function PlayerCard({
   pickVisible,
   compact,
   index = 0,
+  funeral,
 }: PlayerCardProps) {
   const out = standing.status === 'eliminated'
   const champ = standing.status === 'champion' || standing.status === 'co-champion'
@@ -40,14 +44,23 @@ export function PlayerCard({
       style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
       aria-label={`${profile.displayName}: ${standing.status === 'alive' ? `${standing.livesRemaining} lives left` : standing.status}`}
     >
-      <Headshot
-        name={profile.displayName}
-        playerId={profile.playerId}
-        size={compact ? 'md' : 'lg'}
-        status={standing.status}
-        bubble={standing.livesRemaining === 1}
-        desaturate={out}
-      />
+      {out ? (
+        <Headstone
+          name={profile.displayName}
+          playerId={profile.playerId}
+          standing={standing}
+          size={compact ? 'md' : 'lg'}
+          funeral={funeral}
+        />
+      ) : (
+        <Headshot
+          name={profile.displayName}
+          playerId={profile.playerId}
+          size={compact ? 'md' : 'lg'}
+          status={standing.status}
+          bubble={standing.livesRemaining === 1}
+        />
+      )}
       <div className="min-w-0">
         <p className="truncate font-display text-lg font-bold uppercase leading-tight text-ink-50">
           {profile.displayName}

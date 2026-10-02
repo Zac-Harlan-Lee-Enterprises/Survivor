@@ -3,6 +3,7 @@ import { Crown, Skull } from 'lucide-react'
 import { useLeagueContext } from '@/app/hooks'
 import { getTeam, type PlayerStanding } from '@/domain'
 import { Headshot } from '@/components/Headshot'
+import { Headstone } from '@/components/Headstone'
 import { LivesMeter } from '@/components/LivesMeter'
 import { StatusBadge } from '@/components/StatusBadge'
 import { TeamMonogram } from '@/components/TeamMonogram'
@@ -146,14 +147,22 @@ function Row({
         >
           {s.rank}
         </span>
-        <Headshot
-          name={profile.displayName}
-          playerId={profile.playerId}
-          size={hero ? 'lg' : 'md'}
-          status={s.status}
-          bubble={s.livesRemaining === 1}
-          desaturate={s.status === 'eliminated'}
-        />
+        {s.status === 'eliminated' ? (
+          <Headstone
+            name={profile.displayName}
+            playerId={profile.playerId}
+            standing={s}
+            size={hero ? 'lg' : 'md'}
+          />
+        ) : (
+          <Headshot
+            name={profile.displayName}
+            playerId={profile.playerId}
+            size={hero ? 'lg' : 'md'}
+            status={s.status}
+            bubble={s.livesRemaining === 1}
+          />
+        )}
         <div className="min-w-0">
           <Link
             to={`/players/${encodeURIComponent(s.playerId)}`}
