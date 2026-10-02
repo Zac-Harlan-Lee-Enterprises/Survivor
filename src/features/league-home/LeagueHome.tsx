@@ -44,6 +44,8 @@ export function LeagueHome() {
   const recentOut = graveyard.filter(
     (s) => s.eliminatedWeek !== null && s.eliminatedWeek >= evaluation.currentWeek - 1,
   )
+  const freshGraves = recentOut
+  const oldGraves = graveyard.filter((s) => !recentOut.includes(s))
   // The hero reports the LIVE week — next kickoff, deadline, whether picks are
   // open — so it must not follow the week someone is browsing.
   const currentWeekGames = snapshot.games
@@ -327,21 +329,37 @@ export function LeagueHome() {
               Pay respects →
             </Link>
           </div>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
-            {graveyard.map((s, i) => (
-              <li key={s.playerId}>
-                <PlayerCard
-                  standing={s}
-                  profile={profileOf(s.playerId)}
-                  pickVisible={viewer.isCommissioner}
-                  compact
-                  index={i}
-                  // Fresh graves get the funeral, every visit. Old ones just stand there.
-                  funeral={recentOut.some((r) => r.playerId === s.playerId)}
-                />
-              </li>
-            ))}
-          </ul>
+          {/* Fresh graves get a stage and a funeral, every visit; old ones just stand there. */}
+          {freshGraves.length > 0 && (
+            <ul className="mx-auto grid max-w-4xl grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-3">
+              {freshGraves.map((s, i) => (
+                <li key={s.playerId}>
+                  <PlayerCard
+                    standing={s}
+                    profile={profileOf(s.playerId)}
+                    pickVisible={viewer.isCommissioner}
+                    index={i}
+                    funeral
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+          {oldGraves.length > 0 && (
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+              {oldGraves.map((s, i) => (
+                <li key={s.playerId}>
+                  <PlayerCard
+                    standing={s}
+                    profile={profileOf(s.playerId)}
+                    pickVisible={viewer.isCommissioner}
+                    compact
+                    index={i}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       )}
     </div>

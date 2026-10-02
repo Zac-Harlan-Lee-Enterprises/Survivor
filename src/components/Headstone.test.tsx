@@ -7,6 +7,7 @@ import { LeagueContext, ServicesContext, type LeagueContextValue } from '@/app/h
 import { evaluateSeason, findStanding, type PlayerStanding } from '@/domain'
 import { kickoffFor, scenario } from '@/domain/testing/scenario'
 import type { Services } from '@/data'
+import { FUNERAL_MS } from './Funeral'
 import { Headstone } from './Headstone'
 import { PlayerCard } from './PlayerCard'
 
@@ -78,10 +79,10 @@ describe('Headstone', () => {
     expect(within(stone).queryByText('Ann Example')).toBeNull()
   })
 
-  it('without a funeral, shows the stone and no face', () => {
+  it('without a funeral, shows the stone and no scene', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} />)
     expect(screen.getAllByRole('img')).toHaveLength(1)
-    expect(document.querySelector('.animate-crumble')).toBeNull()
+    expect(document.querySelector('.funeral')).toBeNull()
   })
 
   it('without IntersectionObserver, a funeral simply plays', () => {
@@ -89,14 +90,54 @@ describe('Headstone', () => {
     expect(document.querySelector('[data-funeral]')).toHaveAttribute('data-funeral', 'playing')
   })
 
-  it('at a funeral, the face is there to crumble — hidden from assistive tech, which hears only the stone', () => {
+  it('at a funeral, the whole scene is hidden from assistive tech, which hears only the stone', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
-    const face = document.querySelector('.animate-crumble')
-    expect(face).not.toBeNull()
+    expect(document.querySelector('.funeral.is-playing')).not.toBeNull()
+    const face = document.querySelector('.funeral-face')
     expect(face).toHaveAttribute('aria-hidden', 'true')
-    expect(face?.querySelector('img')).not.toBeNull()
+    expect(face?.querySelectorAll('img').length).toBeGreaterThan(1)
     expect(screen.getAllByRole('img')).toHaveLength(1)
-    expect(screen.getByRole('img').className).toMatch(/animate-stone-rise/)
+    expect(screen.getByRole('img')).toHaveClass('funeral-stone')
+  })
+
+  it('tells the death in captions from the player’s own record', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    const lines = [...document.querySelectorAll('.funeral-caption')].map((p) => p.textContent)
+    expect(lines).toEqual(['Week 3.', 'The Seahawks lost.', 'Strike three.', 'Rest in peace, Ann.'])
+    expect(document.querySelector('.funeral-captions')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('shatters into sixteen pieces, and leaves a ghost', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    expect(document.querySelectorAll('.funeral-shard')).toHaveLength(16)
+    expect(document.querySelector('.funeral-ghost img')).not.toBeNull()
+  })
+
+  it('steps aside for the plain stone once the scene is over', () => {
+    vi.useFakeTimers()
+    try {
+      wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+      expect(document.querySelector('[data-funeral]')).toHaveAttribute('data-funeral', 'playing')
+      act(() => vi.advanceTimersByTime(FUNERAL_MS))
+      expect(document.querySelector('[data-funeral]')).toHaveAttribute('data-funeral', 'done')
+      expect(document.querySelector('.funeral')).toBeNull()
+      expect(screen.getByRole('img', { name: /Headstone of Ann Example/ })).not.toHaveClass(
+        'funeral-stone',
+      )
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('skips straight to the stone for viewers who prefer reduced motion', () => {
+    vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('reduce'), media: q }))
+    try {
+      wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+      expect(document.querySelector('[data-funeral]')).toHaveAttribute('data-funeral', 'skipped')
+      expect(document.querySelector('.funeral')).toBeNull()
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 })
 
@@ -124,21 +165,20 @@ describe('Headstone funeral timing', () => {
     )
   }
 
-  it('waits, face intact and stone hidden, until the grave is scrolled into view', () => {
+  it('waits, face intact and stone underground, until the grave is scrolled into view', () => {
     stubObserver()
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
     const grave = document.querySelector('[data-funeral]')!
     expect(grave).toHaveAttribute('data-funeral', 'waiting')
-    expect(document.querySelector('.funeral-face')).not.toHaveClass('animate-crumble')
-    expect(screen.getByRole('img').className).toMatch(/opacity-0/)
+    expect(document.querySelector('.funeral')).not.toHaveClass('is-playing')
+    expect(screen.getByRole('img')).toHaveClass('funeral-stone')
 
     act(() => fire(false))
     expect(grave).toHaveAttribute('data-funeral', 'waiting')
 
     act(() => fire(true))
     expect(grave).toHaveAttribute('data-funeral', 'playing')
-    expect(document.querySelector('.funeral-face')).toHaveClass('animate-crumble')
-    expect(screen.getByRole('img').className).toMatch(/animate-stone-rise/)
+    expect(document.querySelector('.funeral')).toHaveClass('is-playing')
     // Plays once: it stops watching, so scrolling back and forth does not restart it.
     expect(disconnected).toBe(true)
   })
@@ -147,7 +187,7 @@ describe('Headstone funeral timing', () => {
     stubObserver()
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} />)
     expect(document.querySelector('[data-funeral]')).toBeNull()
-    expect(screen.getByRole('img').className).not.toMatch(/opacity-0/)
+    expect(screen.getByRole('img')).not.toHaveClass('funeral-stone')
   })
 })
 
@@ -185,6 +225,6 @@ describe('PlayerCard', () => {
         funeral
       />,
     )
-    expect(document.querySelector('.animate-crumble')).not.toBeNull()
+    expect(document.querySelector('.funeral')).not.toBeNull()
   })
 })

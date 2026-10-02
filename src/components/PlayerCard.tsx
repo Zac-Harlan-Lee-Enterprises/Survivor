@@ -38,7 +38,9 @@ export function PlayerCard({
       to={`/players/${encodeURIComponent(standing.playerId)}`}
       className={cn(
         'card group relative flex animate-rise flex-col items-center gap-2 p-4 text-center transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-sky-400',
-        out && 'graveyard',
+        // A funeral needs its colour: the face drains on its own, on cue.
+        out && !funeral && 'graveyard',
+        funeral && 'overflow-visible',
         champ && 'border-gold-400/60 [--glow:rgba(251,191,36,0.45)] shadow-glow',
       )}
       style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
@@ -49,7 +51,7 @@ export function PlayerCard({
           name={profile.displayName}
           playerId={profile.playerId}
           standing={standing}
-          size={compact ? 'md' : 'lg'}
+          size={funeral ? 'xl' : compact ? 'md' : 'lg'}
           funeral={funeral}
         />
       ) : (

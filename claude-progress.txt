@@ -587,3 +587,16 @@ BLOCKED: none. Merging stays with the commissioner.
          then disconnects: once per page load; plays immediately where IO is unavailable), and is
          ~6.5s end to end (crumble 4.5s, stone rises over the last ~2.6s). data-funeral="waiting"
          / "playing" on the stone's wrapper is the test hook. Frames checked by eye at 0/1.5/3/4.5/7s.
+         Commissioner: "the animation sucks… make it world class… blow my mind." Rebuilt as a
+         ~11.6s scene (src/components/Funeral.tsx, script in its header; all motion CSS keyed off
+         one `.is-playing` class in index.css): lights dim + beam + ash; captions from the
+         player's own record ("Week 3." / "The 49ers lost." / "Strike three." / "Rest in peace,
+         Nate."); colour drains over a slowing heartbeat; cracks spread from one impact point;
+         flash + jolt and the face shatters into 16 shards (one whole face until the blow — the
+         shard copies showed seams on an intact photo); dust; earth mound; the stone grinds up
+         throwing dirt; the epitaph is chiselled line by line; a glint; the ghost rises; lights
+         up, then the scene unmounts for the plain stone (phase "done"). Fresh graves now get big
+         cards (xl stone) on the league page; old graves stay compact. Stone restyled as granite
+         everywhere. Card-sized stones carry only the killing blow; the hero keeps complications.
+         Reduced motion: phase "skipped", stone only. Filmed and reviewed frame by frame on
+         desktop and mobile. validate 273 · e2e 101 · sweep clean.
