@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import { CalendarOff, Crown, Flame, Skull, Volume2, VolumeX, Zap } from 'lucide-react'
+import { CalendarOff, Crown, Flame, Skull, Zap } from 'lucide-react'
 import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useSession } from '@/app/hooks'
 import { useSelectedWeek } from '@/app/useSelectedWeek'
@@ -24,7 +24,6 @@ import { TeamMonogram } from '@/components/TeamMonogram'
 import { Countdown } from '@/components/Countdown'
 import { Button } from '@/components/ui/button'
 import { useConfetti } from '@/components/useConfetti'
-import { funeralSoundEnabled, setFuneralSound } from '@/components/funeralSound'
 import { formatKickoff } from '@/lib/time'
 import { getConfig } from '@/config/env'
 import { cn } from '@/lib/cn'
@@ -73,12 +72,6 @@ export function LeagueHome() {
     !hiddenSet.has(`${s.playerId}:${evaluation.currentWeek}`)
 
   useConfetti(champions.length > 0)
-  // The funeral's score is opt-in: browsers will not play a sound nobody asked for.
-  const [sound, setSound] = useState(funeralSoundEnabled)
-  const toggleSound = () => {
-    setFuneralSound(!sound)
-    setSound(!sound)
-  }
 
   return (
     <div className="space-y-10">
@@ -330,22 +323,6 @@ export function LeagueHome() {
               {recentOut.length > 0 ? 'Fresh graves' : 'Survivor graveyard'}
             </h2>
             <div className="flex items-center gap-4">
-              {freshGraves.length > 0 && (
-                <button
-                  type="button"
-                  onClick={toggleSound}
-                  aria-pressed={sound}
-                  title="The funeral's bell, thunder and wind. Plays once you have clicked something on the page."
-                  className="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1 font-display text-xs font-bold tracking-wide text-ink-200 uppercase hover:border-white/25 focus-visible:ring-2 focus-visible:ring-sky-400"
-                >
-                  {sound ? (
-                    <Volume2 className="h-4 w-4" aria-hidden="true" />
-                  ) : (
-                    <VolumeX className="h-4 w-4" aria-hidden="true" />
-                  )}
-                  Sound {sound ? 'on' : 'off'}
-                </button>
-              )}
               <Link
                 to="/leaderboard#graveyard"
                 className="font-display text-sm font-bold uppercase tracking-wide text-sky-400 hover:underline"
