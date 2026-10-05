@@ -142,7 +142,7 @@ describe('Headstone', () => {
 
   it('drops the murder weapon with the final score', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
-    expect(document.querySelector('.funeral-score')).toHaveTextContent('Killed by WAS 27–17')
+    expect(document.querySelector('.funeral-score')).toHaveTextContent('Finally done in by WAS 27–17')
   })
 
   it('breaks every face its own way', () => {

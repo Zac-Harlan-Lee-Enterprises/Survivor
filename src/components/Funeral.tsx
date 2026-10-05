@@ -24,7 +24,7 @@ import { funeralSoundEnabled, playFuneralScore } from './funeralSound'
  *   dust; the earth heaps; the stone grinds up                   8–11s
  *   the epitaph is chiselled, line by line                       11.2–13.9s
  *   the ghost rises                                              12–17.5s
- *   a glint crosses the stone; "Killed by ARI 30–27" lands       14.4s, 15s
+ *   a glint crosses the stone; "Finally done in by ARI 30–27" lands       14.4s, 15s
  *   lights up, letterbox out; the crow flies in and stays        17.8s, 18.6s
  *
  * All motion is CSS (index.css, `.funeral.is-playing …`) driven by one class
@@ -200,7 +200,7 @@ function useScript(name: string, standing: PlayerStanding) {
       winner && score && fatal.outcome === 'loss'
         ? {
             teamId: winner.id,
-            score: `Killed by ${winner.abbreviation} ${score.theirs}–${score.mine}`,
+            score: `Finally done in by ${winner.abbreviation} ${score.theirs}–${score.mine}`,
           }
         : null
 
