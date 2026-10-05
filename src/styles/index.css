@@ -1052,16 +1052,20 @@
     transform: translateY(0) rotate(0deg);
   }
 }
+/* It faces right, so it arrives from the left: a glide in, a flare, and it settles. */
 @keyframes crow-land {
   0% {
     opacity: 0;
-    transform: translate(160%, -220%) rotate(-12deg);
+    transform: translate(-190%, -200%) rotate(10deg);
   }
   15% {
     opacity: 1;
   }
-  80% {
-    transform: translate(4%, -10%) rotate(-4deg);
+  55% {
+    transform: translate(-60%, -70%) rotate(6deg);
+  }
+  82% {
+    transform: translate(-6%, -14%) rotate(-10deg);
   }
   100% {
     transform: none;
