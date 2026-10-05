@@ -145,9 +145,9 @@ const STORY: Story = {
   // commissioner ruled it a miss.
   'dominic-green': { 1: ['BAL', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: null },
   // Same team as Sheila Acker — different players may ride the same team.
-  'tracy-nelson': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-16T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'] },
+  'tracy-nelson': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-16T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-05T15:00:00.000Z'] },
   // Third player on the Lions, alongside Dave Johnson and James Parker.
-  'bradley-riedell': { 1: ['DET', 'P'], 2: ['CHI', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'] },
+  'bradley-riedell': { 1: ['DET', 'P'], 2: ['CHI', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-05T13:04:46.000Z'] },
   'chloe-bourque': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-16T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BAL', 'P', '2026-10-01T15:00:00.000Z'] },
   'jared-marks': { 1: ['LAC', 'P'], 2: null, 3: ['BUF', 'P', '2026-09-22T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'] },
   'joseph-tomczuk': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'], 3: ['PHI', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'] },
@@ -169,7 +169,7 @@ const STORY: Story = {
   'tina-bush': { 1: ['DET', 'P'], 2: null, 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BUF', 'P', '2026-10-01T15:00:00.000Z'] },
   // Seventh player on the Chargers. Sent nothing for week 2, so it is a miss
   // of the plain kind: no late answer to weigh, just silence at the lock.
-  'craig-mowers': { 1: ['LAC', 'P'], 2: null, 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'], 4: ['CHI', 'P', '2026-10-01T15:00:00.000Z'] },
+  'craig-mowers': { 1: ['LAC', 'P'], 2: null, 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'], 4: ['CHI', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-05T13:34:26.000Z'] },
   'zac-harlan': { 1: ['LAC', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BAL', 'P', '2026-10-01T15:00:00.000Z'] },
 }
 

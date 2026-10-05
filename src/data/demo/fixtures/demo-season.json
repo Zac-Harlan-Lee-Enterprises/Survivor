@@ -1300,6 +1300,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-tracy-nelson-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tracy-nelson",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-05T15:00:00.000Z",
+      "updatedAt": "2026-10-05T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-bradley-riedell-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1348,6 +1361,19 @@
       "gameId": "2026-w04-MIA-at-MIN",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-bradley-riedell-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "bradley-riedell",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-05T13:04:46.000Z",
+      "updatedAt": "2026-10-05T13:04:46.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -2297,6 +2323,19 @@
       "gameId": "2026-w04-NYJ-at-CHI",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-craig-mowers-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "craig-mowers",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-05T13:34:26.000Z",
+      "updatedAt": "2026-10-05T13:34:26.000Z",
       "version": 1,
       "source": "commissioner"
     },
