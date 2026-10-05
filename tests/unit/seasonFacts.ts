@@ -33,9 +33,10 @@ export const season = JSON.parse(
 ) as Season
 
 /**
- * Every week 1, 2 and 3 final, as the ESPN scoreboard
- * reports them (site.api.espn.com, 2026 season type 2, weeks 1 to 3, read on
- * 2026-09-22 and 2026-09-29). The seed deliberately carries no results — the app fetches them
+ * Every week 1–4 final, as the ESPN scoreboard
+ * reports them (site.api.espn.com, 2026 season type 2, weeks 1 to 4, read on
+ * 2026-09-22, 2026-09-29 and 2026-10-05; week 4's Monday night game, which nobody
+ * picked, was still to be played). The seed deliberately carries no results — the app fetches them
  * live — so the note's outcome claims are pinned here instead, keyed by the
  * seed's own game ids so a pick and its result cannot drift apart.
  *
@@ -90,6 +91,21 @@ export const FINALS: Record<string, [number, number]> = {
   '2026-w03-LV-at-NO': [35, 27],
   '2026-w03-LAR-at-DEN': [26, 30],
   '2026-w03-PHI-at-CHI': [7, 27],
+  '2026-w04-PIT-at-CLE': [24, 27],
+  '2026-w04-IND-at-WAS': [30, 13],
+  '2026-w04-NE-at-BUF': [29, 26],
+  '2026-w04-NYJ-at-CHI': [12, 23],
+  '2026-w04-JAX-at-CIN': [22, 17],
+  '2026-w04-ARI-at-NYG': [24, 36],
+  '2026-w04-LAR-at-PHI': [24, 20],
+  '2026-w04-GB-at-TB': [17, 14],
+  '2026-w04-TEN-at-BAL': [18, 24],
+  '2026-w04-DAL-at-HOU': [34, 30],
+  '2026-w04-MIA-at-MIN': [10, 15],
+  '2026-w04-KC-at-LV': [30, 27],
+  '2026-w04-DEN-at-SF': [14, 24],
+  '2026-w04-LAC-at-SEA': [23, 30],
+  '2026-w04-DET-at-CAR': [26, 32],
 }
 
 export const gamesById = new Map(season.games.map((g) => [g.id, g]))
@@ -151,9 +167,17 @@ export const eliminatedWeekOf = (playerId: string, through: number): number | nu
   return null
 }
 
-/** The last week with every final pinned — how far the record reaches. */
+/**
+ * The last week whose record is complete for the league's purposes: every game
+ * somebody picked has its final pinned. A game nobody picked cannot move a
+ * life, so it may still be unplayed.
+ */
 export const pinnedThrough = (() => {
   let week = 0
-  while (season.games.filter((g) => g.week === week + 1).every((g) => g.id in FINALS)) week += 1
-  return week
+  for (;;) {
+    const next = week + 1
+    const picked = new Set(picksIn(next).map((p) => p.gameId))
+    if (picked.size === 0 || ![...picked].every((id) => id in FINALS)) return week
+    week = next
+  }
 })()
