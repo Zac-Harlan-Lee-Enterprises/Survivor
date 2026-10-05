@@ -650,7 +650,12 @@ VERIFIED: validate 285 · e2e 101 · sweep clean · filmed at caption midpoints,
          zoomed. Unit tests cover captions (with and without the league in context), paper,
          weapon, credits, per-player cracks, house portal (bars, lightning), rain, crow
          (landing → perched), mourners (close vs far), sound toggle untested (audio).
-NEXT   : Merge #31 then this. Nobody is out yet; the first elimination also needs the recap.
+         Then: "give an epitaph instead of saying the commissioner is still…" — autoEpitaph() in
+         src/lib/copy.ts writes one from the record (lives, wins, each lost week with score and
+         opponent, the fatal game, a closing note the record supports, "Rest in peace, X. N teams
+         go unused."); the profile shows it until a hand-written recap exists in src/lib/epitaphs.ts.
+         Weapon tag reworded to "Finally done in by ARI 30–27" at his request.
+NEXT   : Merge #31 then #32. The hand-written recap still replaces the automatic one when written.
 BLOCKED: none. Merging stays with the commissioner.
          Commissioner review of the encore: "get rid of the other survivor images and the text
          things — that's just a lot of noise" and the crow "looks like a flea … make the god damn
