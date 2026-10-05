@@ -11,7 +11,6 @@ import { createPortal } from 'react-dom'
 import { getTeam, type PlayerStanding } from '@/domain'
 import { Headshot } from './Headshot'
 import { TeamMonogram } from './TeamMonogram'
-import { funeralSoundEnabled, playFuneralScore } from './funeralSound'
 
 /**
  * The funeral: a short film played over a fresh grave.
@@ -236,12 +235,6 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
   const anchor = useRef<HTMLDivElement>(null)
   const { shards, cracks } = useMemo(() => geometry(playerId), [playerId])
   const { weapon, paper } = useScript(name, standing)
-
-  // The score, if the viewer asked for it; it stops with the scene.
-  useEffect(() => {
-    if (!playing || !funeralSoundEnabled()) return
-    return playFuneralScore()
-  }, [playing])
 
   return (
     <div ref={anchor} className={playing ? 'funeral is-playing' : 'funeral'}>

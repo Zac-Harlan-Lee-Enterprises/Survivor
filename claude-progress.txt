@@ -667,6 +667,13 @@ BLOCKED: none. Merging stays with the commissioner.
          legs set back. He said "that is a crow" of the reference; the trace is from it.
 VERIFIED: validate 283 · e2e 101 · sweep clean · filmed; crow zoomed on the stone.
 
+--- 2026-10-05  Claude Fable 5.1 (feat/no-funeral-sound) ---
+DONE   : Removed the funeral's sound (synth module, the Sound toggle in the Fresh graves heading,
+         the hook-up in Funeral.tsx) at the commissioner's request: "I can't hear anything and it
+         seems clunky." The scene is silent again. #31 and #32 merged by the commissioner.
+NOTE   : quality-sweep fails on the guard self-test because the commissioner's working tree holds
+         an uncommitted edit to scripts/hooks/guard-destructive-commands.sh (merge rule removed,
+         probes not updated). Not mine to touch; it is not staged or committed here.
 --- 2026-10-05  Claude Fable 5.1 (feat/week4-review) ---
 DONE   : FIRST ELIMINATION. Don Turner (PIT✓ BAL✗ SEA✗ DET✗) went out in week 4 when Carolina beat
          Detroit 32–26 on Sunday night. Week 4 was settled a day early: nobody picked Monday's
