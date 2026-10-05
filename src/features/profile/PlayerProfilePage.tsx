@@ -10,7 +10,7 @@ import { TeamMonogram } from '@/components/TeamMonogram'
 import { NotFound } from '@/features/NotFound'
 import { useConfetti } from '@/components/useConfetti'
 import { livesLine, streakLine } from '@/lib/copy'
-import { EPITAPHS } from './epitaphs'
+import { EPITAPHS } from '@/lib/epitaphs'
 import { cn } from '@/lib/cn'
 
 /** A sports-card style profile: the person, their status, and their record. */

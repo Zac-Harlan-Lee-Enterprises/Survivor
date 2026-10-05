@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, render, screen, within } from '@testing-library/react'
+import { act, cleanup, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ReactNode } from 'react'
@@ -103,15 +103,20 @@ describe('Headstone', () => {
   it('tells the death in captions from the player’s own record', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
     const lines = [...document.querySelectorAll('.funeral-caption')].map((p) => p.textContent)
-    expect(lines).toEqual(['Week 3.', 'The Seahawks lost.', 'Strike three.', 'Rest in peace, Ann.'])
+    // No league in context here, so only the player's own record speaks.
+    expect(lines).toEqual(['Week 3.', 'The Seahawks lost.', 'Strike three.'])
     expect(document.querySelector('.funeral-captions')).toHaveAttribute('aria-hidden', 'true')
+    expect(document.querySelector('.funeral-credits-quote')).toHaveTextContent(
+      'Rest in peace, Ann.',
+    )
   })
 
   it('dims the house through a portal on the body, never a box on the card', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
-    const lights = document.body.querySelector(':scope > .funeral-house-lights')
-    expect(lights).not.toBeNull()
-    expect(lights).toHaveAttribute('aria-hidden', 'true')
+    const house = document.body.querySelector(':scope > .funeral-house')
+    expect(house).not.toBeNull()
+    expect(house).toHaveAttribute('aria-hidden', 'true')
+    expect(house!.querySelector('.funeral-house-lights')).not.toBeNull()
     expect(document.querySelector('.funeral .funeral-house-lights')).toBeNull()
   })
 
@@ -134,6 +139,62 @@ describe('Headstone', () => {
     expect(svg).toHaveAttribute('aria-hidden', 'true')
     expect(svg.querySelectorAll('feTurbulence').length).toBeGreaterThanOrEqual(2)
     expect(within(stone).getByText('Ann Example').closest('.headstone-face')).not.toBeNull()
+  })
+
+  it('prints the morning paper from the record', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    expect(document.querySelector('.funeral-paper-head')).toHaveTextContent(
+      'Ann Example trusts Seahawks on the road, dies',
+    )
+    expect(document.querySelector('.funeral-paper-sub')).toHaveTextContent(
+      'Commanders 27, Seahawks 17',
+    )
+  })
+
+  it('drops the murder weapon with the final score, and rolls the credits', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    expect(document.querySelector('.funeral-score')).toHaveTextContent('Killed by WAS 27–17')
+    expect(document.querySelector('.funeral-credits-teams')).toHaveTextContent(
+      'Chargers · Buccaneers · Seahawks',
+    )
+    expect(document.querySelector('.funeral-credits-span')).toHaveTextContent('Weeks 1–3')
+  })
+
+  it('breaks every face its own way', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    const ann = [...document.querySelectorAll('.funeral-crack')].map((p) => p.getAttribute('d'))
+    cleanup()
+    wrap(<Headstone name="Bob Example" playerId="bob" standing={standings().ann} funeral />)
+    const bob = [...document.querySelectorAll('.funeral-crack')].map((p) => p.getAttribute('d'))
+    expect(ann).toHaveLength(9)
+    expect(bob).not.toEqual(ann)
+  })
+
+  it('brings rain, letterbox bars and lightning through the portal', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    expect(document.querySelectorAll('.funeral-rain span').length).toBeGreaterThan(20)
+    const house = document.body.querySelector(':scope > .funeral-house')!
+    expect(house.querySelectorAll('.funeral-bar')).toHaveLength(2)
+    expect(house.querySelector('.funeral-lightning')).not.toBeNull()
+  })
+
+  it('sends the crow in during the scene, and leaves it perched after', () => {
+    vi.useFakeTimers()
+    try {
+      wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+      expect(document.querySelector('.funeral-crow')).toHaveClass('is-landing')
+      act(() => vi.advanceTimersByTime(FUNERAL_MS))
+      const crow = document.querySelector('.funeral-crow')
+      expect(crow).not.toBeNull()
+      expect(crow).not.toHaveClass('is-landing')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('has no crow on an old grave', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} />)
+    expect(document.querySelector('.funeral-crow')).toBeNull()
   })
 
   it('shatters into sixteen pieces, and leaves a ghost', () => {
@@ -217,6 +278,74 @@ describe('Headstone funeral timing', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} />)
     expect(document.querySelector('[data-funeral]')).toBeNull()
     expect(screen.getByRole('img')).not.toHaveClass('funeral-stone')
+  })
+})
+
+describe('Funeral, with the league in the room', () => {
+  function wrapWithLeague(children: ReactNode) {
+    const snap = scenario()
+      .players('ann', 'bob', 'cal', 'dee')
+      .game(1, 'LAC', 'ARI', { final: 'ARI' })
+      .game(2, 'TB', 'CLE', { final: 'CLE' })
+      .game(3, 'WAS', 'SEA', { final: 'WAS' })
+      .pick('ann', 1, 'LAC')
+      .pick('ann', 2, 'TB')
+      .pick('ann', 3, 'SEA')
+      // Bob lost a life on Seattle the same week; Cal and Dee were elsewhere.
+      .pick('bob', 1, 'ARI')
+      .pick('bob', 2, 'CLE')
+      .pick('bob', 3, 'SEA')
+      .pick('cal', 1, 'ARI')
+      .pick('cal', 2, 'CLE')
+      .pick('cal', 3, 'WAS')
+      .pick('dee', 1, 'ARI')
+      .pick('dee', 2, 'CLE')
+      .pick('dee', 3, 'WAS')
+      .build()
+    const evaluation = evaluateSeason(snap, { now: kickoffFor(4, 48) })
+    const services = {
+      images: {
+        defaultAvatarUrl: () => '/Survivor/headshots/default.svg',
+        variantUrl: () => '/Survivor/headshots/default.svg',
+      },
+    } as unknown as Services
+    const names: Record<string, string> = {
+      ann: 'Ann Example',
+      bob: 'Bob Example',
+      cal: 'Cal Example',
+      dee: 'Dee Example',
+    }
+    const league = {
+      evaluation,
+      imageOf: () => null,
+      profileOf: (id: string) => ({ playerId: id, displayName: names[id] ?? id, imageId: null }),
+    } as unknown as LeagueContextValue
+    render(
+      <MemoryRouter>
+        <ServicesContext.Provider value={services}>
+          <LeagueContext.Provider value={league}>{children}</LeagueContext.Provider>
+        </ServicesContext.Provider>
+      </MemoryRouter>,
+    )
+    return findStanding(evaluation, 'ann')!
+  }
+
+  it('names who took the same hit, counts the survivors, and seats the mourners', () => {
+    const Probe = () => null
+    const ann: PlayerStanding = wrapWithLeague(<Probe />)
+    cleanup()
+    wrapWithLeague(<Headstone name="Ann Example" playerId="ann" standing={ann} funeral />)
+    const lines = [...document.querySelectorAll('.funeral-caption')].map((p) => p.textContent)
+    expect(lines).toContain('Bob took the same hit.')
+    expect(lines).toContain('Survived by 3 league members who made better decisions.')
+    const mourners = [...document.querySelectorAll('.funeral-mourner')]
+    expect(mourners.map((m) => m.querySelector('img')?.getAttribute('alt'))).toEqual([
+      'Headshot of Bob Example',
+      'Headshot of Cal Example',
+      'Headshot of Dee Example',
+    ])
+    expect(mourners[0]).toHaveClass('is-close')
+    expect(mourners[1]).not.toHaveClass('is-close')
   })
 })
 

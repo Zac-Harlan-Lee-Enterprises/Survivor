@@ -627,3 +627,28 @@ VERIFIED: validate 278 · e2e 101 passed · init.sh 200 · sweep clean. New unit
          the stone has its noise filters and the inscription sits on the panel.
 NEXT   : Nobody is out yet. The first elimination: write the recap (see epitaph memory).
 BLOCKED: none. Merging stays with the commissioner.
+
+--- 2026-10-04  Claude Fable 5.1 (feat/funeral-encore, stacked on feat/funeral-polish / PR #31) ---
+DONE   : The commissioner said yes to all ten encore ideas. The funeral is now a ~27s film:
+         letterbox bars + page push-in (.card:has(.funeral.is-playing), unlayered CSS); rain
+         (he likes the rain) + lightning on the strike; captions timed inline from the script
+         (--at/--dur) each with a dark pool behind the words; "A Bears fan. Slain by the Bears."
+         from src/lib/fans.ts (Joey → CHI) when the killer is their own team; "X, Y and Z took
+         the same hit." / "Nobody else took that hit."; "Survived by N league members who made
+         better decisions."; the morning paper (The Sunday Survivor: "NATE ADAMS TRUSTS 49ERS AT
+         HOME, DIES" + score) spinning in off the strike; mourners (same-hit losers closest in
+         grey and bowed, survivors in colour; positions computed in JS so a crowd packs inside
+         the card); the murder weapon (killer's monogram, tag "Killed by ARI 30–27") dropped at
+         the foot of the stone; credits (name, weeks, teams up to the fatal week, last sentence
+         of their epitaph or "Rest in peace, X."); a crow (redrawn after "looks like a flea")
+         that flies in as the lights come up and perches on every later visit; shatter geometry
+         seeded per player (FNV-1a); synthesised sound (bell, thunder, organ, wind, thud; opt-in
+         toggle in the Fresh graves heading, localStorage survivor:funeral:sound).
+         Epitaphs moved to src/lib/epitaphs.ts so the credits can quote them (test path, AGENTS
+         row updated). Pacing doubled twice at the commissioner's request (captions 3.2–4.6s).
+VERIFIED: validate 285 · e2e 101 · sweep clean · filmed at caption midpoints, crow and mourners
+         zoomed. Unit tests cover captions (with and without the league in context), paper,
+         weapon, credits, per-player cracks, house portal (bars, lightning), rain, crow
+         (landing → perched), mourners (close vs far), sound toggle untested (audio).
+NEXT   : Merge #31 then this. Nobody is out yet; the first elimination also needs the recap.
+BLOCKED: none. Merging stays with the commissioner.

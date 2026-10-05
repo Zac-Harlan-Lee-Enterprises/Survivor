@@ -249,18 +249,62 @@
   }
 
   /* Lights down: the world darkens around the grave, and a beam falls on it. */
-  .funeral-house-lights {
+  .funeral-house {
     position: fixed;
     inset: 0;
     z-index: 25;
     pointer-events: none;
+  }
+  .funeral-house-lights {
+    position: absolute;
+    inset: 0;
     background: radial-gradient(
       circle at var(--x) var(--y),
       transparent calc(var(--r) * 0.95),
       rgba(3, 5, 12, 0.45) calc(var(--r) * 1.7),
       rgba(3, 5, 12, 0.86) calc(var(--r) * 3.4)
     );
-    animation: funeral-lights 11.6s ease-in-out both;
+    animation: funeral-lights 26.2s ease-in-out both;
+  }
+  /* Letterbox: cinema bars that slide in with the lights and out with them. */
+  .funeral-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 7vh;
+    background: #000;
+    animation: funeral-bars 26.2s ease-in-out both;
+  }
+  .funeral-bar-top {
+    top: 0;
+    transform-origin: 50% 0;
+  }
+  .funeral-bar-bottom {
+    bottom: 0;
+    transform-origin: 50% 100%;
+  }
+  .funeral-lightning {
+    position: absolute;
+    inset: 0;
+    background: #eef3ff;
+    opacity: 0;
+    animation: funeral-lightning 0.9s 7.28s linear both;
+  }
+  /* Rain over the grave, from the first caption to the last. */
+  .funeral-rain {
+    position: absolute;
+    inset: -45% -35% -15%;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .funeral-rain span {
+    position: absolute;
+    top: -8%;
+    width: 1px;
+    height: var(--len);
+    background: linear-gradient(180deg, transparent, rgba(205, 220, 255, var(--o)));
+    transform: translateY(-20px) rotate(8deg);
   }
   .funeral-beam {
     position: absolute;
@@ -438,6 +482,188 @@
     --tw-ring-shadow: 0 0 #0000;
     box-shadow: none;
   }
+  /* The morning paper: spins in off the strike, lands, and is gone before the stone. */
+  .funeral-paper {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 150%;
+    aspect-ratio: 1.3;
+    transform: translate(-50%, -50%) scale(0) rotate(-720deg);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .funeral-paper-sheet {
+    position: absolute;
+    inset: 0;
+    padding: 5% 6%;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.04), transparent 20%), #e9e3d2;
+    color: #1a1712;
+    box-shadow:
+      0 20px 40px -12px rgba(0, 0, 0, 0.8),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    text-align: center;
+    font-family: Georgia, 'Times New Roman', serif;
+    overflow: hidden;
+  }
+  .funeral-paper-mast {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: clamp(0.7rem, 1.6vw, 1rem);
+    border-bottom: 2px solid #1a1712;
+    padding-bottom: 2%;
+  }
+  .funeral-paper-meta {
+    font-size: clamp(0.45rem, 0.9vw, 0.6rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 1.5% 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+  }
+  .funeral-paper-head {
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.05;
+    font-size: clamp(0.95rem, 2.4vw, 1.5rem);
+    padding: 4% 0 2%;
+  }
+  .funeral-paper-sub {
+    font-style: italic;
+    font-size: clamp(0.55rem, 1.1vw, 0.75rem);
+    padding-bottom: 3%;
+  }
+  .funeral-paper-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4%;
+    height: 34%;
+  }
+  .funeral-paper-cols span {
+    background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0 1px, transparent 1px 3px);
+    opacity: 0.35;
+  }
+  /* The murder weapon, dropped at the foot of the stone. */
+  .funeral-weapon {
+    position: absolute;
+    left: 66%;
+    bottom: -4%;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    opacity: 0;
+    transform: translateY(-260%) rotate(-40deg);
+    z-index: 4;
+  }
+  .funeral-weapon img,
+  .funeral-weapon > span:first-child {
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.7));
+  }
+  .funeral-score {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: #f7f3e8;
+    background: rgba(8, 10, 18, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+    padding: 0.1rem 0.45rem;
+    white-space: nowrap;
+    opacity: 0;
+  }
+  /* Credits. */
+  .funeral-credits {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    padding: 6% 4%;
+    border-radius: 1rem;
+    background: radial-gradient(
+      ellipse at 50% 50%,
+      rgba(3, 5, 12, 0.92) 40%,
+      rgba(3, 5, 12, 0.55) 75%,
+      transparent 100%
+    );
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #f7f3e8;
+    text-shadow:
+      0 2px 0 rgba(0, 0, 0, 0.6),
+      0 0 24px rgba(0, 0, 0, 0.95);
+    opacity: 0;
+  }
+  .funeral-credits-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+  }
+  .funeral-credits-span,
+  .funeral-credits-teams {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: clamp(0.65rem, 1.3vw, 0.85rem);
+    color: #cfd4e6;
+  }
+  .funeral-credits-quote {
+    margin-top: 0.4em;
+    font-style: italic;
+    font-size: clamp(0.8rem, 1.6vw, 1.05rem);
+  }
+  /* The mourners gather at the graveside. */
+  .funeral-mourners {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .funeral-mourner {
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
+    bottom: 9%;
+    left: calc(50% + var(--x));
+    transform: translate(-50%, 0);
+    opacity: 0;
+    filter: brightness(0.6) saturate(0.6);
+  }
+  .funeral-mourner.is-close {
+    bottom: 4%;
+    filter: grayscale(1) brightness(0.5);
+  }
+  .funeral-mourner img {
+    width: 100%;
+    height: 100%;
+    --tw-ring-color: rgba(255, 255, 255, 0.12);
+  }
+  /* The crow. */
+  .funeral-crow {
+    position: absolute;
+    top: -9%;
+    left: 46%;
+    width: 46%;
+    height: auto;
+    z-index: 5;
+    pointer-events: none;
+    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.7));
+  }
+  .funeral-crow .crow-lid {
+    transform-origin: 97px 23px;
+    transform: scaleY(0);
+    animation: crow-blink 6s 2s infinite;
+  }
+  .funeral-crow.is-landing {
+    animation: crow-land 1.8s 25.4s cubic-bezier(0.3, 0.6, 0.3, 1) both;
+  }
+  .funeral-crow.is-landing .crow-wing {
+    transform-origin: 58px 34px;
+    animation: crow-flap 0.24s 25.4s ease-in-out 7 both;
+  }
   .funeral-captions {
     position: absolute;
     left: 50%;
@@ -453,6 +679,13 @@
     display: grid;
     place-items: center;
     text-align: center;
+    /* A pool of dark behind the words, so they read over the stone and the ghost alike. */
+    background: radial-gradient(
+      ellipse 55% 32% at 50% 50%,
+      rgba(3, 5, 12, 0.88),
+      rgba(3, 5, 12, 0.5) 60%,
+      transparent 100%
+    );
     font-family: var(--font-display);
     font-weight: 800;
     text-transform: uppercase;
@@ -465,84 +698,99 @@
       0 0 48px rgba(0, 0, 0, 0.9);
     opacity: 0;
   }
-  .funeral-caption-3 {
-    top: auto;
-    bottom: -46%;
-    height: 34%;
-  }
 
-  /* ---- Action ---- */
+  /* ---- Action ---- (the clock: see the script in Funeral.tsx) */
   .funeral.is-playing .funeral-beam {
-    animation: funeral-beam 11.6s ease-in-out both;
+    animation: funeral-beam 26.2s ease-in-out both;
+  }
+  .funeral.is-playing .funeral-rain {
+    animation: funeral-rain-on 26.2s ease-in-out both;
+  }
+  .funeral.is-playing .funeral-rain span {
+    animation: funeral-rain var(--dur) var(--d) linear infinite;
   }
   .funeral.is-playing .funeral-ash span {
-    animation: funeral-ash 5.5s linear var(--d) 2 both;
+    animation: funeral-ash 5.5s linear var(--d) 5 both;
   }
   .funeral.is-playing .funeral-face {
-    animation: funeral-drain 2.2s 0.2s ease-in both;
+    animation: funeral-drain 3.4s 0.3s ease-in both;
   }
   .funeral.is-playing .funeral-pulse {
-    animation: funeral-heartbeat 2.6s 0.1s ease-in-out both;
+    animation: funeral-heartbeat 5.8s 0.2s ease-in-out both;
   }
   .funeral.is-playing .funeral-crack,
   .funeral.is-playing .funeral-crack-shadow {
-    animation: funeral-crack 0.5s calc(2.25s + var(--d)) cubic-bezier(0.3, 0.7, 0.4, 1) both;
+    animation: funeral-crack 0.7s calc(6.2s + var(--d) * 1.6) cubic-bezier(0.3, 0.7, 0.4, 1) both;
   }
   .funeral.is-playing .funeral-cracks {
-    animation: funeral-fade-out 0.25s 3.32s both;
+    animation: funeral-fade-out 0.25s 7.4s both;
   }
   .funeral.is-playing .funeral-flash {
-    animation: funeral-flash 0.6s 3.28s ease-out both;
+    animation: funeral-flash 0.6s 7.35s ease-out both;
   }
   .funeral.is-playing .funeral-whole {
-    animation: funeral-fade-out 0.01s 3.32s both;
+    animation: funeral-fade-out 0.01s 7.4s both;
   }
   .funeral.is-playing .funeral-shards {
-    animation: funeral-fade-in 0.01s 3.32s both;
+    animation: funeral-fade-in 0.01s 7.4s both;
   }
   .funeral.is-playing .funeral-shard {
-    animation: funeral-fall 1.7s calc(3.32s + var(--d)) cubic-bezier(0.45, 0, 0.9, 0.45) both;
+    animation: funeral-fall 2s calc(7.4s + var(--d)) cubic-bezier(0.45, 0, 0.9, 0.45) both;
   }
   .funeral.is-playing .funeral-quake {
     animation:
-      funeral-jolt 0.5s 3.3s both,
-      funeral-rumble 1.9s 4.95s both;
+      funeral-jolt 0.5s 7.35s both,
+      funeral-rumble 2.2s 11.2s both;
+  }
+  .funeral.is-playing .funeral-paper {
+    animation: funeral-paper 4.4s 7.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
   .funeral.is-playing .funeral-dust span {
-    animation: funeral-dust 1.8s calc(4.45s + var(--d)) ease-out both;
+    animation: funeral-dust 1.8s calc(10.5s + var(--d)) ease-out both;
   }
   .funeral.is-playing .funeral-mound {
-    animation: funeral-mound 0.9s 4.6s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+    animation: funeral-mound 0.9s 10.6s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  }
+  .funeral.is-playing .funeral-mourner {
+    animation: funeral-mourner 1.3s calc(11s + var(--d) * 1.5) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .funeral.is-playing .funeral-mourner.is-close {
+    animation:
+      funeral-mourner 1.3s calc(11s + var(--d) * 1.5) cubic-bezier(0.2, 0.8, 0.2, 1) both,
+      funeral-bow 2.2s calc(13s + var(--d)) ease-in-out both;
   }
   .funeral.is-playing .funeral-stone {
-    animation: funeral-rise 2s 4.95s cubic-bezier(0.25, 0.85, 0.3, 1) both;
+    animation: funeral-rise 2.6s 11.2s cubic-bezier(0.25, 0.85, 0.3, 1) both;
   }
   .funeral.is-playing .funeral-dirt span {
-    animation: funeral-dirt 1.1s calc(5s + var(--d)) cubic-bezier(0.2, 0.6, 0.5, 1) both;
+    animation: funeral-dirt 1.3s calc(11.3s + var(--d)) cubic-bezier(0.2, 0.6, 0.5, 1) both;
   }
   .funeral.is-playing .engrave {
-    animation: funeral-engrave 0.75s calc(6.95s + var(--i) * 0.45s) steps(14, end) both;
-  }
-  .funeral.is-playing .funeral-glint {
-    animation: funeral-glint 1.2s 8.95s ease-in-out both;
+    animation: funeral-engrave 0.9s calc(14s + var(--i) * 0.6s) steps(14, end) both;
   }
   .funeral.is-playing .funeral-ghost {
-    animation: funeral-ghost 4.4s 7.3s cubic-bezier(0.3, 0, 0.45, 1) both;
+    animation: funeral-ghost 5.5s 15.2s cubic-bezier(0.3, 0, 0.45, 1) both;
   }
   .funeral.is-playing .funeral-ghost-body {
-    animation: funeral-ghost-wisp 1.6s 7.3s ease-in-out 3 both;
+    animation: funeral-ghost-wisp 1.6s 15.2s ease-in-out 4 both;
   }
-  .funeral.is-playing .funeral-caption-0 {
-    animation: funeral-caption 1.5s 0.35s both;
+  .funeral.is-playing .funeral-glint {
+    animation: funeral-glint 1.4s 18.2s ease-in-out both;
   }
-  .funeral.is-playing .funeral-caption-1 {
-    animation: funeral-caption 1.5s 1.8s both;
+  .funeral.is-playing .funeral-weapon {
+    animation: funeral-weapon 1.1s 18.8s cubic-bezier(0.3, 0, 0.6, 1.4) both;
   }
-  .funeral.is-playing .funeral-caption-2 {
-    animation: funeral-caption-hit 1.4s 3.05s both;
+  .funeral.is-playing .funeral-score {
+    animation: funeral-fade-in 0.5s 19.7s both;
   }
-  .funeral.is-playing .funeral-caption-3 {
-    animation: funeral-caption 2.2s 9.4s both;
+  .funeral.is-playing .funeral-credits {
+    animation: funeral-credits 5.6s 21.2s both;
+  }
+  .funeral.is-playing .funeral-caption {
+    animation: funeral-caption var(--dur) var(--at) both;
+  }
+  .funeral.is-playing .funeral-caption.is-hit {
+    animation: funeral-caption-hit var(--dur) var(--at) both;
   }
 }
 
@@ -815,12 +1063,12 @@
     letter-spacing: 0.5em;
     filter: blur(6px);
   }
-  22% {
+  12% {
     opacity: 1;
     letter-spacing: 0.15em;
     filter: none;
   }
-  78% {
+  88% {
     opacity: 1;
   }
   100% {
@@ -834,23 +1082,206 @@
     transform: scale(1.6);
     filter: blur(4px);
   }
-  14% {
+  9% {
     opacity: 1;
     transform: scale(1);
     filter: none;
   }
-  20% {
+  14% {
     transform: scale(1.04);
   }
-  26% {
+  19% {
     transform: scale(1);
   }
-  78% {
+  88% {
     opacity: 1;
   }
   100% {
     opacity: 0;
     transform: scale(0.96);
     filter: blur(3px);
+  }
+}
+
+/* The camera creeps toward a fresh grave while the funeral plays. Unlayered so
+   it outranks the card's entry animation utility. */
+.card:has(.funeral.is-playing) {
+  animation: funeral-push-in 26.2s ease-in-out both;
+  z-index: 30;
+}
+
+@keyframes funeral-push-in {
+  0% {
+    transform: scale(1);
+  }
+  12% {
+    transform: scale(1.015);
+  }
+  88% {
+    transform: scale(1.07);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes funeral-bars {
+  0% {
+    transform: scaleY(0);
+  }
+  7% {
+    transform: scaleY(1);
+  }
+  93% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(0);
+  }
+}
+@keyframes funeral-lightning {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.85;
+  }
+  18% {
+    opacity: 0.1;
+  }
+  30% {
+    opacity: 0.65;
+  }
+  60% {
+    opacity: 0;
+  }
+}
+@keyframes funeral-rain-on {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  6%,
+  92% {
+    opacity: 1;
+  }
+}
+@keyframes funeral-rain {
+  from {
+    transform: translateY(-20px) rotate(8deg);
+  }
+  to {
+    transform: translateY(120vh) rotate(8deg);
+  }
+}
+@keyframes funeral-paper {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(-720deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  45% {
+    transform: translate(-50%, -50%) scale(1) rotate(-4deg);
+    opacity: 1;
+  }
+  80% {
+    transform: translate(-50%, -50%) scale(1) rotate(-4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -30%) scale(0.9) rotate(-10deg);
+    opacity: 0;
+  }
+}
+@keyframes funeral-mourner {
+  from {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--side) * 60px), 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes funeral-bow {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  50% {
+    rotate: calc(var(--side) * -14deg);
+  }
+}
+@keyframes funeral-weapon {
+  0% {
+    opacity: 0;
+    transform: translateY(-260%) rotate(-40deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  55% {
+    transform: translateY(0) rotate(6deg);
+  }
+  72% {
+    transform: translateY(-22%) rotate(-3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+@keyframes funeral-credits {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -42%);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -56%);
+  }
+}
+@keyframes crow-land {
+  0% {
+    opacity: 0;
+    transform: translate(160%, -220%) rotate(-12deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  80% {
+    transform: translate(4%, -10%) rotate(-4deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes crow-flap {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(-0.7) translateY(-6px);
+  }
+}
+@keyframes crow-blink {
+  0%,
+  96%,
+  100% {
+    transform: scaleY(0);
+  }
+  97%,
+  99% {
+    transform: scaleY(1);
   }
 }

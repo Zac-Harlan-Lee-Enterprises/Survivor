@@ -4,6 +4,7 @@ import { causeOfDeath } from '@/lib/copy'
 import { cn } from '@/lib/cn'
 import { Funeral, FUNERAL_MS } from './Funeral'
 import { StoneFace } from './StoneFace'
+import { Crow } from './Crow'
 
 /** Same footprint as Headshot's sizes, so a headstone drops in where a face was. */
 const SIZES = {
@@ -118,6 +119,8 @@ export function Headstone({
       className={cn('relative shrink-0', SIZES[size], staged && 'z-30', className)}
       data-funeral={funeral ? phase : undefined}
     >
+      {/* The crow: flies in as the lights come up, then sits on every visit after. */}
+      {funeral && phase !== 'waiting' && <Crow landing={phase === 'playing'} />}
       {staged ? (
         <Funeral
           name={name}
