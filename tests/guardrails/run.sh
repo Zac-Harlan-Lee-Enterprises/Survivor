@@ -37,10 +37,7 @@ check() {
 }
 
 echo "── Must BLOCK ─────────────────────────────────────────────────────"
-check block "gh pr merge 42"
 check block "gh pr merge 42 --admin --squash"
-check block "cd /some/repo && gh pr merge 42"
-check block "bash -c 'gh pr merge 42'"
 check block "gh pr review 42 --approve"
 check block "gh api -X PUT repos/o/r/pulls/1/merge"
 check block "gh api --method DELETE repos/o/r/branches/main/protection"
@@ -68,6 +65,11 @@ check block "git clean -fdx"
 
 echo
 echo "── Must ALLOW (no false positives — a noisy guard gets disabled) ───"
+# A plain merge is the commissioner's call, made through /autopilot; branch
+# protection (required CI, no admin bypass) is the gate on main.
+check allow "gh pr merge 42"
+check allow "cd /some/repo && gh pr merge 42"
+check allow "bash -c 'gh pr merge 42'"
 check allow "npm ci"
 check allow "npm run build"
 check allow "npm test"

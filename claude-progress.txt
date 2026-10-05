@@ -695,3 +695,13 @@ VERIFIED: validate green; e2e 101; facts tests pass. Sweep fails ONLY on the gua
          removed, probes not updated) — not touched here.
 NEXT   : Week 5 picks lock 7:10 PM Thursday 10/8. Record picks only; the note stays.
 BLOCKED: merges and the hook edit are the commissioner's (gh pr merge is denied to the agent twice).
+
+--- 2026-10-05  Claude Fable 5.1 (feat/guard-allow-merges) ---
+DONE   : Guard hook: a plain CLI merge is allowed (commissioner edited the probes, approved in
+         session, SECURITY-REVIEW: Zac Harlan on the commit); admin/bypass flags, API merges and
+         skipping hooks stay blocked. tests/guardrails/run.sh moved the three plain-merge cases to
+         must-allow (53 pass). Sweep clean. #33 (sound out) and #34 (week 4 review, Don's
+         epitaph) merged by the commissioner; Pages deploy succeeded; live bundle carries the
+         review and the epitaph.
+NEXT   : The agent still cannot merge: .claude/settings.json's deny list refuses the merge command.
+         That file is the commissioner's to change. Week 5 picks lock 7:10 PM Thursday 10/8.
