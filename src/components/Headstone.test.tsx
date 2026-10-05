@@ -107,6 +107,35 @@ describe('Headstone', () => {
     expect(document.querySelector('.funeral-captions')).toHaveAttribute('aria-hidden', 'true')
   })
 
+  it('dims the house through a portal on the body, never a box on the card', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    const lights = document.body.querySelector(':scope > .funeral-house-lights')
+    expect(lights).not.toBeNull()
+    expect(lights).toHaveAttribute('aria-hidden', 'true')
+    expect(document.querySelector('.funeral .funeral-house-lights')).toBeNull()
+  })
+
+  it('keeps the house lights up when nothing is playing', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} />)
+    expect(document.body.querySelector('.funeral-house-lights')).toBeNull()
+  })
+
+  it('raises a sheet ghost with the face in its head', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    const ghost = document.querySelector('.funeral-ghost')!
+    expect(ghost.querySelector('svg.funeral-sheet path')).not.toBeNull()
+    expect(ghost.querySelector('.funeral-ghost-face img')).not.toBeNull()
+  })
+
+  it('is cut from stone: a tablet on a plinth, with the inscription on its polished panel', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} size="hero" />)
+    const stone = screen.getByRole('img')
+    const svg = stone.querySelector('svg.headstone-svg')!
+    expect(svg).toHaveAttribute('aria-hidden', 'true')
+    expect(svg.querySelectorAll('feTurbulence').length).toBeGreaterThanOrEqual(2)
+    expect(within(stone).getByText('Ann Example').closest('.headstone-face')).not.toBeNull()
+  })
+
   it('shatters into sixteen pieces, and leaves a ghost', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
     expect(document.querySelectorAll('.funeral-shard')).toHaveLength(16)

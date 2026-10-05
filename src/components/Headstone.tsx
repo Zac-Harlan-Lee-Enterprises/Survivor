@@ -3,6 +3,7 @@ import type { PlayerStanding } from '@/domain'
 import { causeOfDeath } from '@/lib/copy'
 import { cn } from '@/lib/cn'
 import { Funeral, FUNERAL_MS } from './Funeral'
+import { StoneFace } from './StoneFace'
 
 /** Same footprint as Headshot's sizes, so a headstone drops in where a face was. */
 const SIZES = {
@@ -71,42 +72,42 @@ export function Headstone({
     <div
       role="img"
       aria-label={label}
-      className={cn(
-        'headstone relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-t-full rounded-b-md px-[8%] pt-[14%] pb-[6%] text-center',
-        staged && 'funeral-stone',
-      )}
+      className={cn('headstone relative h-full w-full', staged && 'funeral-stone')}
     >
-      {engraved(
-        0,
-        cn(
-          'font-display font-extrabold tracking-[0.2em] text-ink-100',
-          detail === 'rip' ? 'text-[0.6rem] sm:text-xs' : 'text-sm md:text-lg',
-        ),
-        'RIP',
-      )}
-      {detail !== 'rip' &&
-        engraved(
-          1,
+      <StoneFace uid={playerId} />
+      <div className="headstone-face flex flex-col items-center justify-center text-center">
+        {engraved(
+          0,
           cn(
-            'w-full font-display font-bold uppercase leading-tight text-ink-50',
-            detail === 'name' ? 'truncate text-[0.65rem]' : 'text-sm md:text-lg',
+            'font-display font-extrabold tracking-[0.2em]',
+            detail === 'rip' ? 'text-[0.62rem] sm:text-xs' : 'text-sm md:text-lg',
           ),
-          detail === 'name' ? name.split(' ')[0]! : name,
+          'RIP',
         )}
-      {detail !== 'rip' &&
-        week !== null &&
-        engraved(
-          2,
-          'text-[0.6rem] text-ink-300 md:text-xs',
-          week === 1 ? 'Week 1' : `Weeks 1–${week}`,
-        )}
-      {detail === 'full' &&
-        carved &&
-        engraved(
-          3,
-          'mt-1 line-clamp-3 text-[0.6rem] italic leading-snug text-ink-300 md:text-xs',
-          carved,
-        )}
+        {detail !== 'rip' &&
+          engraved(
+            1,
+            cn(
+              'w-full font-display font-bold uppercase leading-tight',
+              detail === 'name' ? 'truncate text-[0.65rem]' : 'text-sm md:text-lg',
+            ),
+            detail === 'name' ? name.split(' ')[0]! : name,
+          )}
+        {detail !== 'rip' &&
+          week !== null &&
+          engraved(
+            2,
+            'font-display text-[0.62rem] font-semibold tracking-wide md:text-xs',
+            week === 1 ? 'Week 1' : `Weeks 1–${week}`,
+          )}
+        {detail === 'full' &&
+          carved &&
+          engraved(
+            3,
+            'engrave-soft mt-1 line-clamp-3 font-display text-[0.62rem] leading-snug md:text-xs',
+            carved,
+          )}
+      </div>
       {staged && <span aria-hidden="true" className="funeral-glint" />}
     </div>
   )

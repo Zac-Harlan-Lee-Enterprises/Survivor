@@ -605,3 +605,25 @@ BLOCKED: none. Merging stays with the commissioner.
          he liked; not the league recap itself). Epitaph is now `{ recap, writtenAfterWeek }`,
          rendered as prose under "Epitaph · their season"; epitaphFacts enforces one paragraph
          (proven with a planted two-paragraph entry). AGENTS.md row and memory updated.
+
+--- 2026-10-04  Claude Fable 5.1 (feat/funeral-polish) ---
+DONE   : Three fixes the commissioner asked for after watching the funeral.
+         1. THE BLACK BOX: the "lights down" vignette was a dark square pinned to the grave.
+            Replaced by HouseLights (Funeral.tsx): a page-wide fixed dim rendered through a
+            portal on <body> with a soft radial hole that tracks the stone (scroll/resize via
+            rAF). No edges anywhere. Needed the portal because .card's backdrop-filter makes
+            position:fixed relative to the card.
+         2. THE GHOST: now a sheet ghost (SVG body with a wavy tail) with the headshot in its
+            head, translucent (luminosity blend), wisping (rotate/skew) as it rises and drifts.
+         3. THE STONE: src/components/StoneFace.tsx — SVG granite tablet on a plinth. Texture =
+            feTurbulence speckle lit by feDiffuseLighting (relief) + a cloudy vein layer;
+            bevelled edge, polished inscription panel, lichen, damp stain, hairline crack,
+            chipped corner, ground shadow. Lettering is HTML over the panel, incised (dark cut
+            + light chisel edge). Filter ids are per-player so a graveyard page works.
+         Reviewed frame by frame on desktop; stones shot at 2x. First texture pass read as
+         stucco and the inscription was illegible — finer grain, lower relief, polished panel.
+VERIFIED: validate 278 · e2e 101 passed · init.sh 200 · sweep clean. New unit tests: house
+         lights live on <body> and never inside the card; sheet ghost has a body and a face;
+         the stone has its noise filters and the inscription sits on the panel.
+NEXT   : Nobody is out yet. The first elimination: write the recap (see epitaph memory).
+BLOCKED: none. Merging stays with the commissioner.
