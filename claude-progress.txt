@@ -627,3 +627,42 @@ VERIFIED: validate 278 · e2e 101 passed · init.sh 200 · sweep clean. New unit
          the stone has its noise filters and the inscription sits on the panel.
 NEXT   : Nobody is out yet. The first elimination: write the recap (see epitaph memory).
 BLOCKED: none. Merging stays with the commissioner.
+
+--- 2026-10-04  Claude Fable 5.1 (feat/funeral-encore, stacked on feat/funeral-polish / PR #31) ---
+DONE   : The commissioner said yes to all ten encore ideas. The funeral is now a ~27s film:
+         letterbox bars + page push-in (.card:has(.funeral.is-playing), unlayered CSS); rain
+         (he likes the rain) + lightning on the strike; captions timed inline from the script
+         (--at/--dur) each with a dark pool behind the words; "A Bears fan. Slain by the Bears."
+         from src/lib/fans.ts (Joey → CHI) when the killer is their own team; "X, Y and Z took
+         the same hit." / "Nobody else took that hit."; "Survived by N league members who made
+         better decisions."; the morning paper (The Sunday Survivor: "NATE ADAMS TRUSTS 49ERS AT
+         HOME, DIES" + score) spinning in off the strike; mourners (same-hit losers closest in
+         grey and bowed, survivors in colour; positions computed in JS so a crowd packs inside
+         the card); the murder weapon (killer's monogram, tag "Killed by ARI 30–27") dropped at
+         the foot of the stone; credits (name, weeks, teams up to the fatal week, last sentence
+         of their epitaph or "Rest in peace, X."); a crow (redrawn after "looks like a flea")
+         that flies in as the lights come up and perches on every later visit; shatter geometry
+         seeded per player (FNV-1a); synthesised sound (bell, thunder, organ, wind, thud; opt-in
+         toggle in the Fresh graves heading, localStorage survivor:funeral:sound).
+         Epitaphs moved to src/lib/epitaphs.ts so the credits can quote them (test path, AGENTS
+         row updated). Pacing doubled twice at the commissioner's request (captions 3.2–4.6s).
+VERIFIED: validate 285 · e2e 101 · sweep clean · filmed at caption midpoints, crow and mourners
+         zoomed. Unit tests cover captions (with and without the league in context), paper,
+         weapon, credits, per-player cracks, house portal (bars, lightning), rain, crow
+         (landing → perched), mourners (close vs far), sound toggle untested (audio).
+         Then: "give an epitaph instead of saying the commissioner is still…" — autoEpitaph() in
+         src/lib/copy.ts writes one from the record (lives, wins, each lost week with score and
+         opponent, the fatal game, a closing note the record supports, "Rest in peace, X. N teams
+         go unused."); the profile shows it until a hand-written recap exists in src/lib/epitaphs.ts.
+         Weapon tag reworded to "Finally done in by ARI 30–27" at his request.
+NEXT   : Merge #31 then #32. The hand-written recap still replaces the automatic one when written.
+BLOCKED: none. Merging stays with the commissioner.
+         Commissioner review of the encore: "get rid of the other survivor images and the text
+         things — that's just a lot of noise" and the crow "looks like a flea … make the god damn
+         bird look like a bird" (he sent a reference photo). CUT: mourners, all captions, credits,
+         src/lib/fans.ts. KEPT: rain (he likes it), lightning, letterbox + push-in, paper, weapon
+         ("Killed by ARI 30–27"), ghost, per-player cracks, sound, crow. Scene is ~19s again
+         (FUNERAL_MS 21000). Crow redrawn four times, rendered large against his photo each pass:
+         long sleek body, flat crown, heavy bill, folded wing over a long squared tail, sturdy
+         legs set back. He said "that is a crow" of the reference; the trace is from it.
+VERIFIED: validate 283 · e2e 101 · sweep clean · filmed; crow zoomed on the stone.

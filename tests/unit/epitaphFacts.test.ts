@@ -13,7 +13,7 @@ import { eliminatedWeekOf, pinnedThrough, season } from './seasonFacts'
  * tsconfig.node.json, which does not include src.
  */
 const source = readFileSync(
-  new URL('../../src/features/profile/epitaphs.ts', import.meta.url),
+  new URL('../../src/lib/epitaphs.ts', import.meta.url),
   'utf8',
 )
 const block = source.slice(source.indexOf('export const EPITAPHS'))

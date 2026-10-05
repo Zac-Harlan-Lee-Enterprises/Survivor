@@ -1,30 +1,37 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from 'react'
 import { createPortal } from 'react-dom'
 import { getTeam, type PlayerStanding } from '@/domain'
 import { Headshot } from './Headshot'
+import { TeamMonogram } from './TeamMonogram'
+import { funeralSoundEnabled, playFuneralScore } from './funeralSound'
 
 /**
  * The funeral: a short film played over a fresh grave.
  *
- *   lights dim, a beam falls, ash drifts      0.0s
- *   captions: "Week 3." "The 49ers lost."     0.4s
- *   colour drains, the heart slows            0.2–2.4s
- *   cracks spread from one point              2.2–3.2s
- *   "Strike three." — flash, the face shatters 3.3s
- *   dust; earth heaps; the stone grinds up    4.4–6.9s
- *   the epitaph is chiselled, line by line    6.9–8.6s
- *   a glint crosses the stone                 8.9s
- *   the ghost rises out of the grave          7.6–10.8s
- *   "Rest in peace, Nate." Lights up.         9.4–11.6s
+ *   house lights down, letterbox in, a beam falls, ash and rain  0.0s
+ *   colour drains over a slowing heartbeat                       0.3–4.8s
+ *   cracks spread from the point of impact                       4.4–5.5s
+ *   lightning; the face shatters                                 5.4s
+ *   the morning paper lands                                      5.9–9.9s
+ *   dust; the earth heaps; the stone grinds up                   8–11s
+ *   the epitaph is chiselled, line by line                       11.2–13.9s
+ *   the ghost rises                                              12–17.5s
+ *   a glint crosses the stone; "Finally done in by ARI 30–27" lands       14.4s, 15s
+ *   lights up, letterbox out; the crow flies in and stays        17.8s, 18.6s
  *
- * All motion is CSS (index.css, `.funeral.is-playing …`), driven by one class
+ * All motion is CSS (index.css, `.funeral.is-playing …`) driven by one class
  * toggle, so the browser composites it and nothing re-renders mid-scene. The
  * whole scene is aria-hidden: the stone it reveals carries the meaning.
  */
-export const FUNERAL_MS = 11_800
-
-/** Where the blow lands — every crack starts here. Percent of the frame. */
-const IMPACT = { x: 46, y: 40 }
+export const FUNERAL_MS = 21_000
 
 /** Where the radial cracks meet the edge of the frame, clockwise from the top. */
 const RIM: Array<{ x: number; y: number; corner?: { x: number; y: number } }> = [
@@ -38,61 +45,76 @@ const RIM: Array<{ x: number; y: number; corner?: { x: number; y: number } }> = 
   { x: 0, y: 22, corner: { x: 0, y: 0 } },
 ]
 
-/** Where the ring crack crosses each radial one: a little uneven, like glass. */
-const RING = RIM.map((p, i) => {
-  const t = i % 2 === 0 ? 0.42 : 0.52
-  return { x: IMPACT.x + (p.x - IMPACT.x) * t, y: IMPACT.y + (p.y - IMPACT.y) * t }
-})
-
 const pt = (p: { x: number; y: number }) => `${p.x.toFixed(1)}% ${p.y.toFixed(1)}%`
 
-interface Shard {
-  clip: string
-  style: CSSProperties
-}
-
-/** Sixteen shards: an inner and an outer piece between each pair of radial cracks. */
-const SHARDS: Shard[] = RIM.flatMap((rim, i) => {
-  const next = RIM[(i + 1) % RIM.length]!
-  const ringA = RING[i]!
-  const ringB = RING[(i + 1) % RING.length]!
-  const inner = [IMPACT, ringA, ringB]
-  const outer = [ringA, rim, ...(rim.corner ? [rim.corner] : []), next, ringB]
-  // Each piece leaves along its own direction from the impact, then gravity takes it.
-  const mid = { x: (rim.x + next.x) / 2 - IMPACT.x, y: (rim.y + next.y) / 2 - IMPACT.y }
-  const len = Math.hypot(mid.x, mid.y) || 1
-  const dir = { x: mid.x / len, y: mid.y / len }
-  const piece = (poly: typeof inner, reach: number, k: number): Shard => ({
-    clip: `polygon(${poly.map(pt).join(', ')})`,
-    style: {
-      '--dx': `${(dir.x * reach).toFixed(0)}%`,
-      '--dy': `${(70 + dir.y * reach * 0.6).toFixed(0)}%`,
-      '--rot': `${(i % 2 ? 1 : -1) * (24 + ((i * 37 + k * 19) % 50))}deg`,
-      '--d': `${(((i * 7 + k * 3) % 6) * 0.06).toFixed(2)}s`,
-    } as CSSProperties,
-  })
-  return [piece(inner, 18, 0), piece(outer, 46, 1)]
-})
-
-/** Radial cracks first, out from the impact; then the ring that frees the pieces. */
-const CRACKS: Array<{ d: string; delay: number }> = [
-  ...RIM.map((p, i) => ({
-    d: `M${IMPACT.x} ${IMPACT.y} L${p.x} ${p.y}`,
-    delay: (i % 4) * 0.09,
-  })),
-  {
-    d: `M${RING.map((p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L')} Z`,
-    delay: 0.45,
-  },
-]
-
-/** A tiny seeded generator, so particles scatter the same way every time. */
+/** A tiny seeded generator, so a scene plays the same way every time. */
 function scatter(seed: number) {
   let s = seed
   return () => {
     s = (s * 1664525 + 1013904223) % 4294967296
     return s / 4294967296
   }
+}
+
+/** FNV-1a, so each player's break is their own and never changes. */
+function hash(s: string): number {
+  let h = 2166136261
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return h >>> 0
+}
+
+interface Shard {
+  clip: string
+  style: CSSProperties
+}
+
+/**
+ * How this particular face breaks: where the blow lands, where the ring crack
+ * runs, and the sixteen pieces between. Seeded by player, so Nate's shatter
+ * never looks like Joey's.
+ */
+function geometry(seed: string) {
+  const r = scatter(hash(seed))
+  const impact = { x: 36 + r() * 28, y: 30 + r() * 22 }
+  const ring = RIM.map((p) => {
+    const t = 0.36 + r() * 0.2
+    return { x: impact.x + (p.x - impact.x) * t, y: impact.y + (p.y - impact.y) * t }
+  })
+  const shards: Shard[] = RIM.flatMap((rim, i) => {
+    const next = RIM[(i + 1) % RIM.length]!
+    const ringA = ring[i]!
+    const ringB = ring[(i + 1) % ring.length]!
+    const inner = [impact, ringA, ringB]
+    const outer = [ringA, rim, ...(rim.corner ? [rim.corner] : []), next, ringB]
+    // Each piece leaves along its own direction from the impact, then gravity takes it.
+    const mid = { x: (rim.x + next.x) / 2 - impact.x, y: (rim.y + next.y) / 2 - impact.y }
+    const len = Math.hypot(mid.x, mid.y) || 1
+    const dir = { x: mid.x / len, y: mid.y / len }
+    const piece = (poly: typeof inner, reach: number): Shard => ({
+      clip: `polygon(${poly.map(pt).join(', ')})`,
+      style: {
+        '--dx': `${(dir.x * reach).toFixed(0)}%`,
+        '--dy': `${(70 + dir.y * reach * 0.6).toFixed(0)}%`,
+        '--rot': `${(i % 2 ? 1 : -1) * (24 + Math.round(r() * 50))}deg`,
+        '--d': `${(r() * 0.3).toFixed(2)}s`,
+      } as CSSProperties,
+    })
+    return [piece(inner, 18), piece(outer, 46)]
+  })
+  const cracks: Array<{ d: string; delay: number }> = [
+    ...RIM.map((p, i) => ({
+      d: `M${impact.x.toFixed(1)} ${impact.y.toFixed(1)} L${p.x} ${p.y}`,
+      delay: (i % 4) * 0.09,
+    })),
+    {
+      d: `M${ring.map((p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L')} Z`,
+      delay: 0.45,
+    },
+  ]
+  return { shards, cracks }
 }
 
 function particles(
@@ -114,6 +136,19 @@ const ASH = particles(
       '--drift': `${((r() - 0.5) * 40).toFixed(0)}%`,
       '--d': `${(r() * 5).toFixed(2)}s`,
       '--s': `${(2 + r() * 3).toFixed(1)}px`,
+    }) as CSSProperties,
+)
+
+const RAIN = particles(
+  38,
+  3,
+  (r) =>
+    ({
+      left: `${(-10 + r() * 120).toFixed(0)}%`,
+      '--d': `${(r() * 0.9).toFixed(2)}s`,
+      '--dur': `${(0.55 + r() * 0.3).toFixed(2)}s`,
+      '--len': `${(10 + r() * 14).toFixed(0)}px`,
+      '--o': `${(0.25 + r() * 0.45).toFixed(2)}`,
     }) as CSSProperties,
 )
 
@@ -140,21 +175,50 @@ const DIRT = particles(14, 23, (r, i) => {
   } as CSSProperties
 })
 
-const ORDINAL = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+/**
+ * What the scene needs from the player's record: the weapon that finished
+ * them and the morning paper's headline.
+ */
+function useScript(name: string, standing: PlayerStanding) {
+  return useMemo(() => {
+    const fatal = standing.history.find((h) => h.eliminatedHere)
+    if (!fatal) return { weapon: null, paper: null }
+    const team = fatal.pick ? getTeam(fatal.pick.teamId) : null
+    const game = fatal.game
+    const winner = game?.winnerTeamId ? getTeam(game.winnerTeamId) : null
+    const home = !!(fatal.pick && game && game.homeTeamId === fatal.pick.teamId)
+    const score = (() => {
+      if (!game || !fatal.pick || game.homeScore === undefined || game.awayScore === undefined) {
+        return null
+      }
+      const mine = fatal.pick.teamId === game.homeTeamId ? game.homeScore : game.awayScore
+      const theirs = fatal.pick.teamId === game.homeTeamId ? game.awayScore : game.homeScore
+      return { mine, theirs }
+    })()
 
-/** The film's captions, told from the player's own record. */
-function captions(name: string, standing: PlayerStanding): string[] {
-  const fatal = standing.history.find((h) => h.eliminatedHere)
-  if (!fatal) return []
-  const team = fatal.pick ? getTeam(fatal.pick.teamId) : null
-  const blow = !fatal.pick
-    ? 'No pick came in.'
-    : `The ${team?.name ?? fatal.pick.teamId} ${fatal.outcome === 'tie' ? 'tied' : 'lost'}.`
-  const strike =
-    standing.livesTotal === 1
-      ? 'One strike.'
-      : `Strike ${ORDINAL[standing.livesTotal] ?? standing.livesTotal}.`
-  return [`Week ${fatal.week}.`, blow, strike, `Rest in peace, ${name.split(' ')[0]}.`]
+    const weapon =
+      winner && score && fatal.outcome === 'loss'
+        ? {
+            teamId: winner.id,
+            score: `Finally done in by ${winner.abbreviation} ${score.theirs}–${score.mine}`,
+          }
+        : null
+
+    const headline = !fatal.pick
+      ? `${name} forgets to pick, dies`
+      : fatal.outcome === 'tie'
+        ? `${name} ties, still dies`
+        : `${name} trusts ${team?.name ?? fatal.pick.teamId} ${home ? 'at home' : 'on the road'}, dies`
+    const paper = {
+      headline,
+      sub:
+        score && team && winner
+          ? `${winner.name} ${score.theirs}, ${team.name} ${score.mine}`
+          : `Week ${fatal.week}`,
+      week: fatal.week,
+    }
+    return { weapon, paper }
+  }, [name, standing])
 }
 
 export interface FuneralProps {
@@ -170,7 +234,15 @@ export interface FuneralProps {
 export function Funeral({ name, playerId, standing, size, playing, children }: FuneralProps) {
   const face = <Headshot name={name} playerId={playerId} size={size} status="eliminated" />
   const anchor = useRef<HTMLDivElement>(null)
-  const lines = captions(name, standing)
+  const { shards, cracks } = useMemo(() => geometry(playerId), [playerId])
+  const { weapon, paper } = useScript(name, standing)
+
+  // The score, if the viewer asked for it; it stops with the scene.
+  useEffect(() => {
+    if (!playing || !funeralSoundEnabled()) return
+    return playFuneralScore()
+  }, [playing])
+
   return (
     <div ref={anchor} className={playing ? 'funeral is-playing' : 'funeral'}>
       <HouseLights playing={playing} anchor={anchor} />
@@ -188,13 +260,19 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
             <span key={i} style={style} />
           ))}
         </div>
+        {weapon && (
+          <div aria-hidden="true" className="funeral-weapon" title={weapon.score}>
+            <TeamMonogram teamId={weapon.teamId} size="sm" />
+            <span className="funeral-score">{weapon.score}</span>
+          </div>
+        )}
         <div aria-hidden="true" className="funeral-face">
           <div className="funeral-pulse">
             {/* One whole face until the blow lands; the shards only exist from then on,
                 so their seams never show on an intact photo. */}
             <div className="funeral-whole">{face}</div>
             <div className="funeral-shards">
-              {SHARDS.map((s, i) => (
+              {shards.map((s, i) => (
                 <div key={i} className="funeral-shard" style={{ ...s.style, clipPath: s.clip }}>
                   {face}
                 </div>
@@ -207,7 +285,7 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
                 </clipPath>
               </defs>
               <g clipPath={`url(#funeral-round-${playerId})`}>
-                {CRACKS.map((c, i) => (
+                {cracks.map((c, i) => (
                   <g key={i} style={{ '--d': `${c.delay}s` } as CSSProperties}>
                     <path className="funeral-crack-shadow" d={c.d} pathLength={1} />
                     <path className="funeral-crack" d={c.d} pathLength={1} />
@@ -242,28 +320,41 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
           </div>
         </div>
       </div>
-      <div aria-hidden="true" className="funeral-captions">
-        {lines.map((line, i) => (
-          <p key={line} className={`funeral-caption funeral-caption-${i}`}>
-            {line}
-          </p>
+      <div aria-hidden="true" className="funeral-rain">
+        {RAIN.map((style, i) => (
+          <span key={i} style={style} />
         ))}
       </div>
+      {paper && (
+        <div aria-hidden="true" className="funeral-paper">
+          <div className="funeral-paper-sheet">
+            <p className="funeral-paper-mast">The Sunday Survivor</p>
+            <p className="funeral-paper-meta">Week {paper.week} · Price: one life</p>
+            <p className="funeral-paper-head">{paper.headline}</p>
+            <p className="funeral-paper-sub">{paper.sub}</p>
+            <div className="funeral-paper-cols">
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 /**
- * The house lights. A page-wide dim with a soft hole over the grave, rendered
- * through a portal so no card edge can frame it; it follows the stone if the
- * viewer scrolls. Reduced-motion viewers never reach the funeral at all.
+ * The house: a page-wide dim with a soft hole over the grave, the letterbox
+ * bars, and the lightning — all rendered through a portal on the body so no
+ * card edge can frame them. The hole follows the stone if the viewer scrolls.
  */
 function HouseLights({
   playing,
   anchor,
 }: {
   playing: boolean
-  anchor: React.RefObject<HTMLDivElement | null>
+  anchor: RefObject<HTMLDivElement | null>
 }) {
   const [spot, setSpot] = useState<{ x: number; y: number; r: number } | null>(null)
   useEffect(() => {
@@ -290,11 +381,17 @@ function HouseLights({
   }, [playing, anchor])
   if (!playing || !spot) return null
   return createPortal(
-    <div
-      aria-hidden="true"
-      className="funeral-house-lights"
-      style={{ '--x': `${spot.x}px`, '--y': `${spot.y}px`, '--r': `${spot.r}px` } as CSSProperties}
-    />,
+    <div aria-hidden="true" className="funeral-house">
+      <div
+        className="funeral-house-lights"
+        style={
+          { '--x': `${spot.x}px`, '--y': `${spot.y}px`, '--r': `${spot.r}px` } as CSSProperties
+        }
+      />
+      <div className="funeral-bar funeral-bar-top" />
+      <div className="funeral-bar funeral-bar-bottom" />
+      <div className="funeral-lightning" />
+    </div>,
     document.body,
   )
 }

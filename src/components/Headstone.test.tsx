@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, render, screen, within } from '@testing-library/react'
+import { act, cleanup, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ReactNode } from 'react'
@@ -100,18 +100,12 @@ describe('Headstone', () => {
     expect(screen.getByRole('img')).toHaveClass('funeral-stone')
   })
 
-  it('tells the death in captions from the player’s own record', () => {
-    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
-    const lines = [...document.querySelectorAll('.funeral-caption')].map((p) => p.textContent)
-    expect(lines).toEqual(['Week 3.', 'The Seahawks lost.', 'Strike three.', 'Rest in peace, Ann.'])
-    expect(document.querySelector('.funeral-captions')).toHaveAttribute('aria-hidden', 'true')
-  })
-
   it('dims the house through a portal on the body, never a box on the card', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
-    const lights = document.body.querySelector(':scope > .funeral-house-lights')
-    expect(lights).not.toBeNull()
-    expect(lights).toHaveAttribute('aria-hidden', 'true')
+    const house = document.body.querySelector(':scope > .funeral-house')
+    expect(house).not.toBeNull()
+    expect(house).toHaveAttribute('aria-hidden', 'true')
+    expect(house!.querySelector('.funeral-house-lights')).not.toBeNull()
     expect(document.querySelector('.funeral .funeral-house-lights')).toBeNull()
   })
 
@@ -134,6 +128,58 @@ describe('Headstone', () => {
     expect(svg).toHaveAttribute('aria-hidden', 'true')
     expect(svg.querySelectorAll('feTurbulence').length).toBeGreaterThanOrEqual(2)
     expect(within(stone).getByText('Ann Example').closest('.headstone-face')).not.toBeNull()
+  })
+
+  it('prints the morning paper from the record', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    expect(document.querySelector('.funeral-paper-head')).toHaveTextContent(
+      'Ann Example trusts Seahawks on the road, dies',
+    )
+    expect(document.querySelector('.funeral-paper-sub')).toHaveTextContent(
+      'Commanders 27, Seahawks 17',
+    )
+  })
+
+  it('drops the murder weapon with the final score', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    expect(document.querySelector('.funeral-score')).toHaveTextContent('Finally done in by WAS 27–17')
+  })
+
+  it('breaks every face its own way', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    const ann = [...document.querySelectorAll('.funeral-crack')].map((p) => p.getAttribute('d'))
+    cleanup()
+    wrap(<Headstone name="Bob Example" playerId="bob" standing={standings().ann} funeral />)
+    const bob = [...document.querySelectorAll('.funeral-crack')].map((p) => p.getAttribute('d'))
+    expect(ann).toHaveLength(9)
+    expect(bob).not.toEqual(ann)
+  })
+
+  it('brings rain, letterbox bars and lightning through the portal', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+    expect(document.querySelectorAll('.funeral-rain span').length).toBeGreaterThan(20)
+    const house = document.body.querySelector(':scope > .funeral-house')!
+    expect(house.querySelectorAll('.funeral-bar')).toHaveLength(2)
+    expect(house.querySelector('.funeral-lightning')).not.toBeNull()
+  })
+
+  it('sends the crow in during the scene, and leaves it perched after', () => {
+    vi.useFakeTimers()
+    try {
+      wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
+      expect(document.querySelector('.funeral-crow')).toHaveClass('is-landing')
+      act(() => vi.advanceTimersByTime(FUNERAL_MS))
+      const crow = document.querySelector('.funeral-crow')
+      expect(crow).not.toBeNull()
+      expect(crow).not.toHaveClass('is-landing')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('has no crow on an old grave', () => {
+    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} />)
+    expect(document.querySelector('.funeral-crow')).toBeNull()
   })
 
   it('shatters into sixteen pieces, and leaves a ghost', () => {

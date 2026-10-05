@@ -168,7 +168,7 @@ All frontend variables are **public** (compiled into the bundle). Values in `.en
 | Regenerate season / default avatar | `npm run fixtures:generate` · `npm run headshots:generate` |
 | Refresh the real NFL schedule | `npm run schedule:fetch` |
 | Import real player photos from `photos/` | `npm run headshots:import` |
-| Someone was eliminated: carve their epitaph | Write a one-paragraph recap of their own season (factual, funny, a bit edgy) as their entry in `src/features/profile/epitaphs.ts`, in the same PR as that week's review, pin that week's finals in `tests/unit/seasonFacts.ts`, and assert each claim in `tests/unit/epitaphFacts.test.ts` |
+| Someone was eliminated: carve their epitaph | Write a one-paragraph recap of their own season (factual, funny, a bit edgy) as their entry in `src/lib/epitaphs.ts`, in the same PR as that week's review, pin that week's finals in `tests/unit/seasonFacts.ts`, and assert each claim in `tests/unit/epitaphFacts.test.ts` |
 | Spreadsheet import report | `npm run import:report -- data/import/sample-league.csv --out report.md` |
 | Bundle Lambda handlers | `npm run api:build` |
 | Dead code | `npm run knip` |

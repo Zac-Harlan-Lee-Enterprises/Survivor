@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { evaluateSeason, findStanding } from '@/domain'
 import { kickoffFor, scenario } from '@/domain/testing/scenario'
-import { causeOfDeath } from './copy'
+import { autoEpitaph, causeOfDeath } from './copy'
 
 const AFTER = kickoffFor(4, 48)
 const standing = (snap: ReturnType<ReturnType<typeof scenario>['build']>, id: string) => {
@@ -89,5 +89,74 @@ describe('causeOfDeath', () => {
       .pick('ann', 1, 'LAC')
       .build()
     expect(causeOfDeath(standing(snap, 'ann'))).toBe('Died of the Chargers, week 1.')
+  })
+})
+
+describe('autoEpitaph', () => {
+  it('is nothing for the living', () => {
+    const snap = scenario()
+      .players('ann')
+      .game(1, 'GB', 'CHI', { final: 'GB' })
+      .pick('ann', 1, 'GB')
+      .build()
+    expect(autoEpitaph('Ann Example', standing(snap, 'ann'))).toBeNull()
+  })
+
+  it('tells the season from the record, week by week, and signs off', () => {
+    const snap = scenario()
+      .players('ann')
+      .game(1, 'LAC', 'ARI', { final: 'ARI', score: [14, 26] })
+      .game(2, 'KC', 'MIA', { final: 'KC', score: [24, 10] })
+      .game(3, 'TB', 'CLE', { final: 'CLE', score: [19, 23] })
+      .game(4, 'WAS', 'SEA', { final: 'WAS', score: [33, 31] })
+      .pick('ann', 1, 'LAC')
+      .pick('ann', 2, 'KC')
+      .pick('ann', 3, 'TB')
+      .pick('ann', 4, 'SEA')
+      .build()
+    const text = autoEpitaph('Ann Example', standing(snap, 'ann'))!
+    expect(text).toContain(
+      'Ann Example came into the season with three lives and left it in week 4.',
+    )
+    expect(text).toContain('The win — the Chiefs in week 2 — was the easy part.')
+    expect(text).toContain('Week 1: the Chargers at home, beaten by Cardinals, 14–26.')
+    expect(text).toContain('Week 3: the Buccaneers at home, beaten by Browns, 19–23.')
+    expect(text).toContain(
+      'Then, on the last life, the Seahawks on the road, beaten by Commanders, 31–33.',
+    )
+    expect(text).toMatch(/Rest in peace, Ann\. Twenty-eight teams go unused\.$/)
+    expect(text).not.toMatch(/\n/)
+  })
+
+  it('notices when the same team comes back to finish the job', () => {
+    const snap = scenario()
+      .players('ann')
+      .game(1, 'LAC', 'ARI', { final: 'ARI' })
+      .game(2, 'TB', 'CLE', { final: 'CLE' })
+      .game(3, 'SF', 'ARI', { final: 'ARI' })
+      .pick('ann', 1, 'LAC')
+      .pick('ann', 2, 'TB')
+      .pick('ann', 3, 'SF')
+      .build()
+    expect(autoEpitaph('Ann Example', standing(snap, 'ann'))).toContain(
+      'Cardinals had already taken a life in week 1; they came back to finish the job.',
+    )
+  })
+
+  it('counts a missing pick as the one way to lose without watching', () => {
+    const snap = scenario()
+      .players('ann')
+      .game(1, 'LAC', 'ARI', { final: 'ARI' })
+      .game(2, 'TB', 'CLE', { final: 'CLE' })
+      .game(3, 'WAS', 'SEA', { final: 'WAS' })
+      .pick('ann', 1, 'LAC')
+      .pick('ann', 3, 'SEA')
+      .build()
+    const text = autoEpitaph('Ann Example', standing(snap, 'ann'))!
+    expect(text).toContain('Week 2: no pick arrived, which the rules price the same as a loss.')
+    expect(text).toContain(
+      'One of the lives went to a missing pick, which is the one way to lose without watching.',
+    )
+    expect(text).toContain('There were no wins. Not one. Consistency is a virtue.')
   })
 })

@@ -105,7 +105,9 @@ test.describe('the graveyard', () => {
     await expect(page.getByRole('img', { name: /^Headstone of Nate Adams/ })).toBeVisible()
     const epitaph = page.locator('section[aria-labelledby="epitaph-title"]')
     await expect(epitaph.getByRole('heading', { name: /^Epitaph/ })).toBeVisible()
-    await expect(epitaph).toContainText(/still choosing his words/i)
+    // Written from his record until the commissioner writes his own.
+    await expect(epitaph).toContainText(/left it in week 3/)
+    await expect(epitaph).toContainText(/Rest in peace, Nate/)
   })
 
   test('the living keep their faces and have no epitaph', async ({ page }) => {
