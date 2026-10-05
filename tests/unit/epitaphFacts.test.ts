@@ -1,6 +1,14 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { eliminatedWeekOf, pinnedThrough, season } from './seasonFacts'
+import {
+  FINALS,
+  eliminatedWeekOf,
+  gamesById,
+  pickOf,
+  picksIn,
+  pinnedThrough,
+  season,
+} from './seasonFacts'
 
 /**
  * Epitaphs are carved for real people, about real picks. Two ways that goes
@@ -12,10 +20,7 @@ import { eliminatedWeekOf, pinnedThrough, season } from './seasonFacts'
  * Read from disk rather than imported: tests/unit is compiled by
  * tsconfig.node.json, which does not include src.
  */
-const source = readFileSync(
-  new URL('../../src/lib/epitaphs.ts', import.meta.url),
-  'utf8',
-)
+const source = readFileSync(new URL('../../src/lib/epitaphs.ts', import.meta.url), 'utf8')
 const block = source.slice(source.indexOf('export const EPITAPHS'))
 
 /** Each carved entry: who it is for, and the week it says put them there. */
@@ -49,5 +54,64 @@ describe('epitaphs bury only the dead', () => {
         `${playerId}'s epitaph says week ${week}; pin that week's finals in seasonFacts first`,
       ).toBe(week)
     }
+  })
+})
+
+describe('Don Turner’s epitaph', () => {
+  const pick = (week: number) => pickOf('Don Turner', week)!
+  const scoreFor = (week: number) => {
+    const p = pick(week)
+    const g = gamesById.get(p.gameId)!
+    const [away, home] = FINALS[p.gameId]!
+    const mine = p.teamId === g.homeTeamId ? home : away
+    const theirs = p.teamId === g.homeTeamId ? away : home
+    return {
+      mine,
+      theirs,
+      home: p.teamId === g.homeTeamId,
+      opponent: p.teamId === g.homeTeamId ? g.awayTeamId : g.homeTeamId,
+    }
+  }
+
+  it('“Pittsburgh at home in week 1, a tidy 20–13 over Atlanta”', () => {
+    expect(pick(1).teamId).toBe('PIT')
+    expect(scoreFor(1)).toMatchObject({ mine: 20, theirs: 13, home: true, opponent: 'ATL' })
+  })
+
+  it('“Week 2, Baltimore at home … Week 3, the … Seahawks in Washington’s home opener, beaten 33–31”', () => {
+    expect(pick(2).teamId).toBe('BAL')
+    expect(scoreFor(2)).toMatchObject({ home: true, mine: 17, theirs: 24 })
+    expect(pick(3).teamId).toBe('SEA')
+    expect(scoreFor(3)).toMatchObject({ home: false, opponent: 'WAS', mine: 31, theirs: 33 })
+    expect(season.games.filter((g) => g.week < 3 && g.homeTeamId === 'WAS')).toHaveLength(0)
+  })
+
+  it('“week 4, on his last life, Detroit on Sunday night in Carolina … won 32–26”', () => {
+    expect(pick(4).teamId).toBe('DET')
+    expect(scoreFor(4)).toMatchObject({ home: false, opponent: 'CAR', mine: 26, theirs: 32 })
+    const kickoff = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago',
+      weekday: 'long',
+      hour: 'numeric',
+    })
+    expect(kickoff.format(new Date(gamesById.get(pick(4).gameId)!.kickoffAt))).toBe('Sunday 7 PM')
+    expect(eliminatedWeekOf('don-turner', pinnedThrough)).toBe(4)
+  })
+
+  it('“Three losses by seven, two and six points”', () => {
+    expect([2, 3, 4].map((w) => scoreFor(w).theirs - scoreFor(w).mine)).toEqual([7, 2, 6])
+  })
+
+  it('“the same team as Corey in weeks 1 and 3 and the same team as Dave and Maya in week 2”', () => {
+    expect(pickOf('Corey Cowell', 1)?.teamId).toBe('PIT')
+    expect(pickOf('Corey Cowell', 3)?.teamId).toBe('SEA')
+    expect(pickOf('Dave Johnson', 2)?.teamId).toBe('BAL')
+    expect(pickOf('Maya Israel', 2)?.teamId).toBe('BAL')
+  })
+
+  it('“Twenty-eight teams go unused”', () => {
+    const used = new Set([1, 2, 3, 4].map((w) => pick(w).teamId))
+    expect(32 - used.size).toBe(28)
+    expect(picksIn(5).filter((p) => p.playerId === 'don-turner')).toHaveLength(0)
   })
 })
