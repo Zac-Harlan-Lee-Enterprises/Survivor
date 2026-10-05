@@ -147,12 +147,12 @@ export function playFuneralScore(): () => void {
   const t = ctx.currentTime
   try {
     bell(ctx, master, t + 0.5)
-    bell(ctx, master, t + 3.8, 174.6)
-    thunder(ctx, master, t + 7.32)
-    organ(ctx, master, t + 7.2, 6)
-    wind(ctx, master, t + 15.2, 6)
-    thud(ctx, master, t + 19.1)
-    bell(ctx, master, t + 25.2, 146.8)
+    bell(ctx, master, t + 3, 174.6)
+    thunder(ctx, master, t + 5.42)
+    organ(ctx, master, t + 5.3, 5)
+    wind(ctx, master, t + 12, 5.5)
+    thud(ctx, master, t + 15.3)
+    bell(ctx, master, t + 18.4, 146.8)
   } catch {
     /* a browser that refuses: the scene plays mute */
   }

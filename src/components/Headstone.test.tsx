@@ -100,17 +100,6 @@ describe('Headstone', () => {
     expect(screen.getByRole('img')).toHaveClass('funeral-stone')
   })
 
-  it('tells the death in captions from the player’s own record', () => {
-    wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
-    const lines = [...document.querySelectorAll('.funeral-caption')].map((p) => p.textContent)
-    // No league in context here, so only the player's own record speaks.
-    expect(lines).toEqual(['Week 3.', 'The Seahawks lost.', 'Strike three.'])
-    expect(document.querySelector('.funeral-captions')).toHaveAttribute('aria-hidden', 'true')
-    expect(document.querySelector('.funeral-credits-quote')).toHaveTextContent(
-      'Rest in peace, Ann.',
-    )
-  })
-
   it('dims the house through a portal on the body, never a box on the card', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
     const house = document.body.querySelector(':scope > .funeral-house')
@@ -151,13 +140,9 @@ describe('Headstone', () => {
     )
   })
 
-  it('drops the murder weapon with the final score, and rolls the credits', () => {
+  it('drops the murder weapon with the final score', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
     expect(document.querySelector('.funeral-score')).toHaveTextContent('Killed by WAS 27–17')
-    expect(document.querySelector('.funeral-credits-teams')).toHaveTextContent(
-      'Chargers · Buccaneers · Seahawks',
-    )
-    expect(document.querySelector('.funeral-credits-span')).toHaveTextContent('Weeks 1–3')
   })
 
   it('breaks every face its own way', () => {
@@ -278,74 +263,6 @@ describe('Headstone funeral timing', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} />)
     expect(document.querySelector('[data-funeral]')).toBeNull()
     expect(screen.getByRole('img')).not.toHaveClass('funeral-stone')
-  })
-})
-
-describe('Funeral, with the league in the room', () => {
-  function wrapWithLeague(children: ReactNode) {
-    const snap = scenario()
-      .players('ann', 'bob', 'cal', 'dee')
-      .game(1, 'LAC', 'ARI', { final: 'ARI' })
-      .game(2, 'TB', 'CLE', { final: 'CLE' })
-      .game(3, 'WAS', 'SEA', { final: 'WAS' })
-      .pick('ann', 1, 'LAC')
-      .pick('ann', 2, 'TB')
-      .pick('ann', 3, 'SEA')
-      // Bob lost a life on Seattle the same week; Cal and Dee were elsewhere.
-      .pick('bob', 1, 'ARI')
-      .pick('bob', 2, 'CLE')
-      .pick('bob', 3, 'SEA')
-      .pick('cal', 1, 'ARI')
-      .pick('cal', 2, 'CLE')
-      .pick('cal', 3, 'WAS')
-      .pick('dee', 1, 'ARI')
-      .pick('dee', 2, 'CLE')
-      .pick('dee', 3, 'WAS')
-      .build()
-    const evaluation = evaluateSeason(snap, { now: kickoffFor(4, 48) })
-    const services = {
-      images: {
-        defaultAvatarUrl: () => '/Survivor/headshots/default.svg',
-        variantUrl: () => '/Survivor/headshots/default.svg',
-      },
-    } as unknown as Services
-    const names: Record<string, string> = {
-      ann: 'Ann Example',
-      bob: 'Bob Example',
-      cal: 'Cal Example',
-      dee: 'Dee Example',
-    }
-    const league = {
-      evaluation,
-      imageOf: () => null,
-      profileOf: (id: string) => ({ playerId: id, displayName: names[id] ?? id, imageId: null }),
-    } as unknown as LeagueContextValue
-    render(
-      <MemoryRouter>
-        <ServicesContext.Provider value={services}>
-          <LeagueContext.Provider value={league}>{children}</LeagueContext.Provider>
-        </ServicesContext.Provider>
-      </MemoryRouter>,
-    )
-    return findStanding(evaluation, 'ann')!
-  }
-
-  it('names who took the same hit, counts the survivors, and seats the mourners', () => {
-    const Probe = () => null
-    const ann: PlayerStanding = wrapWithLeague(<Probe />)
-    cleanup()
-    wrapWithLeague(<Headstone name="Ann Example" playerId="ann" standing={ann} funeral />)
-    const lines = [...document.querySelectorAll('.funeral-caption')].map((p) => p.textContent)
-    expect(lines).toContain('Bob took the same hit.')
-    expect(lines).toContain('Survived by 3 league members who made better decisions.')
-    const mourners = [...document.querySelectorAll('.funeral-mourner')]
-    expect(mourners.map((m) => m.querySelector('img')?.getAttribute('alt'))).toEqual([
-      'Headshot of Bob Example',
-      'Headshot of Cal Example',
-      'Headshot of Dee Example',
-    ])
-    expect(mourners[0]).toHaveClass('is-close')
-    expect(mourners[1]).not.toHaveClass('is-close')
   })
 })
 

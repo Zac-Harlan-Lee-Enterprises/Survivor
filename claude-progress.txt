@@ -652,3 +652,12 @@ VERIFIED: validate 285 · e2e 101 · sweep clean · filmed at caption midpoints,
          (landing → perched), mourners (close vs far), sound toggle untested (audio).
 NEXT   : Merge #31 then this. Nobody is out yet; the first elimination also needs the recap.
 BLOCKED: none. Merging stays with the commissioner.
+         Commissioner review of the encore: "get rid of the other survivor images and the text
+         things — that's just a lot of noise" and the crow "looks like a flea … make the god damn
+         bird look like a bird" (he sent a reference photo). CUT: mourners, all captions, credits,
+         src/lib/fans.ts. KEPT: rain (he likes it), lightning, letterbox + push-in, paper, weapon
+         ("Killed by ARI 30–27"), ghost, per-player cracks, sound, crow. Scene is ~19s again
+         (FUNERAL_MS 21000). Crow redrawn four times, rendered large against his photo each pass:
+         long sleek body, flat crown, heavy bill, folded wing over a long squared tail, sturdy
+         legs set back. He said "that is a crow" of the reference; the trace is from it.
+VERIFIED: validate 283 · e2e 101 · sweep clean · filmed; crow zoomed on the stone.

@@ -1,5 +1,4 @@
 import {
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -9,11 +8,7 @@ import {
   type RefObject,
 } from 'react'
 import { createPortal } from 'react-dom'
-import { LeagueContext } from '@/app/hooks'
 import { getTeam, type PlayerStanding } from '@/domain'
-import { EPITAPHS } from '@/lib/epitaphs'
-import { FAN_OF } from '@/lib/fans'
-import { cn } from '@/lib/cn'
 import { Headshot } from './Headshot'
 import { TeamMonogram } from './TeamMonogram'
 import { funeralSoundEnabled, playFuneralScore } from './funeralSound'
@@ -22,29 +17,21 @@ import { funeralSoundEnabled, playFuneralScore } from './funeralSound'
  * The funeral: a short film played over a fresh grave.
  *
  *   house lights down, letterbox in, a beam falls, ash and rain  0.0s
- *   "Week 3."  "The 49ers lost."                                 0.6–7.2s
- *   colour drains over a slowing heartbeat                       0.3–6.0s
- *   cracks spread from the point of impact                       6.2–7.3s
- *   "Strike three." — lightning, the face shatters               7.1–10.5s
- *   the morning paper lands                                      7.8–12.2s
- *   "A Bears fan. Slain by the Bears."  (when it applies)        10.4–13.8s
- *   dust; the earth heaps; the mourners gather                   10.5–12.5s
- *   the stone grinds up out of the ground                        11.2–13.8s
- *   "Dave, Don and Maya took the same hit."                      12.6–16.6s
- *   the epitaph is chiselled, line by line                       14–16.7s
- *   the ghost rises                                              15.2–20.7s
- *   "Survived by 23 league members who made better decisions."   16.8–21.4s
- *   a glint crosses the stone; "Killed by ARI 30–27" lands       18.2s, 18.8s
- *   credits                                                      21.2–26.8s
- *   lights up, letterbox out; the crow flies in and stays        24.6s, 25.4s
+ *   colour drains over a slowing heartbeat                       0.3–4.8s
+ *   cracks spread from the point of impact                       4.4–5.5s
+ *   lightning; the face shatters                                 5.4s
+ *   the morning paper lands                                      5.9–9.9s
+ *   dust; the earth heaps; the stone grinds up                   8–11s
+ *   the epitaph is chiselled, line by line                       11.2–13.9s
+ *   the ghost rises                                              12–17.5s
+ *   a glint crosses the stone; "Killed by ARI 30–27" lands       14.4s, 15s
+ *   lights up, letterbox out; the crow flies in and stays        17.8s, 18.6s
  *
  * All motion is CSS (index.css, `.funeral.is-playing …`) driven by one class
  * toggle, so the browser composites it and nothing re-renders mid-scene. The
- * whole scene is aria-hidden: the stone it reveals carries the meaning. The
- * script is written from the player's own record and, where the league is in
- * context, from everyone else's.
+ * whole scene is aria-hidden: the stone it reveals carries the meaning.
  */
-export const FUNERAL_MS = 27_500
+export const FUNERAL_MS = 21_000
 
 /** Where the radial cracks meet the edge of the frame, clockwise from the top. */
 const RIM: Array<{ x: number; y: number; corner?: { x: number; y: number } }> = [
@@ -188,128 +175,26 @@ const DIRT = particles(14, 23, (r, i) => {
   } as CSSProperties
 })
 
-const ORDINAL = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
-
-const firstName = (name: string) => name.split(' ')[0]!
-
-/** "Dave, Don and Maya" */
-function list(names: string[]): string {
-  if (names.length <= 1) return names.join('')
-  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
-}
-
-interface Caption {
-  text: string
-  at: number
-  dur: number
-  hit?: boolean
-}
-
-/** Someone else at the graveside. */
-interface Mourner {
-  playerId: string
-  name: string
-  /** Lost a life on the same team the same week: stands closest, head bowed. */
-  close: boolean
-}
-
 /**
- * Everything the script needs, read once from the player's record and — when
- * the league is in context — everyone else's. In a component test with no
- * league, the scene simply has fewer lines and no mourners.
+ * What the scene needs from the player's record: the weapon that finished
+ * them and the morning paper's headline.
  */
-function useScript(name: string, playerId: string, standing: PlayerStanding) {
-  const league = useContext(LeagueContext)
+function useScript(name: string, standing: PlayerStanding) {
   return useMemo(() => {
     const fatal = standing.history.find((h) => h.eliminatedHere)
-    if (!fatal) {
-      return {
-        captions: [] as Caption[],
-        mourners: [] as Mourner[],
-        weapon: null,
-        paper: null,
-        credits: null,
-      }
-    }
-    const first = firstName(name)
+    if (!fatal) return { weapon: null, paper: null }
     const team = fatal.pick ? getTeam(fatal.pick.teamId) : null
     const game = fatal.game
-    const winnerId = game?.winnerTeamId ?? null
-    const winner = winnerId ? getTeam(winnerId) : null
+    const winner = game?.winnerTeamId ? getTeam(game.winnerTeamId) : null
     const home = !!(fatal.pick && game && game.homeTeamId === fatal.pick.teamId)
     const score = (() => {
-      if (!game || !fatal.pick || game.homeScore === undefined || game.awayScore === undefined)
+      if (!game || !fatal.pick || game.homeScore === undefined || game.awayScore === undefined) {
         return null
+      }
       const mine = fatal.pick.teamId === game.homeTeamId ? game.homeScore : game.awayScore
       const theirs = fatal.pick.teamId === game.homeTeamId ? game.awayScore : game.homeScore
       return { mine, theirs }
     })()
-
-    const captions: Caption[] = [
-      { text: `Week ${fatal.week}.`, at: 0.6, dur: 3.2 },
-      {
-        text: !fatal.pick
-          ? 'No pick came in.'
-          : `The ${team?.name ?? fatal.pick.teamId} ${fatal.outcome === 'tie' ? 'tied' : 'lost'}.`,
-        at: 3.6,
-        dur: 3.6,
-      },
-      {
-        text:
-          standing.livesTotal === 1
-            ? 'One strike.'
-            : `Strike ${ORDINAL[standing.livesTotal] ?? standing.livesTotal}.`,
-        at: 7.1,
-        dur: 3.4,
-        hit: true,
-      },
-    ]
-
-    // "A Bears fan. Slain by the Bears." — only when the record says so.
-    const fan = FAN_OF[playerId] ? getTeam(FAN_OF[playerId]!) : null
-    if (fan && winnerId === fan.id) {
-      captions.push({ text: `A ${fan.name} fan. Slain by the ${fan.name}.`, at: 10.4, dur: 3.4 })
-    }
-
-    // Who else took the same hit, and who is left.
-    const standings = league?.evaluation?.standings ?? []
-    const nameOf = (id: string) => league?.profileOf(id).displayName ?? id
-    const close = standings.filter(
-      (s) =>
-        s.playerId !== playerId &&
-        s.history.some(
-          (h) =>
-            h.week === fatal.week &&
-            h.consumedLife &&
-            !!h.pick &&
-            !!fatal.pick &&
-            h.pick.teamId === fatal.pick.teamId,
-        ),
-    )
-    if (fatal.pick && league?.evaluation) {
-      captions.push({
-        text: close.length
-          ? `${list(close.map((s) => firstName(nameOf(s.playerId))))} took the same hit.`
-          : `Nobody else took that hit.`,
-        at: 12.6,
-        dur: 4.0,
-      })
-    }
-    const living = standings.filter((s) => s.status === 'alive' && s.playerId !== playerId)
-    if (league?.evaluation) {
-      captions.push({
-        text: `Survived by ${living.length} league member${living.length === 1 ? '' : 's'} who made better decisions.`,
-        at: 16.8,
-        dur: 4.6,
-      })
-    }
-
-    const mourners: Mourner[] = [
-      ...close.map((s) => ({ playerId: s.playerId, name: nameOf(s.playerId), close: true })),
-      ...living
-        .filter((s) => !close.includes(s))
-        .map((s) => ({ playerId: s.playerId, name: nameOf(s.playerId), close: false })),
-    ].slice(0, 10)
 
     const weapon =
       winner && score && fatal.outcome === 'loss'
@@ -332,26 +217,8 @@ function useScript(name: string, playerId: string, standing: PlayerStanding) {
           : `Week ${fatal.week}`,
       week: fatal.week,
     }
-
-    const teams = standing.history
-      .filter((h) => h.pick && h.week <= fatal.week)
-      .map((h) => getTeam(h.pick!.teamId)?.name ?? h.pick!.teamId)
-    const recap = EPITAPHS[playerId]?.recap
-    const quote = recap
-      ? (recap
-          .split(/(?<=[.!?])\s+/)
-          .filter(Boolean)
-          .at(-1) ?? `Rest in peace, ${first}.`)
-      : `Rest in peace, ${first}.`
-    const credits = {
-      name,
-      span: fatal.week === 1 ? 'Week 1' : `Weeks 1–${fatal.week}`,
-      teams: teams.join(' · '),
-      quote,
-    }
-
-    return { captions, mourners, weapon, paper, credits }
-  }, [league, name, playerId, standing])
+    return { weapon, paper }
+  }, [name, standing])
 }
 
 export interface FuneralProps {
@@ -368,7 +235,7 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
   const face = <Headshot name={name} playerId={playerId} size={size} status="eliminated" />
   const anchor = useRef<HTMLDivElement>(null)
   const { shards, cracks } = useMemo(() => geometry(playerId), [playerId])
-  const { captions, mourners, weapon, paper, credits } = useScript(name, playerId, standing)
+  const { weapon, paper } = useScript(name, standing)
 
   // The score, if the viewer asked for it; it stops with the scene.
   useEffect(() => {
@@ -386,37 +253,6 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
         ))}
       </div>
       <div className="funeral-quake">
-        <div aria-hidden="true" className="funeral-mourners">
-          {mourners.map((m, i) => {
-            const side = i % 2 ? 1 : -1
-            const k = Math.floor(i / 2)
-            const perSide = Math.ceil(mourners.length / 2)
-            // A crowd packs in: the whole row has to fit beside the stone.
-            const step = perSide > 1 ? Math.min(14, 30 / (perSide - 1)) : 0
-            const x = side * (m.close ? 50 : 56) * 1 + side * k * step
-            return (
-              <div
-                key={m.playerId}
-                className={cn('funeral-mourner', m.close && 'is-close')}
-                style={
-                  {
-                    '--side': side,
-                    '--x': `${x.toFixed(1)}%`,
-                    '--d': `${(i * 0.14).toFixed(2)}s`,
-                    zIndex: 10 - k,
-                  } as CSSProperties
-                }
-              >
-                <Headshot
-                  name={m.name}
-                  playerId={m.playerId}
-                  size="xs"
-                  status={m.close ? 'eliminated' : 'alive'}
-                />
-              </div>
-            )
-          })}
-        </div>
         <div className="funeral-plot">{children}</div>
         <div aria-hidden="true" className="funeral-mound" />
         <div aria-hidden="true" className="funeral-dirt">
@@ -504,25 +340,6 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
           </div>
         </div>
       )}
-      <div aria-hidden="true" className="funeral-captions">
-        {captions.map((c) => (
-          <p
-            key={c.text}
-            className={cn('funeral-caption', c.hit && 'is-hit')}
-            style={{ '--at': `${c.at}s`, '--dur': `${c.dur}s` } as CSSProperties}
-          >
-            {c.text}
-          </p>
-        ))}
-        {credits && (
-          <div className="funeral-credits">
-            <p className="funeral-credits-name">{credits.name}</p>
-            <p className="funeral-credits-span">{credits.span}</p>
-            <p className="funeral-credits-teams">{credits.teams}</p>
-            <p className="funeral-credits-quote">“{credits.quote}”</p>
-          </div>
-        )}
-      </div>
     </div>
   )
 }
