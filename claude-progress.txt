@@ -674,3 +674,24 @@ DONE   : Removed the funeral's sound (synth module, the Sound toggle in the Fres
 NOTE   : quality-sweep fails on the guard self-test because the commissioner's working tree holds
          an uncommitted edit to scripts/hooks/guard-destructive-commands.sh (merge rule removed,
          probes not updated). Not mine to touch; it is not staged or committed here.
+--- 2026-10-05  Claude Fable 5.1 (feat/week4-review) ---
+DONE   : FIRST ELIMINATION. Don Turner (PIT✓ BAL✗ SEA✗ DET✗) went out in week 4 when Carolina beat
+         Detroit 32–26 on Sunday night. Week 4 was settled a day early: nobody picked Monday's
+         NO–ATL, so every picked game is final. seasonFacts now pins week 4's fifteen finals and
+         `pinnedThrough` counts a week complete when every PICKED game is pinned.
+         Don's epitaph is hand-written in src/lib/epitaphs.ts (per the standing rule) with every
+         claim asserted in epitaphFacts: 20–13 PIT, 17–24 BAL at home, 31–33 SEA at WAS, 26–32 DET at
+         CAR on Sunday night; margins 7/2/6; Corey wk1+3, Dave+Maya wk2; 28 teams unused. Sources:
+         ESPN scoreboard; wbtv/detroitnews (first CAR SNF since 2015, six straight scoring drives,
+         Goff 412). The headstone and funeral go live for him as soon as the live sync lands week 4.
+         Note rewritten as the WEEK 4 REVIEW (keyed 1–5): MIN 16 (15–10, five FGs, no TD in two
+         games), BAL 8, CHI 2 → 26 fine; Dominic's reuse miss ("but they won"); Phyllis (CLE 56-yd
+         FG at :10, 8–0 on TNF) and Tina (NE 29–26, one-handed catch at 1:50, Bills' first loss and
+         first at new stadium) to one life; Don; standings 29 alive, 7/14/8 named; week 5: byes CAR
+         + KC, TB at DAL locks 7:10 PM Thu 10/8, PHI–JAX in London 8:30 AM. Callout back for week 5.
+         Also PR #33: the funeral's sound removed at the commissioner's request.
+VERIFIED: validate green; e2e 101; facts tests pass. Sweep fails ONLY on the guard self-test because
+         the commissioner's working tree holds an uncommitted edit to the guard hook (merge rule
+         removed, probes not updated) — not touched here.
+NEXT   : Week 5 picks lock 7:10 PM Thursday 10/8. Record picks only; the note stays.
+BLOCKED: merges and the hook edit are the commissioner's (gh pr merge is denied to the agent twice).
