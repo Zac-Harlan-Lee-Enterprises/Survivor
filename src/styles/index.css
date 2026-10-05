@@ -174,25 +174,31 @@
     @apply font-display text-xs font-bold tracking-[0.2em] text-ink-300 uppercase;
   }
   /* Granite, lit from above, with a chiselled edge. */
-  .headstone {
-    background:
-      radial-gradient(ellipse at 50% -10%, rgba(255, 255, 255, 0.26), transparent 55%),
-      radial-gradient(circle at 30% 40%, rgba(0, 0, 0, 0.22) 0 0.6px, transparent 1.2px) 0 0 / 6px
-        6px,
-      radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.1) 0 0.6px, transparent 1.2px) 0 0 /
-        9px 9px,
-      radial-gradient(circle at 50% 80%, rgba(0, 0, 0, 0.16) 0 0.8px, transparent 1.4px) 0 0 / 13px
-        13px,
-      linear-gradient(180deg, #858a96, #555a65 55%, #3a3d45);
-    box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.18),
-      inset 3px 0 6px rgba(255, 255, 255, 0.06),
-      inset -4px -8px 14px rgba(0, 0, 0, 0.4),
-      0 8px 18px -8px rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  /* The stone is drawn by StoneFace.tsx; the lettering sits on its tablet. */
+  .headstone-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+  }
+  .headstone-face {
+    position: absolute;
+    left: 23%;
+    right: 23%;
+    top: 28%;
+    bottom: 20%;
+    padding: 0 1%;
+  }
+  /* Incised: dark in the cut, a thread of light where the chisel's lower edge catches it. */
+  .engrave {
+    color: #0f1115;
     text-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.18),
-      0 -1px 0 rgba(0, 0, 0, 0.55);
+      0 1px 0 rgba(255, 255, 255, 0.42),
+      0 -1px 0 rgba(0, 0, 0, 0.5);
+  }
+  .engrave-soft {
+    color: #15171c;
   }
 
   .graveyard {
@@ -243,17 +249,18 @@
   }
 
   /* Lights down: the world darkens around the grave, and a beam falls on it. */
-  .funeral-vignette {
-    position: absolute;
-    inset: -90%;
+  .funeral-house-lights {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
     pointer-events: none;
     background: radial-gradient(
-      circle at 50% 50%,
-      transparent 14%,
-      rgba(3, 5, 12, 0.55) 26%,
-      rgba(3, 5, 12, 0.9) 48%
+      circle at var(--x) var(--y),
+      transparent calc(var(--r) * 0.95),
+      rgba(3, 5, 12, 0.45) calc(var(--r) * 1.7),
+      rgba(3, 5, 12, 0.86) calc(var(--r) * 3.4)
     );
-    opacity: 0;
+    animation: funeral-lights 11.6s ease-in-out both;
   }
   .funeral-beam {
     position: absolute;
@@ -338,7 +345,6 @@
   /* The ground: the stone waits below it, the mound and dirt sit on it. */
   .funeral-plot {
     overflow: hidden;
-    border-radius: 9999px 9999px 0.375rem 0.375rem;
   }
   .funeral-stone {
     transform: translateY(105%);
@@ -348,11 +354,12 @@
   }
   .funeral-glint {
     position: absolute;
-    inset: -20% -60%;
+    inset: 0;
+    clip-path: inset(6% 15.5% 15% 15.5% round 42% 42% 0 0);
     background: linear-gradient(
       105deg,
       transparent 40%,
-      rgba(255, 246, 220, 0.38) 50%,
+      rgba(255, 246, 220, 0.45) 50%,
       transparent 60%
     );
     transform: translateX(-100%);
@@ -395,12 +402,41 @@
     background: #3b2f25;
   }
   .funeral-ghost {
+    inset: -30% -28% auto;
+    height: 200%;
     opacity: 0;
-    filter: grayscale(1) brightness(1.5) contrast(0.8) blur(1.6px)
-      drop-shadow(0 0 14px rgba(200, 220, 255, 0.9));
-    mask-image: radial-gradient(circle at 50% 45%, #000 30%, transparent 70%);
-    mix-blend-mode: screen;
     pointer-events: none;
+    filter: drop-shadow(0 0 14px rgba(190, 210, 255, 0.45));
+  }
+  .funeral-ghost-body {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 30%;
+  }
+  .funeral-sheet {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .funeral-ghost-face {
+    position: absolute;
+    left: 25%;
+    top: 7%;
+    width: 50%;
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    overflow: hidden;
+    opacity: 0.55;
+    filter: grayscale(1) brightness(1.35) contrast(0.8) blur(0.6px);
+    mix-blend-mode: luminosity;
+  }
+  .funeral-ghost-face img {
+    height: 100%;
+    width: 100%;
+    --tw-ring-shadow: 0 0 #0000;
+    box-shadow: none;
   }
   .funeral-captions {
     position: absolute;
@@ -436,9 +472,6 @@
   }
 
   /* ---- Action ---- */
-  .funeral.is-playing .funeral-vignette {
-    animation: funeral-lights 11.6s ease-in-out both;
-  }
   .funeral.is-playing .funeral-beam {
     animation: funeral-beam 11.6s ease-in-out both;
   }
@@ -494,7 +527,10 @@
     animation: funeral-glint 1.2s 8.95s ease-in-out both;
   }
   .funeral.is-playing .funeral-ghost {
-    animation: funeral-ghost 3.4s 7.5s cubic-bezier(0.35, 0, 0.4, 1) both;
+    animation: funeral-ghost 4.4s 7.3s cubic-bezier(0.3, 0, 0.45, 1) both;
+  }
+  .funeral.is-playing .funeral-ghost-body {
+    animation: funeral-ghost-wisp 1.6s 7.3s ease-in-out 3 both;
   }
   .funeral.is-playing .funeral-caption-0 {
     animation: funeral-caption 1.5s 0.35s both;
@@ -745,22 +781,32 @@
 }
 @keyframes funeral-ghost {
   0% {
-    transform: translateY(12%) scale(0.92);
+    transform: translate(0, 18%) scale(0.7);
     opacity: 0;
   }
-  14% {
-    opacity: 0.34;
+  18% {
+    opacity: 0.85;
+    transform: translate(-2%, -2%) scale(0.92);
   }
-  35% {
-    transform: translate(-6%, -40%) scale(1);
+  45% {
+    transform: translate(6%, -40%) scale(1);
   }
-  60% {
-    transform: translate(5%, -85%) scale(1.06);
-    opacity: 0.24;
+  70% {
+    transform: translate(-5%, -80%) scale(1.04);
+    opacity: 0.6;
   }
   100% {
-    transform: translate(-3%, -150%) scale(1.15);
+    transform: translate(3%, -135%) scale(1.1);
     opacity: 0;
+  }
+}
+@keyframes funeral-ghost-wisp {
+  0%,
+  100% {
+    transform: rotate(-4deg) skewX(2deg);
+  }
+  50% {
+    transform: rotate(4deg) skewX(-2deg);
   }
 }
 @keyframes funeral-caption {

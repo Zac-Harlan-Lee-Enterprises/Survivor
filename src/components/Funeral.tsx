@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { getTeam, type PlayerStanding } from '@/domain'
 import { Headshot } from './Headshot'
 
@@ -168,10 +169,11 @@ export interface FuneralProps {
 
 export function Funeral({ name, playerId, standing, size, playing, children }: FuneralProps) {
   const face = <Headshot name={name} playerId={playerId} size={size} status="eliminated" />
+  const anchor = useRef<HTMLDivElement>(null)
   const lines = captions(name, standing)
   return (
-    <div className={playing ? 'funeral is-playing' : 'funeral'}>
-      <div aria-hidden="true" className="funeral-vignette" />
+    <div ref={anchor} className={playing ? 'funeral is-playing' : 'funeral'}>
+      <HouseLights playing={playing} anchor={anchor} />
       <div aria-hidden="true" className="funeral-beam" />
       <div aria-hidden="true" className="funeral-ash">
         {ASH.map((style, i) => (
@@ -222,7 +224,22 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
           ))}
         </div>
         <div aria-hidden="true" className="funeral-ghost">
-          {face}
+          <div className="funeral-ghost-body">
+            <svg className="funeral-sheet" viewBox="0 0 100 130" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id={`funeral-sheet-${playerId}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#eef3ff" stopOpacity="0.62" />
+                  <stop offset="0.55" stopColor="#d6dfff" stopOpacity="0.42" />
+                  <stop offset="1" stopColor="#c9d4ff" stopOpacity="0.04" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M50 4 C27 4 15 24 15 50 L15 108 Q22.5 122 30 108 Q37.5 122 45 108 Q52.5 122 60 108 Q67.5 122 75 108 Q82.5 122 85 108 L85 50 C85 24 73 4 50 4 Z"
+                fill={`url(#funeral-sheet-${playerId})`}
+              />
+            </svg>
+            <div className="funeral-ghost-face">{face}</div>
+          </div>
         </div>
       </div>
       <div aria-hidden="true" className="funeral-captions">
@@ -233,5 +250,51 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
         ))}
       </div>
     </div>
+  )
+}
+
+/**
+ * The house lights. A page-wide dim with a soft hole over the grave, rendered
+ * through a portal so no card edge can frame it; it follows the stone if the
+ * viewer scrolls. Reduced-motion viewers never reach the funeral at all.
+ */
+function HouseLights({
+  playing,
+  anchor,
+}: {
+  playing: boolean
+  anchor: React.RefObject<HTMLDivElement | null>
+}) {
+  const [spot, setSpot] = useState<{ x: number; y: number; r: number } | null>(null)
+  useEffect(() => {
+    if (!playing || typeof document === 'undefined') return
+    let frame = 0
+    const measure = () => {
+      frame = 0
+      const el = anchor.current
+      if (!el) return
+      const b = el.getBoundingClientRect()
+      setSpot({ x: b.left + b.width / 2, y: b.top + b.height / 2, r: Math.max(b.width, b.height) })
+    }
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(measure)
+    }
+    measure()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    return () => {
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
+  }, [playing, anchor])
+  if (!playing || !spot) return null
+  return createPortal(
+    <div
+      aria-hidden="true"
+      className="funeral-house-lights"
+      style={{ '--x': `${spot.x}px`, '--y': `${spot.y}px`, '--r': `${spot.r}px` } as CSSProperties}
+    />,
+    document.body,
   )
 }
