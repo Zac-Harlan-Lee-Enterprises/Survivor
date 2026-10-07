@@ -897,6 +897,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-maya-israel-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "maya-israel",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-07T03:22:35.000Z",
+      "updatedAt": "2026-10-07T03:22:35.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-shahid-ali-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1157,6 +1170,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-stacey-markendorff-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "stacey-markendorff",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-06T14:20:38.000Z",
+      "updatedAt": "2026-10-06T14:20:38.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-sheila-acker-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1248,6 +1274,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dominic-green-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dominic-green",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-06T14:23:12.000Z",
+      "updatedAt": "2026-10-06T14:23:12.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-tracy-nelson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1300,6 +1339,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-tracy-nelson-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tracy-nelson",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-05T15:00:00.000Z",
+      "updatedAt": "2026-10-05T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-bradley-riedell-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1348,6 +1400,19 @@
       "gameId": "2026-w04-MIA-at-MIN",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-bradley-riedell-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "bradley-riedell",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-05T13:04:46.000Z",
+      "updatedAt": "2026-10-05T13:04:46.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -1911,6 +1976,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-tony-canody-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tony-canody",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-06T14:17:53.000Z",
+      "updatedAt": "2026-10-06T14:17:53.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-joanna-moss-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2301,6 +2379,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-craig-mowers-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "craig-mowers",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-05T13:34:26.000Z",
+      "updatedAt": "2026-10-05T13:34:26.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-zac-harlan-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2349,6 +2440,19 @@
       "gameId": "2026-w04-TEN-at-BAL",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-zac-harlan-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "zac-harlan",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-07T11:34:29.000Z",
+      "updatedAt": "2026-10-07T11:34:29.000Z",
       "version": 1,
       "source": "commissioner"
     }

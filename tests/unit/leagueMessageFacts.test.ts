@@ -47,11 +47,45 @@ const note = readFileSync(
 )
 const body = note.slice(note.indexOf('const WEEK_4_REVIEW'), note.indexOf('const NOTES'))
 
+/** The note's copy, sentence by sentence — the unit a reader takes a hint from. */
+const sentences = [...body.matchAll(/'([^']*(?:’[^']*)*)'/g)]
+  .map((m) => m[1]!)
+  .flatMap((line) => line.split(/(?<=[.!?:])\s+/))
+
+/** City and nickname for each team, from the domain's own table. */
+const teamsSource = readFileSync(new URL('../../src/domain/teams.ts', import.meta.url), 'utf8')
+const teamWords = new Map(
+  [...teamsSource.matchAll(/\['([A-Z]{2,3})', '([^']+)', '([^']+)'/g)].map((m) => [
+    m[1]!,
+    [m[2]!, m[3]!],
+  ]),
+)
+/** What the league calls each player; Joseph Tomczuk goes by Joey. */
+const callNames = (displayName: string) => {
+  const first = displayName.split(' ')[0]!
+  return first === 'Joseph' ? [first, 'Joey'] : [first]
+}
+
 describe('the week 4 review gives away nothing about week 5', () => {
   it('mentions week 5 picks only to ask for them', () => {
     expect(body.match(/week 5 pick/gi) ?? []).toHaveLength(1)
     expect(body).toMatch(/DM me your week 5 pick on Teams/)
-    expect(picksIn(5)).toHaveLength(0)
+  })
+
+  it('never names a player in the same sentence as their week 5 team, as picks arrive', () => {
+    expect(teamWords.size).toBe(32)
+    for (const pick of picksIn(WEEK + 1)) {
+      const words = teamWords.get(pick.teamId)!
+      const names = callNames(nameOf(pick.playerId))
+      for (const sentence of sentences) {
+        const named = names.some((n) => new RegExp(`\\b${n}\\b`).test(sentence))
+        const teamed = words.some((w) => sentence.includes(w))
+        expect(
+          named && teamed,
+          `${nameOf(pick.playerId)} beside ${pick.teamId}: “${sentence}”`,
+        ).toBe(false)
+      }
+    }
   })
 })
 

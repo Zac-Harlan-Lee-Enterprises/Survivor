@@ -705,3 +705,17 @@ DONE   : Guard hook: a plain CLI merge is allowed (commissioner edited the probe
          review and the epitaph.
 NEXT   : The agent still cannot merge: .claude/settings.json's deny list refuses the merge command.
          That file is the commissioner's to change. Week 5 picks lock 7:10 PM Thursday 10/8.
+
+--- 2026-10-05  Claude Fable 5.1 (feat/week5-picks) ---
+DONE   : First week 5 picks. Tracy Nelson DAL (relayed by the commissioner — "via gifs");
+         Bradley Riedell DAL and Craig Mowers DAL found by searching the commissioner's Teams
+         chats (Microsoft 365 connector; messages 2026-10-05 13:04Z and 13:34Z, recorded with
+         those timestamps). Outlook had nothing. Three of twenty-nine. All three on the Cowboys
+         (vs TB, Thursday night); none reuses a team. Note untouched — it names nobody's week 5
+         pick, and the facts test now guards that as picks arrive (the "no week 5 picks yet"
+         assertion was wrong by design and is gone).
+         Second Teams sweep (2026-10-07): Stacey Markendorff, Tony Canody, Dominic Green and Maya
+         Israel, all DAL, recorded with their message timestamps. Seven of twenty-nine, all on
+         the Cowboys. Outlook still had no picks.
+         Then Zac Harlan DAL (told in session). Eight of twenty-nine, all on the Cowboys.
+NEXT   : Twenty-one still owed before 7:10 PM Thursday 10/8. Search Teams again before the lock.
