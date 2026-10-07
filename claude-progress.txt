@@ -714,4 +714,7 @@ DONE   : First week 5 picks. Tracy Nelson DAL (relayed by the commissioner — "
          (vs TB, Thursday night); none reuses a team. Note untouched — it names nobody's week 5
          pick, and the facts test now guards that as picks arrive (the "no week 5 picks yet"
          assertion was wrong by design and is gone).
-NEXT   : Twenty-six still owed before 7:10 PM Thursday 10/8. Search Teams again before the lock.
+         Second Teams sweep (2026-10-07): Stacey Markendorff, Tony Canody, Dominic Green and Maya
+         Israel, all DAL, recorded with their message timestamps. Seven of twenty-nine, all on
+         the Cowboys. Outlook still had no picks.
+NEXT   : Twenty-two still owed before 7:10 PM Thursday 10/8. Search Teams again before the lock.
