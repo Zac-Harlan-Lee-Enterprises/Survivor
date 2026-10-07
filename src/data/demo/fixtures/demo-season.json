@@ -2442,6 +2442,19 @@
       "updatedAt": "2026-10-01T15:00:00.000Z",
       "version": 1,
       "source": "commissioner"
+    },
+    {
+      "id": "pick-zac-harlan-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "zac-harlan",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-07T11:34:29.000Z",
+      "updatedAt": "2026-10-07T11:34:29.000Z",
+      "version": 1,
+      "source": "commissioner"
     }
   ],
   "games": [

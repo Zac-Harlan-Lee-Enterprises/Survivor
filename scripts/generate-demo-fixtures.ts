@@ -170,7 +170,7 @@ const STORY: Story = {
   // Seventh player on the Chargers. Sent nothing for week 2, so it is a miss
   // of the plain kind: no late answer to weigh, just silence at the lock.
   'craig-mowers': { 1: ['LAC', 'P'], 2: null, 3: ['KC', 'P', '2026-09-22T15:00:00.000Z'], 4: ['CHI', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-05T13:34:26.000Z'] },
-  'zac-harlan': { 1: ['LAC', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BAL', 'P', '2026-10-01T15:00:00.000Z'] },
+  'zac-harlan': { 1: ['LAC', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BAL', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-07T11:34:29.000Z'] },
 }
 
 // ---------------------------------------------------------------------------
