@@ -725,5 +725,8 @@ DONE   : First week 5 picks. Tracy Nelson DAL (relayed by the commissioner — "
          Acker DAL, Jared Marks DAL recorded. Matt Hadley named BAL, which he used in week 4 —
          NOT recorded; flagged to the commissioner with hours left before the lock to re-pick.
          Twelve of twenty-nine.
-NEXT   : Seventeen still owed (Matt included) before 7:10 PM tonight. Sweep Teams again this
-         afternoon; settle Matt's pick with the commissioner.
+         #38 merged and deployed. Fifth sweep (Thu 12:50 PM CT): Chloe Bourque DAL, Matt Hadley
+         DAL (his re-pick after the commissioner told him BAL was used), Dave Johnson CIN, Mike
+         Lancaster DAL. Sixteen of twenty-nine. Commissioner asked for point spreads on the slate;
+         declined pending his say-so because AGENTS.md bans spreads by product decision.
+NEXT   : Thirteen still owed before 7:10 PM tonight. One more sweep late afternoon.
