@@ -962,6 +962,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-shahid-ali-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "shahid-ali",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-08T19:57:23.000Z",
+      "updatedAt": "2026-10-08T19:57:23.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-dave-johnson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1625,6 +1638,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-joseph-tomczuk-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "joseph-tomczuk",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-08T20:07:38.000Z",
+      "updatedAt": "2026-10-08T20:07:38.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-corey-cowell-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1673,6 +1699,19 @@
       "gameId": "2026-w04-MIA-at-MIN",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-corey-cowell-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "corey-cowell",
+      "week": 5,
+      "teamId": "HOU",
+      "gameId": "2026-w05-HOU-at-TEN",
+      "submittedAt": "2026-10-08T19:43:01.000Z",
+      "updatedAt": "2026-10-08T19:43:01.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -1790,6 +1829,19 @@
       "gameId": "2026-w04-MIA-at-MIN",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-jason-snook-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "jason-snook",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-08T19:59:20.000Z",
+      "updatedAt": "2026-10-08T19:59:20.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -2219,6 +2271,19 @@
       "gameId": "2026-w04-TEN-at-BAL",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-allison-petty-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "allison-petty",
+      "week": 5,
+      "teamId": "CIN",
+      "gameId": "2026-w05-CIN-at-MIA",
+      "submittedAt": "2026-10-08T21:49:26.000Z",
+      "updatedAt": "2026-10-08T21:49:26.000Z",
       "version": 1,
       "source": "commissioner"
     },
