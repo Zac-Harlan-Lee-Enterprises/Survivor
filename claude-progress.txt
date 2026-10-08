@@ -751,4 +751,5 @@ NEXT   : Connected mode has no spreads until the API proxies a provider.
          owed before 7:10 PM tonight.
          Seventh sweep (Thu 2:52 PM CT), after the commissioner's group nudge: Wesley Childers DAL,
          Melanie Moeller CIN. Nate Adams sent "My pick" with no team and no attachment that the
-         connector can see — flagged to the commissioner, not recorded. Nineteen of twenty-nine.
+         connector can see — flagged to the commissioner. He confirmed Nate is DAL; recorded at
+         the time of that message. Twenty of twenty-nine.
