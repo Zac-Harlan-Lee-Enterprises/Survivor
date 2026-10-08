@@ -753,3 +753,6 @@ NEXT   : Connected mode has no spreads until the API proxies a provider.
          Melanie Moeller CIN. Nate Adams sent "My pick" with no team and no attachment that the
          connector can see — flagged to the commissioner. He confirmed Nate is DAL; recorded at
          the time of that message. Twenty of twenty-nine.
+         Eighth sweep (Thu 5:01 PM CT): Corey Cowell HOU, Shahid Ali DAL, Jason Snook DAL, Joey
+         Tomczuk DAL, Allison Petty CIN. Twenty-five of twenty-nine; owed: James, KC, Phyllis,
+         Tina (Phyllis and Tina on their last life).
