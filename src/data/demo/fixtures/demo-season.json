@@ -1131,6 +1131,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-nate-adams-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "nate-adams",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-08T19:36:53.000Z",
+      "updatedAt": "2026-10-08T19:36:53.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-stacey-markendorff-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
