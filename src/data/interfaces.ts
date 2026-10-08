@@ -15,6 +15,7 @@ import type {
   Season,
   SeasonDecision,
   SeasonSnapshot,
+  GameLine,
 } from '@/domain'
 import type { PickViolation } from '@/domain'
 
@@ -189,6 +190,11 @@ export interface NFLDataProvider {
   recordManualResult?(input: GameResultInput, reason: string): Promise<NFLGame>
   /** Pull the live schedule and scores for one week from the provider. */
   syncResults?(seasonYear: number, week: number): Promise<SyncSummary>
+  /**
+   * The current point spreads for one week, by game id. Read fresh, never
+   * stored. Optional: a provider without lines simply shows none.
+   */
+  getLines?(seasonYear: number, week: number): Promise<Record<string, GameLine>>
   /** Commissioner enters/replaces one week's schedule by hand (provider outage or manual mode). */
   putSchedule?(seasonYear: number, week: number, games: NFLGame[]): Promise<{ saved: number }>
 }

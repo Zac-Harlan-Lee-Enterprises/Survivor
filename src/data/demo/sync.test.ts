@@ -49,6 +49,7 @@ function harness(games: NFLGame[], snapshot = base(), liveDetail: Record<string,
       games,
       skipped: 0,
       liveDetail,
+      lines: {},
     })),
   }
   const ctx = {
@@ -199,6 +200,7 @@ describe('demo live-score sync — established league (ships with the real sched
           games: contradicting,
           skipped: 0,
           liveDetail: {},
+          lines: {},
         }),
       },
     )

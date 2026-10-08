@@ -3,6 +3,7 @@ import {
   espnWeekUrl,
   liveDetailFor,
   mapEspnStatus,
+  parseLine,
   parseScoreboard,
   type EspnScoreboard,
 } from './espn'
@@ -173,9 +174,9 @@ describe('live detail', () => {
 
   it('prefers ESPN’s own short label, which already handles OT and period ends', () => {
     expect(liveDetailFor('in_progress', espnStatus())).toBe('3rd 5:21')
-    expect(
-      liveDetailFor('in_progress', espnStatus({ type: { shortDetail: 'Halftime' } })),
-    ).toBe('Halftime')
+    expect(liveDetailFor('in_progress', espnStatus({ type: { shortDetail: 'Halftime' } }))).toBe(
+      'Halftime',
+    )
   })
 
   it('falls back to the period and clock when no label is given', () => {
@@ -244,5 +245,70 @@ describe('live detail', () => {
 
   it('reports nothing for the seeded week, where no game has kicked off', () => {
     expect(parseScoreboard(realWeek1 as EspnScoreboard, OBSERVED).liveDetail).toEqual({})
+  })
+})
+
+describe('parseLine', () => {
+  it("reads the favourite and the points from the feed's summary", () => {
+    expect(parseLine('DAL -9.5', 'DAL', 'TB')).toEqual({ favoriteTeamId: 'DAL', points: 9.5 })
+    expect(parseLine('CIN -7', 'MIA', 'CIN')).toEqual({ favoriteTeamId: 'CIN', points: 7 })
+  })
+
+  it("maps ESPN's own abbreviations onto ours", () => {
+    expect(parseLine('WSH -3.5', 'WAS', 'NYG')).toEqual({ favoriteTeamId: 'WAS', points: 3.5 })
+  })
+
+  it("knows a pick'em when it sees one", () => {
+    for (const text of ['EVEN', 'PK', "Pick'em"]) {
+      expect(parseLine(text, 'DAL', 'TB')).toEqual({ favoriteTeamId: null, points: 0 })
+    }
+  })
+
+  it('gives no line rather than a wrong one', () => {
+    expect(parseLine(undefined, 'DAL', 'TB')).toBeNull()
+    expect(parseLine('', 'DAL', 'TB')).toBeNull()
+    expect(parseLine('O/U 48.5', 'DAL', 'TB')).toBeNull()
+    // A favourite who is not in this game.
+    expect(parseLine('KC -3', 'DAL', 'TB')).toBeNull()
+  })
+})
+
+describe('parseScoreboard lines', () => {
+  it("attaches each game's spread by game id, and only where the feed has one", () => {
+    const payload = {
+      season: { year: 2026, type: 2 },
+      week: { number: 5 },
+      events: [
+        {
+          date: '2026-10-09T00:15Z',
+          competitions: [
+            {
+              date: '2026-10-09T00:15Z',
+              status: { type: { name: 'STATUS_SCHEDULED' } },
+              competitors: [
+                { homeAway: 'home', team: { abbreviation: 'DAL' } },
+                { homeAway: 'away', team: { abbreviation: 'TB' } },
+              ],
+              odds: [{ details: 'DAL -9.5' }],
+            },
+          ],
+        },
+        {
+          date: '2026-10-11T17:00Z',
+          competitions: [
+            {
+              date: '2026-10-11T17:00Z',
+              status: { type: { name: 'STATUS_SCHEDULED' } },
+              competitors: [
+                { homeAway: 'home', team: { abbreviation: 'MIA' } },
+                { homeAway: 'away', team: { abbreviation: 'CIN' } },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    const { lines } = parseScoreboard(payload, '2026-10-08T00:00:00.000Z')
+    expect(lines).toEqual({ '2026-w05-TB-at-DAL': { favoriteTeamId: 'DAL', points: 9.5 } })
   })
 })
