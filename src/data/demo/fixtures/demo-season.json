@@ -1014,6 +1014,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dave-johnson-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dave-johnson",
+      "week": 5,
+      "teamId": "CIN",
+      "gameId": "2026-w05-CIN-at-MIA",
+      "submittedAt": "2026-10-08T15:55:13.000Z",
+      "updatedAt": "2026-10-08T15:55:13.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-james-parker-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1482,6 +1495,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-chloe-bourque-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "chloe-bourque",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-08T15:14:19.000Z",
+      "updatedAt": "2026-10-08T15:14:19.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-jared-marks-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1794,6 +1820,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-matt-hadley-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "matt-hadley",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-08T15:52:57.000Z",
+      "updatedAt": "2026-10-08T15:52:57.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-mike-lancaster-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1842,6 +1881,19 @@
       "gameId": "2026-w04-TEN-at-BAL",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-mike-lancaster-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "mike-lancaster",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-08T17:45:05.000Z",
+      "updatedAt": "2026-10-08T17:45:05.000Z",
       "version": 1,
       "source": "commissioner"
     },
