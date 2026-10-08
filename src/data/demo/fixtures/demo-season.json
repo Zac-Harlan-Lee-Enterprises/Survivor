@@ -2028,6 +2028,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-kc-walker-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "kc-walker",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-08T22:19:50.000Z",
+      "updatedAt": "2026-10-08T22:19:50.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-paul-lim-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2557,6 +2570,19 @@
       "gameId": "2026-w04-NE-at-BUF",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-tina-bush-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tina-bush",
+      "week": 5,
+      "teamId": "NE",
+      "gameId": "2026-w05-LV-at-NE",
+      "submittedAt": "2026-10-08T22:06:29.000Z",
+      "updatedAt": "2026-10-08T22:06:29.000Z",
       "version": 1,
       "source": "commissioner"
     },
