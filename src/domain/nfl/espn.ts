@@ -35,10 +35,15 @@ interface EspnStatus {
   period?: number
   type?: { name?: string; shortDetail?: string }
 }
+/** The odds block. Only `details` is read ("DAL -9.5", "EVEN"); the rest is sportsbook detail. */
+interface EspnOdds {
+  details?: string
+}
 interface EspnCompetition {
   date?: string
   competitors?: EspnCompetitor[]
   status?: EspnStatus
+  odds?: EspnOdds[]
 }
 interface EspnEvent {
   id?: string
@@ -137,6 +142,46 @@ export interface ParsedScoreboard {
    * go stale between syncs. It is display detail from this observation only.
    */
   liveDetail: Record<string, string>
+  /**
+   * Game id → the point spread, where the feed has one. EPHEMERAL like
+   * liveDetail: a line moves all week, so it is read fresh, never stored.
+   */
+  lines: Record<string, GameLine>
+}
+
+/**
+ * The point spread for one game: who is favoured, and by how much. Shown on
+ * the slate as a data point for picking — the market's view of who should win
+ * — and nothing more: no sportsbook, no prices, no links.
+ */
+export interface GameLine {
+  /** The favoured team, or null for a pick'em. */
+  favoriteTeamId: string | null
+  /** Points the favourite is laying; 0 for a pick'em. */
+  points: number
+}
+
+/**
+ * Reads ESPN's line summary ("DAL -9.5", "WSH -3.5", "EVEN", "PK") for a game
+ * between these two teams. Anything it cannot read, or a favourite who is not
+ * in the game, is no line at all rather than a wrong one.
+ */
+export function parseLine(
+  details: string | undefined,
+  homeTeamId: string,
+  awayTeamId: string,
+): GameLine | null {
+  const text = details?.trim()
+  if (!text) return null
+  if (/^(even|pk|pick'?em|pick)$/i.test(text)) return { favoriteTeamId: null, points: 0 }
+  const m = /^([A-Za-z]{2,4})\s*([-+]?\d+(?:\.\d+)?)$/.exec(text)
+  if (!m) return null
+  const hit = lookupTeam(m[1]!)
+  if (hit.kind !== 'match') return null
+  if (hit.teamId !== homeTeamId && hit.teamId !== awayTeamId) return null
+  const points = Math.abs(Number(m[2]))
+  if (!Number.isFinite(points)) return null
+  return points === 0 ? { favoriteTeamId: null, points: 0 } : { favoriteTeamId: hit.teamId, points }
 }
 
 export function parseScoreboard(
@@ -152,6 +197,7 @@ export function parseScoreboard(
 
   const games: NFLGame[] = []
   const liveDetail: Record<string, string> = {}
+  const lines: Record<string, GameLine> = {}
   let skipped = 0
   for (const ev of data.events ?? []) {
     const comp = ev.competitions?.[0]
@@ -185,6 +231,8 @@ export function parseScoreboard(
     const id = gameIdFor(seasonYear, weekNumber, awayTeamId, homeTeamId)
     const detail = liveDetailFor(status, comp?.status ?? ev.status)
     if (detail) liveDetail[id] = detail
+    const line = parseLine(comp?.odds?.[0]?.details, homeTeamId, awayTeamId)
+    if (line) lines[id] = line
     games.push({
       id,
       seasonYear,
@@ -215,5 +263,6 @@ export function parseScoreboard(
     games,
     skipped,
     liveDetail,
+    lines,
   }
 }

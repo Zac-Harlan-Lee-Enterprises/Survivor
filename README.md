@@ -12,7 +12,7 @@ A responsive React + TypeScript survivor-pool app that replaces the commissioner
 
 ## What's in the box
 
-- **League Home** — who's still standing at a glance: headshot grid, lives, the bubble, the graveyard, this week's slate, countdown to the next kickoff.
+- **League Home** — who's still standing at a glance: headshot grid, lives, the bubble, the graveyard, this week's slate with each game's point spread, countdown to the next kickoff.
 - **Player Dashboard** — big headshot, *Still Alive / On the Bubble / Eliminated / Champion*, lives meter, current pick, countdown, mini leaderboard.
 - **Weekly Pick** — polished team cards with real logos (opponent, home/away, kickoff, availability), explicit *"You are riding with Green Bay in week 1."* confirmation, changeable until the deadline, huge tap targets on phones.
 - **Leaderboard** — survivors first, then the desaturated **Survivor Graveyard**; champion spotlight with confetti.

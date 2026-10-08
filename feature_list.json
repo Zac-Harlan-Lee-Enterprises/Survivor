@@ -526,5 +526,14 @@
     "priority": 2,
     "hermetic": true,
     "passes": true
+  },
+  {
+    "id": "slate-point-spreads",
+    "category": "functional",
+    "description": "Games on the league page's slate that have not kicked off show the current point spread (\"DAL \u22129.5\", or \"Pick'em\") read fresh from ESPN, as a data point for picking. Favourite and number only: no sportsbook name or logo, no prices, no links. Spoken in words for screen readers; dropped once the game starts. Commissioner's decision 2026-10-08.",
+    "verification": "npx vitest run src/domain/nfl/espn.test.ts src/features/league-home/GameRow.test.tsx && npx playwright test tests/e2e/live-scores.spec.ts -g 'point spread'",
+    "priority": 2,
+    "hermetic": true,
+    "passes": true
   }
 ]

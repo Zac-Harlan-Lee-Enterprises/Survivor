@@ -109,4 +109,40 @@ describe('GameRow', () => {
     )
     expect(bumped(container)).toHaveLength(0)
   })
+
+  it('shows the spread beside the kickoff before a game starts, spoken in words', () => {
+    wrap(<GameRow game={game()} line={{ favoriteTeamId: 'JAX', points: 4.5 }} />)
+    expect(screen.getByText('JAX \u22124.5')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByText('Point spread: Jaguars favored by 4.5')).toBeInTheDocument()
+  })
+
+  it("calls an even line a pick'em", () => {
+    wrap(<GameRow game={game()} line={{ favoriteTeamId: null, points: 0 }} />)
+    expect(screen.getByText("Pick'em")).toBeInTheDocument()
+  })
+
+  it('drops the spread once the game is under way, or over', () => {
+    const line = { favoriteTeamId: 'JAX', points: 4.5 }
+    const { container, rerender } = wrap(
+      <GameRow game={game({ status: 'in_progress', homeScore: 7, awayScore: 3 })} line={line} />,
+    )
+    expect(container.textContent).not.toMatch(/4\.5/)
+    rerender(
+      <LeagueContext.Provider value={league}>
+        <GameRow
+          game={game({ status: 'final', homeScore: 27, awayScore: 20, winnerTeamId: 'JAX' })}
+          line={line}
+        />
+      </LeagueContext.Provider>,
+    )
+    expect(container.textContent).not.toMatch(/4\.5/)
+  })
+
+  it('names no sportsbook and links nowhere', () => {
+    const { container } = wrap(
+      <GameRow game={game()} line={{ favoriteTeamId: 'JAX', points: 4.5 }} />,
+    )
+    expect(container.querySelector('a')).toBeNull()
+    expect(container.textContent).not.toMatch(/draftkings|fanduel|bet|odds|moneyline/i)
+  })
 })

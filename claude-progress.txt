@@ -730,3 +730,20 @@ DONE   : First week 5 picks. Tracy Nelson DAL (relayed by the commissioner — "
          Lancaster DAL. Sixteen of twenty-nine. Commissioner asked for point spreads on the slate;
          declined pending his say-so because AGENTS.md bans spreads by product decision.
 NEXT   : Thirteen still owed before 7:10 PM tonight. One more sweep late afternoon.
+
+--- 2026-10-08  Claude Opus 5.5 (feat/slate-spreads) ---
+DONE   : POINT SPREADS ON THE SLATE, at the commissioner's request ("not for betting … a data point
+         to help people decide … drive more traffic"). This reverses the AGENTS.md product rule;
+         the rule now reads: no betting or money; spreads shown as favourite + number only, never a
+         sportsbook name/logo, prices, moneylines or links. parseLine() in src/domain/nfl/espn.ts
+         reads ESPN's odds summary ("DAL -9.5", "WSH -3.5" → WAS, "EVEN"/"PK" → pick'em; unknown or
+         a favourite not in the game → no line). ParsedScoreboard.lines (ephemeral, never stored).
+         Port: NFLDataProvider.getLines? (demo implements via the ESPN client; connected has none
+         yet). useWeekLines hook (react-query, 15-min stale, only while a game is unplayed). The
+         slate tile shows "DAL −9.5" beside the kickoff, spoken as "Point spread: Cowboys favored
+         by 9.5", gone once the game starts. Screenshot of the real week 5 slate checked.
+         The e2e "a week nobody is playing does not call the feed" became "reads the feed once for
+         spreads, and never polls" — the point (no polling before kickoff) is kept.
+VERIFIED: validate 299 · e2e 103 · registry slate-point-spreads verified and flipped.
+         Sweep fails only on the commissioner's invalid .claude/settings.json (commented-out line).
+NEXT   : Connected mode has no spreads until the API proxies a provider. Week 5 picks: 13 owed.

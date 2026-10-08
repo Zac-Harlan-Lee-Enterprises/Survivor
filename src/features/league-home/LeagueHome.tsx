@@ -5,6 +5,7 @@ import { useLeagueContext, useLeagueTimeZone } from '@/app/hooks'
 import { useSession } from '@/app/hooks'
 import { useSelectedWeek } from '@/app/useSelectedWeek'
 import { useLiveScores } from '@/app/useLiveScores'
+import { useWeekLines } from '@/app/useWeekLines'
 import { WeekSelect } from '@/components/WeekSelect'
 import {
   applyGameOverrides,
@@ -16,6 +17,7 @@ import {
   type PlayerStanding,
   type ScoreChange,
   type ScoreLine,
+  type GameLine,
 } from '@/domain'
 import { Headshot } from '@/components/Headshot'
 import { PlayerCard } from '@/components/PlayerCard'
@@ -58,6 +60,7 @@ export function LeagueHome() {
     .filter((g) => g.week === viewedWeek)
     .sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))
   const liveScores = useLiveScores(snapshot.season.year, viewedWeek, slate)
+  const lines = useWeekLines(snapshot.season.year, viewedWeek, slate)
   const byes = teamsOnBye(snapshot.games, snapshot.season.year, viewedWeek)
   const nextKickoff = currentWeekGames.find(
     (g) =>
@@ -291,7 +294,7 @@ export function LeagueHome() {
           <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {slate.map((g) => (
               <li key={g.id}>
-                <GameRow game={g} detail={liveScores.detail[g.id]} />
+                <GameRow game={g} detail={liveScores.detail[g.id]} line={lines[g.id]} />
               </li>
             ))}
           </ul>
@@ -397,9 +400,18 @@ function Stat({
  *
  * `detail` is where the game is up to ("3rd 5:21"). It is passed in rather than
  * read from the game because it is display-only and never stored — see
- * ParsedScoreboard.liveDetail.
+ * ParsedScoreboard.liveDetail. `line` is the point spread, shown only before
+ * kickoff, for the same reason.
  */
-export function GameRow({ game, detail }: { game: NFLGame; detail?: string }) {
+export function GameRow({
+  game,
+  detail,
+  line,
+}: {
+  game: NFLGame
+  detail?: string
+  line?: GameLine
+}) {
   const tz = useLeagueTimeZone()
   const away = getTeam(game.awayTeamId)
   const home = getTeam(game.homeTeamId)
@@ -456,11 +468,36 @@ export function GameRow({ game, detail }: { game: NFLGame; detail?: string }) {
             {detail ?? 'In progress'}
           </span>
         ) : (
-          `${away?.abbreviation} at ${home?.abbreviation} \u00b7 ${formatKickoff(game.kickoffAt, { timeZone: tz })}`
+          <>
+            {`${away?.abbreviation} at ${home?.abbreviation} \u00b7 ${formatKickoff(game.kickoffAt, { timeZone: tz })}`}
+            {line && <SpreadTag line={line} />}
+          </>
         )}
         {game.resultSource === 'commissioner' && ' \u00b7 corrected by commissioner'}
       </p>
     </div>
+  )
+}
+
+/**
+ * The spread, set apart from the kickoff time: "DAL −9.5", or "Pick'em". A data
+ * point for picking — who the market expects to win, and by how much — with
+ * nothing about where to bet on it.
+ */
+function SpreadTag({ line }: { line: GameLine }) {
+  const team = line.favoriteTeamId ? getTeam(line.favoriteTeamId) : null
+  const text = team ? `${team.abbreviation} \u2212${line.points}` : "Pick'em"
+  const spoken = team
+    ? `Point spread: ${team.name} favored by ${line.points}`
+    : 'Point spread: pick\u2019em, neither team favored'
+  return (
+    <span
+      className="ml-1.5 inline-block rounded border border-white/10 px-1.5 py-px align-middle font-display text-[0.7rem] font-semibold tracking-wide text-ink-300"
+      title="Point spread: who is favored, and by how much. A guide for picking."
+    >
+      <span className="sr-only">{spoken}</span>
+      <span aria-hidden="true">{text}</span>
+    </span>
   )
 }
 

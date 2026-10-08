@@ -615,6 +615,9 @@ export function createDemoNFLProvider(
      * commissioner entered by hand is never overwritten (applyGameResults
      * enforces both).
      */
+    async getLines(seasonYear, week) {
+      return (await espn.fetchWeek(seasonYear, week)).lines
+    },
     async syncResults(seasonYear, week) {
       const parsed = await espn.fetchWeek(seasonYear, week)
       const at = ctx.clock.now().toISOString()

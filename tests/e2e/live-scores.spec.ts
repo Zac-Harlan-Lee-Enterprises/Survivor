@@ -1,5 +1,12 @@
 import { expect, test, type Page } from '@playwright/test'
-import { COMMISSIONER, resetDemo, serveEspn, setDemoClock, signInAs, SUNDAY_AFTERNOON } from './helpers'
+import {
+  COMMISSIONER,
+  resetDemo,
+  serveEspn,
+  setDemoClock,
+  signInAs,
+  SUNDAY_AFTERNOON,
+} from './helpers'
 
 /**
  * Live scores on the slate.
@@ -38,9 +45,12 @@ const scoreboard = (jaxScore: string, detail: string) => ({
 })
 
 const jaxTile = (page: Page) =>
-  page.locator('section[aria-labelledby="slate-title"]').getByRole('listitem').filter({
-    hasText: /jaguars/i,
-  })
+  page
+    .locator('section[aria-labelledby="slate-title"]')
+    .getByRole('listitem')
+    .filter({
+      hasText: /jaguars/i,
+    })
 
 /** Sunday afternoon of week 1: the 17:00Z games have kicked off. */
 async function openMidGame(page: Page) {
@@ -82,7 +92,11 @@ test.describe('live scores on the slate', () => {
     await expect(tile).toContainText('4th 12:04')
   })
 
-  test('a week nobody is playing does not call the feed at all', async ({ page }) => {
+  // Before kickoff the slate reads the feed once, for the point spreads; what it
+  // must never do is poll for scores that cannot exist yet.
+  test('a week nobody is playing reads the feed once for spreads, and never polls', async ({
+    page,
+  }) => {
     await resetDemo(page)
     let calls = 0
     await page.route('**/site.api.espn.com/**', (route) => {
@@ -93,7 +107,49 @@ test.describe('live scores on the slate', () => {
     await page.goto('./#/')
     await expect(page.getByRole('heading', { name: /still standing/i })).toBeVisible()
     await page.waitForTimeout(1500)
-    expect(calls, 'nothing has kicked off, so there is nothing to fetch').toBe(0)
+    await page.waitForTimeout(1500)
+    expect(
+      calls,
+      'one read for the spreads; nothing has kicked off, so no polling',
+    ).toBeLessThanOrEqual(1)
+  })
+
+  test('shows the point spread on a game that has not kicked off, with no sportsbook in sight', async ({
+    page,
+  }) => {
+    await resetDemo(page)
+    await page.route('**/site.api.espn.com/**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          season: { year: 2026, type: 2 },
+          week: { number: 1 },
+          events: [
+            {
+              date: '2026-09-13T17:00Z',
+              competitions: [
+                {
+                  date: '2026-09-13T17:00Z',
+                  status: { type: { name: 'STATUS_SCHEDULED' } },
+                  competitors: [
+                    { homeAway: 'home', team: { abbreviation: 'JAX' } },
+                    { homeAway: 'away', team: { abbreviation: 'CLE' } },
+                  ],
+                  odds: [{ details: 'JAX -4.5', provider: { name: 'DraftKings' } }],
+                },
+              ],
+            },
+          ],
+        }),
+      }),
+    )
+    // The pinned clock sits before any week 1 kickoff.
+    await page.goto('./#/')
+    const tile = jaxTile(page)
+    await expect(tile).toContainText('JAX \u22124.5')
+    await expect(tile.getByText('Point spread: Jaguars favored by 4.5')).toBeAttached()
+    await expect(tile).not.toContainText(/DraftKings/i)
   })
 
   test('an unreachable feed leaves the slate readable', async ({ page }) => {
