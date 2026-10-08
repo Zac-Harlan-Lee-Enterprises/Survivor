@@ -746,4 +746,6 @@ DONE   : POINT SPREADS ON THE SLATE, at the commissioner's request ("not for bet
          spreads, and never polls" — the point (no polling before kickoff) is kept.
 VERIFIED: validate 299 · e2e 103 · registry slate-point-spreads verified and flipped.
          Sweep fails only on the commissioner's invalid .claude/settings.json (commented-out line).
-NEXT   : Connected mode has no spreads until the API proxies a provider. Week 5 picks: 13 owed.
+NEXT   : Connected mode has no spreads until the API proxies a provider.
+         Sixth sweep (Thu 2:32 PM CT): Joanna Moss HOU (at TEN). Seventeen of twenty-nine; twelve
+         owed before 7:10 PM tonight.

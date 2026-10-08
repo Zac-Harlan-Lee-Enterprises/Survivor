@@ -2132,6 +2132,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-joanna-moss-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "joanna-moss",
+      "week": 5,
+      "teamId": "HOU",
+      "gameId": "2026-w05-HOU-at-TEN",
+      "submittedAt": "2026-10-08T18:54:51.000Z",
+      "updatedAt": "2026-10-08T18:54:51.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-allison-petty-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
