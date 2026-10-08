@@ -1716,6 +1716,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-melanie-moeller-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "melanie-moeller",
+      "week": 5,
+      "teamId": "CIN",
+      "gameId": "2026-w05-CIN-at-MIA",
+      "submittedAt": "2026-10-08T19:39:50.000Z",
+      "updatedAt": "2026-10-08T19:39:50.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-jason-snook-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2414,6 +2427,19 @@
       "gameId": "2026-w04-TEN-at-BAL",
       "submittedAt": "2026-10-01T15:00:00.000Z",
       "updatedAt": "2026-10-01T15:00:00.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-wesley-childers-5",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "wesley-childers",
+      "week": 5,
+      "teamId": "DAL",
+      "gameId": "2026-w05-TB-at-DAL",
+      "submittedAt": "2026-10-08T19:38:22.000Z",
+      "updatedAt": "2026-10-08T19:38:22.000Z",
       "version": 1,
       "source": "commissioner"
     },
