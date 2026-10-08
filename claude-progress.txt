@@ -749,3 +749,6 @@ VERIFIED: validate 299 · e2e 103 · registry slate-point-spreads verified and f
 NEXT   : Connected mode has no spreads until the API proxies a provider.
          Sixth sweep (Thu 2:32 PM CT): Joanna Moss HOU (at TEN). Seventeen of twenty-nine; twelve
          owed before 7:10 PM tonight.
+         Seventh sweep (Thu 2:52 PM CT), after the commissioner's group nudge: Wesley Childers DAL,
+         Melanie Moeller CIN. Nate Adams sent "My pick" with no team and no attachment that the
+         connector can see — flagged to the commissioner, not recorded. Nineteen of twenty-nine.
