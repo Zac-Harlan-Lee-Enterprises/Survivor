@@ -767,3 +767,17 @@ NEXT   : Connected mode has no spreads until the API proxies a provider.
 NEXT   : Week 5 review after Monday night (BUF at LAR). Check for eliminations: the eight on one
          life were Corey HOU, Craig DAL, Jared DAL, Joanna HOU, Joey DAL, Nate DAL, Phyllis DAL,
          Tina NE.
+
+--- 2026-10-08  Claude Opus 5.5 (feat/week5-kickoff-note) ---
+DONE   : Week 5 KICKOFF note (two paragraphs, as asked), published only after Thursday's 7:15 PM
+         kickoff because it names week 5 picks. 21 of 29 on DAL (2–2) vs TB (0–4); the five on
+         their last life all on Dallas (Craig, Jared, Joey, Nate, Phyllis); Joey PHI→MIN→DAL;
+         CIN ×4 at MIA (≤13 points in all four games); HOU ×2 at TEN (0–4 vs 0–4), Corey on one
+         life; Paul WAS (1–3) vs NYG (3–1); Tina NE (2–2) vs LV (3–1), one life; nobody on London
+         or Monday; all 29 before the lock, the last message 5:41 PM (James). No callout; the e2e
+         guard flipped back to "no pick instruction while locked" with the restore note.
+         The week 5 leak guard is gone with the week 4 review: picks are public after kickoff.
+VERIFIED: validate 299; note's e2e passes; facts test asserts every claim from the seed and the
+         pinned week 1–4 finals.
+NEXT   : Week 5 review after Monday night. If Dallas loses tonight, five funerals and five
+         epitaphs (Craig, Jared, Joey, Nate, Phyllis) — see the epitaph rule in AGENTS.md.
