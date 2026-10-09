@@ -74,10 +74,10 @@ describe('the week 5 kickoff note states only true things', () => {
     expect([3, 4, 5].map((w) => pickOf('Joseph Tomczuk', w)?.teamId)).toEqual(['PHI', 'MIN', 'DAL'])
   })
 
-  it('“The other eight of you scattered across four games … Cincinnati at a Miami team … thirteen or fewer in every game”', () => {
+  it('“The other eight of you saw twenty-one people climbing onto the Cowboys bandwagon … Cincinnati at a Miami team … thirteen or fewer in every game”', () => {
     const elsewhere = picks.filter((p) => p.teamId !== 'DAL')
     expect(elsewhere).toHaveLength(8)
-    expect(new Set(elsewhere.map((p) => p.gameId)).size).toBe(4)
+    expect(picks.filter((p) => p.teamId === 'DAL')).toHaveLength(21)
     expect(body).not.toMatch(/chosen violence/)
     expect(whoOn('CIN')).toEqual(['Allison', 'Cindy', 'Dave', 'Melanie'])
     const g = gameOf('CIN')
@@ -98,7 +98,7 @@ describe('the week 5 kickoff note states only true things', () => {
     expect(onLastLife('Corey Cowell')).toBe(true)
   })
 
-  it('“Paul has Washington, 1–3, at home to the 3–1 Giants, and Tina, also on her last life, has New England at home to the 3–1 Raiders”', () => {
+  it('“Paul has Washington, 1–3, at home to the 3–1 Giants … Tina, also on her last life, has taken New England” (at home to the 3–1 Raiders)', () => {
     expect(whoOn('WAS')).toEqual(['Paul'])
     expect(gameOf('WAS').homeTeamId).toBe('WAS')
     expect(gameOf('WAS').awayTeamId).toBe('NYG')
@@ -110,6 +110,12 @@ describe('the week 5 kickoff note states only true things', () => {
     expect(record('NE')).toBe('2-2')
     expect(record('LV')).toBe('3-1')
     expect(onLastLife('Tina Bush')).toBe(true)
+  })
+
+  it('“Tina … has taken New England — the team that knocked her Bills off last week”', () => {
+    expect(pickOf('Tina Bush', WEEK)?.teamId).toBe('NE')
+    expect(pickOf('Tina Bush', WEEK - 1)?.teamId).toBe('BUF')
+    expect(FINALS['2026-w04-NE-at-BUF']).toEqual([29, 26])
   })
 
   it('“Nobody has a stake in London or on Monday night”', () => {
