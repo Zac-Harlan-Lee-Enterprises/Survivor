@@ -74,8 +74,11 @@ describe('the week 5 kickoff note states only true things', () => {
     expect([3, 4, 5].map((w) => pickOf('Joseph Tomczuk', w)?.teamId)).toEqual(['PHI', 'MIN', 'DAL'])
   })
 
-  it('“The eight of you who went elsewhere … Cincinnati at a Miami team … thirteen or fewer in every game”', () => {
-    expect(picks.filter((p) => p.teamId !== 'DAL')).toHaveLength(8)
+  it('“The other eight of you scattered across four games … Cincinnati at a Miami team … thirteen or fewer in every game”', () => {
+    const elsewhere = picks.filter((p) => p.teamId !== 'DAL')
+    expect(elsewhere).toHaveLength(8)
+    expect(new Set(elsewhere.map((p) => p.gameId)).size).toBe(4)
+    expect(body).not.toMatch(/chosen violence/)
     expect(whoOn('CIN')).toEqual(['Allison', 'Cindy', 'Dave', 'Melanie'])
     const g = gameOf('CIN')
     expect([g.awayTeamId, g.homeTeamId]).toEqual(['CIN', 'MIA'])
