@@ -345,6 +345,8 @@ export function LeagueHome() {
                     pickVisible={viewer.isCommissioner}
                     index={i}
                     funeral
+                    // A cascade, not a chorus: each grave starts a beat after the last.
+                    funeralDelay={i * 1.1}
                   />
                 </li>
               ))}

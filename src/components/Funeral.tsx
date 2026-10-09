@@ -1,8 +1,10 @@
 import {
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
   type RefObject,
@@ -10,6 +12,7 @@ import {
 import { createPortal } from 'react-dom'
 import { getTeam, type PlayerStanding } from '@/domain'
 import { Headshot } from './Headshot'
+import { hash } from './graveVariant'
 import { TeamMonogram } from './TeamMonogram'
 
 /**
@@ -53,16 +56,6 @@ function scatter(seed: number) {
     s = (s * 1664525 + 1013904223) % 4294967296
     return s / 4294967296
   }
-}
-
-/** FNV-1a, so each player's break is their own and never changes. */
-function hash(s: string): number {
-  let h = 2166136261
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i)
-    h = Math.imul(h, 16777619)
-  }
-  return h >>> 0
 }
 
 interface Shard {
@@ -226,18 +219,32 @@ export interface FuneralProps {
   standing: PlayerStanding
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'hero'
   playing: boolean
+  /** Which way the ghost drifts as it rises (see graveVariant). */
+  sway?: 1 | -1
   /** The stone, already engraved; the scene raises it out of the ground. */
   children: ReactNode
 }
 
-export function Funeral({ name, playerId, standing, size, playing, children }: FuneralProps) {
+export function Funeral({
+  name,
+  playerId,
+  standing,
+  size,
+  playing,
+  sway = 1,
+  children,
+}: FuneralProps) {
   const face = <Headshot name={name} playerId={playerId} size={size} status="eliminated" />
   const anchor = useRef<HTMLDivElement>(null)
   const { shards, cracks } = useMemo(() => geometry(playerId), [playerId])
   const { weapon, paper } = useScript(name, standing)
 
   return (
-    <div ref={anchor} className={playing ? 'funeral is-playing' : 'funeral'}>
+    <div
+      ref={anchor}
+      className={playing ? 'funeral is-playing' : 'funeral'}
+      style={{ '--sway': sway } as CSSProperties}
+    >
       <HouseLights playing={playing} anchor={anchor} />
       <div aria-hidden="true" className="funeral-beam" />
       <div aria-hidden="true" className="funeral-ash">
@@ -338,6 +345,39 @@ export function Funeral({ name, playerId, standing, size, playing, children }: F
 }
 
 /**
+ * Who holds the house lights. A row of fresh graves plays as a cascade, and
+ * six dims stacked on one page turn it black; only the earliest funeral still
+ * playing dims the house. When it ends, the next one takes the lights over
+ * mid-scene, picking up its own timeline where it is, so the room never
+ * flickers between them.
+ */
+const lightsQueue: string[] = []
+const lightsListeners = new Set<() => void>()
+const emitLights = () => lightsListeners.forEach((l) => l())
+function useHoldsLights(playing: boolean): boolean {
+  const id = useId()
+  useEffect(() => {
+    if (!playing) return
+    lightsQueue.push(id)
+    emitLights()
+    return () => {
+      const at = lightsQueue.indexOf(id)
+      if (at >= 0) lightsQueue.splice(at, 1)
+      emitLights()
+    }
+  }, [playing, id])
+  const owner = useSyncExternalStore(
+    (l) => {
+      lightsListeners.add(l)
+      return () => lightsListeners.delete(l)
+    },
+    () => lightsQueue[0] ?? null,
+    () => null,
+  )
+  return playing && owner === id
+}
+
+/**
  * The house: a page-wide dim with a soft hole over the grave, the letterbox
  * bars, and the lightning — all rendered through a portal on the body so no
  * card edge can frame them. The hole follows the stone if the viewer scrolls.
@@ -349,16 +389,35 @@ function HouseLights({
   playing: boolean
   anchor: RefObject<HTMLDivElement | null>
 }) {
-  const [spot, setSpot] = useState<{ x: number; y: number; r: number } | null>(null)
+  const holds = useHoldsLights(playing)
+  // When this scene began, so a late handover picks the lights up mid-timeline.
+  const startedAt = useRef(0)
   useEffect(() => {
-    if (!playing || typeof document === 'undefined') return
+    if (playing && !startedAt.current) startedAt.current = Date.now()
+  }, [playing])
+  const [spot, setSpot] = useState<{
+    x: number
+    y: number
+    r: number
+    elapsed: number
+  } | null>(null)
+  useEffect(() => {
+    if (!holds || typeof document === 'undefined') return
     let frame = 0
+    // How far into its own scene this funeral was when it took the lights:
+    // fixed once, at the handover, so scrolling never moves the timeline.
+    const elapsed = startedAt.current ? Math.max(0, Date.now() - startedAt.current) : 0
     const measure = () => {
       frame = 0
       const el = anchor.current
       if (!el) return
       const b = el.getBoundingClientRect()
-      setSpot({ x: b.left + b.width / 2, y: b.top + b.height / 2, r: Math.max(b.width, b.height) })
+      setSpot({
+        x: b.left + b.width / 2,
+        y: b.top + b.height / 2,
+        r: Math.max(b.width, b.height),
+        elapsed,
+      })
     }
     const schedule = () => {
       if (!frame) frame = window.requestAnimationFrame(measure)
@@ -371,10 +430,14 @@ function HouseLights({
       window.removeEventListener('resize', schedule)
       if (frame) window.cancelAnimationFrame(frame)
     }
-  }, [playing, anchor])
-  if (!playing || !spot) return null
+  }, [holds, anchor])
+  if (!holds || !spot) return null
   return createPortal(
-    <div aria-hidden="true" className="funeral-house">
+    <div
+      aria-hidden="true"
+      className="funeral-house"
+      style={{ '--elapsed': `${-spot.elapsed}ms` } as CSSProperties}
+    >
       <div
         className="funeral-house-lights"
         style={

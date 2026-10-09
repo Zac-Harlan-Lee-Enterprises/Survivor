@@ -175,6 +175,13 @@
   }
   /* Granite, lit from above, with a chiselled edge. */
   /* The stone is drawn by StoneFace.tsx; the lettering sits on its tablet. */
+  /* Old stones settle; each leans its own way, pivoting on its foot. */
+  .headstone-lean {
+    position: absolute;
+    inset: 0;
+    transform: rotate(var(--lean, 0deg));
+    transform-origin: 50% 96%;
+  }
   .headstone-svg {
     position: absolute;
     inset: 0;
@@ -264,7 +271,7 @@
       rgba(3, 5, 12, 0.45) calc(var(--r) * 1.7),
       rgba(3, 5, 12, 0.86) calc(var(--r) * 3.4)
     );
-    animation: funeral-lights 19.4s ease-in-out both;
+    animation: funeral-lights 19.4s ease-in-out var(--elapsed, 0ms) both;
   }
   /* Letterbox: cinema bars that slide in with the lights and out with them. */
   .funeral-bar {
@@ -273,7 +280,7 @@
     right: 0;
     height: 7vh;
     background: #000;
-    animation: funeral-bars 19.4s ease-in-out both;
+    animation: funeral-bars 19.4s ease-in-out var(--elapsed, 0ms) both;
   }
   .funeral-bar-top {
     top: 0;
@@ -288,7 +295,7 @@
     inset: 0;
     background: #eef3ff;
     opacity: 0;
-    animation: funeral-lightning 0.9s 5.38s linear both;
+    animation: funeral-lightning 0.9s calc(5.38s + var(--elapsed, 0ms)) linear both;
   }
   /* Rain over the grave, from the first beat to the last. */
   .funeral-rain {
@@ -546,13 +553,16 @@
     opacity: 0.35;
   }
   /* The murder weapon, dropped at the foot of the stone. */
+  /* The murder weapon, dropped at the foot of the stone. Anchored to the right
+     so it stays inside its own card: a row of fresh graves sits side by side,
+     and anything that spills over is painted under the next card. */
   .funeral-weapon {
     position: absolute;
-    left: 66%;
-    bottom: -4%;
+    right: -26%;
+    bottom: -3%;
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.3rem;
     opacity: 0;
     transform: translateY(-260%) rotate(-40deg);
     z-index: 4;
@@ -564,14 +574,15 @@
   .funeral-score {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 0.7rem;
-    letter-spacing: 0.06em;
+    font-size: 0.62rem;
+    line-height: 1.15;
+    letter-spacing: 0.05em;
     color: #f7f3e8;
-    background: rgba(8, 10, 18, 0.85);
+    background: rgba(8, 10, 18, 0.88);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 9999px;
-    padding: 0.1rem 0.45rem;
-    white-space: nowrap;
+    border-radius: 0.45rem;
+    padding: 0.2rem 0.4rem;
+    max-width: 5.6rem;
     opacity: 0;
   }
   /* The crow. */
@@ -591,8 +602,14 @@
     transform: scaleY(0);
     animation: crow-blink 6s 2s infinite;
   }
+  .funeral-crow.is-left {
+    left: 6%;
+  }
   .funeral-crow.is-landing {
     animation: crow-land 1.8s 18.6s cubic-bezier(0.3, 0.6, 0.3, 1) both;
+  }
+  .funeral-crow.is-left.is-landing {
+    animation-name: crow-land-left;
   }
   .funeral-crow.is-landing .crow-wing {
     transform-origin: 100px 70px;
@@ -917,17 +934,17 @@
   }
   18% {
     opacity: 0.85;
-    transform: translate(-2%, -2%) scale(0.92);
+    transform: translate(calc(-2% * var(--sway, 1)), -2%) scale(0.92);
   }
   45% {
-    transform: translate(6%, -40%) scale(1);
+    transform: translate(calc(6% * var(--sway, 1)), -40%) scale(1);
   }
   70% {
-    transform: translate(-5%, -80%) scale(1.04);
+    transform: translate(calc(-5% * var(--sway, 1)), -80%) scale(1.04);
     opacity: 0.6;
   }
   100% {
-    transform: translate(3%, -135%) scale(1.1);
+    transform: translate(calc(3% * var(--sway, 1)), -135%) scale(1.1);
     opacity: 0;
   }
 }
@@ -1066,6 +1083,25 @@
   }
   82% {
     transform: translate(-6%, -14%) rotate(-10deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+/* Perched on the left it faces left, so it comes in from the right. */
+@keyframes crow-land-left {
+  0% {
+    opacity: 0;
+    transform: translate(190%, -200%) rotate(-10deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(60%, -70%) rotate(-6deg);
+  }
+  82% {
+    transform: translate(6%, -14%) rotate(10deg);
   }
   100% {
     transform: none;
