@@ -19,33 +19,26 @@ import { Megaphone, Send } from 'lucide-react'
 /**
  * Mapped to weeks 1 through 5 on purpose. The seed carries no results, so the
  * engine calls week 1 current until the live sync lands them, at which point
- * week 5 is — and the league needs the review under whichever key it is shown.
+ * week 5 is — and the league needs the note under whichever key it is shown.
  *
- * Week 4 is public (its first kickoff has passed), so the review names picks.
- * It says nothing about week 5 picks, which are hidden until Thursday.
+ * Published after Thursday's kickoff, when week 5's picks are public, so it
+ * names them. No callout: the picks are locked and nothing is owed.
  */
-const WEEK_4_REVIEW = {
+const WEEK_5_KICKOFF = {
   heading: 'Word from the commissioner',
   lines: [
-    'Week 4 is done a day early: nobody in this league touched Monday night’s game, so New Orleans and Atlanta can play it in peace and, for once, nobody’s week depends on a Monday. Here is the damage. Sixteen of you took Minnesota, who beat Miami 15–10 with five field goals and no touchdown, their second straight game without one. More than half this league was carried by a team that cannot find the end zone. Eight of you took Baltimore, 24–18 over Tennessee. Dave and Craig took Chicago, 23–12 over the Jets. All twenty-six of you are fine.',
-    'Dominic also took Baltimore. Baltimore won. Dominic lost a life anyway, because he had already used the Ravens in week 1, and the rulebook does not have a box marked “but they won”. That is a new way to lose in this league, and I salute the creativity.',
-    'Phyllis went early with Pittsburgh on Thursday night and lost 27–24 to a 56-yard field goal with ten seconds left; Cleveland are now 8–0 on Thursday nights, the least Cleveland fact ever recorded. Tina took Buffalo, unbeaten until Sunday, and lost them 29–26 to a one-handed catch with 1:50 to go: the Bills’ first loss of the year and their first ever in the new stadium. Both are down to one life. Both picked a team that had every right to win. That is the game.',
-    'And then there is Don. Don took Detroit on Sunday night in Carolina on his last life, and Carolina, the team that gave up fifty-nine points to Chicago in week 1, scored on six straight possessions and won 32–26. Jared Goff threw for 412 yards; it bought Don nothing. Don is the first member of the Sunday Survivors to lose all three lives, and he did it the hard way: three straight losses, by seven, two and six points. His headstone is on this page. His epitaph is on his profile. Don, we hardly knew your picks.',
-    'Where we stand: twenty-nine alive. Seven on three lives (Allison, Cindy, Jason, Mike, Shahid, Tracy and Wesley), fourteen on two, and eight on one: Corey, Craig, Jared, Joanna, Joey, Nate, Phyllis and Tina. Eight people one bad Sunday from a headstone. The crow has been told.',
-    'Week 5 has byes: Carolina and Kansas City sit out, so thirty teams on the menu. Thursday night is Tampa Bay at Dallas, which locks the week. Philadelphia and Jacksonville play in London at 8:30 on Sunday morning our time, again. Minnesota, 4–0 and still waiting for a touchdown, are spent for sixteen of you; Kansas City are spent for twenty, which costs nothing this week since they are on the sofa anyway.',
+    'Picks are locked and the secret is out: twenty-one of you are on Dallas tonight. Twenty-one of twenty-nine, on a Cowboys team that is 2–2, at home to a Tampa Bay team that is 0–4 — which is either the safest pick this league has ever made or the setup for the most catastrophic Thursday in its history, and we will know by about ten o’clock. Craig, Jared, Joey, Nate and Phyllis are all on their last life and all on Dallas, so if the Bucs win their first game of the season tonight, the crow is going to need a bigger stone. Joey, for the record, has now gone Eagles, Vikings and Cowboys in successive weeks: three NFC teams in a row, not one of them the Bears.',
+    'The eight of you who went elsewhere have chosen violence. Cindy, Dave, Melanie and Allison took Cincinnati at a Miami team that has scored thirteen points or fewer in every game this season. Joanna and Corey took Houston at Tennessee, which is an 0–4 team visiting an 0–4 team — somebody’s losing streak ends on Sunday, and Corey, on his last life, needs it to be Houston’s. Paul has Washington, 1–3, at home to the 3–1 Giants, and Tina, also on her last life, has New England at home to the 3–1 Raiders. Nobody has a stake in London or on Monday night, and all twenty-nine picks arrived before the lock, the last of them at 5:41 — thank you, James.',
   ],
-  // Set apart from the banter, because an instruction buried in jokes is an
-  // instruction somebody misses — and eight people are on their last life.
-  callout:
-    'DM me your week 5 pick on Teams before 7:10 PM Thursday — five minutes before Tampa Bay at Dallas kicks off. A missing pick costs a life, and eight of you have exactly one.',
+  // No callout: the picks are locked. The week 6 one comes with the week 5 review.
 }
 
 const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {
-  1: WEEK_4_REVIEW,
-  2: WEEK_4_REVIEW,
-  3: WEEK_4_REVIEW,
-  4: WEEK_4_REVIEW,
-  5: WEEK_4_REVIEW,
+  1: WEEK_5_KICKOFF,
+  2: WEEK_5_KICKOFF,
+  3: WEEK_5_KICKOFF,
+  4: WEEK_5_KICKOFF,
+  5: WEEK_5_KICKOFF,
 }
 
 export function LeagueMessage({ week }: { week: number }) {

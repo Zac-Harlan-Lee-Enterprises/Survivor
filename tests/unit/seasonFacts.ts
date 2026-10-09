@@ -13,6 +13,7 @@ export interface Pick {
   week: number
   teamId: string
   gameId: string
+  submittedAt: string
 }
 export interface Game {
   id: string
