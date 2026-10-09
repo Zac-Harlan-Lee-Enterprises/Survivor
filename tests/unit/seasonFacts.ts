@@ -36,8 +36,7 @@ export const season = JSON.parse(
 /**
  * Every week 1–4 final, as the ESPN scoreboard
  * reports them (site.api.espn.com, 2026 season type 2, weeks 1 to 4, read on
- * 2026-09-22, 2026-09-29 and 2026-10-05; week 4's Monday night game, which nobody
- * picked, was still to be played). The seed deliberately carries no results — the app fetches them
+ * 2026-09-22, 2026-09-29 and 2026-10-05, Monday night's added on 2026-10-09). The seed deliberately carries no results — the app fetches them
  * live — so the note's outcome claims are pinned here instead, keyed by the
  * seed's own game ids so a pick and its result cannot drift apart.
  *
@@ -107,6 +106,7 @@ export const FINALS: Record<string, [number, number]> = {
   '2026-w04-DEN-at-SF': [14, 24],
   '2026-w04-LAC-at-SEA': [23, 30],
   '2026-w04-DET-at-CAR': [26, 32],
+  '2026-w04-ATL-at-NO': [45, 24],
 }
 
 export const gamesById = new Map(season.games.map((g) => [g.id, g]))

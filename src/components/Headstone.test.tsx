@@ -9,6 +9,7 @@ import { kickoffFor, scenario } from '@/domain/testing/scenario'
 import type { Services } from '@/data'
 import { FUNERAL_MS } from './Funeral'
 import { Headstone } from './Headstone'
+import { graveVariant } from './graveVariant'
 import { PlayerCard } from './PlayerCard'
 
 function wrap(children: ReactNode) {
@@ -142,7 +143,9 @@ describe('Headstone', () => {
 
   it('drops the murder weapon with the final score', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
-    expect(document.querySelector('.funeral-score')).toHaveTextContent('Finally done in by WAS 27–17')
+    expect(document.querySelector('.funeral-score')).toHaveTextContent(
+      'Finally done in by WAS 27–17',
+    )
   })
 
   it('breaks every face its own way', () => {
@@ -263,6 +266,103 @@ describe('Headstone funeral timing', () => {
     wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} />)
     expect(document.querySelector('[data-funeral]')).toBeNull()
     expect(screen.getByRole('img')).not.toHaveClass('funeral-stone')
+  })
+})
+
+describe('a row of graves', () => {
+  it('gives each grave its own stone, fixed per player', () => {
+    const ids = [
+      'craig-mowers',
+      'jared-marks',
+      'joseph-tomczuk',
+      'nate-adams',
+      'phyllis-collins',
+      'don-turner',
+    ]
+    const variants = ids.map(graveVariant)
+    // Same player, same stone, every time.
+    expect(ids.map(graveVariant)).toEqual(variants)
+    expect(new Set(variants.map((v) => v.shape)).size).toBe(3)
+    expect(new Set(variants.map((v) => v.tint)).size).toBe(3)
+    expect(new Set(variants.map((v) => v.lean)).size).toBeGreaterThan(3)
+    for (const v of variants) {
+      expect(Math.abs(v.lean)).toBeLessThanOrEqual(2)
+    }
+  })
+
+  it('carves the variant into the stone it renders', () => {
+    wrap(
+      <Headstone name="Nate Adams" playerId="nate-adams" standing={standings().ann} size="hero" />,
+    )
+    const v = graveVariant('nate-adams')
+    const lean = document.querySelector('.headstone-lean') as HTMLElement
+    expect(lean.style.getPropertyValue('--lean')).toBe(`${v.lean}deg`)
+  })
+
+  it('perches the crow on the shoulder the variant picks', () => {
+    vi.useFakeTimers()
+    try {
+      wrap(<Headstone name="Nate Adams" playerId="nate-adams" standing={standings().ann} funeral />)
+      act(() => vi.advanceTimersByTime(FUNERAL_MS))
+      const crow = document.querySelector('.funeral-crow')!
+      expect(crow.classList.contains('is-left')).toBe(
+        graveVariant('nate-adams').crowSide === 'left',
+      )
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('dims the house once for the whole row, not once per grave', () => {
+    wrap(
+      <>
+        <Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />
+        <Headstone name="Bob Example" playerId="bob" standing={standings().ann} funeral />
+        <Headstone name="Cal Example" playerId="cal" standing={standings().ann} funeral />
+      </>,
+    )
+    expect(document.querySelectorAll('.funeral.is-playing')).toHaveLength(3)
+    expect(document.body.querySelectorAll(':scope > .funeral-house')).toHaveLength(1)
+  })
+})
+
+describe('the cascade', () => {
+  let fire: (visible: boolean) => void = () => {}
+  afterEach(() => vi.unstubAllGlobals())
+
+  it("holds a grave's funeral for its delay after it comes into view", () => {
+    vi.useFakeTimers()
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(cb: IntersectionObserverCallback) {
+          fire = (visible) =>
+            cb([{ isIntersecting: visible } as IntersectionObserverEntry], this as never)
+        }
+        observe() {}
+        disconnect() {}
+      },
+    )
+    try {
+      wrap(
+        <Headstone
+          name="Ann Example"
+          playerId="ann"
+          standing={standings().ann}
+          funeral
+          funeralDelay={2.2}
+        />,
+      )
+      const grave = document.querySelector('[data-funeral]')!
+      act(() => fire(true))
+      expect(grave).toHaveAttribute('data-funeral', 'waiting')
+      act(() => vi.advanceTimersByTime(2100))
+      expect(grave).toHaveAttribute('data-funeral', 'waiting')
+      act(() => vi.advanceTimersByTime(200))
+      expect(grave).toHaveAttribute('data-funeral', 'playing')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
 

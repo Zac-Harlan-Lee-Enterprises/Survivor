@@ -19,6 +19,8 @@ export interface PlayerCardProps {
   index?: number
   /** Play the funeral (headshot crumbles into the headstone). Eliminated players only. */
   funeral?: boolean
+  /** Seconds to hold the funeral after it comes into view, for a cascade along a row. */
+  funeralDelay?: number
 }
 
 export function PlayerCard({
@@ -28,6 +30,7 @@ export function PlayerCard({
   compact,
   index = 0,
   funeral,
+  funeralDelay,
 }: PlayerCardProps) {
   const out = standing.status === 'eliminated'
   const champ = standing.status === 'champion' || standing.status === 'co-champion'
@@ -53,6 +56,7 @@ export function PlayerCard({
           standing={standing}
           size={funeral ? 'xl' : compact ? 'md' : 'lg'}
           funeral={funeral}
+          funeralDelay={funeralDelay}
         />
       ) : (
         <Headshot

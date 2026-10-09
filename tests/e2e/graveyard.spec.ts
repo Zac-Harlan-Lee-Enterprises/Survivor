@@ -145,4 +145,73 @@ test.describe('the graveyard', () => {
       expect(summary, `${path}\n${summary.join('\n')}`).toEqual([])
     }
   })
+
+  test('a row of fresh graves keeps every "finally done in" tag inside its own card', async ({
+    page,
+  }) => {
+    // The real weeks 1–4, plus Thursday of week 5: Tampa Bay 24, Dallas 16.
+    // That buries the five last-life Dallas pickers alongside Don.
+    const week5 = { '2026-w05-TB-at-DAL': [24, 16] as [number, number] }
+    await resetDemo(page)
+    await signInAs(page, COMMISSIONER)
+    await setDemoClock(page, '2026-10-09T15:00')
+    await page.route('**/site.api.espn.com/**', (route) => {
+      const week = Number(new URL(route.request().url()).searchParams.get('week'))
+      const events = season.games
+        .filter((g) => g.week === week && week <= 5)
+        .map((g) => {
+          const final = week5[g.id as keyof typeof week5] ?? (week <= 4 ? FINALS[g.id] : undefined)
+          const [away, home] = final ?? [0, 0]
+          return {
+            date: g.kickoffAt,
+            competitions: [
+              {
+                date: g.kickoffAt,
+                status: { type: { name: final ? 'STATUS_FINAL' : 'STATUS_SCHEDULED' } },
+                competitors: [
+                  {
+                    homeAway: 'home',
+                    score: String(home),
+                    winner: !!final && home > away,
+                    team: { abbreviation: g.homeTeamId },
+                  },
+                  {
+                    homeAway: 'away',
+                    score: String(away),
+                    winner: !!final && away > home,
+                    team: { abbreviation: g.awayTeamId },
+                  },
+                ],
+              },
+            ],
+          }
+        })
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ season: { year: 2026, type: 2 }, week: { number: week }, events }),
+      })
+    })
+    await page.goto('./#/')
+    const graves = page.locator('section[aria-labelledby="grave-title"]')
+    await expect(graves.getByRole('img', { name: /^Headstone of/ })).toHaveCount(6, {
+      timeout: 20_000,
+    })
+
+    // Freeze every scene on its last frame, so the tags sit where they land.
+    await page.addStyleTag({
+      content:
+        '.funeral-weapon, .funeral-score { animation: none !important; transform: none !important; opacity: 1 !important; }',
+    })
+    const tags = graves.locator('.funeral-score')
+    await expect(tags).toHaveCount(6)
+    for (let i = 0; i < 6; i++) {
+      const tag = tags.nth(i)
+      const card = tag.locator('xpath=ancestor::a[contains(@class, "card")]')
+      const [t, c] = await Promise.all([tag.boundingBox(), card.boundingBox()])
+      expect(t && c, `tag ${i}`).toBeTruthy()
+      expect(t!.x, `tag ${i} left edge`).toBeGreaterThanOrEqual(c!.x)
+      expect(t!.x + t!.width, `tag ${i} right edge`).toBeLessThanOrEqual(c!.x + c!.width)
+    }
+  })
 })

@@ -1,3 +1,5 @@
+import type { GraveShape, GraveTint } from './graveVariant'
+
 /**
  * The stone itself: a granite tablet on a plinth, drawn in SVG so it reads as
  * rock at any size. Texture comes from noise filters (fine speckle lit from
@@ -8,7 +10,17 @@
  *
  * Filter ids are suffixed per stone: a page can hold a whole graveyard.
  */
-export function StoneFace({ uid }: { uid: string }) {
+export function StoneFace({
+  uid,
+  shape = 'round',
+  tint = 'grey',
+}: {
+  uid: string
+  shape?: GraveShape
+  tint?: GraveTint
+}) {
+  const TABLET = TABLETS[shape]
+  const granite = GRANITE[tint]
   const id = (s: string) => `stone-${s}-${uid}`
   return (
     <svg
@@ -22,9 +34,9 @@ export function StoneFace({ uid }: { uid: string }) {
           <path d={TABLET} />
         </clipPath>
         <linearGradient id={id('granite')} x1="0" y1="0" x2="0.25" y2="1">
-          <stop offset="0" stopColor="#7c8088" />
-          <stop offset="0.55" stopColor="#5f636b" />
-          <stop offset="1" stopColor="#474a52" />
+          <stop offset="0" stopColor={granite[0]} />
+          <stop offset="0.55" stopColor={granite[1]} />
+          <stop offset="1" stopColor={granite[2]} />
         </linearGradient>
         <linearGradient id={id('plinth')} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#5a5d64" />
@@ -183,5 +195,20 @@ export function StoneFace({ uid }: { uid: string }) {
   )
 }
 
-/** A rounded-shoulder tablet, a little wider at the foot, standing on the plinth. */
-const TABLET = 'M15.5 85 L15.5 32 C15.5 14.5 29 6 50 6 C71 6 84.5 14.5 84.5 32 L84.5 85 Z'
+/** The tablet's outline, standing on the plinth, in three of the shapes a real graveyard is full of. */
+const TABLETS: Record<GraveShape, string> = {
+  // Rounded shoulders, a little wider at the foot.
+  round: 'M15.5 85 L15.5 32 C15.5 14.5 29 6 50 6 C71 6 84.5 14.5 84.5 32 L84.5 85 Z',
+  // A pointed Gothic arch.
+  gothic: 'M17 85 L17 34 C17 22 30 13 50 4 C70 13 83 22 83 34 L83 85 Z',
+  // Flat-topped with squared shoulders and a small crown at the centre.
+  crowned:
+    'M15.5 85 L15.5 19 Q15.5 13 21.5 13 L37 13 Q42 13 44 9 Q50 3 56 9 Q58 13 63 13 L78.5 13 Q84.5 13 84.5 19 L84.5 85 Z',
+}
+
+/** Granite from light to dark: plain grey, a warmer weathered stone, and a cooler slate. */
+const GRANITE: Record<GraveTint, [string, string, string]> = {
+  grey: ['#7c8088', '#5f636b', '#474a52'],
+  warm: ['#8a837a', '#6a645b', '#4e4942'],
+  slate: ['#76808e', '#5a6370', '#434a55'],
+}

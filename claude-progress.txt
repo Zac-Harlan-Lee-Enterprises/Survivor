@@ -781,3 +781,23 @@ VERIFIED: validate 299; note's e2e passes; facts test asserts every claim from t
          pinned week 1–4 finals.
 NEXT   : Week 5 review after Monday night. If Dallas loses tonight, five funerals and five
          epitaphs (Craig, Jared, Joey, Nate, Phyllis) — see the epitaph rule in AGENTS.md.
+
+--- 2026-10-09  Claude Opus 5.5 (fix/graveyard-overlap) ---
+CONTEXT: Tampa Bay beat Dallas 24–16 on Thursday: Craig, Jared, Joey, Nate and Phyllis are OUT
+         (five last-life Dallas pickers), so the league page shows six fresh graves with Don.
+DONE   : 1. Commissioner: "the text from one to the other gets hidden behind the headstone beside
+         it." It was the weapon tag ("Finally done in by TB 24–16") spilling past its card and
+         being painted under the next card. Now anchored to the right inside the card and wrapped
+         to two lines. New e2e builds six real graves (weeks 1–4 + TB 24–16) and asserts every tag
+         lies within its own card, desktop and mobile.
+         2. Commissioner: six identical funerals "looks weird." graveVariant(playerId) — stable
+         per player — gives each grave a shape (round / gothic / crowned), a granite tint (grey /
+         warm / slate), a lean of up to ±2°, the crow's shoulder (left-perched crows face left and
+         fly in from the right, head first) and the ghost's drift direction. Fresh graves play as
+         a cascade (funeralDelay = index × 1.1 s after coming into view). Only one funeral holds
+         the house lights at a time (useHoldsLights queue); when it finishes the next takes over
+         mid-timeline via a negative animation delay, so six funerals no longer stack six dims.
+         Pinned Monday's ATL 45–24 NO into seasonFacts (week 4 is now complete).
+VERIFIED: validate 305 · e2e 105 · filmed the six-grave cascade at 3/8/14/27 s and checked the stones.
+NEXT   : WEEK 5 REVIEW after Monday night (BUF at LAR): FIVE EPITAPHS (Craig, Jared, Joey, Nate,
+         Phyllis), one-paragraph recaps, "always more jokes", every claim pinned in epitaphFacts.

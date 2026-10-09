@@ -5,6 +5,7 @@ import { cn } from '@/lib/cn'
 import { Funeral, FUNERAL_MS } from './Funeral'
 import { StoneFace } from './StoneFace'
 import { Crow } from './Crow'
+import { graveVariant } from './graveVariant'
 
 /** Same footprint as Headshot's sizes, so a headstone drops in where a face was. */
 const SIZES = {
@@ -41,6 +42,11 @@ export interface HeadstoneProps {
    * motion just see the stone.
    */
   funeral?: boolean
+  /**
+   * Seconds to wait, once the grave is on screen, before its funeral starts.
+   * A row of fresh graves plays as a cascade rather than in unison.
+   */
+  funeralDelay?: number
   className?: string
 }
 
@@ -51,15 +57,17 @@ export function Headstone({
   standing,
   size = 'md',
   funeral,
+  funeralDelay = 0,
   className,
 }: HeadstoneProps) {
+  const variant = graveVariant(playerId)
   const week = standing.eliminatedWeek
   const cause = causeOfDeath(standing)
   // A card-sized stone carries the killing blow; the hero stone has room for the whole story.
   const carved = size === 'hero' ? cause : cause?.replace(/ Complications:.*$/, '')
   const detail = DETAIL[size]
   const label = `Headstone of ${name}, eliminated in week ${week}.${cause ? ` ${cause}` : ''}`
-  const { ref, phase } = useFuneral(!!funeral)
+  const { ref, phase } = useFuneral(!!funeral, funeralDelay)
   const staged = phase === 'waiting' || phase === 'playing'
 
   /** Each carved line, numbered so the funeral can chisel them in order. */
@@ -75,39 +83,41 @@ export function Headstone({
       aria-label={label}
       className={cn('headstone relative h-full w-full', staged && 'funeral-stone')}
     >
-      <StoneFace uid={playerId} />
-      <div className="headstone-face flex flex-col items-center justify-center text-center">
-        {engraved(
-          0,
-          cn(
-            'font-display font-extrabold tracking-[0.2em]',
-            detail === 'rip' ? 'text-[0.62rem] sm:text-xs' : 'text-sm md:text-lg',
-          ),
-          'RIP',
-        )}
-        {detail !== 'rip' &&
-          engraved(
-            1,
+      <div className="headstone-lean" style={{ '--lean': `${variant.lean}deg` } as CSSProperties}>
+        <StoneFace uid={playerId} shape={variant.shape} tint={variant.tint} />
+        <div className="headstone-face flex flex-col items-center justify-center text-center">
+          {engraved(
+            0,
             cn(
-              'w-full font-display font-bold uppercase leading-tight',
-              detail === 'name' ? 'truncate text-[0.65rem]' : 'text-sm md:text-lg',
+              'font-display font-extrabold tracking-[0.2em]',
+              detail === 'rip' ? 'text-[0.62rem] sm:text-xs' : 'text-sm md:text-lg',
             ),
-            detail === 'name' ? name.split(' ')[0]! : name,
+            'RIP',
           )}
-        {detail !== 'rip' &&
-          week !== null &&
-          engraved(
-            2,
-            'font-display text-[0.62rem] font-semibold tracking-wide md:text-xs',
-            week === 1 ? 'Week 1' : `Weeks 1–${week}`,
-          )}
-        {detail === 'full' &&
-          carved &&
-          engraved(
-            3,
-            'engrave-soft mt-1 line-clamp-3 font-display text-[0.62rem] leading-snug md:text-xs',
-            carved,
-          )}
+          {detail !== 'rip' &&
+            engraved(
+              1,
+              cn(
+                'w-full font-display font-bold uppercase leading-tight',
+                detail === 'name' ? 'truncate text-[0.65rem]' : 'text-sm md:text-lg',
+              ),
+              detail === 'name' ? name.split(' ')[0]! : name,
+            )}
+          {detail !== 'rip' &&
+            week !== null &&
+            engraved(
+              2,
+              'font-display text-[0.62rem] font-semibold tracking-wide md:text-xs',
+              week === 1 ? 'Week 1' : `Weeks 1–${week}`,
+            )}
+          {detail === 'full' &&
+            carved &&
+            engraved(
+              3,
+              'engrave-soft mt-1 line-clamp-3 font-display text-[0.62rem] leading-snug md:text-xs',
+              carved,
+            )}
+        </div>
       </div>
       {staged && <span aria-hidden="true" className="funeral-glint" />}
     </div>
@@ -120,7 +130,9 @@ export function Headstone({
       data-funeral={funeral ? phase : undefined}
     >
       {/* The crow: flies in as the lights come up, then sits on every visit after. */}
-      {funeral && phase !== 'waiting' && <Crow landing={phase === 'playing'} />}
+      {funeral && phase !== 'waiting' && (
+        <Crow landing={phase === 'playing'} side={variant.crowSide} />
+      )}
       {staged ? (
         <Funeral
           name={name}
@@ -128,6 +140,7 @@ export function Headstone({
           standing={standing}
           size={size}
           playing={phase === 'playing'}
+          sway={variant.sway}
         >
           {stone}
         </Funeral>
@@ -151,7 +164,7 @@ const prefersReducedMotion = () =>
  * who asked for reduced motion skip straight to the stone. Without
  * IntersectionObserver there is no way to know what is on screen, so it plays.
  */
-function useFuneral(funeral: boolean) {
+function useFuneral(funeral: boolean, delaySeconds = 0) {
   const ref = useRef<HTMLDivElement>(null)
   const [phase, setPhase] = useState<Phase>(() =>
     !funeral || prefersReducedMotion()
@@ -166,15 +179,23 @@ function useFuneral(funeral: boolean) {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
-          setPhase('playing')
           observer.disconnect()
+          if (delaySeconds > 0) {
+            timer = window.setTimeout(() => setPhase('playing'), delaySeconds * 1000)
+          } else {
+            setPhase('playing')
+          }
         }
       },
       { threshold: 0.75 },
     )
+    let timer = 0
     observer.observe(el)
-    return () => observer.disconnect()
-  }, [phase])
+    return () => {
+      observer.disconnect()
+      window.clearTimeout(timer)
+    }
+  }, [phase, delaySeconds])
   useEffect(() => {
     if (phase !== 'playing') return
     const t = window.setTimeout(() => setPhase('done'), FUNERAL_MS)
