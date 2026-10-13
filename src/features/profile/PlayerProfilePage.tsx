@@ -9,8 +9,8 @@ import { StatusBadge } from '@/components/StatusBadge'
 import { TeamMonogram } from '@/components/TeamMonogram'
 import { NotFound } from '@/features/NotFound'
 import { useConfetti } from '@/components/useConfetti'
-import { autoEpitaph, livesLine, streakLine } from '@/lib/copy'
-import { EPITAPHS } from '@/lib/epitaphs'
+import { livesLine, streakLine } from '@/lib/copy'
+import { epitaphFor } from '@/lib/epitaphs'
 import { cn } from '@/lib/cn'
 
 /** A sports-card style profile: the person, their status, and their record. */
@@ -33,9 +33,7 @@ export function PlayerProfilePage() {
   const isMe = viewer.playerId === playerId
   const out = standing.status === 'eliminated'
   // The commissioner's own words when he has written them; the record's until then.
-  const epitaph = out
-    ? (EPITAPHS[playerId]?.recap ?? autoEpitaph(profile.displayName, standing))
-    : null
+  const epitaph = epitaphFor(playerId, profile.displayName, standing)
   const streak = streakLine(standing.streak)
 
   return (
