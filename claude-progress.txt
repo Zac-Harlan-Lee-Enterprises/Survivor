@@ -801,3 +801,13 @@ DONE   : 1. Commissioner: "the text from one to the other gets hidden behind the
 VERIFIED: validate 305 · e2e 105 · filmed the six-grave cascade at 3/8/14/27 s and checked the stones.
 NEXT   : WEEK 5 REVIEW after Monday night (BUF at LAR): FIVE EPITAPHS (Craig, Jared, Joey, Nate,
          Phyllis), one-paragraph recaps, "always more jokes", every claim pinned in epitaphFacts.
+
+== 2026-10-13 · Claude Code (Opus 5.5) · feat/week5-review ==
+- Week 5 review note (WEEK_5_REVIEW, weeks 1–6 keys): Dallas 0-for-21 vs 0–4 Tampa (24–16), five out (Craig, Jared, Joey, Nate, Phyllis), Bears 31–7 at GB, Paul's 27–27 WAS–NYG tie, CIN 31–24 / HOU 26–3 / NE 45–17, standings 24 alive (2 on three lives, 7 on two, 15 on one), week 6 byes + Thursday SEA@DEN lock 7:10 PM CT + London HOU–JAX 8:30 AM + DAL@GB SNF.
+- Week 5 finals pinned in tests/unit/seasonFacts.ts; winnerOf returns null on a tie, record() shows W-L-T.
+- Five epitaphs (writtenAfterWeek 5), each claim asserted in tests/unit/epitaphFacts.test.ts.
+- New epitaphFor() in src/lib/epitaphs.ts: a carved recap shows only when the engine's eliminatedWeek matches writtenAfterWeek; otherwise autoEpitaph (graveyard e2e's counterfactual week-3 burial of Nate exposed it). Tests: src/lib/epitaphs.test.ts.
+- e2e league-message: callout assertions restored (pick on Teams / time / costs a life).
+- Verified: npm run validate (315 unit), npm run test:e2e (105 passed, 2 skipped), init.sh HTTP 200. quality-sweep fails only on the user's local invalid .claude/settings.json (line 18 comment) — not committed.
+- NOT merged: commissioner previews first.
+NEXT: commissioner reviews locally → merge on his word. Then week 6 picks (lock Thu 2026-10-15 7:10 PM CT); record picks only, don't touch the note before kickoff.

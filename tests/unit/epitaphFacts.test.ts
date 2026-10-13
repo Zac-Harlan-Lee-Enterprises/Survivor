@@ -8,6 +8,7 @@ import {
   picksIn,
   pinnedThrough,
   season,
+  winnerOf,
 } from './seasonFacts'
 
 /**
@@ -113,5 +114,178 @@ describe('Don Turner’s epitaph', () => {
     const used = new Set([1, 2, 3, 4].map((w) => pick(w).teamId))
     expect(32 - used.size).toBe(28)
     expect(picksIn(5).filter((p) => p.playerId === 'don-turner')).toHaveLength(0)
+  })
+})
+
+/** One player's pick in a week, with the game as it finished. */
+function played(displayName: string, week: number) {
+  const p = pickOf(displayName, week)
+  if (!p) return null
+  const g = gamesById.get(p.gameId)!
+  const [away, home] = FINALS[p.gameId]!
+  const isHome = p.teamId === g.homeTeamId
+  return {
+    teamId: p.teamId,
+    mine: isHome ? home : away,
+    theirs: isHome ? away : home,
+    home: isHome,
+    opponent: isHome ? g.awayTeamId : g.homeTeamId,
+    gameId: p.gameId,
+  }
+}
+const livesEntering = (playerId: string, week: number) => {
+  let lives = 3
+  for (let w = 1; w < week; w++) {
+    const p = season.picks.find((x) => x.playerId === playerId && x.week === w)
+    if (!p || winnerOf(p.gameId) !== p.teamId) lives -= 1
+  }
+  return lives
+}
+
+describe('the week 5 epitaphs', () => {
+  it('bury exactly the five that week 5 eliminated', () => {
+    for (const id of [
+      'craig-mowers',
+      'jared-marks',
+      'joseph-tomczuk',
+      'nate-adams',
+      'phyllis-collins',
+    ]) {
+      expect(eliminatedWeekOf(id, pinnedThrough), id).toBe(5)
+    }
+  })
+
+  it('Craig: Chargers 26–14, no week 2 pick, last life from week 3, KC 24–10, CHI 23–12, “Dallas week 5 so I don’t forget later”, 24–16', () => {
+    expect(played('Craig Mowers', 1)).toMatchObject({ teamId: 'LAC', mine: 14, theirs: 26 })
+    expect(pickOf('Craig Mowers', 2)).toBeNull()
+    expect(livesEntering('craig-mowers', 3)).toBe(1)
+    expect(played('Craig Mowers', 3)).toMatchObject({
+      teamId: 'KC',
+      mine: 24,
+      theirs: 10,
+      opponent: 'MIA',
+    })
+    expect(played('Craig Mowers', 4)).toMatchObject({
+      teamId: 'CHI',
+      mine: 23,
+      theirs: 12,
+      opponent: 'NYJ',
+    })
+    expect(played('Craig Mowers', 5)).toMatchObject({
+      teamId: 'DAL',
+      mine: 16,
+      theirs: 24,
+      opponent: 'TB',
+    })
+    // His pick came in on the Monday of week 5.
+    const at = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'long' })
+    expect(at.format(new Date(pickOf('Craig Mowers', 5)!.submittedAt))).toBe('Monday')
+  })
+
+  it('Jared: Chargers, no counted week 2 pick, last life by week 3, Buffalo over the Chargers 24–16, MIN 15–10, the biggest crowd ever', () => {
+    expect(played('Jared Marks', 1)).toMatchObject({ teamId: 'LAC', mine: 14, theirs: 26 })
+    expect(pickOf('Jared Marks', 2)).toBeNull()
+    expect(livesEntering('jared-marks', 3)).toBe(1)
+    expect(played('Jared Marks', 3)).toMatchObject({
+      teamId: 'BUF',
+      opponent: 'LAC',
+      mine: 24,
+      theirs: 16,
+    })
+    expect(played('Jared Marks', 4)).toMatchObject({ teamId: 'MIN', mine: 15, theirs: 10 })
+    expect(played('Jared Marks', 5)).toMatchObject({ teamId: 'DAL', mine: 16, theirs: 24 })
+    const biggest = (w: number) => {
+      const c = new Map<string, number>()
+      for (const p of picksIn(w)) c.set(p.teamId, (c.get(p.teamId) ?? 0) + 1)
+      return Math.max(...c.values())
+    }
+    expect(biggest(5)).toBe(21)
+    for (const w of [1, 2, 3, 4]) expect(biggest(w)).toBeLessThan(21)
+  })
+
+  it('Joey: JAX 34–10, TB 23–19 to Cleveland, against the Bears 27–7 on his second life, MIN 15–10 on his last, DAL; Bears 31–7 at Green Bay', () => {
+    expect(played('Joseph Tomczuk', 1)).toMatchObject({ teamId: 'JAX', mine: 34, theirs: 10 })
+    expect(played('Joseph Tomczuk', 2)).toMatchObject({
+      teamId: 'TB',
+      opponent: 'CLE',
+      mine: 19,
+      theirs: 23,
+    })
+    expect(livesEntering('joseph-tomczuk', 3)).toBe(2)
+    expect(played('Joseph Tomczuk', 3)).toMatchObject({
+      teamId: 'PHI',
+      opponent: 'CHI',
+      home: false,
+      mine: 7,
+      theirs: 27,
+    })
+    expect(27 - 7).toBe(20)
+    expect(livesEntering('joseph-tomczuk', 4)).toBe(1)
+    expect(played('Joseph Tomczuk', 4)).toMatchObject({ teamId: 'MIN', mine: 15, theirs: 10 })
+    expect(played('Joseph Tomczuk', 5)).toMatchObject({ teamId: 'DAL', mine: 16, theirs: 24 })
+    expect(FINALS['2026-w05-CHI-at-GB']).toEqual([7, 31])
+  })
+
+  it('Nate: the only one burned by both the Chargers and the Bucs, last life by week 3, the unbeaten 49ers, MIN, DAL', () => {
+    const chargers = new Set(
+      picksIn(1)
+        .filter((p) => p.teamId === 'LAC')
+        .map((p) => p.playerId),
+    )
+    const bucs = new Set(
+      picksIn(2)
+        .filter((p) => p.teamId === 'TB')
+        .map((p) => p.playerId),
+    )
+    expect([...chargers].filter((id) => bucs.has(id))).toEqual(['nate-adams'])
+    expect(played('Nate Adams', 2)).toMatchObject({ teamId: 'TB', mine: 19, theirs: 23 })
+    expect(livesEntering('nate-adams', 3)).toBe(1)
+    expect(played('Nate Adams', 3)).toMatchObject({
+      teamId: 'SF',
+      opponent: 'ARI',
+      mine: 36,
+      theirs: 30,
+    })
+    expect(['2026-w01-SF-at-LAR', '2026-w02-MIA-at-SF'].every((id) => winnerOf(id) === 'SF')).toBe(
+      true,
+    )
+    expect(played('Nate Adams', 4)).toMatchObject({ teamId: 'MIN', mine: 15, theirs: 10 })
+    expect(played('Nate Adams', 5)).toMatchObject({
+      teamId: 'DAL',
+      opponent: 'TB',
+      mine: 16,
+      theirs: 24,
+    })
+  })
+
+  it('Phyllis: the opening game every week, two wins then three straight losses, last life by week 5', () => {
+    for (const w of [1, 2, 3, 4, 5]) {
+      const opener = season.games
+        .filter((g) => g.week === w)
+        .sort((a, b) => a.kickoffAt.localeCompare(b.kickoffAt))[0]!
+      expect(pickOf('Phyllis Collins', w)?.gameId, `week ${w}`).toBe(opener.id)
+    }
+    expect(played('Phyllis Collins', 1)).toMatchObject({
+      teamId: 'SEA',
+      opponent: 'NE',
+      mine: 13,
+      theirs: 10,
+    })
+    expect(played('Phyllis Collins', 2)).toMatchObject({ teamId: 'BUF', mine: 41, theirs: 31 })
+    expect(played('Phyllis Collins', 3)).toMatchObject({
+      teamId: 'GB',
+      opponent: 'ATL',
+      mine: 14,
+      theirs: 35,
+    })
+    expect(FINALS['2026-w02-CAR-at-ATL']).toEqual([34, 3])
+    expect(played('Phyllis Collins', 4)).toMatchObject({
+      teamId: 'PIT',
+      opponent: 'CLE',
+      mine: 24,
+      theirs: 27,
+    })
+    expect(livesEntering('phyllis-collins', 5)).toBe(1)
+    expect(played('Phyllis Collins', 5)).toMatchObject({ teamId: 'DAL', mine: 16, theirs: 24 })
   })
 })

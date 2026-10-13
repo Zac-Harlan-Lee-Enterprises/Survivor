@@ -17,28 +17,36 @@ import { Megaphone, Send } from 'lucide-react'
  */
 
 /**
- * Mapped to weeks 1 through 5 on purpose. The seed carries no results, so the
+ * Mapped to weeks 1 through 6 on purpose. The seed carries no results, so the
  * engine calls week 1 current until the live sync lands them, at which point
- * week 5 is — and the league needs the note under whichever key it is shown.
+ * week 6 is — and the league needs the review under whichever key it is shown.
  *
- * Published after Thursday's kickoff, when week 5's picks are public, so it
- * names them. No callout: the picks are locked and nothing is owed.
+ * Week 5 is public, so the review names picks. It says nothing about week 6
+ * picks, which are hidden until Thursday.
  */
-const WEEK_5_KICKOFF = {
+const WEEK_5_REVIEW = {
   heading: 'Word from the commissioner',
   lines: [
-    'Picks are locked and the secret is out: twenty-one of you are on Dallas tonight. Twenty-one of twenty-nine, on a Cowboys team that is 2–2, at home to a Tampa Bay team that is 0–4 — which is either the safest pick this league has ever made or the setup for the most catastrophic Thursday in its history, and we will know by about ten o’clock. Craig, Jared, Joey, Nate and Phyllis are all on their last life and all on Dallas, so if the Bucs win their first game of the season tonight, the crow is going to need a bigger stone. Joey, for the record, has now gone Eagles, Vikings and Cowboys in successive weeks: three NFC teams in a row, not one of them the Bears.',
-    'The other eight of you saw twenty-one people climbing onto the Cowboys bandwagon and decided to walk. Cindy, Dave, Melanie and Allison took Cincinnati at a Miami team that has scored thirteen points or fewer in every game this season. Joanna and Corey took Houston at Tennessee, which is an 0–4 team visiting an 0–4 team — somebody’s losing streak ends on Sunday, and Corey, on his last life, needs it to be Houston’s. Paul has Washington, 1–3, at home to the 3–1 Giants, which takes either nerve or a spreadsheet the rest of us haven’t seen. And Tina, also on her last life, has taken New England — the team that knocked her Bills off last week. If you can’t beat them, pick them. Nobody has a stake in London or on Monday night, and all twenty-nine picks arrived before the lock, the last of them at 5:41 — thank you, James.',
+    'Twenty-one of you rode Dallas on Thursday night. Tampa Bay, 0–4 and starting a rookie quarterback in his second game, won 24–16, and every one of the twenty-one lost a life. Not most. All. Bucky Irving ran for 165 yards, Dak Prescott threw two interceptions — the last off a tipped pass in the final two minutes — and KaVontae Turpin fumbled a kickoff, for completeness. Last week I wrote that if the Bucs won their first game of the season the crow would need a bigger stone. The crow needed five.',
+    'Craig, Jared, Joey, Nate and Phyllis are out. With Don, that is six graves, and the graveyard on this page now has more going on than the Tennessee offense. Their epitaphs are on their profiles; read them, they earned every word. Joey went out on the same weekend the Bears lost 31–7 at Green Bay, so for the first time all season, Joey and his Bears suffered together.',
+    'Then there is Paul, who did not lose. Washington did not lose. Washington tied the Giants 27–27, and a tie costs a life exactly like a loss — it is in the rules, I checked, twice. The Giants’ kicker missed three field goals; with twelve seconds left in overtime at the Giants’ 24, Jayden Daniels scrambled, was sacked for no gain, and Washington had no timeouts. Nobody wanted to win that game, and Paul paid for both of them.',
+    'Elsewhere, sanity. Cindy, Dave, Melanie and Allison survived Cincinnati 31–24 — Miami scored twenty-four, nearly double its previous season high, and still lost, which is the most Miami thing that has happened all year. Joanna and Corey took Houston, who won their first game of the season 26–3; Tennessee kicked a field goal on the opening drive and did nothing else for three quarters. And Tina took New England, who beat the Raiders 45–17 behind 374 yards from Drake Maye. If you can’t beat them, pick them. It worked.',
+    'Where we stand: twenty-four alive, six in the ground. Allison and Cindy are the only two still holding all three lives — both rode Cincinnati, and neither has lost a pick all season. Seven of you are on two lives, and fifteen of you are on your last. Fifteen people, one bad Sunday each from a headstone, and the crow can count.',
+    'Week 6 has four teams on bye: Cincinnati, Miami, Detroit and Minnesota. Thursday night is Seattle at Denver, which locks the week. Houston and Jacksonville play in London at 8:30 on Sunday morning our time — the Texans, fresh from their first win, against a Jacksonville side that is 4–1. And Dallas visit Green Bay on Sunday night, which twenty-one of you can now watch with nothing riding on it: the healthiest way to watch the Cowboys there is.',
   ],
-  // No callout: the picks are locked. The week 6 one comes with the week 5 review.
+  // Set apart from the banter, because an instruction buried in jokes is an
+  // instruction somebody misses — and fifteen people are on their last life.
+  callout:
+    'DM me your week 6 pick on Teams before 7:10 PM Thursday — five minutes before Seattle at Denver kicks off. A missing pick costs a life, and fifteen of you have exactly one.',
 }
 
 const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {
-  1: WEEK_5_KICKOFF,
-  2: WEEK_5_KICKOFF,
-  3: WEEK_5_KICKOFF,
-  4: WEEK_5_KICKOFF,
-  5: WEEK_5_KICKOFF,
+  1: WEEK_5_REVIEW,
+  2: WEEK_5_REVIEW,
+  3: WEEK_5_REVIEW,
+  4: WEEK_5_REVIEW,
+  5: WEEK_5_REVIEW,
+  6: WEEK_5_REVIEW,
 }
 
 export function LeagueMessage({ week }: { week: number }) {

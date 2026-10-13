@@ -36,7 +36,7 @@ export const season = JSON.parse(
 /**
  * Every week 1–4 final, as the ESPN scoreboard
  * reports them (site.api.espn.com, 2026 season type 2, weeks 1 to 4, read on
- * 2026-09-22, 2026-09-29 and 2026-10-05, Monday night's added on 2026-10-09). The seed deliberately carries no results — the app fetches them
+ * 2026-09-22, 2026-09-29 and 2026-10-05, Monday night's added on 2026-10-09; week 5 read 2026-10-13). The seed deliberately carries no results — the app fetches them
  * live — so the note's outcome claims are pinned here instead, keyed by the
  * seed's own game ids so a pick and its result cannot drift apart.
  *
@@ -107,6 +107,21 @@ export const FINALS: Record<string, [number, number]> = {
   '2026-w04-LAC-at-SEA': [23, 30],
   '2026-w04-DET-at-CAR': [26, 32],
   '2026-w04-ATL-at-NO': [45, 24],
+  '2026-w05-TB-at-DAL': [24, 16],
+  '2026-w05-PHI-at-JAX': [17, 19],
+  '2026-w05-CHI-at-GB': [7, 31],
+  '2026-w05-HOU-at-TEN': [26, 3],
+  '2026-w05-CIN-at-MIA': [31, 24],
+  '2026-w05-LV-at-NE': [17, 45],
+  '2026-w05-MIN-at-NO': [23, 13],
+  '2026-w05-CLE-at-NYJ': [12, 17],
+  '2026-w05-IND-at-PIT': [22, 34],
+  '2026-w05-NYG-at-WAS': [27, 27],
+  '2026-w05-DEN-at-LAC': [23, 17],
+  '2026-w05-DET-at-ARI': [45, 21],
+  '2026-w05-SF-at-SEA': [32, 29],
+  '2026-w05-BAL-at-ATL': [30, 23],
+  '2026-w05-BUF-at-LAR': [37, 34],
 }
 
 export const gamesById = new Map(season.games.map((g) => [g.id, g]))
@@ -116,27 +131,33 @@ export const picksIn = (week: number) => season.picks.filter((p) => p.week === w
 export const pickOf = (displayName: string, week: number) =>
   season.picks.find((p) => p.week === week && nameOf(p.playerId) === displayName) ?? null
 
-export const winnerOf = (gameId: string) => {
+/** The winning team, or null for a tie (which, by the league's rules, costs a life like a loss). */
+export const winnerOf = (gameId: string): string | null => {
   const game = gamesById.get(gameId)
   const final = FINALS[gameId]
   if (!game || !final) throw new Error(`no final pinned for ${gameId}`)
   const [away, home] = final
+  if (away === home) return null
   return away > home ? game.awayTeamId : game.homeTeamId
 }
-/** True when the pick's team lost. No ties pinned yet, so this is the whole question. */
+/** True when the pick cost a life: its team lost, or tied. */
 export const lost = (p: Pick) => winnerOf(p.gameId) !== p.teamId
 
 /** A team's record over the pinned finals, from the schedule. */
+/** A team's record over the pinned finals, from the schedule: "4-1", or "1-3-1" with a tie. */
 export const record = (teamId: string) => {
   let wins = 0
   let losses = 0
+  let ties = 0
   for (const [id] of Object.entries(FINALS)) {
     const g = gamesById.get(id)
     if (!g || (g.homeTeamId !== teamId && g.awayTeamId !== teamId)) continue
-    if (winnerOf(id) === teamId) wins += 1
+    const winner = winnerOf(id)
+    if (winner === null) ties += 1
+    else if (winner === teamId) wins += 1
     else losses += 1
   }
-  return `${wins}-${losses}`
+  return ties ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`
 }
 
 /**
