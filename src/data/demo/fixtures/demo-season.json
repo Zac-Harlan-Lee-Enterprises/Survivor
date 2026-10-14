@@ -1482,6 +1482,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-bradley-riedell-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "bradley-riedell",
+      "week": 6,
+      "teamId": "SF",
+      "gameId": "2026-w06-WAS-at-SF",
+      "submittedAt": "2026-10-13T12:03:18.000Z",
+      "updatedAt": "2026-10-13T12:03:18.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-chloe-bourque-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2180,6 +2193,19 @@
       "gameId": "2026-w05-TB-at-DAL",
       "submittedAt": "2026-10-06T14:17:53.000Z",
       "updatedAt": "2026-10-06T14:17:53.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-tony-canody-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tony-canody",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-13T13:56:00.000Z",
+      "updatedAt": "2026-10-13T13:56:00.000Z",
       "version": 1,
       "source": "commissioner"
     },
