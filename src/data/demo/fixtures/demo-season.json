@@ -1859,6 +1859,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-corey-cowell-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "corey-cowell",
+      "week": 6,
+      "teamId": "IND",
+      "gameId": "2026-w06-TEN-at-IND",
+      "submittedAt": "2026-10-15T22:02:57.000Z",
+      "updatedAt": "2026-10-15T22:02:57.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-melanie-moeller-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2548,6 +2561,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-allison-petty-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "allison-petty",
+      "week": 6,
+      "teamId": "IND",
+      "gameId": "2026-w06-TEN-at-IND",
+      "submittedAt": "2026-10-15T20:12:07.000Z",
+      "updatedAt": "2026-10-15T20:12:07.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-don-turner-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2856,6 +2882,19 @@
       "gameId": "2026-w05-LV-at-NE",
       "submittedAt": "2026-10-08T22:06:29.000Z",
       "updatedAt": "2026-10-08T22:06:29.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-tina-bush-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tina-bush",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-15T21:40:19.000Z",
+      "updatedAt": "2026-10-15T21:40:19.000Z",
       "version": 1,
       "source": "commissioner"
     },
