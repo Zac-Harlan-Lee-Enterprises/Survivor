@@ -910,6 +910,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-maya-israel-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "maya-israel",
+      "week": 6,
+      "teamId": "NE",
+      "gameId": "2026-w06-NYJ-at-NE",
+      "submittedAt": "2026-10-14T12:55:49.000Z",
+      "updatedAt": "2026-10-14T12:55:49.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-shahid-ali-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1231,6 +1244,19 @@
       "gameId": "2026-w05-TB-at-DAL",
       "submittedAt": "2026-10-06T14:20:38.000Z",
       "updatedAt": "2026-10-06T14:20:38.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-stacey-markendorff-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "stacey-markendorff",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-14T15:46:07.000Z",
+      "updatedAt": "2026-10-14T15:46:07.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -1807,6 +1833,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-melanie-moeller-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "melanie-moeller",
+      "week": 6,
+      "teamId": "NE",
+      "gameId": "2026-w06-NYJ-at-NE",
+      "submittedAt": "2026-10-14T20:08:53.000Z",
+      "updatedAt": "2026-10-14T20:08:53.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-jason-snook-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2067,6 +2106,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-kc-walker-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "kc-walker",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-14T12:48:38.000Z",
+      "updatedAt": "2026-10-14T12:48:38.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-paul-lim-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2271,6 +2323,19 @@
       "gameId": "2026-w05-HOU-at-TEN",
       "submittedAt": "2026-10-08T18:54:51.000Z",
       "updatedAt": "2026-10-08T18:54:51.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-joanna-moss-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "joanna-moss",
+      "week": 6,
+      "teamId": "IND",
+      "gameId": "2026-w06-TEN-at-IND",
+      "submittedAt": "2026-10-14T13:33:18.000Z",
+      "updatedAt": "2026-10-14T13:33:18.000Z",
       "version": 1,
       "source": "commissioner"
     },
