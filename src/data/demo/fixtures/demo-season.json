@@ -1339,6 +1339,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-sheila-acker-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "sheila-acker",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-15T16:06:59.000Z",
+      "updatedAt": "2026-10-15T16:06:59.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-dominic-green-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1998,6 +2011,19 @@
       "gameId": "2026-w05-TB-at-DAL",
       "submittedAt": "2026-10-08T15:52:57.000Z",
       "updatedAt": "2026-10-08T15:52:57.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-matt-hadley-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "matt-hadley",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-15T15:13:32.000Z",
+      "updatedAt": "2026-10-15T15:13:32.000Z",
       "version": 1,
       "source": "commissioner"
     },
