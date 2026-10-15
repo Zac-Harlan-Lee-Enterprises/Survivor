@@ -122,7 +122,8 @@ describe('the commissioner’s week 5 review states only true things', () => {
     expect(onLives(3)).toEqual(['Allison', 'Cindy'])
     for (const name of ['Allison Petty', 'Cindy Mendoza']) {
       expect(pickOf(name, WEEK)?.teamId).toBe('CIN')
-      const theirs = season.picks.filter((p) => nameOf(p.playerId) === name)
+      // Through week 5 only: the review speaks as of that week, and later picks keep arriving.
+      const theirs = season.picks.filter((p) => nameOf(p.playerId) === name && p.week <= WEEK)
       expect(theirs).toHaveLength(5)
       expect(theirs.some(lost)).toBe(false)
     }

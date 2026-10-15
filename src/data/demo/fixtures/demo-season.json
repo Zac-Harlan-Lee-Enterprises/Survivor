@@ -1118,6 +1118,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-james-parker-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "james-parker",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-15T14:06:42.000Z",
+      "updatedAt": "2026-10-15T14:06:42.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-nate-adams-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2197,6 +2210,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-paul-lim-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "paul-lim",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-15T14:03:10.000Z",
+      "updatedAt": "2026-10-15T14:03:10.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-tony-canody-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2531,6 +2557,19 @@
       "gameId": "2026-w05-CIN-at-MIA",
       "submittedAt": "2026-10-07T20:13:08.000Z",
       "updatedAt": "2026-10-07T20:13:08.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-cindy-mendoza-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "cindy-mendoza",
+      "week": 6,
+      "teamId": "NE",
+      "gameId": "2026-w06-NYJ-at-NE",
+      "submittedAt": "2026-10-15T13:49:22.000Z",
+      "updatedAt": "2026-10-15T13:49:22.000Z",
       "version": 1,
       "source": "commissioner"
     },
