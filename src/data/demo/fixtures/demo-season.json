@@ -988,6 +988,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-shahid-ali-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "shahid-ali",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-15T18:41:12.000Z",
+      "updatedAt": "2026-10-15T18:41:12.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-dave-johnson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1972,6 +1985,19 @@
       "gameId": "2026-w05-TB-at-DAL",
       "submittedAt": "2026-10-08T19:59:20.000Z",
       "updatedAt": "2026-10-08T19:59:20.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-jason-snook-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "jason-snook",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-15T18:42:04.000Z",
+      "updatedAt": "2026-10-15T18:42:04.000Z",
       "version": 1,
       "source": "commissioner"
     },
