@@ -1508,6 +1508,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-tracy-nelson-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tracy-nelson",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-15T19:02:25.000Z",
+      "updatedAt": "2026-10-15T19:02:25.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-bradley-riedell-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
