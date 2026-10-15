@@ -1378,6 +1378,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dominic-green-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dominic-green",
+      "week": 6,
+      "teamId": "NE",
+      "gameId": "2026-w06-NYJ-at-NE",
+      "submittedAt": "2026-10-15T12:10:48.000Z",
+      "updatedAt": "2026-10-15T12:10:48.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-tracy-nelson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",

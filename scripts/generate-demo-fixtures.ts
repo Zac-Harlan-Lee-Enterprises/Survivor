@@ -143,7 +143,7 @@ const STORY: Story = {
   'sheila-acker': { 1: ['SEA', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-08T13:33:36.000Z'] },
   // Week 4: named Baltimore, which he used in week 1. Not a valid pick, so the
   // commissioner ruled it a miss.
-  'dominic-green': { 1: ['BAL', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: null, 5: ['DAL', 'P', '2026-10-06T14:23:12.000Z'] },
+  'dominic-green': { 1: ['BAL', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: null, 5: ['DAL', 'P', '2026-10-06T14:23:12.000Z'], 6: ['NE', 'P', '2026-10-15T12:10:48.000Z'] },
   // Same team as Sheila Acker — different players may ride the same team.
   'tracy-nelson': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-16T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-05T15:00:00.000Z'] },
   // Third player on the Lions, alongside Dave Johnson and James Parker.
