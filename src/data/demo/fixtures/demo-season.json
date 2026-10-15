@@ -2819,6 +2819,19 @@
       "updatedAt": "2026-10-07T11:34:29.000Z",
       "version": 1,
       "source": "commissioner"
+    },
+    {
+      "id": "pick-zac-harlan-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "zac-harlan",
+      "week": 6,
+      "teamId": "LAR",
+      "gameId": "2026-w06-ARI-at-LAR",
+      "submittedAt": "2026-10-15T12:17:31.000Z",
+      "updatedAt": "2026-10-15T12:17:31.000Z",
+      "version": 1,
+      "source": "commissioner"
     }
   ],
   "games": [
