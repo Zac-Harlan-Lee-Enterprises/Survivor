@@ -1053,6 +1053,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dave-johnson-6",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dave-johnson",
+      "week": 6,
+      "teamId": "IND",
+      "gameId": "2026-w06-TEN-at-IND",
+      "submittedAt": "2026-10-15T17:22:41.000Z",
+      "updatedAt": "2026-10-15T17:22:41.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-james-parker-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
