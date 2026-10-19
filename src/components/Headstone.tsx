@@ -68,7 +68,10 @@ export function Headstone({
   const detail = DETAIL[size]
   const label = `Headstone of ${name}, eliminated in week ${week}.${cause ? ` ${cause}` : ''}`
   const { ref, phase } = useFuneral(!!funeral, funeralDelay)
-  const staged = phase === 'waiting' || phase === 'playing'
+  // Once a funeral starts, its scene stays: when it ends it holds its last frame
+  // (stone risen, mound heaped, the killer's logo and score at its foot) rather
+  // than swapping in a bare stone, which flashed and dropped the logo.
+  const staged = phase !== 'skipped'
 
   /** Each carved line, numbered so the funeral can chisel them in order. */
   const engraved = (i: number, cls: string, text: string) => (
@@ -140,6 +143,7 @@ export function Headstone({
           standing={standing}
           size={size}
           playing={phase === 'playing'}
+          ended={phase === 'done'}
           sway={variant.sway}
         >
           {stone}
@@ -160,7 +164,7 @@ const prefersReducedMotion = () =>
 
 /**
  * The funeral's lifecycle. It waits, face intact, until the stone is mostly on
- * screen; plays once; then steps aside for the plain stone it ended on. Viewers
+ * screen; plays once; then holds its last frame and hands back the lights. Viewers
  * who asked for reduced motion skip straight to the stone. Without
  * IntersectionObserver there is no way to know what is on screen, so it plays.
  */

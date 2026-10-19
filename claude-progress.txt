@@ -811,3 +811,10 @@ NEXT   : WEEK 5 REVIEW after Monday night (BUF at LAR): FIVE EPITAPHS (Craig, Ja
 - Verified: npm run validate (315 unit), npm run test:e2e (105 passed, 2 skipped), init.sh HTTP 200. quality-sweep fails only on the user's local invalid .claude/settings.json (line 18 comment) — not committed.
 - NOT merged: commissioner previews first.
 NEXT: commissioner reviews locally → merge on his word. Then week 6 picks (lock Thu 2026-10-15 7:10 PM CT); record picks only, don't touch the note before kickoff.
+
+== 2026-10-19 · Claude Code (Opus 5.5) · fix/graveyard-every-grave ==
+- League page showed at most 6 headstones in total (`.slice(0, 6)` before the fresh/old split), so a week with more deaths dropped some. New `graveyardPreview()` (src/lib/graveyard.ts): every fresh grave (out last week or this) shown with its own funeral; older graves one compact row of 6; full graveyard still on the leaderboard. Tests: src/lib/graveyard.test.ts; e2e "every grave dug last week…" (weeks 1–5 replayed with HOU and NE flipped → 8 week-5 graves; fails on the old code at 6).
+- Funeral end flash: at 21s the scene unmounted and a bare stone was rebuilt (flash; mound and "Finally done in by" tag + team logo vanished). Now the scene stays mounted on its last frame (`ended` prop, `.is-ended` only stops the looping rain), house lights released. Tests: Headstone.test "holds its last frame…" (same nodes, logo + score present); e2e screenshot before/after the curtain must be identical (fails on old code).
+- Week 6 picks: all recorded and deployed (#52–#56); Wesley missed → down to 1 life, not out (4–1 before week 6).
+- Verified: npm run validate (318), npm run test:e2e (109 passed, 2 skipped), knip clean, init.sh 200.
+NEXT: commissioner previews locally, merges. Week 6 review note after MNF (WAS at SF).

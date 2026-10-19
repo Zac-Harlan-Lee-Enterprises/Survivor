@@ -626,6 +626,10 @@
   .funeral.is-playing .funeral-rain span {
     animation: funeral-rain var(--dur) var(--d) linear infinite;
   }
+  /* Over: the rain has already faded to nothing, so stop it falling for good. */
+  .funeral.is-ended .funeral-rain {
+    display: none;
+  }
   .funeral.is-playing .funeral-ash span {
     animation: funeral-ash 5.5s linear var(--d) 4 both;
   }
