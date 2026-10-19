@@ -322,5 +322,23 @@ test.describe('the graveyard', () => {
     await expect(card.locator('.funeral-score')).toBeVisible()
     const after = await shot()
     expect(after.equals(before), 'the grave changed when the scene ended').toBe(true)
+
+    // The held frame keeps the card raised over the house lights, but never over
+    // the sticky header: scroll the grave up under it and the header stays on top.
+    const header = page.locator('header').first()
+    const headerBox = (await header.boundingBox())!
+    // The graveyard ends the page; give it room to scroll up under the header.
+    await page.addStyleTag({ content: 'main { padding-bottom: 150vh !important; }' })
+    // Card's top edge to the very top of the window: the header now sits on it.
+    const cardTop = (await card.boundingBox())!.y
+    // (String scripts: this spec is compiled without DOM types.)
+    await page.evaluate(`window.scrollBy(0, ${cardTop - 2})`)
+    await page.waitForTimeout(100)
+    const cardBox = (await card.boundingBox())!
+    expect(cardBox.y).toBeLessThan(headerBox.height / 4)
+    const onTop = await page.evaluate(
+      `!!document.elementFromPoint(${cardBox.x + cardBox.width / 2}, ${headerBox.height / 2})?.closest('header')`,
+    )
+    expect(onTop, 'a finished grave painted over the sticky header').toBe(true)
   })
 })

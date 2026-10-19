@@ -963,10 +963,12 @@
 }
 
 /* The camera creeps toward a fresh grave while the funeral plays. Unlayered so
-   it outranks the card's entry animation utility. */
+   it outranks the card's entry animation utility. The card rises above the
+   house lights (z-25) so its grave is lit, but stays under the sticky header
+   (z-30): the scene holds its last frame, so this layer outlives it. */
 .card:has(.funeral.is-playing) {
   animation: funeral-push-in 19.4s ease-in-out both;
-  z-index: 30;
+  z-index: 26;
 }
 
 @keyframes funeral-push-in {

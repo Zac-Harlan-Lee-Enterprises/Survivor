@@ -132,9 +132,10 @@ export function Headstone({
       className={cn(
         'relative shrink-0',
         SIZES[size],
-        // Above the house lights (z-25) so the grave is lit while they are down;
-        // under the sticky header (z-30) always. It keeps the layer after the
-        // scene, so ending it repaints nothing.
+        // Inside its card, the grave stands over the card's own text so the scene
+        // passes in front of it; it keeps that layer after the scene, so ending it
+        // repaints nothing. (The card's own layer, in index.css, is what keeps a
+        // fresh grave under the sticky header.)
         staged && 'z-[26]',
         className,
       )}
