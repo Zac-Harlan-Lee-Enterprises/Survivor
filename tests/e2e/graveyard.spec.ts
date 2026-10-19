@@ -150,7 +150,7 @@ test.describe('the graveyard', () => {
     page,
   }) => {
     // The real weeks 1–4, plus Thursday of week 5: Tampa Bay 24, Dallas 16.
-    // That buries the five last-life Dallas pickers alongside Don.
+    // That buries the five last-life Dallas pickers beside Don, who went in week 4.
     const week5 = { '2026-w05-TB-at-DAL': [24, 16] as [number, number] }
     await resetDemo(page)
     await signInAs(page, COMMISSIONER)
@@ -204,8 +204,15 @@ test.describe('the graveyard', () => {
         '.funeral-weapon, .funeral-score { animation: none !important; transform: none !important; opacity: 1 !important; }',
     })
     const tags = graves.locator('.funeral-score')
-    await expect(tags).toHaveCount(6)
-    for (let i = 0; i < 6; i++) {
+    // Only this week's dead get the scene: five funerals; Don, a week older, is a plain stone.
+    await expect(graves.locator('[data-funeral]')).toHaveCount(5)
+    await expect(
+      graves
+        .locator('a.card', { has: page.getByRole('img', { name: /^Headstone of Don Turner/ }) })
+        .locator('[data-funeral]'),
+    ).toHaveCount(0)
+    await expect(tags).toHaveCount(5)
+    for (let i = 0; i < 5; i++) {
       const tag = tags.nth(i)
       const card = tag.locator('xpath=ancestor::a[contains(@class, "card")]')
       const [t, c] = await Promise.all([tag.boundingBox(), card.boundingBox()])
@@ -215,7 +222,7 @@ test.describe('the graveyard', () => {
     }
   })
 
-  test('every grave dug last week gets its own headstone, however many', async ({ page }) => {
+  test('every one of the week’s dead gets a funeral, however many', async ({ page }) => {
     // The real weeks 1–5 with TWO COUNTERFACTUALS (test-only, never the league):
     // Houston lose at Tennessee (really won 26–3) and New England lose to Las
     // Vegas (really won 45–17). That sends Corey, Joanna and Tina — each on a
@@ -284,7 +291,7 @@ test.describe('the graveyard', () => {
         graves.getByRole('img', { name: new RegExp(`^Headstone of ${name},`) }),
       ).toHaveCount(1)
     }
-    // Every fresh grave gets a funeral; Don, a week older, still stands in the row behind.
+    // Every one of this week's graves gets a funeral; Don, from week 4, is a plain stone behind.
     await expect(graves.locator('[data-funeral]')).toHaveCount(8)
     await expect(
       graves.getByRole('img', { name: /^Headstone of Don Turner, eliminated in week 4/ }),

@@ -43,10 +43,8 @@ export function LeagueHome() {
     (s) => s.status === 'champion' || s.status === 'co-champion',
   )
   const finalists = evaluation.standings.filter((s) => s.status === 'finalist')
-  const { fresh: freshGraves, old: oldGraves } = graveyardPreview(
-    evaluation.standings,
-    evaluation.currentWeek,
-  )
+  // This week's dead get a funeral; everyone before them is a plain headstone.
+  const { fresh: freshGraves, old: oldGraves } = graveyardPreview(evaluation)
   const graveyard = [...freshGraves, ...oldGraves]
   // The hero reports the LIVE week — next kickoff, deadline, whether picks are
   // open — so it must not follow the week someone is browsing.
