@@ -129,7 +129,15 @@ export function Headstone({
   return (
     <div
       ref={ref}
-      className={cn('relative shrink-0', SIZES[size], staged && 'z-30', className)}
+      className={cn(
+        'relative shrink-0',
+        SIZES[size],
+        // Above the house lights (z-25) so the grave is lit while they are down;
+        // under the sticky header (z-30) always. It keeps the layer after the
+        // scene, so ending it repaints nothing.
+        staged && 'z-[26]',
+        className,
+      )}
       data-funeral={funeral ? phase : undefined}
     >
       {/* The crow: flies in as the lights come up, then sits on every visit after. */}

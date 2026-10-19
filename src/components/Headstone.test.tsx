@@ -198,7 +198,14 @@ describe('Headstone', () => {
       expect(document.querySelector('[data-funeral]')).toHaveAttribute('data-funeral', 'playing')
       const stone = screen.getByRole('img', { name: /Headstone of Ann Example/ })
       const scene = document.querySelector('.funeral')
+      const grave = document.querySelector('[data-funeral]')!
+      // Above the house lights (z-25) while they are down, under the sticky header (z-30).
+      expect(grave).toHaveClass('z-[26]')
+      expect(grave).not.toHaveClass('z-30')
       act(() => vi.advanceTimersByTime(FUNERAL_MS))
+      // Over: the same layer, still under the header, so nothing repaints.
+      expect(grave).toHaveClass('z-[26]')
+      expect(grave).not.toHaveClass('z-30')
       expect(document.querySelector('[data-funeral]')).toHaveAttribute('data-funeral', 'done')
       // Nothing is torn down and rebuilt (that was the flash): the very same nodes stay.
       expect(document.querySelector('.funeral')).toBe(scene)
