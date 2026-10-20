@@ -11,6 +11,7 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { getTeam, type PlayerStanding } from '@/domain'
+import { cn } from '@/lib/cn'
 import { Headshot } from './Headshot'
 import { hash } from './graveVariant'
 import { TeamMonogram } from './TeamMonogram'
@@ -28,6 +29,7 @@ import { TeamMonogram } from './TeamMonogram'
  *   the ghost rises                                              12–17.5s
  *   a glint crosses the stone; "Finally done in by ARI 30–27" lands       14.4s, 15s
  *   lights up, letterbox out; the crow flies in and stays        17.8s, 18.6s
+ *   the scene ends and holds its last frame (`ended`)            21s
  *
  * All motion is CSS (index.css, `.funeral.is-playing …`) driven by one class
  * toggle, so the browser composites it and nothing re-renders mid-scene. The
@@ -219,6 +221,12 @@ export interface FuneralProps {
   standing: PlayerStanding
   size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'hero'
   playing: boolean
+  /**
+   * The scene has played and now holds its last frame: the risen stone, the
+   * mound, the killer's logo and score. The house lights go back up and the
+   * (already faded) rain stops; nothing on the grave moves or flashes.
+   */
+  ended?: boolean
   /** Which way the ghost drifts as it rises (see graveVariant). */
   sway?: 1 | -1
   /** The stone, already engraved; the scene raises it out of the ground. */
@@ -231,6 +239,7 @@ export function Funeral({
   standing,
   size,
   playing,
+  ended = false,
   sway = 1,
   children,
 }: FuneralProps) {
@@ -242,7 +251,9 @@ export function Funeral({
   return (
     <div
       ref={anchor}
-      className={playing ? 'funeral is-playing' : 'funeral'}
+      // `is-playing` stays on once the scene ends, so every track keeps its final
+      // frame (they all fill `both`); `is-ended` only stops what still loops.
+      className={cn('funeral', (playing || ended) && 'is-playing', ended && 'is-ended')}
       style={{ '--sway': sway } as CSSProperties}
     >
       <HouseLights playing={playing} anchor={anchor} />

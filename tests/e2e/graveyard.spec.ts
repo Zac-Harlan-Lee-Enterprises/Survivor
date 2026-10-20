@@ -150,7 +150,7 @@ test.describe('the graveyard', () => {
     page,
   }) => {
     // The real weeks 1–4, plus Thursday of week 5: Tampa Bay 24, Dallas 16.
-    // That buries the five last-life Dallas pickers alongside Don.
+    // That buries the five last-life Dallas pickers beside Don, who went in week 4.
     const week5 = { '2026-w05-TB-at-DAL': [24, 16] as [number, number] }
     await resetDemo(page)
     await signInAs(page, COMMISSIONER)
@@ -204,8 +204,15 @@ test.describe('the graveyard', () => {
         '.funeral-weapon, .funeral-score { animation: none !important; transform: none !important; opacity: 1 !important; }',
     })
     const tags = graves.locator('.funeral-score')
-    await expect(tags).toHaveCount(6)
-    for (let i = 0; i < 6; i++) {
+    // Only this week's dead get the scene: five funerals; Don, a week older, is a plain stone.
+    await expect(graves.locator('[data-funeral]')).toHaveCount(5)
+    await expect(
+      graves
+        .locator('a.card', { has: page.getByRole('img', { name: /^Headstone of Don Turner/ }) })
+        .locator('[data-funeral]'),
+    ).toHaveCount(0)
+    await expect(tags).toHaveCount(5)
+    for (let i = 0; i < 5; i++) {
       const tag = tags.nth(i)
       const card = tag.locator('xpath=ancestor::a[contains(@class, "card")]')
       const [t, c] = await Promise.all([tag.boundingBox(), card.boundingBox()])
@@ -213,5 +220,125 @@ test.describe('the graveyard', () => {
       expect(t!.x, `tag ${i} left edge`).toBeGreaterThanOrEqual(c!.x)
       expect(t!.x + t!.width, `tag ${i} right edge`).toBeLessThanOrEqual(c!.x + c!.width)
     }
+  })
+
+  test('every one of the week’s dead gets a funeral, however many', async ({ page }) => {
+    // The real weeks 1–5 with TWO COUNTERFACTUALS (test-only, never the league):
+    // Houston lose at Tennessee (really won 26–3) and New England lose to Las
+    // Vegas (really won 45–17). That sends Corey, Joanna and Tina — each on a
+    // last life — down with the five Dallas pickers: eight graves in one week,
+    // more than the league page used to have room for.
+    const flipped: Record<string, [number, number]> = {
+      '2026-w05-HOU-at-TEN': [3, 26],
+      '2026-w05-LV-at-NE': [45, 17],
+    }
+    await resetDemo(page)
+    await signInAs(page, COMMISSIONER)
+    // Wednesday after week 5: every week 5 game is final, week 6 has not begun.
+    await setDemoClock(page, '2026-10-14T15:00')
+    await page.route('**/site.api.espn.com/**', (route) => {
+      const week = Number(new URL(route.request().url()).searchParams.get('week'))
+      const events = season.games
+        .filter((g) => g.week === week && week <= 5)
+        .map((g) => {
+          const [away, home] = flipped[g.id] ?? FINALS[g.id] ?? [0, 0]
+          return {
+            date: g.kickoffAt,
+            competitions: [
+              {
+                date: g.kickoffAt,
+                status: { type: { name: 'STATUS_FINAL', shortDetail: 'Final' } },
+                competitors: [
+                  {
+                    homeAway: 'home',
+                    score: String(home),
+                    winner: home > away,
+                    team: { abbreviation: g.homeTeamId },
+                  },
+                  {
+                    homeAway: 'away',
+                    score: String(away),
+                    winner: away > home,
+                    team: { abbreviation: g.awayTeamId },
+                  },
+                ],
+              },
+            ],
+          }
+        })
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ season: { year: 2026, type: 2 }, week: { number: week }, events }),
+      })
+    })
+    await page.goto('./#/')
+
+    const graves = page.locator('section[aria-labelledby="grave-title"]')
+    const fresh = graves.getByRole('img', { name: /^Headstone of .*, eliminated in week 5/ })
+    await expect(fresh).toHaveCount(8, { timeout: 30_000 })
+    for (const name of [
+      'Craig Mowers',
+      'Jared Marks',
+      'Joseph Tomczuk',
+      'Nate Adams',
+      'Phyllis Collins',
+      'Corey Cowell',
+      'Joanna Moss',
+      'Tina Bush',
+    ]) {
+      await expect(
+        graves.getByRole('img', { name: new RegExp(`^Headstone of ${name},`) }),
+      ).toHaveCount(1)
+    }
+    // Every one of this week's graves gets a funeral; Don, from week 4, is a plain stone behind.
+    await expect(graves.locator('[data-funeral]')).toHaveCount(8)
+    await expect(
+      graves.getByRole('img', { name: /^Headstone of Don Turner, eliminated in week 4/ }),
+    ).toHaveCount(1)
+  })
+
+  test('when the scene ends the grave holds still: no flash, the logo stays', async ({ page }) => {
+    test.slow()
+    await buryNate(page)
+    const graves = page.locator('section[aria-labelledby="grave-title"]')
+    const grave = graves.locator('[data-funeral]')
+    await grave.scrollIntoViewIfNeeded({ timeout: 15_000 })
+    await expect(grave).toHaveAttribute('data-funeral', 'playing', { timeout: 15_000 })
+    const card = grave.locator('xpath=ancestor::a[contains(@class, "card")]')
+    // Late in the scene, safely before its 21s curtain. The shot fast-forwards
+    // whatever is still moving, so this is the frame the scene ends on.
+    await page.waitForTimeout(19_000)
+    await expect(grave).toHaveAttribute('data-funeral', 'playing')
+    // The crow is tested on its own; here it would only add shadow anti-aliasing.
+    const shot = () =>
+      card.screenshot({
+        animations: 'disabled',
+        style: '.funeral-crow { visibility: hidden !important; }',
+      })
+    const before = await shot()
+    await expect(grave).toHaveAttribute('data-funeral', 'done', { timeout: 5_000 })
+    await expect(card.locator('.funeral-weapon img, .funeral-weapon > span').first()).toBeVisible()
+    await expect(card.locator('.funeral-score')).toBeVisible()
+    const after = await shot()
+    expect(after.equals(before), 'the grave changed when the scene ended').toBe(true)
+
+    // The held frame keeps the card raised over the house lights, but never over
+    // the sticky header: scroll the grave up under it and the header stays on top.
+    const header = page.locator('header').first()
+    const headerBox = (await header.boundingBox())!
+    // The graveyard ends the page; give it room to scroll up under the header.
+    await page.addStyleTag({ content: 'main { padding-bottom: 150vh !important; }' })
+    // Card's top edge to the very top of the window: the header now sits on it.
+    const cardTop = (await card.boundingBox())!.y
+    // (String scripts: this spec is compiled without DOM types.)
+    await page.evaluate(`window.scrollBy(0, ${cardTop - 2})`)
+    await page.waitForTimeout(100)
+    const cardBox = (await card.boundingBox())!
+    expect(cardBox.y).toBeLessThan(headerBox.height / 4)
+    const onTop = await page.evaluate(
+      `!!document.elementFromPoint(${cardBox.x + cardBox.width / 2}, ${headerBox.height / 2})?.closest('header')`,
+    )
+    expect(onTop, 'a finished grave painted over the sticky header').toBe(true)
   })
 })

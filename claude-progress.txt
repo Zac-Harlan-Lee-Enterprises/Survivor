@@ -812,6 +812,13 @@ NEXT   : WEEK 5 REVIEW after Monday night (BUF at LAR): FIVE EPITAPHS (Craig, Ja
 - NOT merged: commissioner previews first.
 NEXT: commissioner reviews locally → merge on his word. Then week 6 picks (lock Thu 2026-10-15 7:10 PM CT); record picks only, don't touch the note before kickoff.
 
+== 2026-10-19 · Claude Code (Opus 5.5) · fix/graveyard-every-grave ==
+- League page showed at most 6 headstones in total (`.slice(0, 6)` before the fresh/old split), so a week with more deaths dropped some. New `graveyardPreview(evaluation)` (src/lib/graveyard.ts): only the CURRENT week's dead get a funeral (commissioner: "only the current week's animations"); everyone from earlier weeks is a plain headstone like Don's, no cap. `funeralWeek()`: the current week once locked; while the next week is open for picks, the week just played stays on stage until that week locks. Tests: src/lib/graveyard.test.ts; e2e "every grave dug last week…" (weeks 1–5 replayed with HOU and NE flipped → 8 week-5 graves; fails on the old code at 6).
+- Funeral end flash: at 21s the scene unmounted and a bare stone was rebuilt (flash; mound and "Finally done in by" tag + team logo vanished). Now the scene stays mounted on its last frame (`ended` prop, `.is-ended` only stops the looping rain), house lights released. Tests: Headstone.test "holds its last frame…" (same nodes, logo + score present); e2e screenshot before/after the curtain must be identical (fails on old code).
+- Week 6 picks: all recorded and deployed (#52–#56); Wesley missed → down to 1 life, not out (4–1 before week 6).
+- Verified: npm run validate (318), npm run test:e2e (109 passed, 2 skipped), knip clean, init.sh 200.
+NEXT: commissioner previews locally, merges. Week 6 review note after MNF (WAS at SF).
+
 == 2026-10-20 · Claude Code (Opus 5.5) · feat/week6-review ==
 - Week 6 review note (WEEK_6_REVIEW, weeks 1–7 keys, heading "Word from the late commissioner"): Rams 0-for-13 vs Arizona 18–16 (six Chad Ryland FGs, no ARI touchdown, Rams led 16–15 at 0:47, last FG at 0:00); Colts 0-for-5 vs 0–5 Tennessee 26–20 (blocked-punt TD, four Joey Slye FGs, last two in the final 2:03); TWELVE knocked out (James, Stacey, Sheila, Matt, KC, Paul, Tony, Tina, Zac on the Rams; Chloe, Corey, Joanna on the Colts) — previous record five; graveyard 6 → 18, 12 alive (Cindy 3; Allison, Melanie 2; nine on 1); Bradley alone on 6–0 SF; NE 26–19 (three Maye TDs); callbacks (Arizona's only two wins both over LA teams vs Stacey/Tony/Zac; Chargers 0–6; the week-3 Seattle four all dead; Paul's tie; Dallas 23–13 at GB; Bears won the first game after Joey died); week 7 byes BUF/JAX/WAS/LAC, Thursday NE@CHI lock 7:10 PM CT.
 - Week 6 finals pinned in tests/unit/seasonFacts.ts, plus SCORING (ESPN scoring plays) for ARI@LAR, TEN@IND, NYJ@NE; record(team, through) and crowd(week, team) helpers.
@@ -819,5 +826,5 @@ NEXT: commissioner reviews locally → merge on his word. Then week 6 picks (loc
 - e2e league-message: heading may read "late commissioner"; body asserted as several paragraphs instead of one week's word.
 - Wesley (no week 6 pick) checked: 2 → 1 life, alive, as settled on 2026-10-15.
 - Verified: npm run validate (339 unit + serve-static 3 once built), npm run test:e2e (105 passed).
-- NOT merged: commissioner previews first. Done in a worktree off main so the uncommitted feat/death-collects work stays untouched; PR #57 (every grave shown) is still open and matters now — twelve fresh graves this week.
+- NOT merged: commissioner previews first. Done in a worktree off main so the uncommitted feat/death-collects work stays untouched; PR #57 (every grave shown) merged 2026-10-20 at the commissioner's word and brought into this branch, so all twelve fresh graves show.
 NEXT: commissioner reviews → merge on his word. Week 7 picks (lock Thu 2026-10-22 7:10 PM CT): record picks only, leave the note alone before kickoff.

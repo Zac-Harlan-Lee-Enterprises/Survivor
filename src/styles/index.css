@@ -626,6 +626,10 @@
   .funeral.is-playing .funeral-rain span {
     animation: funeral-rain var(--dur) var(--d) linear infinite;
   }
+  /* Over: the rain has already faded to nothing, so stop it falling for good. */
+  .funeral.is-ended .funeral-rain {
+    display: none;
+  }
   .funeral.is-playing .funeral-ash span {
     animation: funeral-ash 5.5s linear var(--d) 4 both;
   }
@@ -959,10 +963,12 @@
 }
 
 /* The camera creeps toward a fresh grave while the funeral plays. Unlayered so
-   it outranks the card's entry animation utility. */
+   it outranks the card's entry animation utility. The card rises above the
+   house lights (z-25) so its grave is lit, but stays under the sticky header
+   (z-30): the scene holds its last frame, so this layer outlives it. */
 .card:has(.funeral.is-playing) {
   animation: funeral-push-in 19.4s ease-in-out both;
-  z-index: 30;
+  z-index: 26;
 }
 
 @keyframes funeral-push-in {

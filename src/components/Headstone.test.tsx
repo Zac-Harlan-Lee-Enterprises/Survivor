@@ -191,17 +191,34 @@ describe('Headstone', () => {
     expect(document.querySelector('.funeral-ghost img')).not.toBeNull()
   })
 
-  it('steps aside for the plain stone once the scene is over', () => {
+  it('holds its last frame once the scene is over: same stone, logo and score still at its foot', () => {
     vi.useFakeTimers()
     try {
       wrap(<Headstone name="Ann Example" playerId="ann" standing={standings().ann} funeral />)
       expect(document.querySelector('[data-funeral]')).toHaveAttribute('data-funeral', 'playing')
+      const stone = screen.getByRole('img', { name: /Headstone of Ann Example/ })
+      const scene = document.querySelector('.funeral')
+      const grave = document.querySelector('[data-funeral]')!
+      // Above the house lights (z-25) while they are down, under the sticky header (z-30).
+      expect(grave).toHaveClass('z-[26]')
+      expect(grave).not.toHaveClass('z-30')
       act(() => vi.advanceTimersByTime(FUNERAL_MS))
+      // Over: the same layer, still under the header, so nothing repaints.
+      expect(grave).toHaveClass('z-[26]')
+      expect(grave).not.toHaveClass('z-30')
       expect(document.querySelector('[data-funeral]')).toHaveAttribute('data-funeral', 'done')
-      expect(document.querySelector('.funeral')).toBeNull()
-      expect(screen.getByRole('img', { name: /Headstone of Ann Example/ })).not.toHaveClass(
-        'funeral-stone',
+      // Nothing is torn down and rebuilt (that was the flash): the very same nodes stay.
+      expect(document.querySelector('.funeral')).toBe(scene)
+      expect(screen.getByRole('img', { name: /Headstone of Ann Example/ })).toBe(stone)
+      // Every track keeps its final frame; only the looping rain is stopped.
+      expect(scene).toHaveClass('is-playing', 'is-ended')
+      const weapon = document.querySelector('.funeral-weapon')!
+      expect(weapon.querySelector('.funeral-score')).toHaveTextContent(
+        'Finally done in by WAS 27–17',
       )
+      expect(weapon.querySelector('img[src$="team-logos/was.png"]')).not.toBeNull()
+      // The house lights are back up.
+      expect(document.body.querySelector('.funeral-house')).toBeNull()
     } finally {
       vi.useRealTimers()
     }
