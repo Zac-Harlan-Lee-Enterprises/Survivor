@@ -69,6 +69,7 @@ def main(src):
             originY=take["originY"],
             crownY=take["crownY"],
             stride=take["stride"],
+            armClearance=take.get("armClearance"),
             sheets=sheets,
             frames=index,
             walk=walk,

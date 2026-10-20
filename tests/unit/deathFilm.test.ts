@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest'
 
 /** The parts of src/lib/deathFilm.ts's Film this checks (read from disk, as the other fact tests do). */
 interface Film {
+  /** How far his elbows and forearms stay outside his body at the closest, over every frame (cm). */
+  armClearance: number
   frameWidth: number
   frameHeight: number
   stride: number
@@ -27,6 +29,12 @@ describe('the rendered film', () => {
       expect(f.dx + f.w).toBeLessThanOrEqual(FILM.frameWidth)
       expect(f.dy + f.h).toBeLessThanOrEqual(FILM.frameHeight)
     }
+  })
+
+  it('keeps his arms outside his body in every frame (measured when the take was rendered)', () => {
+    // Facing you with his hands on the cane, his arms once passed through his
+    // chest. death_scene.py measures every rendered frame against his torso.
+    expect(FILM.armClearance).toBeGreaterThan(0)
   })
 
   it('walks him forward every stride; in the scene he stops, stands a long while, and walks on', () => {
