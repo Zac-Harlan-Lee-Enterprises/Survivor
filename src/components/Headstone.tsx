@@ -123,6 +123,12 @@ export function Headstone({
         </div>
       </div>
       {staged && <span aria-hidden="true" className="funeral-glint" />}
+      {/* the frost Death leaves on the stone as he passes (DeathArrives.tsx) */}
+      {staged && (
+        <span aria-hidden="true" className="funeral-frost">
+          <span className="funeral-frost-rime" />
+        </span>
+      )}
     </div>
   )
 
@@ -140,6 +146,7 @@ export function Headstone({
         className,
       )}
       data-funeral={funeral ? phase : undefined}
+      data-grave={funeral ? playerId : undefined}
     >
       {/* The crow: flies in as the lights come up, then sits on every visit after. */}
       {funeral && phase !== 'waiting' && (

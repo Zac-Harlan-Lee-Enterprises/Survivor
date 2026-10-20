@@ -19,6 +19,7 @@ import {
   type ScoreLine,
   type GameLine,
 } from '@/domain'
+import { DeathArrives } from '@/components/DeathArrives'
 import { Headshot } from '@/components/Headshot'
 import { PlayerCard } from '@/components/PlayerCard'
 import { LeagueMessage } from './LeagueMessage'
@@ -334,21 +335,25 @@ export function LeagueHome() {
           </div>
           {/* Fresh graves get a stage and a funeral, every visit; old ones just stand there. */}
           {freshGraves.length > 0 && (
-            <ul className="mx-auto grid max-w-4xl grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-3">
-              {freshGraves.map((s, i) => (
-                <li key={s.playerId}>
-                  <PlayerCard
-                    standing={s}
-                    profile={profileOf(s.playerId)}
-                    pickVisible={viewer.isCommissioner}
-                    index={i}
-                    funeral
-                    // A cascade, not a chorus: each grave starts a beat after the last.
-                    funeralDelay={i * 1.1}
-                  />
-                </li>
-              ))}
-            </ul>
+            <div className="relative mx-auto max-w-4xl">
+              <ul className="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-3">
+                {freshGraves.map((s, i) => (
+                  <li key={s.playerId}>
+                    <PlayerCard
+                      standing={s}
+                      profile={profileOf(s.playerId)}
+                      pickVisible={viewer.isCommissioner}
+                      index={i}
+                      funeral
+                      // A cascade, not a chorus: each grave starts a beat after the last.
+                      funeralDelay={i * 1.1}
+                    />
+                  </li>
+                ))}
+              </ul>
+              {/* When the funerals are over, Death arrives. */}
+              <DeathArrives graves={freshGraves} />
+            </div>
           )}
           {oldGraves.length > 0 && (
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
