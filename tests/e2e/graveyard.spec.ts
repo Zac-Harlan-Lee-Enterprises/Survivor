@@ -311,10 +311,14 @@ test.describe('the graveyard', () => {
     await page.waitForTimeout(19_000)
     await expect(grave).toHaveAttribute('data-funeral', 'playing')
     // The crow is tested on its own; here it would only add shadow anti-aliasing.
+    // Death arrives once the scenes are over: he has his own test, and is kept
+    // out of these pictures.
+    // (On a phone, if his layer ever widened the page the browser would re-lay
+    // it and this card would jump: this is what caught that.)
     const shot = () =>
       card.screenshot({
         animations: 'disabled',
-        style: '.funeral-crow { visibility: hidden !important; }',
+        style: '.funeral-crow, .death-scene { visibility: hidden !important; }',
       })
     const before = await shot()
     await expect(grave).toHaveAttribute('data-funeral', 'done', { timeout: 5_000 })
@@ -341,4 +345,108 @@ test.describe('the graveyard', () => {
     )
     expect(onTop, 'a finished grave painted over the sticky header').toBe(true)
   })
+
+  test('when the funerals are over, Death arrives: the world stops, the crows leave, the stones frost', async ({
+    page,
+  }) => {
+    test.slow()
+    // Thursday of week 5, real results: Tampa Bay 24, Dallas 16 buries the five
+    // last-life Dallas pickers.
+    await thursdayOfWeek5(page)
+    const graves = page.locator('section[aria-labelledby="grave-title"]')
+    const stones = graves.locator('[data-funeral]')
+    await expect(stones).toHaveCount(5, { timeout: 20_000 })
+    // A funeral waits for its grave to be seen: on a phone that means scrolling down the row.
+    for (const stone of await stones.all()) {
+      await stone.scrollIntoViewIfNeeded()
+      await expect(stone).not.toHaveAttribute('data-funeral', 'waiting', { timeout: 10_000 })
+    }
+    const scene = page.locator('.death-scene')
+    await expect(scene).toHaveAttribute('data-death', 'arriving', { timeout: 45_000 })
+    // One Death, over the whole page; everything else holds still for him.
+    await expect(page.locator('.death-figure')).toHaveCount(1)
+    await expect(page.locator('html')).toHaveClass(/death-is-here/)
+    // He is rendered: every sheet of his frames is served (the canvas draws from them).
+    const sheets = ((await scene.locator('canvas.death-sprite').getAttribute('data-sheets')) ?? '')
+      .split(' ')
+      .filter(Boolean)
+    expect(sheets.length).toBeGreaterThan(1)
+    for (const src of sheets) {
+      expect(src).toMatch(/^death\/death-\d+\.webp$/)
+      expect((await page.request.get(new URL(src, page.url()).href)).ok(), src).toBe(true)
+    }
+    // Hurry him along: finish each beat as soon as it starts (the falling rain loops forever).
+    await scene.evaluate((el) => {
+      const hurry = () => {
+        for (const a of el.ownerDocument.getAnimations()) {
+          if (a.effect?.getTiming().iterations !== Infinity) a.finish()
+        }
+        if (el.isConnected) setTimeout(hurry, 16)
+      }
+      hurry()
+    })
+    // Then he is not there; the page moves again; every crow is gone, every stone frosted.
+    await expect(scene).toHaveCount(0, { timeout: 30_000 })
+    await expect(page.locator('html')).not.toHaveClass(/death-is-here/)
+    for (const stone of await stones.all()) await expect(stone).toHaveAttribute('data-frost', '')
+    for (const crow of await graves.locator('.funeral-crow').all()) {
+      await expect(crow).toHaveCSS('opacity', '0')
+    }
+  })
+
+  test('viewers who prefer reduced motion get no funeral, so no Death', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await thursdayOfWeek5(page)
+    const graves = page.locator('section[aria-labelledby="grave-title"]')
+    await expect(graves.getByRole('img', { name: /^Headstone of/ })).toHaveCount(6, {
+      timeout: 20_000,
+    })
+    await expect(page.locator('.death-scene')).toHaveCount(0)
+  })
 })
+
+/** Weeks 1–4 as they really finished, and Thursday night of week 5: Tampa Bay 24, Dallas 16. */
+async function thursdayOfWeek5(page: Page) {
+  const week5: Record<string, [number, number]> = { '2026-w05-TB-at-DAL': [24, 16] }
+  await resetDemo(page)
+  await signInAs(page, COMMISSIONER)
+  await setDemoClock(page, '2026-10-09T15:00')
+  await page.route('**/site.api.espn.com/**', (route) => {
+    const week = Number(new URL(route.request().url()).searchParams.get('week'))
+    const events = season.games
+      .filter((g) => g.week === week && week <= 5)
+      .map((g) => {
+        const final = week5[g.id] ?? (week <= 4 ? FINALS[g.id] : undefined)
+        const [away, home] = final ?? [0, 0]
+        return {
+          date: g.kickoffAt,
+          competitions: [
+            {
+              date: g.kickoffAt,
+              status: { type: { name: final ? 'STATUS_FINAL' : 'STATUS_SCHEDULED' } },
+              competitors: [
+                {
+                  homeAway: 'home',
+                  score: String(home),
+                  winner: !!final && home > away,
+                  team: { abbreviation: g.homeTeamId },
+                },
+                {
+                  homeAway: 'away',
+                  score: String(away),
+                  winner: !!final && away > home,
+                  team: { abbreviation: g.awayTeamId },
+                },
+              ],
+            },
+          ],
+        }
+      })
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ season: { year: 2026, type: 2 }, week: { number: week }, events }),
+    })
+  })
+  await page.goto('./#/')
+}

@@ -125,6 +125,7 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | `scripts/generate-demo-fixtures.ts` | Seeds the league: real roster, week 1 picks, real cached schedule, no results. `npm run fixtures:generate`. |
 | `scripts/fetch-nfl-schedule.mjs` | Caches the real NFL schedule from ESPN. `npm run schedule:fetch`. |
 | `scripts/import-headshots.mjs` | Turns `photos/` into cropped headshot variants. `npm run headshots:import`. |
+| `scripts/art/death_scene.py` | Renders Death (`src/components/DeathArrives.tsx`) in Blender with BibleGame's figure engine: casting `death_cast.py`, suit and cane `death_dress.py`, the walk-stop-turn take `death_motion.py`; `death_film.py` packs the frames into `public/death/` and `src/components/deathFrames.json`. |
 | `src/domain/nfl/espn.ts` | Pure ESPN scoreboard parser, shared by browser and Lambda. |
 | `src/data/nfl/espnClient.ts` | Browser fetch for live scores (one of two network modules). |
 | `scripts/serve-static.mjs` | GitHub Pages look-alike server (real 404s, base-only). |
