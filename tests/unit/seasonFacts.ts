@@ -214,6 +214,85 @@ export const SCORING: Record<string, ScoringPlay[]> = {
   ],
 }
 
+/**
+ * Box-score lines from the same ESPN game summaries (team statistics and the
+ * players' passing and kicking lines, read 2026-10-20), for the games the
+ * notes tell the story of. Only what a note or an epitaph actually uses.
+ */
+export interface TeamBox {
+  totalYards: number
+  firstDowns: number
+  passingYards: number
+  /** Red-zone trips that ended in a touchdown, and trips. */
+  redZone: [made: number, trips: number]
+}
+export interface PlayerBox {
+  team: string
+  completions?: number
+  attempts?: number
+  passingYards?: number
+  touchdowns?: number
+  interceptions?: number
+  fieldGoals?: [made: number, tried: number]
+  longest?: number
+  points?: number
+}
+export const BOX: Record<
+  string,
+  { teams: Record<string, TeamBox>; players: Record<string, PlayerBox> }
+> = {
+  '2026-w06-ARI-at-LAR': {
+    teams: {
+      ARI: { totalYards: 338, firstDowns: 22, passingYards: 218, redZone: [0, 5] },
+      LAR: { totalYards: 286, firstDowns: 19, passingYards: 194, redZone: [2, 4] },
+    },
+    players: {
+      'Jacoby Brissett': {
+        team: 'ARI',
+        completions: 24,
+        attempts: 35,
+        passingYards: 218,
+        touchdowns: 0,
+        interceptions: 1,
+      },
+      'Matthew Stafford': {
+        team: 'LAR',
+        completions: 25,
+        attempts: 33,
+        passingYards: 222,
+        touchdowns: 2,
+        interceptions: 0,
+      },
+      'Chad Ryland': { team: 'ARI', fieldGoals: [6, 6], longest: 43, points: 18 },
+    },
+  },
+  '2026-w06-TEN-at-IND': {
+    teams: {
+      TEN: { totalYards: 186, firstDowns: 11, passingYards: 102, redZone: [1, 2] },
+      IND: { totalYards: 399, firstDowns: 24, passingYards: 234, redZone: [2, 4] },
+    },
+    players: {
+      'Cam Ward': {
+        team: 'TEN',
+        completions: 11,
+        attempts: 22,
+        passingYards: 102,
+        touchdowns: 1,
+        interceptions: 1,
+      },
+      'Daniel Jones': {
+        team: 'IND',
+        completions: 22,
+        attempts: 42,
+        passingYards: 269,
+        touchdowns: 1,
+        interceptions: 2,
+      },
+      'Joey Slye': { team: 'TEN', fieldGoals: [4, 4], longest: 56, points: 14 },
+    },
+  },
+}
+
 export const gamesById = new Map(season.games.map((g) => [g.id, g]))
 export const nameOf = (playerId: string) =>
   season.profiles.find((p) => p.playerId === playerId)?.displayName ?? playerId
