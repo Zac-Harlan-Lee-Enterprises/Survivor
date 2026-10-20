@@ -34,9 +34,10 @@ export const season = JSON.parse(
 ) as Season
 
 /**
- * Every week 1–4 final, as the ESPN scoreboard
+ * Every week 1–6 final, as the ESPN scoreboard
  * reports them (site.api.espn.com, 2026 season type 2, weeks 1 to 4, read on
- * 2026-09-22, 2026-09-29 and 2026-10-05, Monday night's added on 2026-10-09; week 5 read 2026-10-13). The seed deliberately carries no results — the app fetches them
+ * 2026-09-22, 2026-09-29 and 2026-10-05, Monday night's added on 2026-10-09; week 5 read 2026-10-13;
+ * week 6 read 2026-10-20). The seed deliberately carries no results — the app fetches them
  * live — so the note's outcome claims are pinned here instead, keyed by the
  * seed's own game ids so a pick and its result cannot drift apart.
  *
@@ -122,6 +123,95 @@ export const FINALS: Record<string, [number, number]> = {
   '2026-w05-SF-at-SEA': [32, 29],
   '2026-w05-BAL-at-ATL': [30, 23],
   '2026-w05-BUF-at-LAR': [37, 34],
+  '2026-w06-SEA-at-DEN': [14, 17],
+  '2026-w06-HOU-at-JAX': [34, 31],
+  '2026-w06-CHI-at-ATL': [31, 23],
+  '2026-w06-BAL-at-CLE': [10, 13],
+  '2026-w06-TEN-at-IND': [26, 20],
+  '2026-w06-NYJ-at-NE': [19, 26],
+  '2026-w06-NO-at-NYG': [34, 27],
+  '2026-w06-CAR-at-PHI': [25, 14],
+  '2026-w06-PIT-at-TB': [26, 19],
+  '2026-w06-ARI-at-LAR': [18, 16],
+  '2026-w06-LAC-at-KC': [6, 22],
+  '2026-w06-BUF-at-LV': [33, 30],
+  '2026-w06-DAL-at-GB': [13, 23],
+  '2026-w06-WAS-at-SF': [17, 23],
+}
+
+/**
+ * The scoring plays of the games a note or an epitaph tells the story of, as
+ * the ESPN game summary lists them (site.api.espn.com summary, read
+ * 2026-10-20): quarter, game clock, scoring team, the score after it
+ * `[away, home]`, and ESPN's description.
+ */
+export type ScoringPlay = [
+  quarter: number,
+  clock: string,
+  team: string,
+  score: [number, number],
+  text: string,
+]
+export const SCORING: Record<string, ScoringPlay[]> = {
+  '2026-w06-ARI-at-LAR': [
+    [1, '9:41', 'LAR', [0, 3], 'Blake Grupe 44 Yd Field Goal'],
+    [1, '5:37', 'ARI', [3, 3], 'Chad Ryland 34 Yd Field Goal'],
+    [2, '14:51', 'ARI', [6, 3], 'Chad Ryland 30 Yd Field Goal'],
+    [
+      2,
+      '8:23',
+      'LAR',
+      [6, 9],
+      'Blake Corum 15 Yd pass from Matthew Stafford (Two-Point Pass Conversion Failed)',
+    ],
+    [2, '0:46', 'ARI', [9, 9], 'Chad Ryland 22 Yd Field Goal'],
+    [3, '6:25', 'ARI', [12, 9], 'Chad Ryland 38 Yd Field Goal'],
+    [4, '9:28', 'ARI', [15, 9], 'Chad Ryland 27 Yd Field Goal'],
+    [
+      4,
+      '0:47',
+      'LAR',
+      [15, 16],
+      'Colby Parkinson 6 Yd pass from Matthew Stafford (Ethan Evans Kick)',
+    ],
+    [4, '0:00', 'ARI', [18, 16], 'Chad Ryland 43 Yd Field Goal'],
+  ],
+  '2026-w06-TEN-at-IND': [
+    [2, '11:07', 'IND', [0, 7], 'Mo Alie-Cox 1 Yd pass from Daniel Jones (Spencer Shrader Kick)'],
+    [2, '2:06', 'IND', [0, 10], 'Spencer Shrader 23 Yd Field Goal'],
+    [2, '0:11', 'IND', [0, 13], 'Spencer Shrader 47 Yd Field Goal'],
+    [3, '13:30', 'TEN', [3, 13], 'Joey Slye 29 Yd Field Goal'],
+    [3, '3:21', 'TEN', [6, 13], 'Joey Slye 56 Yd Field Goal'],
+    [4, '13:00', 'TEN', [13, 13], 'Carnell Tate 8 Yd pass from Cam Ward (Joey Slye Kick)'],
+    [4, '10:17', 'TEN', [20, 13], 'Oluwafemi Oladejo 14 Yd return of blocked punt (J.Slye kick)'],
+    [4, '5:32', 'IND', [20, 20], 'Jonathan Taylor 4 Yd Rush (Spencer Shrader Kick)'],
+    [4, '2:03', 'TEN', [23, 20], 'Joey Slye 49 Yd Field Goal'],
+    [4, '0:43', 'TEN', [26, 20], 'Joey Slye 44 Yd Field Goal'],
+  ],
+  '2026-w06-NYJ-at-NE': [
+    [1, '8:17', 'NYJ', [3, 0], 'Jason Sanders 42 Yd Field Goal'],
+    [1, '4:10', 'NE', [3, 7], 'Romeo Doubs 42 Yd pass from Drake Maye (Andy Borregales Kick)'],
+    [2, '1:46', 'NE', [3, 10], 'Andy Borregales 32 Yd Field Goal'],
+    [2, '0:14', 'NE', [3, 17], 'DeMario Douglas 9 Yd pass from Drake Maye (Andy Borregales Kick)'],
+    [
+      3,
+      '10:24',
+      'NYJ',
+      [10, 17],
+      'Omar Cooper Jr. 48 Yd pass from Geno Smith (Jason Sanders Kick)',
+    ],
+    [3, '4:46', 'NYJ', [13, 17], 'Jason Sanders 36 Yd Field Goal'],
+    [
+      4,
+      '14:10',
+      'NE',
+      [13, 23],
+      'Hunter Henry 7 Yd pass from Drake Maye (Andy Borregales PAT Failed)',
+    ],
+    [4, '7:20', 'NYJ', [16, 23], 'Jason Sanders 40 Yd Field Goal'],
+    [4, '1:12', 'NE', [16, 26], 'Andy Borregales 27 Yd Field Goal'],
+    [4, '0:32', 'NYJ', [19, 26], 'Jason Sanders 36 Yd Field Goal'],
+  ],
 }
 
 export const gamesById = new Map(season.games.map((g) => [g.id, g]))
@@ -143,15 +233,21 @@ export const winnerOf = (gameId: string): string | null => {
 /** True when the pick cost a life: its team lost, or tied. */
 export const lost = (p: Pick) => winnerOf(p.gameId) !== p.teamId
 
-/** A team's record over the pinned finals, from the schedule. */
-/** A team's record over the pinned finals, from the schedule: "4-1", or "1-3-1" with a tie. */
-export const record = (teamId: string) => {
+/** How many of the league picked a team in a week. */
+export const crowd = (week: number, teamId: string) =>
+  picksIn(week).filter((p) => p.teamId === teamId).length
+
+/**
+ * A team's record over the pinned finals, from the schedule: "4-1", or "1-3-1"
+ * with a tie. Through week `through` when given (a record as it stood then).
+ */
+export const record = (teamId: string, through = Infinity) => {
   let wins = 0
   let losses = 0
   let ties = 0
   for (const [id] of Object.entries(FINALS)) {
     const g = gamesById.get(id)
-    if (!g || (g.homeTeamId !== teamId && g.awayTeamId !== teamId)) continue
+    if (!g || g.week > through || (g.homeTeamId !== teamId && g.awayTeamId !== teamId)) continue
     const winner = winnerOf(id)
     if (winner === null) ties += 1
     else if (winner === teamId) wins += 1

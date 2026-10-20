@@ -10,12 +10,12 @@ test.describe('word from the commissioner', () => {
     await resetDemo(page)
     const note = page.locator('section[aria-labelledby="league-message-title"]')
     await expect(note).toBeVisible()
-    await expect(note).toContainText(/word from the commissioner/i)
-    // Body, not just a heading. Naming one joke here would mean rewriting this
-    // test every week; the note's factual claims are checked against the season
-    // in tests/unit/leagueMessageFacts.test.ts instead.
-    await expect(note.locator('p')).not.toHaveCount(0)
-    await expect(note).toContainText(/tampa bay/i)
+    // (The commissioner may be late — he was buried in week 6 — and still writes.)
+    await expect(note).toContainText(/word from the (late )?commissioner/i)
+    // Body, not just a heading: a review is several paragraphs. Naming one joke
+    // here would mean rewriting this test every week; the note's factual claims
+    // are checked against the season in tests/unit/leagueMessageFacts.test.ts.
+    expect(await note.locator('p').count()).toBeGreaterThan(2)
 
     // Order on the page: hero, then the note, then Still standing. Measured
     // through locators so the spec needs no DOM types.
@@ -53,6 +53,8 @@ test.describe('word from the commissioner', () => {
 
   test('reads on a phone too, and is announced as a section', async ({ page }) => {
     await resetDemo(page)
-    await expect(page.getByRole('heading', { name: /word from the commissioner/i })).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: /word from the (late )?commissioner/i }),
+    ).toBeVisible()
   })
 })
