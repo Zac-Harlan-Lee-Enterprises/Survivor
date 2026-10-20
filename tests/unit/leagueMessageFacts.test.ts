@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
+  BOX,
   FINALS,
   SCORING,
   crowd,
@@ -55,6 +56,24 @@ const at = (iso: string) =>
 /** A line from the week 5 review, kept for the callback above it in this one. */
 const WEEK_5_REVIEW_SAID =
   'Craig, Jared, Joey, Nate and Phyllis are out. With Don, that is six graves, and the graveyard on this page now has more going on than the Tennessee offense.'
+
+/** Every life lost, in order: the week, and the team that cost it (null: no pick). */
+const livesLost = (() => {
+  const out: { week: number; teamId: string | null }[] = []
+  const lives = new Map(season.profiles.map((p) => [p.playerId, 3]))
+  for (let week = 1; week <= WEEK; week++) {
+    for (const p of season.profiles) {
+      if (lives.get(p.playerId)! <= 0) continue
+      const pick = season.picks.find((x) => x.playerId === p.playerId && x.week === week)
+      if (!pick || lost(pick)) {
+        lives.set(p.playerId, lives.get(p.playerId)! - 1)
+        out.push({ week, teamId: pick?.teamId ?? null })
+      }
+    }
+  }
+  return out
+})()
+const box = (gameId: string) => BOX[gameId]!
 
 const note = readFileSync(
   new URL('../../src/features/league-home/LeagueMessage.tsx', import.meta.url),
@@ -132,6 +151,98 @@ describe('the commissioner’s week 6 review states only true things', () => {
       /the graveyard on this page now has more going on than the Tennessee offense/,
     )
     expect(body).toMatch(/I wrote last week, had less going on than our graveyard/)
+  })
+
+  it('“Arizona went into the red zone five times, scored zero touchdowns … Matthew Stafford threw two touchdowns and no interceptions. Arizona’s quarterback threw no touchdowns and an interception”', () => {
+    const g = box('2026-w06-ARI-at-LAR')
+    expect(g.teams.ARI!.redZone).toEqual([0, 5])
+    expect(g.players['Matthew Stafford']).toMatchObject({
+      team: 'LAR',
+      touchdowns: 2,
+      interceptions: 0,
+    })
+    expect(g.players['Jacoby Brissett']).toMatchObject({
+      team: 'ARI',
+      touchdowns: 0,
+      interceptions: 1,
+    })
+    // He was Arizona's passer: his yards are all of theirs.
+    expect(g.players['Jacoby Brissett']!.passingYards).toBe(g.teams.ARI!.passingYards)
+    expect(g.players['Chad Ryland']!.fieldGoals).toEqual([6, 6])
+  })
+
+  it('“thirteen of you were safe for forty-seven seconds”', () => {
+    const lead = SCORING['2026-w06-ARI-at-LAR']!.find(([, , , score]) => score.join() === '15,16')!
+    expect(lead[1]).toBe('0:47')
+    expect(SCORING['2026-w06-ARI-at-LAR']!.at(-1)![1]).toBe('0:00')
+  })
+
+  it('“Tennessee gained 186 yards, completed eleven passes and managed eleven first downs. Indianapolis gained 399 … a man named Joey — scored fourteen points by himself, including a 56-yard field goal”', () => {
+    const g = box('2026-w06-TEN-at-IND')
+    expect(g.teams.TEN).toMatchObject({ totalYards: 186, firstDowns: 11 })
+    expect(g.players['Cam Ward']).toMatchObject({ team: 'TEN', completions: 11 })
+    // He was Tennessee's only passer: his yards are all of theirs.
+    expect(g.players['Cam Ward']!.passingYards).toBe(g.teams.TEN!.passingYards)
+    expect(g.teams.IND!.totalYards).toBe(399)
+    expect(g.players['Joey Slye']).toMatchObject({ team: 'TEN', points: 14, longest: 56 })
+  })
+
+  it('“went into the weekend twenty-four strong and came out of it twelve”', () => {
+    expect([...before.values()].filter((l) => l > 0)).toHaveLength(24)
+    expect([...after.values()].filter((l) => l > 0)).toHaveLength(12)
+  })
+
+  it('“More lives have now been lost in the last two weeks (forty-one) than in the first four combined (thirty-three)”', () => {
+    const inWeeks = (...weeks: number[]) => livesLost.filter((l) => weeks.includes(l.week)).length
+    expect(inWeeks(5, 6)).toBe(41)
+    expect(inWeeks(1, 2, 3, 4)).toBe(33)
+  })
+
+  it('“Dallas remain this league’s leading cause of death, with twenty-two lives, but the Rams went from nothing to second place in one Sunday afternoon, with thirteen”', () => {
+    const tally = new Map<string, number>()
+    for (const l of livesLost) if (l.teamId) tally.set(l.teamId, (tally.get(l.teamId) ?? 0) + 1)
+    const ranked = [...tally.entries()].sort((a, b) => b[1] - a[1])
+    expect(ranked[0]).toEqual(['DAL', 22])
+    expect(ranked[1]).toEqual(['LAR', 13])
+    expect(livesLost.filter((l) => l.teamId === 'LAR' && l.week < WEEK)).toHaveLength(0)
+    expect(at(gamesById.get('2026-w06-ARI-at-LAR')!.kickoffAt)).toMatch(/^Sunday [1-4]:\d\d PM$/)
+  })
+
+  it('“The most popular pick has now lost two weeks running — 0-for-34”', () => {
+    const top = (week: number) => {
+      const counts = new Map<string, number>()
+      for (const p of picksIn(week)) counts.set(p.teamId, (counts.get(p.teamId) ?? 0) + 1)
+      const most = Math.max(...counts.values())
+      return [...counts.entries()].filter(([, n]) => n === most)
+    }
+    expect(top(5)).toEqual([['DAL', 21]])
+    expect(top(6)).toEqual([['LAR', 13]])
+    for (const w of [5, 6]) {
+      const [team] = top(w)[0]!
+      expect(
+        picksIn(w)
+          .filter((p) => p.teamId === team)
+          .every(lost),
+      ).toBe(true)
+    }
+    expect(21 + 13).toBe(34)
+  })
+
+  it('“Bradley, Cindy, Shahid and Tracy have already spent all three unbeaten teams, and only Jason and Melanie still have Kansas City”', () => {
+    const alive = season.profiles.filter((p) => after.get(p.displayName)! > 0)
+    const used = (playerId: string) =>
+      new Set(season.picks.filter((p) => p.playerId === playerId).map((p) => p.teamId))
+    const all3 = alive.filter((p) => ['SF', 'MIN', 'KC'].every((t) => used(p.playerId).has(t)))
+    expect(firstNames(all3.map((p) => p.displayName))).toEqual([
+      'Bradley',
+      'Cindy',
+      'Shahid',
+      'Tracy',
+    ])
+    const kc = alive.filter((p) => !used(p.playerId).has('KC'))
+    expect(firstNames(kc.map((p) => p.displayName))).toEqual(['Jason', 'Melanie'])
+    const teams = new Set(season.games.flatMap((g) => [g.homeTeamId, g.awayTeamId]))
+    expect([...teams].filter((t) => /^\d+-0$/.test(record(t))).sort()).toEqual(['KC', 'MIN', 'SF'])
   })
 
   it('“Our Joey has been in the ground a week”', () => {
