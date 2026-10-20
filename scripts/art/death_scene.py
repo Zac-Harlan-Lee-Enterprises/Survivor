@@ -147,6 +147,8 @@ def main():
             originY=FOOT * a.ppu,
             crownY=round((FOOT - person.H * TILE) * a.ppu, 1),
             stride=round(mo.d * ppb, 2),
+            # How far his arms stay outside his body at the closest (cm).
+            armClearance=round(mo.arm_clearance(take) * 100, 1),
             cane=mo.L,
             frames=frames,
         ),

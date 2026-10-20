@@ -367,7 +367,9 @@ class Motion:
         # ── His cane: where its tip is set down, and where his hand would be.
         A_hand = 0.08
         side_tip = np.array([X0 + self.cane_x, Ye - 0.13, 0.0])
-        front_tip = np.array([X0 - (abs(self.cane_x) + 0.02), Ye, 0.0])
+        # Facing you, the cane stands a forearm's length in front of him, so his
+        # arms reach forward to it rather than folding into his chest.
+        front_tip = np.array([X0 - 0.42, Ye, 0.0])
         side_knob = np.array([side_tip[0] + 0.025, Ye])
 
         def stride_tip(t0):
@@ -377,14 +379,21 @@ class Motion:
         for k in range(-1, 4):
             t0 = tw + k * C
             canes.append((t0, t0 + C / 2, stride_tip(t0)))
-        canes.append((ts + C, t_turn + 0.2 * nF, side_tip))
-        canes.append((t_turn + 0.75 * nF, t_back + 0.1 * nJ, front_tip))
+        # He carries it at his side as he comes round (CARRY), and only facing
+        # you brings it out in front and sets it down.
+        carry0, carry1 = t_turn + 0.1 * nF, t_hands + 0.55 * nG
+        # ...and turning away, carries it back round to his side the same way.
+        back0, back1 = t_back + 0.1 * nJ, t_back + 0.65 * nJ
+        canes.append((ts + C, carry0, side_tip))
+        canes.append((carry1, back0, front_tip))
+        # (Where he has carried it to, as a moment's stop before his stride.)
+        canes.append((back1, back1, None))
         for k in range(0, 3):
             t0 = t_s2 + k * C
             canes.append((t0, t0 + C / 2, stride_tip(t0)))
 
         def front_knob(psi):
-            return P_end + yaw(psi)[:2, :2] @ np.array([0.0, -(abs(self.cane_x) - 0.05)])
+            return P_end + yaw(psi)[:2, :2] @ np.array([0.0, -0.36])
 
         def stride_knob(t):
             return np.array([X0 + self.cane_x + 0.03, hips_y(t) + self.hand_y - A_hand * math.cos(2 * math.pi * phase(t))])
@@ -399,13 +408,48 @@ class Motion:
                 return side_knob
             if t < t_back:
                 return lerp(side_knob, front_knob(psi), smoother(-psi / 90.0))
+            if t <= back0:
+                return front_knob(-90.0)
             if t < t_s2:
-                return lerp(front_knob(-90.0), stride_knob(t_s2), smoother((t - t_back) / (t_s2 - t_back)))
+                # From his side, where he carried it, into his stride.
+                at_side = landed[0][:2]
+                return lerp(at_side, stride_knob(t_s2), smoother((t - back1) / (t_s2 - back1)))
             return stride_knob(t)
+
+        # Carried, the cane is placed relative to him (x across, y back, from his
+        # hips): at his right side, leaning a little forward, held clear of the
+        # ground; then, facing you, swung out round in front of him on an arc
+        # well clear of his body, and set down.
+        side_body = (np.array([self.cane_x + 0.025, -0.03]), np.array([self.cane_x, -0.10]))
+        front_body = (np.array([0.0, -0.36]), np.array([0.0, -0.42]))
+
+        def arc(a, b, f):
+            # Swung wide of him on the way (never across his front).
+            ra, rb = math.hypot(*a), math.hypot(*b)
+            ta, tb = math.atan2(a[0], -a[1]), math.atan2(b[0], -b[1])
+            r = ra + (rb - ra) * f + 0.08 * math.sin(math.pi * f)
+            th = ta + (tb - ta) * f
+            return np.array([r * math.sin(th), -r * math.cos(th)])
+
+        def carried(t, psi):
+            if t < back0:
+                f = smoother((t - t_hands) / (carry1 - t_hands)) if t > t_hands else 0.0
+                lift = 0.03 * min(1.0, (t - carry0) / 4.0) * (1.0 - f)
+            else:
+                f = 1.0 - smoother((t - back0) / (back1 - back0))
+                lift = 0.03 * math.sin(math.pi * min(1.0, (t - back0) / (back1 - back0)))
+            knob_b = arc(side_body[0], front_body[0], f)
+            tip_b = arc(side_body[1], front_body[1], f)
+            Y = yaw(psi)[:2, :2]
+            tip = np.append(P_end + Y @ tip_b, 0.0)
+            top = self._knob(tip, P_end + Y @ knob_b)
+            return tip + np.array([0.0, 0.0, lift]), top + np.array([0.0, 0.0, lift])
 
         def cane_at(t, psi):
             """(tip, top) of the cane: planted, or swinging under his hand to
             where it will be planted next (clear of the ground)."""
+            if carry0 < t < carry1 or back0 < t <= back1:
+                return carried(t, psi)
             xy = knob_xy(t, psi)
             for k, (t0, t1, tip) in enumerate(canes):
                 if t0 <= t <= t1 or (k == 0 and t < t0):
@@ -440,6 +484,15 @@ class Motion:
                 psi = -90.0 + 90.0 * smoother(u)
                 shift = 0.35 * (plants["L"][6].F - P_end) * bump(u, 0.05, 0.6)
             return np.array([X0 + sway + shift[0], hips_y(t) + shift[1]]), psi, rot(y=drop * 0.6, z=turn)
+
+        # Where he set the cane down at his side, turning away (its top, its tip).
+        landed = [None]
+        top_b1 = None
+        for i, (t0, t1, tip) in enumerate(canes):
+            if tip is None:
+                tip_b1, top_b1 = carried(t0, hips_at(t0)[1])
+                canes[i] = (t0, t1, tip_b1)
+        landed[0] = top_b1
 
         def root_of(xy, psi, Rloc, z):
             M = np.eye(4)
@@ -534,7 +587,7 @@ class Motion:
         def on_knob(t):
             """0: his fist round the cane under the knob; 1: his palm on the
             knob (his hands at rest on it, facing you)."""
-            return smoother((t - t_hands) / (0.6 * nG)) * (1.0 - smoother((t - t_release) / nI))
+            return smoother((t - t_hands - 0.3 * nG) / (0.4 * nG)) * (1.0 - smoother((t - t_release) / nI))
 
         def look(R, amount, eyes, pitch):
             for bone, deg in HEAD:
@@ -575,7 +628,11 @@ class Motion:
                 look(R, a, e, pitch)
             if t_hands <= t < t_back + nJ:
                 u = smoother((t - t_hands) / nG) * (1.0 - smoother((t - t_release) / (nI + nJ * 0.5)))
-                _after(R, "spine02", rot(x=2.0 * u))
+                # He leans a little onto it, his shoulders coming forward as his
+                # hands go to the knob, so his arms fall in front of him.
+                _after(R, "spine02", rot(x=3.5 * u))
+                _after(R, "clavicle.L", rot(z=-8.0 * u))
+                _after(R, "clavicle.R", rot(z=8.0 * u))
                 tilt = smoother((t - t_regard) / nH) * (1.0 - smoother((t - t_release) / nI))
                 _after(R, "head", rot(x=1.5 * u, y=-3.5 * tilt))
             # The legs.
@@ -595,7 +652,9 @@ class Motion:
             grip = top - u_cane * 0.055 - n_grip * 0.02 - f_grip * 0.025
             on = top + u_cane * 0.02
             f_body = lerp((-0.35, -1.0, -0.15), (0.25, -1.0, -0.2), smoother(-psi / 90.0))
-            self.reach(R, root, "R", lerp(grip, on, k), lerp(f_grip, yaw(psi) @ f_body, k), lerp(n_grip, -u_cane, k), yaw(psi) @ np.array([-0.5, 1.0, -0.1]))
+            # (Carrying it, his elbow points back; resting on it, out to the side.)
+            pole_r = lerp((-0.5, 1.0, -0.1), (-0.85, 0.5, -0.15), k)
+            self.reach(R, root, "R", lerp(grip, on, k), lerp(f_grip, yaw(psi) @ f_body, k), lerp(n_grip, -u_cane, k), yaw(psi) @ pole_r)
             wm.curl(R, "R", 0.88 - 0.33 * k)
             # His left hand comes to rest on his right, and leaves it again.
             if t_hands <= t < t_back:
@@ -605,7 +664,8 @@ class Motion:
                 on = right + yaw(psi) @ np.array([-0.004, -0.012, 0.0]) + np.array([0.0, 0.0, 0.042])
                 on_dirs = (yaw(psi) @ np.array([-0.55, -1.0, -0.1]), np.array([0.0, 0.0, -1.0]))
                 if t < t_release:
-                    u = (t - t_hands) / nG
+                    # (Once the cane is down and his right hand is on it.)
+                    u = (t - t_hands - 0.45 * nG) / (0.55 * nG)
                     e = smoother(u)
                     start = left_from
                     lift = bump(u)
@@ -618,7 +678,7 @@ class Motion:
                     start = left_back
                     lift = bump(u)
                 target = lerp(start[0], on, e) + np.array([0.0, 0.0, 0.035]) * lift
-                self.reach(R, root, "L", target, lerp(start[1], on_dirs[0], e), lerp(start[2], on_dirs[1], e), yaw(psi) @ np.array([0.6, 0.8, -0.1]))
+                self.reach(R, root, "L", target, lerp(start[1], on_dirs[0], e), lerp(start[2], on_dirs[1], e), yaw(psi) @ np.array([0.85, 0.5, -0.15]))
                 wm.curl(R, "L", 0.5 - 0.26 * e)
             rec = None
             if fi < tw:
@@ -635,6 +695,56 @@ class Motion:
             M[:3, 0], M[:3, 1], M[:3, 2], M[:3, 3] = xc, np.cross(zc, xc), zc, tip
             out.append(dict(R=R, root=root, cane=M, blink=blink, hips=float(hips_y(t)), rec=rec))
         return out
+
+    def arm_clearance(self, take):
+        """How far his elbows and forearms stay outside his body, at the
+        closest, over every rendered frame (m; negative: an arm inside him).
+        His torso is its outline at each height in the rest pose, let out by
+        his jacket; each elbow and forearm is brought back into his own frame
+        (hips at the origin, facing -y) and measured against the outline at
+        its height."""
+        base = mh.Base.get()
+        body = base.verts_of("body")
+        names = self.sk.names
+        cols = [self.idx[n] for n in names if n.startswith(("upperarm", "lowerarm", "wrist", "finger", "metacarpal", "shoulder", "clavicle", "neck", "head", "upperleg", "lowerleg", "foot", "toe"))]
+        limbs = self.W[body][:, cols].sum(1)
+        torso = self.co[body][limbs < 0.2] - self.Jp
+        zs = np.arange(-0.1, 0.45, 0.02)
+        th = np.linspace(0, 2 * math.pi, 48, endpoint=False)
+        outline = {}
+        for z in zs:
+            band = torso[np.abs(torso[:, 2] - z) < 0.015]
+            if len(band) < 8:
+                continue
+            ang = np.arctan2(band[:, 0], -band[:, 1]) % (2 * math.pi)
+            r = np.hypot(band[:, 0], band[:, 1])
+            k = (np.round(ang / (2 * math.pi) * 48).astype(int)) % 48
+            radius = np.zeros(48)
+            np.maximum.at(radius, k, r)
+            for _ in range(48):
+                gap = radius == 0
+                if not gap.any():
+                    break
+                radius[gap] = np.maximum(np.roll(radius, 1), np.roll(radius, -1))[gap]
+            outline[round(float(z), 2)] = radius + 0.012
+        worst = float("inf")
+        for f in take:
+            if f["rec"] is None:
+                continue
+            D = self.fk(f["R"], f["root"])
+            inv = np.linalg.inv(f["root"])
+            for s in "LR":
+                E = self.at(D, f"lowerarm01.{s}", self.heads[self.idx[f"lowerarm01.{s}"]])
+                W = self.at(D, f"wrist.{s}", self.heads[self.idx[f"wrist.{s}"]])
+                for P in (E, (E + W) / 2, W):
+                    q = (inv @ np.append(P, 1.0))[:3] - self.Jp
+                    z = round(round(q[2] / 0.02) * 0.02, 2)
+                    if z not in outline:
+                        continue
+                    a = math.atan2(q[0], -q[1]) % (2 * math.pi)
+                    edge = outline[z][int(round(a / (2 * math.pi) * 48)) % 48]
+                    worst = min(worst, math.hypot(q[0], q[1]) - edge)
+        return worst
 
     def _knob(self, tip, xy):
         """The top of the cane over `tip`, toward (x, y), on the sphere of its length."""
