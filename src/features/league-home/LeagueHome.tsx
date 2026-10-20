@@ -29,6 +29,7 @@ import { useConfetti } from '@/components/useConfetti'
 import { formatKickoff } from '@/lib/time'
 import { getConfig } from '@/config/env'
 import { cn } from '@/lib/cn'
+import { graveyardPreview } from '@/lib/graveyard'
 
 export function LeagueHome() {
   const tz = useLeagueTimeZone()
@@ -42,12 +43,9 @@ export function LeagueHome() {
     (s) => s.status === 'champion' || s.status === 'co-champion',
   )
   const finalists = evaluation.standings.filter((s) => s.status === 'finalist')
-  const graveyard = evaluation.standings.filter((s) => s.status === 'eliminated').slice(0, 6)
-  const recentOut = graveyard.filter(
-    (s) => s.eliminatedWeek !== null && s.eliminatedWeek >= evaluation.currentWeek - 1,
-  )
-  const freshGraves = recentOut
-  const oldGraves = graveyard.filter((s) => !recentOut.includes(s))
+  // This week's dead get a funeral; everyone before them is a plain headstone.
+  const { fresh: freshGraves, old: oldGraves } = graveyardPreview(evaluation)
+  const graveyard = [...freshGraves, ...oldGraves]
   // The hero reports the LIVE week — next kickoff, deadline, whether picks are
   // open — so it must not follow the week someone is browsing.
   const currentWeekGames = snapshot.games
@@ -323,7 +321,7 @@ export function LeagueHome() {
           <div className="mb-4 flex items-end justify-between">
             <h2 id="grave-title" className="flex items-center gap-2 text-3xl text-ink-50">
               <Skull className="h-6 w-6 text-flag-400" aria-hidden="true" />{' '}
-              {recentOut.length > 0 ? 'Fresh graves' : 'Survivor graveyard'}
+              {freshGraves.length > 0 ? 'Fresh graves' : 'Survivor graveyard'}
             </h2>
             <div className="flex items-center gap-4">
               <Link
