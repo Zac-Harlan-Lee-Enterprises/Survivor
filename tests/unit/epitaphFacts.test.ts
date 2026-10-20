@@ -2,11 +2,15 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
   FINALS,
+  SCORING,
+  crowd,
   eliminatedWeekOf,
   gamesById,
+  lost,
   pickOf,
   picksIn,
   pinnedThrough,
+  record,
   season,
   winnerOf,
 } from './seasonFacts'
@@ -287,5 +291,441 @@ describe('the week 5 epitaphs', () => {
     })
     expect(livesEntering('phyllis-collins', 5)).toBe(1)
     expect(played('Phyllis Collins', 5)).toMatchObject({ teamId: 'DAL', mine: 16, theirs: 24 })
+  })
+})
+
+describe('the week 6 epitaphs', () => {
+  const rams = SCORING['2026-w06-ARI-at-LAR']!
+  const titans = SCORING['2026-w06-TEN-at-IND']!
+  /** Arizona 18, Rams 16: six field goals and no touchdown, the Rams ahead with 0:47 left, the last kick at 0:00. */
+  const ramsGame = () => {
+    expect(FINALS['2026-w06-ARI-at-LAR']).toEqual([18, 16])
+    const arizona = rams.filter(([, , team]) => team === 'ARI')
+    expect(arizona).toHaveLength(6)
+    expect(arizona.every(([, , , , text]) => /Field Goal$/.test(text))).toBe(true)
+    expect(rams.find(([, , , score]) => score.join() === '15,16')?.slice(0, 3)).toEqual([
+      4,
+      '0:47',
+      'LAR',
+    ])
+    expect(rams.at(-1)!.slice(0, 3)).toEqual([4, '0:00', 'ARI'])
+  }
+  /** Tennessee, 0–5, won 26–20 at Indianapolis: its first win, a blocked punt, four Joey Slye field goals. */
+  const titansGame = () => {
+    expect(record('TEN', 5)).toBe('0-5')
+    expect(FINALS['2026-w06-TEN-at-IND']).toEqual([26, 20])
+    expect(titans.some(([, , team, , text]) => team === 'TEN' && /blocked punt/.test(text))).toBe(
+      true,
+    )
+    expect(
+      titans.filter(([, , , , text]) => /^Joey Slye \d+ Yd Field Goal$/.test(text)),
+    ).toHaveLength(4)
+  }
+  /** The Dallas loss of week 5: twenty-one of us, to a Tampa Bay that had not won. */
+  const dallas = (name: string) => {
+    expect(played(name, 5)).toMatchObject({ teamId: 'DAL', opponent: 'TB', mine: 16, theirs: 24 })
+    expect(crowd(5, 'DAL')).toBe(21)
+    expect(record('TB', 4)).toBe('0-4')
+  }
+  const arizonaWins = () => Object.keys(FINALS).filter((id) => winnerOf(id) === 'ARI')
+
+  it('bury exactly the twelve that week 6 eliminated', () => {
+    const twelve = [
+      'james-parker',
+      'stacey-markendorff',
+      'sheila-acker',
+      'chloe-bourque',
+      'corey-cowell',
+      'matt-hadley',
+      'kc-walker',
+      'paul-lim',
+      'tony-canody',
+      'joanna-moss',
+      'tina-bush',
+      'zac-harlan',
+    ]
+    for (const id of twelve) expect(eliminatedWeekOf(id, pinnedThrough), id).toBe(6)
+    expect(season.profiles.filter((p) => eliminatedWeekOf(p.playerId, 6) === 6)).toHaveLength(12)
+  })
+
+  it('James: Detroit 31–30, the 49ers, Seattle 33–31 in Washington, Minnesota 15–10, Dallas, the Rams with twelve others; one point, two points, never alone', () => {
+    expect(played('James Parker', 1)).toMatchObject({
+      teamId: 'DET',
+      opponent: 'NO',
+      mine: 31,
+      theirs: 30,
+    })
+    expect(played('James Parker', 2)).toMatchObject({ teamId: 'SF' })
+    expect(winnerOf(played('James Parker', 2)!.gameId)).toBe('SF')
+    expect(played('James Parker', 3)).toMatchObject({
+      teamId: 'SEA',
+      opponent: 'WAS',
+      home: false,
+      mine: 31,
+      theirs: 33,
+    })
+    expect(played('James Parker', 4)).toMatchObject({ teamId: 'MIN', mine: 15, theirs: 10 })
+    dallas('James Parker')
+    // “did what most of the league did”
+    expect(crowd(5, 'DAL')).toBeGreaterThan(picksIn(5).length / 2)
+    expect(livesEntering('james-parker', 6)).toBe(1)
+    expect(played('James Parker', 6)).toMatchObject({ teamId: 'LAR', mine: 16, theirs: 18 })
+    expect(crowd(6, 'LAR')).toBe(13)
+    ramsGame()
+    const margins = [1, 2, 3, 4, 5, 6]
+      .map((w) => played('James Parker', w)!)
+      .map((g) => g.mine - g.theirs)
+    expect(margins[0]).toBe(1)
+    expect(margins[5]).toBe(-2)
+    expect(margins.filter((m) => m < 0)).toEqual([-2, -8, -2])
+    const crowds = [1, 2, 3, 4, 5, 6].map((w) => crowd(w, pickOf('James Parker', w)!.teamId))
+    expect(Math.min(...crowds)).toBe(4)
+    expect(crowds[2]).toBe(4)
+  })
+
+  it('Stacey: Arizona’s only two wins, the Chargers (one of seven) and the Rams (one of thirteen); SF, KC, MIN in crowds of eleven and more; Dallas; the Chargers 0–6', () => {
+    expect(arizonaWins()).toEqual(['2026-w01-ARI-at-LAC', '2026-w06-ARI-at-LAR'])
+    expect(played('Stacey Markendorff', 1)).toMatchObject({
+      teamId: 'LAC',
+      opponent: 'ARI',
+      mine: 14,
+      theirs: 26,
+    })
+    expect(crowd(1, 'LAC')).toBe(7)
+    expect(played('Stacey Markendorff', 6)).toMatchObject({ teamId: 'LAR', opponent: 'ARI' })
+    ramsGame()
+    const middle = [2, 3, 4].map((w) => played('Stacey Markendorff', w)!)
+    expect(middle.map((g) => g.teamId)).toEqual(['SF', 'KC', 'MIN'])
+    expect(middle.every((g) => g.mine > g.theirs)).toBe(true)
+    expect(Math.min(...[2, 3, 4].map((w) => crowd(w, middle[w - 2]!.teamId)))).toBe(11)
+    dallas('Stacey Markendorff')
+    expect(record('LAC')).toBe('0-6')
+  })
+
+  it('Sheila: Seattle 13–10 over New England; won with teams now 13–3, lost with teams now 5–13; Tampa Bay twice; the Rams; right three times, wrong three, wrong last', () => {
+    expect(played('Sheila Acker', 1)).toMatchObject({
+      teamId: 'SEA',
+      opponent: 'NE',
+      mine: 13,
+      theirs: 10,
+    })
+    const weeks = [1, 2, 3, 4, 5, 6].map((w) => played('Sheila Acker', w)!)
+    const won = weeks.filter((g) => g.mine > g.theirs).map((g) => g.teamId)
+    const lostWith = weeks.filter((g) => g.mine <= g.theirs).map((g) => g.teamId)
+    expect(won).toEqual(['SEA', 'KC', 'MIN'])
+    expect(lostWith).toEqual(['TB', 'DAL', 'LAR'])
+    const combined = (teams: string[]) =>
+      teams
+        .map((t) => record(t).split('-').map(Number))
+        .reduce(([w, l], [a, b]) => [w! + a!, l! + b!], [0, 0])
+    expect(combined(won)).toEqual([13, 3])
+    expect(combined(lostWith)).toEqual([5, 13])
+    expect(played('Sheila Acker', 2)).toMatchObject({
+      teamId: 'TB',
+      opponent: 'CLE',
+      mine: 19,
+      theirs: 23,
+    })
+    dallas('Sheila Acker')
+    expect(played('Sheila Acker', 6)).toMatchObject({ teamId: 'LAR' })
+    expect(crowd(6, 'LAR')).toBe(13)
+    ramsGame()
+    expect(weeks.slice(-2).every((g) => g.mine < g.theirs)).toBe(true)
+  })
+
+  it('Chloe: beat Cleveland, then Cleveland beat her; beat Tennessee, then Tennessee beat her; KC with nineteen others, Dallas with twenty; the only Cowboys-to-Colts', () => {
+    expect(played('Chloe Bourque', 1)).toMatchObject({
+      teamId: 'JAX',
+      opponent: 'CLE',
+      mine: 34,
+      theirs: 10,
+    })
+    expect(played('Chloe Bourque', 2)).toMatchObject({
+      teamId: 'TB',
+      opponent: 'CLE',
+      mine: 19,
+      theirs: 23,
+    })
+    expect(played('Chloe Bourque', 4)).toMatchObject({
+      teamId: 'BAL',
+      opponent: 'TEN',
+      mine: 24,
+      theirs: 18,
+    })
+    expect(played('Chloe Bourque', 6)).toMatchObject({
+      teamId: 'IND',
+      opponent: 'TEN',
+      home: true,
+      mine: 20,
+      theirs: 26,
+    })
+    titansGame()
+    expect(played('Chloe Bourque', 3)).toMatchObject({ teamId: 'KC', mine: 24, theirs: 10 })
+    expect(crowd(3, 'KC')).toBe(20)
+    dallas('Chloe Bourque')
+    const switched = picksIn(5)
+      .filter((p) => p.teamId === 'DAL')
+      .filter((p) => picksIn(6).some((q) => q.playerId === p.playerId && q.teamId === 'IND'))
+    expect(switched.map((p) => p.playerId)).toEqual(['chloe-bourque'])
+  })
+
+  it('Corey: Pittsburgh, one of two, 20–13; Tampa Bay and Seattle; one life from week 4; Minnesota 15–10; Houston, one of two, 26–3 in Tennessee, their first win; the Colts; Houston won again; the Seattle four all dead, Corey two weeks after Don', () => {
+    expect(played('Corey Cowell', 1)).toMatchObject({ teamId: 'PIT', mine: 20, theirs: 13 })
+    expect(crowd(1, 'PIT')).toBe(2)
+    expect(played('Corey Cowell', 2)).toMatchObject({
+      teamId: 'TB',
+      opponent: 'CLE',
+      mine: 19,
+      theirs: 23,
+    })
+    expect(played('Corey Cowell', 3)).toMatchObject({
+      teamId: 'SEA',
+      opponent: 'WAS',
+      home: false,
+      mine: 31,
+      theirs: 33,
+    })
+    expect(livesEntering('corey-cowell', 4)).toBe(1)
+    expect(played('Corey Cowell', 4)).toMatchObject({ teamId: 'MIN', mine: 15, theirs: 10 })
+    expect(played('Corey Cowell', 5)).toMatchObject({
+      teamId: 'HOU',
+      opponent: 'TEN',
+      home: false,
+      mine: 26,
+      theirs: 3,
+    })
+    expect(crowd(5, 'HOU')).toBe(2)
+    expect(record('HOU', 4)).toBe('0-4')
+    expect(played('Corey Cowell', 6)).toMatchObject({
+      teamId: 'IND',
+      opponent: 'TEN',
+      mine: 20,
+      theirs: 26,
+    })
+    expect(winnerOf('2026-w06-HOU-at-JAX')).toBe('HOU')
+    expect(26 - 3).toBe(23)
+    for (const p of picksIn(3).filter((x) => x.teamId === 'SEA')) {
+      expect(eliminatedWeekOf(p.playerId, pinnedThrough), p.playerId).not.toBeNull()
+    }
+    expect(eliminatedWeekOf('don-turner', pinnedThrough)).toBe(4)
+    expect(eliminatedWeekOf('corey-cowell', pinnedThrough)! - 4).toBe(2)
+    expect([4, 5, 6].every((w) => livesEntering('corey-cowell', w) === 1)).toBe(true)
+    // “spent half his season on his last life”
+    expect([1, 2, 3, 4, 5, 6].filter((w) => livesEntering('corey-cowell', w) === 1)).toHaveLength(3)
+  })
+
+  it('Matt: the only Green Bay pick in week 1, 39–22 at Minnesota, the Vikings unbeaten since; SF, KC, BAL; Dallas with twenty others; the Rams with twelve; Green Bay 23–13 over Dallas', () => {
+    expect(played('Matt Hadley', 1)).toMatchObject({
+      teamId: 'GB',
+      opponent: 'MIN',
+      home: false,
+      mine: 22,
+      theirs: 39,
+    })
+    expect(crowd(1, 'GB')).toBe(1)
+    expect(record('MIN')).toBe('5-0')
+    expect([2, 3, 4].map((w) => played('Matt Hadley', w)!.teamId)).toEqual(['SF', 'KC', 'BAL'])
+    // “with company”
+    expect([2, 3, 4].every((w) => crowd(w, played('Matt Hadley', w)!.teamId) > 1)).toBe(true)
+    expect(
+      [2, 3, 4].every((w) => played('Matt Hadley', w)!.mine > played('Matt Hadley', w)!.theirs),
+    ).toBe(true)
+    dallas('Matt Hadley')
+    expect(played('Matt Hadley', 6)).toMatchObject({ teamId: 'LAR' })
+    ramsGame()
+    expect(FINALS['2026-w06-DAL-at-GB']).toEqual([13, 23])
+  })
+
+  it('KC: Kansas City in week 3 with nineteen others, the most popular pick, 24–10 in Miami; Jacksonville and Tampa Bay with seven each; Minnesota with sixteen; Dallas; the Rams; Kansas City 5–0', () => {
+    expect(played('KC Walker', 3)).toMatchObject({
+      teamId: 'KC',
+      opponent: 'MIA',
+      home: false,
+      mine: 24,
+      theirs: 10,
+    })
+    expect(crowd(3, 'KC')).toBe(20)
+    expect(Math.max(...picksIn(3).map((p) => crowd(3, p.teamId)))).toBe(20)
+    expect(played('KC Walker', 1)).toMatchObject({ teamId: 'JAX', mine: 34, theirs: 10 })
+    expect(crowd(1, 'JAX')).toBe(7)
+    expect(played('KC Walker', 2)).toMatchObject({
+      teamId: 'TB',
+      opponent: 'CLE',
+      mine: 19,
+      theirs: 23,
+    })
+    expect(crowd(2, 'TB')).toBe(7)
+    expect(played('KC Walker', 4)).toMatchObject({ teamId: 'MIN', mine: 15, theirs: 10 })
+    expect(crowd(4, 'MIN')).toBe(16)
+    dallas('KC Walker')
+    expect(played('KC Walker', 6)).toMatchObject({ teamId: 'LAR' })
+    expect(crowd(6, 'LAR')).toBe(13)
+    ramsGame()
+    expect(record('KC')).toBe('5-0')
+  })
+
+  it('Paul: the only one to lose a life to a tie; Jacksonville 34–10; Tampa Bay; KC and Minnesota; Washington alone, 27–27; Washington 1–4–1; the Rams with twelve others', () => {
+    const ties = Object.keys(FINALS).filter((id) => winnerOf(id) === null)
+    expect(ties).toEqual(['2026-w05-NYG-at-WAS'])
+    expect(season.picks.filter((p) => ties.includes(p.gameId)).map((p) => p.playerId)).toEqual([
+      'paul-lim',
+    ])
+    expect(played('Paul Lim', 1)).toMatchObject({
+      teamId: 'JAX',
+      opponent: 'CLE',
+      mine: 34,
+      theirs: 10,
+    })
+    expect(played('Paul Lim', 2)).toMatchObject({ teamId: 'TB', mine: 19, theirs: 23 })
+    expect([3, 4].map((w) => played('Paul Lim', w)!.teamId)).toEqual(['KC', 'MIN'])
+    expect([3, 4].every((w) => played('Paul Lim', w)!.mine > played('Paul Lim', w)!.theirs)).toBe(
+      true,
+    )
+    expect(played('Paul Lim', 5)).toMatchObject({
+      teamId: 'WAS',
+      opponent: 'NYG',
+      mine: 27,
+      theirs: 27,
+    })
+    expect(crowd(5, 'WAS')).toBe(1)
+    expect(record('WAS')).toBe('1-4-1')
+    expect(played('Paul Lim', 6)).toMatchObject({ teamId: 'LAR' })
+    expect(crowd(6, 'LAR')).toBe(13)
+    ramsGame()
+  })
+
+  it('Tony: alone on Cleveland against seven on Tampa Bay, 23–19; the Chargers (one of seven), 0–6 since; the Rams (one of thirteen); Arizona’s two wins; KC and Baltimore; Dallas with twenty others; alone only once', () => {
+    expect(played('Tony Canody', 2)).toMatchObject({
+      teamId: 'CLE',
+      opponent: 'TB',
+      mine: 23,
+      theirs: 19,
+    })
+    expect(crowd(2, 'CLE')).toBe(1)
+    expect(crowd(2, 'TB')).toBe(7)
+    expect(played('Tony Canody', 1)).toMatchObject({
+      teamId: 'LAC',
+      opponent: 'ARI',
+      mine: 14,
+      theirs: 26,
+    })
+    expect(crowd(1, 'LAC')).toBe(7)
+    expect(record('LAC')).toBe('0-6')
+    expect(played('Tony Canody', 6)).toMatchObject({
+      teamId: 'LAR',
+      opponent: 'ARI',
+      mine: 16,
+      theirs: 18,
+    })
+    expect(arizonaWins()).toEqual(['2026-w01-ARI-at-LAC', '2026-w06-ARI-at-LAR'])
+    expect([3, 4].map((w) => played('Tony Canody', w)!.teamId)).toEqual(['KC', 'BAL'])
+    expect(
+      [3, 4].every((w) => played('Tony Canody', w)!.mine > played('Tony Canody', w)!.theirs),
+    ).toBe(true)
+    dallas('Tony Canody')
+    const alone = [1, 2, 3, 4, 5, 6].filter((w) => crowd(w, pickOf('Tony Canody', w)!.teamId) === 1)
+    expect(alone).toEqual([2])
+  })
+
+  it('Joanna: the only one on Dallas in week 1, 28–20 at the Giants, and not on Dallas in week 5; Buffalo 41–31 over Detroit; Seattle 33–31; last life weeks 4–6; Baltimore 24–18 over Tennessee; Houston with only Corey, 26–3 in Tennessee; the Colts with Corey', () => {
+    expect(played('Joanna Moss', 1)).toMatchObject({
+      teamId: 'DAL',
+      opponent: 'NYG',
+      home: false,
+      mine: 20,
+      theirs: 28,
+    })
+    expect(crowd(1, 'DAL')).toBe(1)
+    expect(pickOf('Joanna Moss', 5)?.teamId).not.toBe('DAL')
+    expect(crowd(5, 'DAL')).toBe(21)
+    expect(played('Joanna Moss', 2)).toMatchObject({
+      teamId: 'BUF',
+      opponent: 'DET',
+      mine: 41,
+      theirs: 31,
+    })
+    expect(played('Joanna Moss', 3)).toMatchObject({ teamId: 'SEA', mine: 31, theirs: 33 })
+    expect([4, 5, 6].every((w) => livesEntering('joanna-moss', w) === 1)).toBe(true)
+    expect(played('Joanna Moss', 4)).toMatchObject({
+      teamId: 'BAL',
+      opponent: 'TEN',
+      mine: 24,
+      theirs: 18,
+    })
+    expect(played('Joanna Moss', 5)).toMatchObject({
+      teamId: 'HOU',
+      opponent: 'TEN',
+      home: false,
+      mine: 26,
+      theirs: 3,
+    })
+    expect(
+      picksIn(5)
+        .filter((p) => p.teamId === 'HOU')
+        .map((p) => p.playerId)
+        .sort(),
+    ).toEqual(['corey-cowell', 'joanna-moss'])
+    expect(played('Joanna Moss', 6)).toMatchObject({
+      teamId: 'IND',
+      opponent: 'TEN',
+      mine: 20,
+      theirs: 26,
+    })
+    expect(pickOf('Corey Cowell', 6)?.teamId).toBe('IND')
+    titansGame()
+  })
+
+  it('Tina: alone on Buffalo, beaten 29–26 by New England; alone on New England, 45–17 over the Raiders; New England 26–19 in week 6 without her; the Rams with twelve others; Detroit by a point, no week 2 pick, Kansas City; half of New England’s four wins', () => {
+    expect(played('Tina Bush', 4)).toMatchObject({
+      teamId: 'BUF',
+      opponent: 'NE',
+      mine: 26,
+      theirs: 29,
+    })
+    expect(crowd(4, 'BUF')).toBe(1)
+    expect(played('Tina Bush', 5)).toMatchObject({
+      teamId: 'NE',
+      opponent: 'LV',
+      mine: 45,
+      theirs: 17,
+    })
+    expect(crowd(5, 'NE')).toBe(1)
+    expect(FINALS['2026-w06-NYJ-at-NE']).toEqual([19, 26])
+    expect(played('Tina Bush', 6)).toMatchObject({ teamId: 'LAR' })
+    expect(crowd(6, 'LAR')).toBe(13)
+    ramsGame()
+    expect(played('Tina Bush', 1)).toMatchObject({ teamId: 'DET', mine: 31, theirs: 30 })
+    expect(pickOf('Tina Bush', 2)).toBeNull()
+    expect(played('Tina Bush', 3)).toMatchObject({ teamId: 'KC' })
+    const neWins = Object.keys(FINALS).filter((id) => winnerOf(id) === 'NE')
+    expect(neWins).toHaveLength(4)
+    const hers = neWins.filter((id) => [4, 5].some((w) => pickOf('Tina Bush', w)?.gameId === id))
+    expect(hers).toHaveLength(2)
+  })
+
+  it('Zac: the commissioner, out in week 6; never alone (seven on the Chargers at least); SF, KC, BAL; the two biggest losing crowds; Arizona’s two wins; the Chargers 0–6, the Rams 2–4', () => {
+    expect(season.memberships.find((m) => m.playerId === 'zac-harlan')?.role).toBe('commissioner')
+    expect(eliminatedWeekOf('zac-harlan', pinnedThrough)).toBe(6)
+    const crowds = [1, 2, 3, 4, 5, 6].map((w) => crowd(w, pickOf('Zac Harlan', w)!.teamId))
+    expect(Math.min(...crowds)).toBe(7)
+    expect(crowds[0]).toBe(7)
+    expect(played('Zac Harlan', 1)).toMatchObject({ teamId: 'LAC', mine: 14, theirs: 26 })
+    expect([2, 3, 4].map((w) => played('Zac Harlan', w)!.teamId)).toEqual(['SF', 'KC', 'BAL'])
+    expect(
+      [2, 3, 4].every((w) => played('Zac Harlan', w)!.mine > played('Zac Harlan', w)!.theirs),
+    ).toBe(true)
+    // Every crowd that lost, biggest first: Dallas (21), then the Rams (13).
+    const losing = new Map<string, number>()
+    for (const p of season.picks)
+      if (lost(p)) losing.set(`${p.week}-${p.teamId}`, crowd(p.week, p.teamId))
+    const biggest = [...losing.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2)
+    expect(biggest).toEqual([
+      ['5-DAL', 21],
+      ['6-LAR', 13],
+    ])
+    expect([5, 6].map((w) => pickOf('Zac Harlan', w)!.teamId)).toEqual(['DAL', 'LAR'])
+    expect(arizonaWins()).toEqual(['2026-w01-ARI-at-LAC', '2026-w06-ARI-at-LAR'])
+    expect(record('LAC')).toBe('0-6')
+    expect(record('LAR')).toBe('2-4')
   })
 })

@@ -17,36 +17,38 @@ import { Megaphone, Send } from 'lucide-react'
  */
 
 /**
- * Mapped to weeks 1 through 6 on purpose. The seed carries no results, so the
+ * Mapped to weeks 1 through 7 on purpose. The seed carries no results, so the
  * engine calls week 1 current until the live sync lands them, at which point
- * week 6 is — and the league needs the review under whichever key it is shown.
+ * week 7 is — and the league needs the review under whichever key it is shown.
  *
- * Week 5 is public, so the review names picks. It says nothing about week 6
+ * Week 6 is public, so the review names picks. It says nothing about week 7
  * picks, which are hidden until Thursday.
  */
-const WEEK_5_REVIEW = {
-  heading: 'Word from the commissioner',
+const WEEK_6_REVIEW = {
+  heading: 'Word from the late commissioner',
   lines: [
-    'Twenty-one of you rode Dallas on Thursday night. Tampa Bay, 0–4 and starting a rookie quarterback in his second game, won 24–16, and every one of the twenty-one lost a life. Not most. All. Bucky Irving ran for 165 yards, Dak Prescott threw two interceptions — the last off a tipped pass in the final two minutes — and KaVontae Turpin fumbled a kickoff, for completeness. Last week I wrote that if the Bucs won their first game of the season the crow would need a bigger stone. The crow needed five.',
-    'Craig, Jared, Joey, Nate and Phyllis are out. With Don, that is six graves, and the graveyard on this page now has more going on than the Tennessee offense. Their epitaphs are on their profiles; read them, they earned every word. Joey went out on the same weekend the Bears lost 31–7 at Green Bay, so for the first time all season, Joey and his Bears suffered together.',
-    'Then there is Paul, who did not lose. Washington did not lose. Washington tied the Giants 27–27, and a tie costs a life exactly like a loss — it is in the rules, I checked, twice. The Giants’ kicker missed three field goals; with twelve seconds left in overtime at the Giants’ 24, Jayden Daniels scrambled, was sacked for no gain, and Washington had no timeouts. Nobody wanted to win that game, and Paul paid for both of them.',
-    'Elsewhere, sanity. Cindy, Dave, Melanie and Allison survived Cincinnati 31–24 — Miami scored twenty-four, nearly double its previous season high, and still lost, which is the most Miami thing that has happened all year. Joanna and Corey took Houston, who won their first game of the season 26–3; Tennessee kicked a field goal on the opening drive and did nothing else for three quarters. And Tina took New England, who beat the Raiders 45–17 behind 374 yards from Drake Maye. If you can’t beat them, pick them. It worked.',
-    'Where we stand: twenty-four alive, six in the ground. Allison and Cindy are the only two still holding all three lives — both rode Cincinnati, and neither has lost a pick all season. Seven of you are on two lives, and fifteen of you are on your last. Fifteen people, one bad Sunday each from a headstone, and the crow can count.',
-    'Week 6 has four teams on bye: Cincinnati, Miami, Detroit and Minnesota. Thursday night is Seattle at Denver, which locks the week. Houston and Jacksonville play in London at 8:30 on Sunday morning our time — the Texans, fresh from their first win, against a Jacksonville side that is 4–1. And Dallas visit Green Bay on Sunday night, which twenty-one of you can now watch with nothing riding on it: the healthiest way to watch the Cowboys there is.',
+    'Thirteen of you took the Rams at home to Arizona: a 2–3 team against a 1–4 team that had lost four straight. Arizona won 18–16 without scoring a touchdown. Chad Ryland kicked six field goals, and when the Rams went ahead 16–15 with forty-seven seconds left, that turned out to be exactly enough time for him to kick the sixth as the clock hit zero. All thirteen of you lost a life, and nine of you lost your last one. One of the nine is writing this.',
+    'Five of you took Indianapolis at home to Tennessee — 0–5, the Tennessee whose offense, I wrote last week, had less going on than our graveyard. The Colts led 13–0 at halftime. Then Tennessee blocked a punt and ran it back for a touchdown, and their kicker, a man named Joey, kicked four field goals, the last two in the final 2:03, to win 26–20: Tennessee’s first win of the season. Our Joey has been in the ground a week, and a Joey is still burying people.',
+    'The count: twelve of you were knocked out this week. James, Stacey, Sheila, Matt, KC, Paul, Tony, Tina and I went down with the Rams; Chloe, Corey and Joanna with the Colts. Last week’s five was a league record; this week’s twelve is more than double it. The graveyard went from six to eighteen, and there are now more of us in the ground than above it: eighteen headstones, twelve survivors. Every one of the twelve has an epitaph on their profile, including me, which means I wrote my own.',
+    'The five who lost nothing: Bradley went alone with San Francisco, 23–17 over Washington, and the 49ers are 6–0, the only team in the league with six wins. Cindy, Dominic, Maya and Melanie took New England over the Jets, 26–19, on three Drake Maye touchdown passes. Allison lost her first life of the season with the Colts, which leaves Cindy as the only one of us still holding all three: six picks, six wins. She and I picked the same team in weeks 2 and 3; after that I went my own way, and you can see where it got me.',
+    'Some housekeeping from the season so far. Arizona have won two games all year — the Chargers in week 1 and the Rams this week — and Stacey, Tony and I picked Los Angeles both times. The Chargers are now 0–6, so the seven of you who took them in week 1 weren’t unlucky, just early. Everyone who picked Seattle in week 3 — Don, James, Corey and Joanna — is now dead. Paul is still the only one of us ever to lose a life to a tie. Dallas lost 23–13 in Green Bay on Sunday night, so the twenty-one of you who rode them in week 5 got the full Cowboys experience at no extra charge. And Joey: the Bears won 31–23 in Atlanta, their first game since you died. They waited.',
+    'Where we stand: twelve alive. Cindy is on three lives, Allison and Melanie on two, and nine of you — Bradley, Dave, Dominic, Jason, Maya, Mike, Shahid, Tracy and Wesley — are on your last. Wesley sent no pick at all this week, lost a life for it, and is still standing because his first four picks all won. Let that be a lesson to nobody.',
+    'Week 7 has four teams on bye: Buffalo, Jacksonville, Washington and the Chargers, for whom it is the first week all season they cannot lose. Thursday night is New England at Chicago, two 4–2 teams, which locks the week. The three unbeaten teams all play: San Francisco (6–0) at Atlanta, Minnesota (5–0) at home to the Colts, and Kansas City (5–0) at Seattle on Sunday night. Miami, 0–5, visit the Jets. There are only twelve of you left to bury, so take your time.',
   ],
   // Set apart from the banter, because an instruction buried in jokes is an
-  // instruction somebody misses — and fifteen people are on their last life.
+  // instruction somebody misses — and nine people are on their last life.
   callout:
-    'DM me your week 6 pick on Teams before 7:10 PM Thursday — five minutes before Seattle at Denver kicks off. A missing pick costs a life, and fifteen of you have exactly one.',
+    'DM me your week 7 pick on Teams before 7:10 PM Thursday — five minutes before New England at Chicago kicks off. Nine of you are on your last life, and a missing pick costs a life.',
 }
 
 const NOTES: Record<number, { heading: string; lines: string[]; callout?: string }> = {
-  1: WEEK_5_REVIEW,
-  2: WEEK_5_REVIEW,
-  3: WEEK_5_REVIEW,
-  4: WEEK_5_REVIEW,
-  5: WEEK_5_REVIEW,
-  6: WEEK_5_REVIEW,
+  1: WEEK_6_REVIEW,
+  2: WEEK_6_REVIEW,
+  3: WEEK_6_REVIEW,
+  4: WEEK_6_REVIEW,
+  5: WEEK_6_REVIEW,
+  6: WEEK_6_REVIEW,
+  7: WEEK_6_REVIEW,
 }
 
 export function LeagueMessage({ week }: { week: number }) {
