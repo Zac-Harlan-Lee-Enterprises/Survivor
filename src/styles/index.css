@@ -416,6 +416,34 @@
     transform: translateX(-100%);
     pointer-events: none;
   }
+  /* Frost: Death leaves it on the stone as he passes (data-frost), creeping up
+     from the foot, and it stays. Same outline as the glint. */
+  .funeral-frost {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(6% 15.5% 15% 15.5% round 42% 42% 0 0);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.6s ease-out;
+  }
+  .funeral-frost-rime {
+    position: absolute;
+    inset: 0;
+    transform: translateY(100%);
+    transition: transform 3.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+    mix-blend-mode: screen;
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='3' seed='7'/><feColorMatrix values='0 0 0 0 0.86 0 0 0 0 0.92 0 0 0 0 1 0 0 0 1.5 -0.62'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>"),
+      radial-gradient(ellipse 80% 70% at 50% 100%, rgba(214, 230, 255, 0.5), transparent 75%);
+    -webkit-mask-image: linear-gradient(to top, #000 50%, transparent 96%);
+    mask-image: linear-gradient(to top, #000 50%, transparent 96%);
+  }
+  [data-frost] .funeral-frost {
+    opacity: 1;
+  }
+  [data-frost] .funeral-frost-rime {
+    transform: none;
+  }
   .funeral-mound {
     position: absolute;
     left: -14%;
@@ -585,6 +613,85 @@
     max-width: 5.6rem;
     opacity: 0;
   }
+  /* Death arrives (DeathArrives.tsx): a scene over the whole page, once the
+     week's funerals are over. Movement is scripted there; these are the stage.
+     Above the sticky header: for these few seconds he is the only thing on
+     the page. */
+  .death-scene {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  /* The world stops for him: drained of colour and nearly dark. */
+  .death-world {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    -webkit-backdrop-filter: grayscale(1) brightness(0.42) contrast(1.08);
+    backdrop-filter: grayscale(1) brightness(0.42) contrast(1.08);
+    background: radial-gradient(ellipse 70% 60% at 60% 65%, transparent 35%, rgba(0, 0, 0, 0.55));
+  }
+  .death-rain {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  .death-rain span {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(200, 214, 240, 0.9));
+  }
+  .death-figure {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.75));
+  }
+  /* His frames, drawn onto a canvas the size of his box. Rendered cold and
+     dark; drained of the last of their colour to sit in the stopped world. */
+  .death-sprite {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: saturate(0.55) contrast(1.05);
+  }
+  /* Everything else on the page holds still while he is here. */
+  .death-is-here *:not(.death-scene, .death-scene *) {
+    animation-play-state: paused !important;
+  }
+  /* Backlit: a cold glow behind him, so the black of him reads as a figure. */
+  .death-halo {
+    position: absolute;
+    left: -70%;
+    right: -70%;
+    top: -12%;
+    bottom: 8%;
+    background: radial-gradient(
+      ellipse 50% 46% at 50% 40%,
+      rgba(150, 170, 220, 0.34),
+      rgba(120, 140, 200, 0.14) 55%,
+      transparent 75%
+    );
+  }
+  .death-mist {
+    position: absolute;
+    left: -60%;
+    right: -60%;
+    bottom: -4%;
+    height: 16%;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 60%,
+      rgba(190, 200, 225, 0.32),
+      transparent 70%
+    );
+    filter: blur(2px);
+  }
+
   /* The crow. */
   .funeral-crow {
     position: absolute;

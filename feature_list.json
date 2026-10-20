@@ -535,5 +535,14 @@
     "priority": 2,
     "hermetic": true,
     "passes": true
+  },
+  {
+    "id": "death-arrives",
+    "category": "functional",
+    "description": "When the week's last funeral is over and the fresh graves are on screen, Death arrives: the page drains to grey and holds still, rain hangs frozen, and a rendered Death (BibleGame's figure engine via scripts/art/death_scene.py: a black suit, slicked-back hair, a silver-topped cane) walks in from the left on a planted-foot walk, lifting each crow off its stone and frosting it as he passes. He stops, his eyes then his head turn to the viewer, he turns to face them with both hands on the cane, holds the look, then turns away and walks off the right edge; colour and rain return, the frost stays. Frames are drawn to a canvas from sheets in public/death in step with his route (src/lib/deathFilm.ts). Once per page load; none under reduced motion.",
+    "verification": "npx vitest run src/lib/deathFilm.test.ts tests/unit/deathFilm.test.ts && npx playwright test tests/e2e/graveyard.spec.ts -g 'Death arrives|reduced motion'",
+    "priority": 3,
+    "hermetic": true,
+    "passes": true
   }
 ]
