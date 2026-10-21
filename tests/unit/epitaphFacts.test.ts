@@ -714,9 +714,10 @@ describe('the week 6 epitaphs', () => {
     expect(
       [2, 3, 4].every((w) => played('Zac Harlan', w)!.mine > played('Zac Harlan', w)!.theirs),
     ).toBe(true)
-    // Every crowd that lost, biggest first: Dallas (21), then the Rams (13).
+    // Every crowd that lost through week 6 (the epitaph speaks as of then; later
+    // weeks' picks arrive before their games are played), biggest first.
     const losing = new Map<string, number>()
-    for (const p of season.picks)
+    for (const p of season.picks.filter((x) => x.week <= 6))
       if (lost(p)) losing.set(`${p.week}-${p.teamId}`, crowd(p.week, p.teamId))
     const biggest = [...losing.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2)
     expect(biggest).toEqual([

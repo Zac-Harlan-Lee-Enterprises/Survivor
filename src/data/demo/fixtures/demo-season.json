@@ -923,6 +923,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-maya-israel-7",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "maya-israel",
+      "week": 7,
+      "teamId": "HOU",
+      "gameId": "2026-w07-NYG-at-HOU",
+      "submittedAt": "2026-10-21T03:16:12.000Z",
+      "updatedAt": "2026-10-21T03:16:12.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-shahid-ali-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1599,6 +1612,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-bradley-riedell-7",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "bradley-riedell",
+      "week": 7,
+      "teamId": "HOU",
+      "gameId": "2026-w07-NYG-at-HOU",
+      "submittedAt": "2026-10-20T13:44:28.000Z",
+      "updatedAt": "2026-10-20T13:44:28.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-chloe-bourque-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2024,6 +2050,19 @@
       "gameId": "2026-w06-ARI-at-LAR",
       "submittedAt": "2026-10-15T18:42:04.000Z",
       "updatedAt": "2026-10-15T18:42:04.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-jason-snook-7",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "jason-snook",
+      "week": 7,
+      "teamId": "CAR",
+      "gameId": "2026-w07-TB-at-CAR",
+      "submittedAt": "2026-10-20T13:38:42.000Z",
+      "updatedAt": "2026-10-20T13:38:42.000Z",
       "version": 1,
       "source": "commissioner"
     },

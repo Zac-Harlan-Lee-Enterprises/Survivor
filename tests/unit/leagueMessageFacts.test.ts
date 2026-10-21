@@ -81,11 +81,38 @@ const note = readFileSync(
 )
 const body = note.slice(note.indexOf('const WEEK_6_REVIEW'), note.indexOf('const NOTES'))
 
+/** Every way the note could name a team: abbreviation, city, nickname, aliases (src/domain/teams.ts). */
+const teamNames = (() => {
+  const src = readFileSync(new URL('../../src/domain/teams.ts', import.meta.url), 'utf8')
+  const out = new Map<string, string[]>()
+  for (const m of src.matchAll(/\['([A-Z]+)', '([^']+)', '([^']+)',[^\]]*\[([^\]]*)\]\]/g)) {
+    const aliases = [...m[4]!.matchAll(/'([^']+)'/g)].map((a) => a[1]!)
+    out.set(m[1]!, [m[1]!, m[2]!, m[3]!, ...aliases])
+  }
+  return out
+})()
+
 describe('the week 6 review gives away nothing about week 7', () => {
   it('mentions week 7 picks only to ask for them', () => {
     expect(body.match(/week 7 pick/gi) ?? []).toHaveLength(1)
     expect(body).toMatch(/DM me your week 7 pick on Teams/)
-    expect(picksIn(7)).toHaveLength(0)
+  })
+
+  it('never names a player in the same sentence as the team they have picked for week 7', () => {
+    // Picks arrive all week and stay hidden until Thursday's lock; the note is
+    // up the whole time, so it must not line a player up with their pick.
+    expect(teamNames.size).toBe(32)
+    const sentences = body.split(/(?<=[.!?])\s+/)
+    for (const p of picksIn(7)) {
+      const first = nameOf(p.playerId).split(' ')[0]!
+      const names = teamNames.get(p.teamId)!
+      for (const s of sentences) {
+        if (!new RegExp(`\\b${first}\\b`).test(s)) continue
+        for (const n of names) {
+          expect(new RegExp(`\\b${n}\\b`).test(s), `${first} beside ${n}: “${s}”`).toBe(false)
+        }
+      }
+    }
   })
 })
 
@@ -230,8 +257,11 @@ describe('the commissioner’s week 6 review states only true things', () => {
 
   it('“Bradley, Cindy, Shahid and Tracy have already spent all three unbeaten teams, and only Jason and Melanie still have Kansas City”', () => {
     const alive = season.profiles.filter((p) => after.get(p.displayName)! > 0)
+    // As of week 6, when the note was written (week 7 picks arrive after it).
     const used = (playerId: string) =>
-      new Set(season.picks.filter((p) => p.playerId === playerId).map((p) => p.teamId))
+      new Set(
+        season.picks.filter((p) => p.playerId === playerId && p.week <= WEEK).map((p) => p.teamId),
+      )
     const all3 = alive.filter((p) => ['SF', 'MIN', 'KC'].every((t) => used(p.playerId).has(t)))
     expect(firstNames(all3.map((p) => p.displayName))).toEqual([
       'Bradley',
