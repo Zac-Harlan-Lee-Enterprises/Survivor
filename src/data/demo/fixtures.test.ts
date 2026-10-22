@@ -71,6 +71,14 @@ describe('demo fixture', () => {
     expect(picks[0]).toMatchObject({ teamId: 'HOU', submittedAt: '2026-10-22T18:18:32.000Z' })
   })
 
+  it('records Mike’s commissioner-supplied Texans selection for week 7', () => {
+    const picks = snapshot.picks.filter(
+      (pick) => pick.playerId === 'mike-lancaster' && pick.week === 7,
+    )
+    expect(picks).toHaveLength(1)
+    expect(picks[0]).toMatchObject({ teamId: 'HOU', submittedAt: '2026-10-22T18:22:16.000Z' })
+  })
+
   it('points every pick at a game that week in which the team actually plays', () => {
     for (const pick of snapshot.picks) {
       const game = gamesById.get(pick.gameId)

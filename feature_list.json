@@ -598,5 +598,14 @@
     "priority": 1,
     "hermetic": true,
     "passes": true
+  },
+  {
+    "id": "week7-mike-texans",
+    "category": "data",
+    "description": "Mike Lancaster’s commissioner-supplied week 7 pick is Houston, recorded October 22, 2026.",
+    "verification": "npx vitest run src/data/demo/fixtures.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
   }
 ]
