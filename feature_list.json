@@ -589,5 +589,14 @@
     "priority": 1,
     "hermetic": true,
     "passes": true
+  },
+  {
+    "id": "week7-shahid-texans",
+    "category": "data",
+    "description": "Shahid Ali’s commissioner-supplied week 7 pick is Houston, recorded October 22, 2026.",
+    "verification": "npx vitest run src/data/demo/fixtures.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
   }
 ]
