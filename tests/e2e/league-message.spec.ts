@@ -12,10 +12,9 @@ test.describe('word from the commissioner', () => {
     await expect(note).toBeVisible()
     // (The commissioner may be late — he was buried in week 6 — and still writes.)
     await expect(note).toContainText(/word from the (late )?commissioner/i)
-    // Body, not just a heading: a review is several paragraphs. Naming one joke
-    // here would mean rewriting this test every week; the note's factual claims
-    // are checked against the season in tests/unit/leagueMessageFacts.test.ts.
-    expect(await note.locator('p').count()).toBeGreaterThan(2)
+    await expect(note.locator('p')).toHaveCount(1)
+    await expect(note).toContainText('Being commissioner was easier when I was alive.')
+    await expect(note).toContainText('The tall gentleman behind me has declined to comment.')
 
     // Order on the page: hero, then the note, then Still standing. Measured
     // through locators so the spec needs no DOM types.
@@ -31,24 +30,11 @@ test.describe('word from the commissioner', () => {
     expect(message).toBeLessThan(standing)
   })
 
-  /**
-   * The pick instruction is the one line that costs someone a life if they
-   * miss it, so it is asserted separately from the banter around it: where to
-   * send it, when it locks, what missing costs.
-   *
-   * It is absent while a week is locked (nothing to act on then) and back with
-   * each review, chasing the next week. If a future note drops it on purpose,
-   * invert these three rather than deleting them.
-   */
-  test('tells everyone where to send a pick, when it locks, and what missing costs', async ({
-    page,
-  }) => {
+  test('has no pick instruction that goes stale after Thursday', async ({ page }) => {
     await resetDemo(page)
     const note = page.locator('section[aria-labelledby="league-message-title"]')
     await expect(note).toBeVisible()
-    await expect(note).toContainText(/pick on Teams/i)
-    await expect(note).toContainText(/\d\d?:\d\d (AM|PM)/i)
-    await expect(note).toContainText(/costs a life/i)
+    await expect(note).not.toContainText(/pick on Teams|7:10|costs a life/i)
   })
 
   test('reads on a phone too, and is announced as a section', async ({ page }) => {

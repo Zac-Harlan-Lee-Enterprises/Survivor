@@ -616,5 +616,14 @@
     "priority": 1,
     "hermetic": true,
     "passes": true
+  },
+  {
+    "id": "commish-message-beyond",
+    "category": "content",
+    "description": "The commissioner’s approved message from beyond appears as one paragraph in the existing section, with no players or NFL teams revealed and no new display timing.",
+    "verification": "npx vitest run src/components/LeagueMessage.test.tsx tests/unit/leagueMessageFacts.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
   }
 ]
