@@ -580,5 +580,14 @@
     "priority": 1,
     "hermetic": true,
     "passes": true
+  },
+  {
+    "id": "week7-dave-jets",
+    "category": "data",
+    "description": "Dave Johnson’s commissioner-supplied week 7 pick is the New York Jets, recorded October 22, 2026.",
+    "verification": "npx vitest run src/data/demo/fixtures.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
   }
 ]

@@ -1092,6 +1092,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dave-johnson-7",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dave-johnson",
+      "week": 7,
+      "teamId": "NYJ",
+      "gameId": "2026-w07-MIA-at-NYJ",
+      "submittedAt": "2026-10-22T18:14:49.000Z",
+      "updatedAt": "2026-10-22T18:14:49.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-james-parker-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",

@@ -875,3 +875,9 @@ NEXT: Human reviews and merges to publish the accumulated week 7 picks; continue
 - Commissioner requested submission to GitHub. Reviewed the four-pick diff, confirmed branch is current with origin/main, and prepared the generator, generated fixture, regression tests, registry and handoff log for the PR.
 - Validation of this source state: npm run validate passed (369 tests); all registry/browser verifications passed. Quality sweep exit 1 is solely the pre-existing local .claude/settings.json missing merge deny, excluded from this PR. Bootstrap reconfirmed HTTP 200.
 NEXT: Reviewer reviews and merges the four week 7 picks PR to publish; no merge or deployment performed by the agent.
+
+== 2026-10-22 · Codex (GPT-6) · PR #63 · Dave week 7 ==
+- Recorded Dave Johnson → NYJ for week 7 per the commissioner’s message here. Receipt 2026-10-22T18:14:49Z is this session’s receipt, not an inferred Teams timestamp. No Jets reuse; generation confirms a scheduled game.
+- Updated generator and fixture, added a regression test and passing registry entry. Included in the existing week 7 picks PR #63; retained the previous four picks.
+- Verified npm run validate (lint, typecheck, 370 tests, production build), fixture tests 9/9, init.sh HTTP 200. Every registry/browser verification passed; quality sweep exit 1 solely for the existing local .claude/settings.json missing merge deny, excluded from the PR and left untouched.
+NEXT: Human reviews and merges PR #63 to publish all five added week 7 picks. No merge or deployment performed by the agent.
