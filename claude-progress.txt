@@ -841,3 +841,61 @@ NEXT: commissioner reviews → merge on his word. Week 7 picks (lock Thu 2026-10
 - Commissioner: "when death turns to face the viewer it looks like his arms go inside his chest." Measured it: an elbow or forearm came up to 4.9 cm inside his torso. Two causes, both in death_motion.py. (1) The cane was planted only 9 cm in front of his hips, so his hands on the knob pulled his forearms into his chest; now 42 cm in front, with the knob 36 cm out, and he leans onto it a touch with his shoulders forward. (2) Through the turn the cane swept round in front of him at the height of his hands, dragging his right arm across his body; now he carries it at his side through the turn and only then swings it out (and back again turning away) on an arc wide of him. Elbows point out to the side while resting on the knob.
 - New check: Motion.arm_clearance(take) measures every rendered frame's elbows and forearms against his torso; death_scene.py writes it to take.json, death_film.py to deathFrames.json (armClearance, cm), and tests/unit/deathFilm.test.ts requires it to be positive. Now 0.6 cm clear at the closest.
 - Verified: validate (364 unit), e2e 113 passed; rendered 278 frames, checked the turn, hands and turn-away frames by eye.
+
+== 2026-10-22 · Codex (GPT-6) · fix/dominic-week7-vikings ==
+- Recorded Dominic Green’s week 7 selection as MIN, per the commissioner’s message in this session; receipt recorded at 2026-10-22T17:54:23Z (not a Teams message timestamp).
+- Updated the fixture generator and regenerated demo-season.json: only the new pick was added. Added a fixture regression test for Dominic’s week, team, receipt time and IND-at-MIN matchup; registered its passing verification in feature_list.json.
+- Verified npm run validate: lint, typecheck, 366 tests and production build pass. Fixture-specific verification: 5 tests pass. Post-change bash init.sh returned HTTP 200.
+- Existing .claude/settings.json user edit left untouched. No publication, merge, push or sensitive-path edits performed.
+NEXT: Review this branch and publish through the repository’s human merge process; collect remaining week 7 picks before Thursday’s lock.
+- Quality sweep: all registry checks (including browser animation checks and the new pick test) pass; exit 1 solely because the pre-existing .claude/settings.json edit removes the gh pr merge deny rule. Main branch protection verified active. Sensitive settings left for human review.
+
+== 2026-10-22 · Codex (GPT-6) · fix/dominic-week7-vikings · Cindy week 7 ==
+- Recorded Cindy Mendoza → HOU for week 7, as supplied by the commissioner in this conversation. Receipt timestamp 2026-10-22T17:59:20Z is this session’s receipt, not an inferred Teams timestamp. Houston was unused in her prior picks; the generated pick points to NYG at HOU.
+- Updated generator and fixture; added a regression test and passing feature_list verification. Dominic’s pick retained. No publication or sensitive settings changes.
+- Verified npm run validate (lint, typecheck, 367 tests, production build); fixture-specific verification 6/6.
+NEXT: Human reviews and merges to publish both picks; continue collecting remaining week 7 picks.
+- Post-change init.sh returned HTTP 200. Quality sweep re-verified every registry entry, including browser tests and both new picks; exit 1 solely for the existing missing gh pr merge deny in .claude/settings.json. Left that human-review-only setting untouched.
+
+== 2026-10-22 · Codex (GPT-6) · fix/dominic-week7-vikings · Tracy week 7 ==
+- Recorded Tracy Nelson → DEN for week 7 per the commissioner’s message here. Receipt 2026-10-22T18:02:42Z is this session’s receipt, not an inferred Teams timestamp. No Denver reuse in her earlier picks; fixture generation confirms a scheduled game.
+- Updated generator and fixture, added regression coverage and a passing registry entry. Retained Dominic’s and Cindy’s selections. No publication or sensitive settings edits.
+- Verified npm run validate: lint, typecheck, 368 tests, production build. Fixture verification: 7 tests pass.
+NEXT: Human reviews and merges to publish the week 7 picks; collect remaining selections before Thursday’s lock.
+- Post-change init.sh returned HTTP 200. Quality sweep re-verified every registry entry and browser check; exit 1 solely for the existing missing gh pr merge deny in .claude/settings.json. Human-review-only settings left untouched.
+
+== 2026-10-22 · Codex (GPT-6) · fix/dominic-week7-vikings · Melanie week 7 ==
+- Recorded Melanie Moeller → HOU for week 7 per the commissioner’s message here. Receipt 2026-10-22T18:06:04Z is this session’s receipt, not an inferred Teams timestamp. Houston is unused in her earlier selections; fixture generation confirms a scheduled game.
+- Updated generator and fixture; added regression coverage and a passing registry entry. Preserved all other picks. No publication or sensitive settings edits.
+- Verified npm run validate: lint, typecheck, 369 tests, production build; fixture-specific verification 8/8.
+NEXT: Human reviews and merges to publish the accumulated week 7 picks; continue collecting selections before Thursday’s lock.
+- Post-change init.sh returned HTTP 200. Quality sweep re-verified every registry entry and browser check; exit 1 solely for the pre-existing missing gh pr merge deny in .claude/settings.json. Human-review-only settings left untouched.
+
+== 2026-10-22 · Codex (GPT-6) · week 7 picks PR preparation ==
+- Commissioner requested submission to GitHub. Reviewed the four-pick diff, confirmed branch is current with origin/main, and prepared the generator, generated fixture, regression tests, registry and handoff log for the PR.
+- Validation of this source state: npm run validate passed (369 tests); all registry/browser verifications passed. Quality sweep exit 1 is solely the pre-existing local .claude/settings.json missing merge deny, excluded from this PR. Bootstrap reconfirmed HTTP 200.
+NEXT: Reviewer reviews and merges the four week 7 picks PR to publish; no merge or deployment performed by the agent.
+
+== 2026-10-22 · Codex (GPT-6) · PR #63 · Dave week 7 ==
+- Recorded Dave Johnson → NYJ for week 7 per the commissioner’s message here. Receipt 2026-10-22T18:14:49Z is this session’s receipt, not an inferred Teams timestamp. No Jets reuse; generation confirms a scheduled game.
+- Updated generator and fixture, added a regression test and passing registry entry. Included in the existing week 7 picks PR #63; retained the previous four picks.
+- Verified npm run validate (lint, typecheck, 370 tests, production build), fixture tests 9/9, init.sh HTTP 200. Every registry/browser verification passed; quality sweep exit 1 solely for the existing local .claude/settings.json missing merge deny, excluded from the PR and left untouched.
+NEXT: Human reviews and merges PR #63 to publish all five added week 7 picks. No merge or deployment performed by the agent.
+
+== 2026-10-22 · Codex (GPT-6) · PR #63 · Shahid week 7 ==
+- Recorded Shahid Ali → HOU for week 7 per the commissioner’s message here. Receipt 2026-10-22T18:18:32Z is this session’s receipt, not an inferred Teams timestamp. No Houston reuse; generation confirms a scheduled game.
+- Updated generator and fixture, added regression coverage and a passing registry verification. Included in existing week 7 picks PR #63, preserving the previous five selections.
+- Verified npm run validate (lint, typecheck, 371 tests, production build), fixture tests 10/10, init.sh HTTP 200. Every registry/browser verification passed; quality sweep exit 1 solely for the existing local .claude/settings.json missing merge deny, excluded from the PR and untouched.
+NEXT: Human reviews and merges PR #63 to publish the six added week 7 picks. No merge or deployment performed by the agent.
+
+== 2026-10-22 · Codex (GPT-6) · PR #63 · Mike week 7 ==
+- Recorded Mike Lancaster → HOU for week 7 per the commissioner’s message here. Receipt 2026-10-22T18:22:16Z is this session’s receipt, not an inferred Teams timestamp. No Houston reuse; generation confirms a scheduled game.
+- Updated generator and fixture, added regression coverage and a passing registry verification. Included in existing week 7 picks PR #63, preserving the previous six selections.
+- Verified npm run validate (lint, typecheck, 372 tests, production build), fixture tests 11/11, init.sh HTTP 200. Every registry/browser verification passed; quality sweep exit 1 solely for the existing local .claude/settings.json missing merge deny, excluded from the PR and untouched.
+NEXT: Human reviews and merges PR #63 to publish the seven added week 7 picks. No merge or deployment performed by the agent.
+
+== 2026-10-22 · Codex (GPT-6) · PR #63 · Allison week 7 ==
+- Recorded Allison Petty → NYJ for week 7 per the commissioner’s message here. Receipt 2026-10-22T18:26:14Z is this session’s receipt, not an inferred Teams timestamp. No Jets reuse; generation confirms a scheduled game.
+- Updated generator and fixture, added regression coverage and a passing registry verification. Included in existing week 7 picks PR #63, preserving the previous seven selections.
+- Verified npm run validate (lint, typecheck, 373 tests, production build), fixture tests 12/12, init.sh HTTP 200. Every registry/browser verification passed; quality sweep exit 1 solely for the existing local .claude/settings.json missing merge deny, excluded from the PR and untouched.
+NEXT: Human reviews and merges PR #63 to publish the eight added week 7 picks. No merge or deployment performed by the agent.
