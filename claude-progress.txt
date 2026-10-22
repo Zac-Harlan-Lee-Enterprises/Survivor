@@ -899,3 +899,9 @@ NEXT: Human reviews and merges PR #63 to publish the seven added week 7 picks. N
 - Updated generator and fixture, added regression coverage and a passing registry verification. Included in existing week 7 picks PR #63, preserving the previous seven selections.
 - Verified npm run validate (lint, typecheck, 373 tests, production build), fixture tests 12/12, init.sh HTTP 200. Every registry/browser verification passed; quality sweep exit 1 solely for the existing local .claude/settings.json missing merge deny, excluded from the PR and untouched.
 NEXT: Human reviews and merges PR #63 to publish the eight added week 7 picks. No merge or deployment performed by the agent.
+
+== 2026-10-22 · Codex (GPT-6) · feat/commish-message-beyond ==
+- Replaced the week 6 review in Word from the late commissioner with the exact approved one-paragraph message from beyond (Death asking Anything yet; feet off the desk; declined to comment). No picks revealed. Removed the old pick callout; preserved the existing week 1–7 display scope at the commissioner’s request, with no scheduling or added expiry logic.
+- Replaced obsolete recap fact assertions with a privacy check against player and NFL team names, added exact-copy component coverage, and updated the message browser tests for one paragraph with no stale pick instruction. Added a passing feature registry verification.
+- Verified npm run validate (344 tests), message component/privacy verification (4 tests), and init.sh HTTP 200. Browser suite: 110 passed, 2 skipped, 3 interrupted by my bootstrap restarting the Pages server; all 3 passed on --last-failed rerun (113 total passed). Quality sweep re-verified every entry and browser check; exit 1 solely for the existing local .claude/settings.json missing merge deny, excluded from the PR and untouched.
+NEXT: Human reviews and merges the message PR to publish. The commissioner will decide when to replace the message. No merge or deployment performed by the agent.
