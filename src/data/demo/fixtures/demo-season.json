@@ -1456,6 +1456,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dominic-green-7",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dominic-green",
+      "week": 7,
+      "teamId": "MIN",
+      "gameId": "2026-w07-IND-at-MIN",
+      "submittedAt": "2026-10-22T17:54:23.000Z",
+      "updatedAt": "2026-10-22T17:54:23.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-tracy-nelson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1530,6 +1543,19 @@
       "gameId": "2026-w06-ARI-at-LAR",
       "submittedAt": "2026-10-15T19:02:25.000Z",
       "updatedAt": "2026-10-15T19:02:25.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-tracy-nelson-7",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tracy-nelson",
+      "week": 7,
+      "teamId": "DEN",
+      "gameId": "2026-w07-DEN-at-ARI",
+      "submittedAt": "2026-10-22T18:02:42.000Z",
+      "updatedAt": "2026-10-22T18:02:42.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -1972,6 +1998,19 @@
       "gameId": "2026-w06-NYJ-at-NE",
       "submittedAt": "2026-10-14T20:08:53.000Z",
       "updatedAt": "2026-10-14T20:08:53.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-melanie-moeller-7",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "melanie-moeller",
+      "week": 7,
+      "teamId": "HOU",
+      "gameId": "2026-w07-NYG-at-HOU",
+      "submittedAt": "2026-10-22T18:06:04.000Z",
+      "updatedAt": "2026-10-22T18:06:04.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -2739,6 +2778,19 @@
       "gameId": "2026-w06-NYJ-at-NE",
       "submittedAt": "2026-10-15T13:49:22.000Z",
       "updatedAt": "2026-10-15T13:49:22.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-cindy-mendoza-7",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "cindy-mendoza",
+      "week": 7,
+      "teamId": "HOU",
+      "gameId": "2026-w07-NYG-at-HOU",
+      "submittedAt": "2026-10-22T17:59:20.000Z",
+      "updatedAt": "2026-10-22T17:59:20.000Z",
       "version": 1,
       "source": "commissioner"
     },

@@ -544,5 +544,41 @@
     "priority": 3,
     "hermetic": true,
     "passes": true
+  },
+  {
+    "id": "week7-dominic-vikings",
+    "category": "data",
+    "description": "Dominic Green’s commissioner-supplied week 7 pick is Minnesota, facing Indianapolis at home, recorded October 22, 2026.",
+    "verification": "npx vitest run src/data/demo/fixtures.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "week7-cindy-houston",
+    "category": "data",
+    "description": "Cindy Mendoza’s commissioner-supplied week 7 pick is Houston, recorded October 22, 2026.",
+    "verification": "npx vitest run src/data/demo/fixtures.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "week7-tracy-broncos",
+    "category": "data",
+    "description": "Tracy Nelson’s commissioner-supplied week 7 pick is Denver, recorded October 22, 2026.",
+    "verification": "npx vitest run src/data/demo/fixtures.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
+  },
+  {
+    "id": "week7-melanie-texans",
+    "category": "data",
+    "description": "Melanie Moeller’s commissioner-supplied week 7 pick is Houston, recorded October 22, 2026.",
+    "verification": "npx vitest run src/data/demo/fixtures.test.ts",
+    "priority": 1,
+    "hermetic": true,
+    "passes": true
   }
 ]

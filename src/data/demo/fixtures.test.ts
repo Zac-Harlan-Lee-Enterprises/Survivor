@@ -18,6 +18,43 @@ describe('demo fixture', () => {
     expect(snapshot.picks.length).toBeGreaterThan(0)
   })
 
+  it('records Dominic’s commissioner-supplied Vikings selection for week 7', () => {
+    const picks = snapshot.picks.filter(
+      (pick) => pick.playerId === 'dominic-green' && pick.week === 7,
+    )
+    expect(picks).toHaveLength(1)
+    expect(picks[0]).toMatchObject({ teamId: 'MIN', submittedAt: '2026-10-22T17:54:23.000Z' })
+    expect(gamesById.get(picks[0]?.gameId ?? '')).toMatchObject({
+      week: 7,
+      homeTeamId: 'MIN',
+      awayTeamId: 'IND',
+    })
+  })
+
+  it('records Cindy’s commissioner-supplied Houston selection for week 7', () => {
+    const picks = snapshot.picks.filter(
+      (pick) => pick.playerId === 'cindy-mendoza' && pick.week === 7,
+    )
+    expect(picks).toHaveLength(1)
+    expect(picks[0]).toMatchObject({ teamId: 'HOU', submittedAt: '2026-10-22T17:59:20.000Z' })
+  })
+
+  it('records Tracy’s commissioner-supplied Broncos selection for week 7', () => {
+    const picks = snapshot.picks.filter(
+      (pick) => pick.playerId === 'tracy-nelson' && pick.week === 7,
+    )
+    expect(picks).toHaveLength(1)
+    expect(picks[0]).toMatchObject({ teamId: 'DEN', submittedAt: '2026-10-22T18:02:42.000Z' })
+  })
+
+  it('records Melanie’s commissioner-supplied Texans selection for week 7', () => {
+    const picks = snapshot.picks.filter(
+      (pick) => pick.playerId === 'melanie-moeller' && pick.week === 7,
+    )
+    expect(picks).toHaveLength(1)
+    expect(picks[0]).toMatchObject({ teamId: 'HOU', submittedAt: '2026-10-22T18:06:04.000Z' })
+  })
+
   it('points every pick at a game that week in which the team actually plays', () => {
     for (const pick of snapshot.picks) {
       const game = gamesById.get(pick.gameId)
@@ -26,9 +63,10 @@ describe('demo fixture', () => {
         pick.week,
       )
       const playing = game?.homeTeamId === pick.teamId || game?.awayTeamId === pick.teamId
-      expect(playing, `${pick.playerId} week ${pick.week}: ${pick.teamId} is not in ${game?.id}`).toBe(
-        true,
-      )
+      expect(
+        playing,
+        `${pick.playerId} week ${pick.week}: ${pick.teamId} is not in ${game?.id}`,
+      ).toBe(true)
     }
   })
 
@@ -45,7 +83,9 @@ describe('demo fixture', () => {
       teamsUsed.set(pick.playerId, teams)
 
       const weeks = weeksPicked.get(pick.playerId) ?? new Set()
-      expect(weeks.has(pick.week), `${pick.playerId} has two picks in week ${pick.week}`).toBe(false)
+      expect(weeks.has(pick.week), `${pick.playerId} has two picks in week ${pick.week}`).toBe(
+        false,
+      )
       weeks.add(pick.week)
       weeksPicked.set(pick.playerId, weeks)
     }
