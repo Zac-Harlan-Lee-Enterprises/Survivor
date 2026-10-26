@@ -115,6 +115,41 @@ export const EPITAPHS: Record<string, Epitaph> = {
       'Zac Harlan is the commissioner of this league and, as of week 6, one of its headstones, which makes this the first epitaph in league history written by the deceased. He never picked alone — the smallest crowd he joined all season was seven, on the Chargers in week 1, and Arizona beat them 26–14. Then three straight wins with company — San Francisco, Kansas City, Baltimore — before he joined both of the biggest losing crowds of the season: twenty-one on Dallas in week 5 and thirteen on the Rams in week 6. Arizona have won two games all year, one against each Los Angeles team, and the commissioner had Los Angeles both times. The Chargers are 0–6. The Rams are 2–4. He has no further comment. Rest in peace, Zac. The notes will keep coming; they just come from lower down now.',
     writtenAfterWeek: 6,
   },
+  'bradley-riedell': {
+    recap:
+      'Bradley Riedell won his first pick by a single point — Detroit 31, New Orleans 30 — and spent the rest of the season trying to get away from the rest of us. Twice he went entirely alone: Chicago in week 2, beaten 9–3 by Minnesota, and San Francisco in week 6, 23–17 over Washington. Alone, he went 1–1. In company — six on Detroit, twenty on Kansas City, sixteen on Minnesota, twenty-one on Dallas, six on Houston — he went 3–2, and the company finished him: on his last life he joined five others on Houston, who tied the Giants with fifty-two seconds left and lost in overtime. By then he had already spent all three of the teams that went into week 7 unbeaten. Rest in peace, Bradley: he knew where the exits were, and walked back in with everyone else.',
+    writtenAfterWeek: 7,
+  },
+  'maya-israel': {
+    recap:
+      'Maya Israel spent her season picking alongside people who are now dead. In week 2 she took Baltimore with Don and Dave, and New Orleans won 24–17; Don was buried in week 4, and this week she and Dave went into the ground together, so the week 2 Ravens are now a complete set. In between she won with Jacksonville, Kansas City and Minnesota, lost with the twenty-one on Dallas, and beat the Jets with New England, one of four. On her last life she sent the commissioner “My pick for this week: Houston” at 10:16 on a Tuesday night, and the Texans tied the Giants with fifty-two seconds left and lost in overtime. Rest in peace, Maya: the last of the week 2 Ravens.',
+    writtenAfterWeek: 7,
+  },
+  'mike-lancaster': {
+    recap:
+      'Mike Lancaster was perfect for a month — Seattle by three over New England, then San Francisco, Kansas City and Baltimore — and then he never won again. His last three picks were the most popular pick of their week, every one of them: Dallas with twenty others, the Rams with twelve, Houston with five. All three lost. He went into week 5 with all three lives and was dead by the end of week 7, one crowd at a time. Rest in peace, Mike: four weeks of perfect, three weeks of popular, and it turns out you can only be one of those.',
+    writtenAfterWeek: 7,
+  },
+  'shahid-ali': {
+    recap:
+      'Shahid Ali opened with Baltimore at Indianapolis — one of only two of us, with Dominic — and won 41–23, then took San Francisco, Kansas City and Minnesota in turn, the three teams that would still be unbeaten going into week 7, for a 4–0 start with all three lives. Then he followed the crowd off three cliffs in a row: Dallas, the Rams and Houston, the most popular pick of each week and a loser each week. He had spent the three best teams in football in his first four weeks and had nothing left but everyone else’s ideas. Rest in peace, Shahid: undefeated for a month, and never again.',
+    writtenAfterWeek: 7,
+  },
+  'dave-johnson': {
+    recap:
+      'Dave Johnson won his first pick by one point — Detroit 31, New Orleans 30 — and lost his second with Baltimore, alongside Don and Maya. Then he went on a run: Kansas City, Chicago over the Jets, Cincinnati at Miami. And then winless teams started winning, one at a time, in front of him. In week 6 he took the Colts, and Tennessee, 0–5, won its first game of the season. In week 7 he took the Jets — whom he had beaten in week 4 — against Miami — whom he had beaten in week 5 — and Miami, 0–5, won its first game of the season. Two weeks, two winless teams, two first wins. Rest in peace, Dave: he had beaten the Jets and he had beaten Miami, and when they played each other he picked the wrong one.',
+    writtenAfterWeek: 7,
+  },
+  'jason-snook': {
+    recap:
+      'Jason Snook started 4–0 with all three lives — Jacksonville, San Francisco, Detroit and Minnesota — and was the only one of us on Detroit in week 3, when they beat the Jets 31–24. Then he joined the crowd: twenty-one on Dallas, thirteen on the Rams, two lives gone in two weeks. On his last life he went alone again, with Carolina, and Tampa Bay won 43–13: four Carolina turnovers, and when Carolina finally scored a touchdown, Tampa Bay blocked the extra point and ran it back for two. Rest in peace, Jason: alone he went 1–1, and with the two biggest losing crowds of the season he went 0–2.',
+    writtenAfterWeek: 7,
+  },
+  'wesley-childers': {
+    recap:
+      'Wesley Childers won his first four picks — Detroit by a point, then San Francisco, Kansas City and Baltimore — and still had all three lives in October. In week 5 he took Dallas with twenty others and lost one, and then he simply stopped. No pick in week 6. No pick in week 7. The rules count silence as a loss, so Wesley lost his last two lives without a single team letting him down. He is the only one of us to be eliminated in a week he sent no pick at all. Rest in peace, Wesley: no team has let him down since Dallas.',
+    writtenAfterWeek: 7,
+  },
 }
 
 /**

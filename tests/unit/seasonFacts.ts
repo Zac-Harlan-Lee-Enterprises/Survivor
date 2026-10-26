@@ -34,10 +34,11 @@ export const season = JSON.parse(
 ) as Season
 
 /**
- * Every week 1–6 final, as the ESPN scoreboard
+ * Every week 1–7 final, as the ESPN scoreboard
  * reports them (site.api.espn.com, 2026 season type 2, weeks 1 to 4, read on
  * 2026-09-22, 2026-09-29 and 2026-10-05, Monday night's added on 2026-10-09; week 5 read 2026-10-13;
- * week 6 read 2026-10-20). The seed deliberately carries no results — the app fetches them
+ * week 6 read 2026-10-20;
+ * week 7 read 2026-10-26, before Monday night's DAL at PHI, which nobody picked). The seed deliberately carries no results — the app fetches them
  * live — so the note's outcome claims are pinned here instead, keyed by the
  * seed's own game ids so a pick and its result cannot drift apart.
  *
@@ -137,6 +138,19 @@ export const FINALS: Record<string, [number, number]> = {
   '2026-w06-BUF-at-LV': [33, 30],
   '2026-w06-DAL-at-GB': [13, 23],
   '2026-w06-WAS-at-SF': [17, 23],
+  '2026-w07-NE-at-CHI': [24, 30],
+  '2026-w07-PIT-at-NO': [16, 10],
+  '2026-w07-SF-at-ATL': [20, 29],
+  '2026-w07-CLE-at-TEN': [27, 24],
+  '2026-w07-IND-at-MIN': [10, 16],
+  '2026-w07-MIA-at-NYJ': [28, 25],
+  '2026-w07-TB-at-CAR': [43, 13],
+  '2026-w07-CIN-at-BAL': [35, 13],
+  '2026-w07-NYG-at-HOU': [27, 21],
+  '2026-w07-DEN-at-ARI': [30, 16],
+  '2026-w07-GB-at-DET': [17, 20],
+  '2026-w07-LAR-at-LV': [35, 21],
+  '2026-w07-KC-at-SEA': [3, 20],
 }
 
 /**
@@ -212,6 +226,58 @@ export const SCORING: Record<string, ScoringPlay[]> = {
     [4, '1:12', 'NE', [16, 26], 'Andy Borregales 27 Yd Field Goal'],
     [4, '0:32', 'NYJ', [19, 26], 'Jason Sanders 36 Yd Field Goal'],
   ],
+  '2026-w07-NYG-at-HOU': [
+    [1, '11:40', 'HOU', [0, 3], "Ka'imi Fairbairn 58 Yd Field Goal"],
+    [1, '6:26', 'NYG', [7, 3], 'Tyrone Tracy Jr. 2 Yd Rush (Dominic Zvada Kick)'],
+    [2, '9:03', 'HOU', [7, 6], "Ka'imi Fairbairn 57 Yd Field Goal"],
+    [2, '3:32', 'NYG', [14, 6], 'Jameis Winston 1 Yd Rush (Dominic Zvada Kick)'],
+    [
+      2,
+      '0:34',
+      'HOU',
+      [14, 14],
+      'Marvin Harrison Jr. 6 Yd pass from C.J. Stroud (C.J. Stroud Pass to Cade Stover for Two-Point Conversion)',
+    ],
+    [4, '8:55', 'NYG', [21, 14], 'Cam Skattebo 16 Yd Rush (Dominic Zvada Kick)'],
+    [
+      4,
+      '0:52',
+      'HOU',
+      [21, 21],
+      "Xavier Hutchinson 3 Yd pass from C.J. Stroud (Ka'imi Fairbairn Kick)",
+    ],
+    [5, '7:25', 'NYG', [27, 21], 'Devin Singletary 30 Yd Rush'],
+  ],
+  '2026-w07-TB-at-CAR': [
+    [1, '7:22', 'TB', [7, 0], 'Bucky Irving 4 Yd Rush (Chase McLaughlin Kick)'],
+    [2, '14:12', 'TB', [10, 0], 'Chase McLaughlin 22 Yd Field Goal'],
+    [2, '11:05', 'TB', [17, 0], 'Calijah Kancey 32 Yd Fumble Return (Chase McLaughlin Kick)'],
+    [
+      2,
+      '9:09',
+      'CAR',
+      [17, 6],
+      'Darren Waller 50 Yd pass from Bryce Young (Ryan Fitzgerald PAT blocked)',
+    ],
+    [2, '9:09', 'TB', [19, 6], 'Zyon McCollum Defensive PAT Conversion'],
+    [2, '3:53', 'TB', [26, 6], 'Bucky Irving 1 Yd Rush (Chase McLaughlin Kick)'],
+    [
+      2,
+      '0:04',
+      'TB',
+      [33, 6],
+      'Tez Johnson 14 Yd pass from Baker Mayfield (Chase McLaughlin Kick)',
+    ],
+    [3, '6:30', 'TB', [36, 6], 'Chase McLaughlin 44 Yd Field Goal'],
+    [4, '10:21', 'TB', [43, 6], 'Sean Tucker 46 Yd Rush (Chase McLaughlin Kick)'],
+    [4, '5:28', 'CAR', [43, 13], 'Anthony Tyus III 12 Yd Rush (Ryan Fitzgerald Kick)'],
+  ],
+}
+
+/** Turnovers each side committed (ESPN box score, read 2026-10-26), for the games a note uses. */
+export const TURNOVERS: Record<string, Record<string, number>> = {
+  '2026-w07-TB-at-CAR': { TB: 0, CAR: 4 },
+  '2026-w07-SF-at-ATL': { SF: 4, ATL: 0 },
 }
 
 /**
