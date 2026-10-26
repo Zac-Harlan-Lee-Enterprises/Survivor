@@ -116,6 +116,7 @@ class Plant:
 class Motion:
     def __init__(self, person, sole):
         b = person.bodyd
+        self.tails = b.tails
         self.p = person
         self.sk, self.heads, self.J, self.H = b.sk, b.heads, b.J, b.height
         self.idx = self.sk.index
@@ -179,6 +180,46 @@ class Motion:
         # Hanging at his side, the palm faces his thigh.
         inward = np.array([-np.sign(w[0]), 0.0, 0.0])
         return dict(M0=np.column_stack([f, a, n]), sign=1.0 if n @ inward > 0 else -1.0, wrist=w, pc=(w + k) / 2)
+
+    def fingers(self, R, s, curl):
+        """His fingers drawn together (the body's rest pose fans them out like
+        a starfish) and curled `curl` (0 open, 1 a fist), the thumb tucked
+        toward the index finger."""
+        h, tl, i = self.heads, self.tails, self.idx
+        d = {f: unit(tl[i[f"finger{f}-1.{s}"]] - h[i[f"finger{f}-1.{s}"]]) for f in range(1, 6)}
+        sg = 1.0 if s == "L" else -1.0
+        for f in range(1, 6):
+            if f == 1:
+                together = wb.between(d[1], unit(0.55 * d[1] + 0.45 * d[2]))
+            elif f == 3:
+                together = np.eye(3)
+            else:
+                together = wb.between(d[f], unit(0.3 * d[f] + 0.7 * d[3]))
+            for k in range(1, 4):
+                bone = f"finger{f}-{k}.{s}"
+                if f == 1:
+                    c = rot(y=sg * 18.0 * curl if k == 1 else 0.0, x=-22.0 * curl)
+                else:
+                    c = rot(y=sg * (30.0 if k == 1 else 42.0) * curl)
+                R[bone] = c @ together if k == 1 else c
+        return R
+
+    def relax_hand(self, R, root, s, curl=0.4, flex=10.0):
+        """A hand hanging at ease: in line with the forearm, bent a little
+        toward the palm, the palm facing his thigh, fingers together and
+        softly curled."""
+        D = self.fk(R, root)
+        E = self.at(D, f"lowerarm01.{s}", self.heads[self.idx[f"lowerarm01.{s}"]])
+        Wr = self.at(D, f"wrist.{s}", self.heads[self.idx[f"wrist.{s}"]])
+        fore = unit(Wr - E)
+        side = 1.0 if s == "L" else -1.0
+        medial = -side * root[:3, 0]
+        palm = unit(medial - (medial @ fore) * fore)
+        a = math.radians(flex)
+        fingers = unit(fore * math.cos(a) + palm * math.sin(a))
+        G = self.hand_turn(s, fingers, palm)
+        R[f"wrist.{s}"] = D[self.sk.parent[self.idx[f"wrist.{s}"]]][:3, :3].T @ G
+        return self.fingers(R, s, curl)
 
     def hand_turn(self, s, fingers, palm):
         """The rotation (rest -> posed) that points a hand's fingers along
@@ -581,7 +622,6 @@ class Motion:
                 "lowerarm01.L": rot(x=-12.0),
             }
             R, _ = wc._blend((Rs, np.eye(4)), (Rw, np.eye(4)), w)
-            wm.curl(R, "L", 0.5)
             return R
 
         def on_knob(t):
@@ -640,6 +680,8 @@ class Motion:
             for s, out_x in (("L", 1.0), ("R", -1.0)):
                 A, G, toe, _ = self.foot_at(s, plants[s], t)
                 self.step(R, root, s, A, G, toe, fwd + yaw(psi) @ np.array([0.12 * out_x, 0.0, 0.0]))
+            # His free hand hangs at ease.
+            self.relax_hand(R, root, "L", 0.42)
             # The cane, and his right hand on it: carried in his fist, or (facing
             # you) his palm resting on the knob.
             tip, top = cane_at(t, psi)
@@ -655,7 +697,8 @@ class Motion:
             # (Carrying it, his elbow points back; resting on it, out to the side.)
             pole_r = lerp((-0.5, 1.0, -0.1), (-0.85, 0.5, -0.15), k)
             self.reach(R, root, "R", lerp(grip, on, k), lerp(f_grip, yaw(psi) @ f_body, k), lerp(n_grip, -u_cane, k), yaw(psi) @ pole_r)
-            wm.curl(R, "R", 0.88 - 0.33 * k)
+            # A fist round the shaft; resting on the knob, fingers closed over it.
+            self.fingers(R, "R", 0.9 - 0.3 * k)
             # His left hand comes to rest on his right, and leaves it again.
             if t_hands <= t < t_back:
                 if left_from is None:
@@ -672,6 +715,7 @@ class Motion:
                 else:
                     if left_back is None:
                         R0 = upper(t_back)
+                        self.relax_hand(R0, root, "L", 0.42)
                         left_back = (self.palm_of(R0, root, "L"), *self.hand_dirs(R0, root, "L"))
                     u = (t - t_release) / nI
                     e = 1.0 - smoother(u)
@@ -679,7 +723,8 @@ class Motion:
                     lift = bump(u)
                 target = lerp(start[0], on, e) + np.array([0.0, 0.0, 0.035]) * lift
                 self.reach(R, root, "L", target, lerp(start[1], on_dirs[0], e), lerp(start[2], on_dirs[1], e), yaw(psi) @ np.array([0.85, 0.5, -0.15]))
-                wm.curl(R, "L", 0.5 - 0.26 * e)
+                # Resting on his right hand, the fingers lie together over it.
+                self.fingers(R, "L", 0.42 + 0.2 * e)
             rec = None
             if fi < tw:
                 pass
