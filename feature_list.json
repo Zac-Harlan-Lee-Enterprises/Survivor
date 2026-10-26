@@ -620,7 +620,7 @@
   {
     "id": "commish-message-beyond",
     "category": "content",
-    "description": "The commissioner’s approved message from beyond appears as one paragraph in the existing section, with no players or NFL teams revealed and no new display timing.",
+    "description": "The commissioner's note (Word from the late commissioner) carries the week 7 review in the voice of the message from beyond: the late commissioner with Death in the room. Seven knocked out (Houston's overtime loss, Miami's first win, Carolina 43–13, Wesley's silence), twenty-five headstones and five alive, the week 8 byes and Thursday lock, and a set-apart pick instruction. Every factual claim is asserted against the pinned finals, scoring plays and picks; the note never names a player beside their current-week team. Shown for weeks 1–8.",
     "verification": "npx vitest run src/components/LeagueMessage.test.tsx tests/unit/leagueMessageFacts.test.ts",
     "priority": 1,
     "hermetic": true,
