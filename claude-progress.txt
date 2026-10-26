@@ -911,3 +911,8 @@ NEXT: Human reviews and merges the message PR to publish. The commissioner will 
 - Week 7 finals, scoring plays (NYG@HOU, TB@CAR) and turnovers pinned in seasonFacts. leagueMessageFacts rewritten claim by claim (17), with the guard that no sentence names a player beside their current-week team. Seven epitaphs (writtenAfterWeek 7) asserted in epitaphFacts; week 6 epitaph record checks pinned to week 6. Caught one false draft line (Shahid's teams spent "by the end of September": his week 4 pick was Oct 1) and rewrote it.
 - Verified: validate (366 unit), e2e 113 passed.
 NEXT: commissioner previews and merges. Week 8 picks before Thu 2026-10-29 7:10 PM CT.
+
+== 2026-10-26 · Claude Code (Opus 5.5) · fix/death-chest ==
+- Commissioner: Death "looks like he has boobs like a female"; "his fingers are splayed out crazily and his wrist is bent in an unnatural way". Chest: the jacket followed his chest muscles into two lit mounds with a hollow between; death_dress._jacket now lets the front out to a shallow flat curve through the chest's most forward point at each height (outward only). Hands: nothing set the free hand's wrist twist, so it kept the body model's rest pose (palm turned back, fingers fanned); death_motion adds fingers() (fingers drawn together, curled, thumb tucked) and relax_hand() (wrist in line with the forearm, a little flexed, palm to the thigh), used for the free hand, the fist on the cane and both hands resting on the knob.
+- Re-rendered 278 frames (armClearance 0.6 cm); checked chest and hands by eye in walk, turn, knob and turn-away frames.
+- Verified: validate (344 unit), e2e 113 passed.

@@ -452,8 +452,22 @@ def _jacket(self, color):
         grow = np.maximum(0.0, target - rv) * hang
         dirs = np.stack([V[:, 0], V[:, 1] - cyw], 1) / np.maximum(rv, 1e-6)[:, None]
         V[:, :2] += dirs * grow[:, None]
+    # A man's jacket hangs flat across the chest: it does not follow the
+    # muscles into two mounds with a hollow between them. At each height its
+    # front is a shallow curve through the most forward point of the chest,
+    # and the cloth is let out to it (never drawn in).
+    lim_u = limbs[used]
+    chest_zone = (V[:, 1] < cyw) & (V[:, 2] > self.belt_z - 0.02) & (V[:, 2] < nz - 0.015) & (lim_u < 0.25)
+    for zz in np.arange(self.belt_z - 0.02, nz - 0.015, 0.01):
+        band = chest_zone & (np.abs(V[:, 2] - zz) < 0.006)
+        core = band & (np.abs(V[:, 0]) < 0.11)
+        if core.sum() < 3:
+            continue
+        y_peak = float(V[core, 1].min())
+        target = y_peak + 1.1 * V[band, 0] ** 2
+        V[band, 1] = np.minimum(V[band, 1], target)
     V = bridge(V, Q, N, iterations=60, soften=14)
-    y_front = float(J["chest"][1]) - 0.03
+    y_front =float(J["chest"][1]) - 0.03
     self.skirt_cy = float(J["pelvis"][1]) + 0.005
     mat = jacket(color, self.v_bottom, nz, y_front, self.skirt_cy, self.hem_z)
     self.jacket_mat = mat
