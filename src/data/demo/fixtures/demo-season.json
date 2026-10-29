@@ -1599,6 +1599,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-tracy-nelson-8",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tracy-nelson",
+      "week": 8,
+      "teamId": "CIN",
+      "gameId": "2026-w08-TEN-at-CIN",
+      "submittedAt": "2026-10-28T17:14:40.000Z",
+      "updatedAt": "2026-10-28T17:14:40.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-bradley-riedell-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
