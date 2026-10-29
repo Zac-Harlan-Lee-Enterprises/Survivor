@@ -2743,6 +2743,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-allison-petty-8",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "allison-petty",
+      "week": 8,
+      "teamId": "GB",
+      "gameId": "2026-w08-CAR-at-GB",
+      "submittedAt": "2026-10-29T22:39:08.000Z",
+      "updatedAt": "2026-10-29T22:39:08.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-don-turner-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
