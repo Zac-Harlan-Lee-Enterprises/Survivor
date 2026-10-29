@@ -1495,6 +1495,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dominic-green-8",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dominic-green",
+      "week": 8,
+      "teamId": "CIN",
+      "gameId": "2026-w08-TEN-at-CIN",
+      "submittedAt": "2026-10-29T12:55:17.000Z",
+      "updatedAt": "2026-10-29T12:55:17.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-tracy-nelson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2037,6 +2050,19 @@
       "gameId": "2026-w07-NYG-at-HOU",
       "submittedAt": "2026-10-22T18:06:04.000Z",
       "updatedAt": "2026-10-22T18:06:04.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-melanie-moeller-8",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "melanie-moeller",
+      "week": 8,
+      "teamId": "JAX",
+      "gameId": "2026-w08-IND-at-JAX",
+      "submittedAt": "2026-10-29T21:32:38.000Z",
+      "updatedAt": "2026-10-29T21:32:38.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -2843,6 +2869,19 @@
       "gameId": "2026-w07-NYG-at-HOU",
       "submittedAt": "2026-10-22T17:59:20.000Z",
       "updatedAt": "2026-10-22T17:59:20.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-cindy-mendoza-8",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "cindy-mendoza",
+      "week": 8,
+      "teamId": "LAR",
+      "gameId": "2026-w08-LAC-at-LAR",
+      "submittedAt": "2026-10-29T17:09:34.000Z",
+      "updatedAt": "2026-10-29T17:09:34.000Z",
       "version": 1,
       "source": "commissioner"
     },
