@@ -12,7 +12,9 @@ test.describe('word from the commissioner', () => {
     await expect(note).toBeVisible()
     // (The commissioner may be late — he was buried in week 6 — and still writes.)
     await expect(note).toContainText(/word from the (late )?commissioner/i)
-    await expect(note).toContainText('Good luck.')
+    // Several paragraphs, with Death in the room.
+    expect(await note.locator('p').count()).toBeGreaterThan(2)
+    await expect(note).toContainText(/Death/)
 
     // Order on the page: hero, then the note, then Still standing. Measured
     // through locators so the spec needs no DOM types.
@@ -26,6 +28,22 @@ test.describe('word from the commissioner', () => {
     const standing = await topOf('alive-title')
     expect(hero).toBeLessThan(message)
     expect(message).toBeLessThan(standing)
+  })
+
+  /**
+   * The pick instruction is the one line that costs someone a life if they
+   * miss it, so it is asserted apart from the banter: where to send it, when
+   * it locks, what missing costs.
+   */
+  test('tells everyone where to send a pick, when it locks, and what missing costs', async ({
+    page,
+  }) => {
+    await resetDemo(page)
+    const note = page.locator('section[aria-labelledby="league-message-title"]')
+    await expect(note).toBeVisible()
+    await expect(note).toContainText(/pick on Teams/i)
+    await expect(note).toContainText(/\d\d?:\d\d (AM|PM)/i)
+    await expect(note).toContainText(/costs a life/i)
   })
 
   test('reads on a phone too, and is announced as a section', async ({ page }) => {
