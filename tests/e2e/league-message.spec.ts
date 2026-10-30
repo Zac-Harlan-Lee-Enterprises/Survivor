@@ -12,9 +12,9 @@ test.describe('word from the commissioner', () => {
     await expect(note).toBeVisible()
     // (The commissioner may be late — he was buried in week 6 — and still writes.)
     await expect(note).toContainText(/word from the (late )?commissioner/i)
-    // A review: several paragraphs, with the count of the week's dead.
+    // Several paragraphs, with Death in the room.
     expect(await note.locator('p').count()).toBeGreaterThan(2)
-    await expect(note).toContainText(/knocked out this week/)
+    await expect(note).toContainText(/Death/)
 
     // Order on the page: hero, then the note, then Still standing. Measured
     // through locators so the spec needs no DOM types.

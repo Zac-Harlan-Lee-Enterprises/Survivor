@@ -11,27 +11,29 @@ import { Megaphone, Send } from 'lucide-react'
  *
  * Shown for weeks 1–8: the seed carries no results, so the engine calls week 1
  * current until the live sync lands them, at which point week 8 is.
+ *
+ * Written after the week 8 lock, before a ball was kicked: it says who got a
+ * pick in and when, never what anyone picked.
  */
-const WEEK_7_REVIEW = {
+const WEEK_8_PREVIEW = {
   heading: 'Word from the late commissioner',
   lines: [
-    'Last week Death asked whether we offer a group rate. This week six of you took Houston at home to the Giants, and he got one. The Texans tied it 21–21 with fifty-two seconds left — exactly long enough for six people to start breathing again — and then lost 27–21 in overtime on a thirty-yard run. Death watched overtime standing up. I have never seen him stand up for anything.',
-    'Dave and Allison took the Jets at home to Miami. Before Sunday, fifty-one of this league’s picks had gone against the Dolphins, and all fifty-one had won; Miami were the closest thing we had to a life insurance policy. On Sunday they won their first game of the season, 28–25, against the only two of us who picked against them. Death says he has been waiting on that policy to lapse since September.',
-    'Jason went alone with Carolina and lost 43–13 to Tampa Bay. Carolina turned it over four times, and when they finally scored a touchdown, Tampa Bay blocked the extra point, ran it back, and were given two points for it. That is not a football game; that is a mugging with a scoreboard. And Wesley sent no pick, for the second week running. Death says he didn’t take Wesley so much as notice he’d already gone.',
-    'The official count: seven of you were knocked out this week. Bradley, Maya, Mike and Shahid went down with Houston, Dave with the Jets, Jason with Carolina, and Wesley with nothing at all. That makes twenty-five headstones and five of you still standing. Every single one of you who had company this week lost a life, and the only two who came through clean went alone. The most popular pick has now lost three weeks running — Dallas, the Rams, Houston — and is zero for forty. If you find yourself agreeing with the group chat on Thursday, Death would like you to know he’s free.',
-    'The five. Cindy lost her first life of the season — six straight wins, then Houston — and is still the only one of you on two. Allison and Melanie are down to their last. Dominic went alone with Minnesota and won 16–10, and the Vikings are now 6–0, the last unbeaten team, because San Francisco lost at Atlanta and Kansas City managed three points in Seattle. Tracy went alone with Denver and won 30–16 in Arizona.',
-    'Nobody picked Dallas at Philadelphia, so the week was settled before Monday night kicked off. Death has the evening off. He is spending it behind my chair, which is how he relaxes.',
-    'Week 8: Houston, New Orleans, the Giants and San Francisco are on bye. Thursday night is Carolina at Green Bay, which locks the week. Minnesota, 6–0, go to Detroit, and of the five of you left, only Allison can still pick them. Five of you. Death says take your time; he’s paid by the hour.',
+    'All five week 8 picks are in, and Death has taken it personally. Tracy sent hers at 12:14 on Wednesday afternoon. Allison sent hers at 5:39 on Thursday, an hour and a half before the lock, after I messaged her twice in four minutes. The second message told her she had two hours. She had two hours and fifteen. Even dead, I round down.',
+    'It is the first week since week 5 that everyone still standing sent a pick. Wesley sent nothing in weeks 6 and 7, and he is now in no position to argue about it. Death says he misses the no-shows: they never make him wait for the late game.',
+    'The field: five of you, with twenty-five headstones behind you. Four of you are on your last life. Cindy is on two, which in this cemetery counts as old money. The most popular pick has lost three weeks running and is zero for forty, and last week everyone who had company lost a life. Death isn’t saying whether anyone has company this week. He just keeps smiling at the standings, which he has never done before and which I would ask him to stop.',
+    'Thursday’s Carolina at Green Bay locked the week; the Panthers came in 3–3 and the Packers 4–3. On Sunday, Minnesota take the league’s only unbeaten record, 6–0, to Detroit. Houston, New Orleans, the Giants and San Francisco are on bye, so Death can’t reach anyone through them, and he has checked.',
+    'Monday night the Bears, 5–2, play in Seattle. Joey was buried in week 5, the same weekend the Bears lost 31–7 at Green Bay, and they haven’t lost since. Draw your own conclusions. Death has drawn his.',
+    'I’ll be back after Monday night with the damage. Death would like you to know the cemetery has plenty of room, and that he has been told he is very good with people.',
   ],
   // Set apart from the banter, because an instruction buried in jokes is an
-  // instruction somebody misses — and four of the five are on their last life.
+  // instruction somebody misses.
   callout:
-    'DM me your week 8 pick on Teams before 7:10 PM Thursday — five minutes before Carolina at Green Bay kicks off. Four of you are on your last life, and a missing pick costs a life. Ask Wesley.',
+    'All five week 8 picks are locked. Week 9: DM me your pick on Teams before 7:10 PM Thursday, November 5. A missing pick still costs a life.',
 }
 
 export function LeagueMessage({ week }: { week: number }) {
   if (week < 1 || week > 8) return null
-  const note = WEEK_7_REVIEW
+  const note = WEEK_8_PREVIEW
 
   return (
     <section className="card border-sky-400/25 p-5 md:p-6" aria-labelledby="league-message-title">
