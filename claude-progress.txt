@@ -922,3 +922,6 @@ NEXT: after week 8 finals, write the week 8 review (late-commissioner voice), pi
 
 2026-10-29 — Claude Opus 5.5 — Week 8 preview note (late-commissioner voice) replaces the week 7 review. Gives away no picks: a sentence guard (no player beside their week 8 team) plus a ban on "alone/both/together"-style hints. Every claim asserted in leagueMessageFacts (pick timing incl. Allison 5:39 PM, 1 h 31 min before the lock — first draft said 31 min, test caught it; first full set of picks since week 5; 5 alive / 25 headstones; CAR 3–3 at GB 4–3; MIN 6–0 at DET; byes; Bears 5–2, unbeaten since Joey's week 5 burial; week 9 lock Thu Nov 5 7:10 PM). validate, e2e (113) green.
 NEXT: after Monday night, week 8 review + epitaphs for anyone eliminated.
+
+2026-10-30 — Claude Opus 5.5 — Commissioner asked to remove the note's detail about how he messaged a player for her pick. Removed; the note keeps only when picks arrived. A test now bans any mention of chasing players for picks.
+2026-10-30 — Commissioner then asked for the week 8 note to say just "Good luck." Done; callout made optional. NEXT: week 8 review after Monday night only if he asks.
