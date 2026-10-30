@@ -916,3 +916,6 @@ NEXT: commissioner previews and merges. Week 8 picks before Thu 2026-10-29 7:10 
 - Commissioner: Death "looks like he has boobs like a female"; "his fingers are splayed out crazily and his wrist is bent in an unnatural way". Chest: the jacket followed his chest muscles into two lit mounds with a hollow between; death_dress._jacket now lets the front out to a shallow flat curve through the chest's most forward point at each height (outward only). Hands: nothing set the free hand's wrist twist, so it kept the body model's rest pose (palm turned back, fingers fanned); death_motion adds fingers() (fingers drawn together, curled, thumb tucked) and relax_hand() (wrist in line with the forearm, a little flexed, palm to the thigh), used for the free hand, the fist on the cane and both hands resting on the knob.
 - Re-rendered 278 frames (armClearance 0.6 cm); checked chest and hands by eye in walk, turn, knob and turn-away frames.
 - Verified: validate (344 unit), e2e 113 passed.
+
+2026-10-29 — Claude Opus 5.5 — Week 8 pick: Allison Petty takes the Packers (Teams, 5:39 PM CT, before the 7:10 PM lock; GB unused by her, hosts CAR Thursday). All five alive players now have a week 8 pick. validate, e2e (113 passed) and init.sh HTTP 200 green.
+NEXT: after week 8 finals, write the week 8 review (late-commissioner voice), pin finals, epitaphs for anyone eliminated.
