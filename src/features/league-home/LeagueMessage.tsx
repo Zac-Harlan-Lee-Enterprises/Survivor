@@ -18,7 +18,7 @@ import { Megaphone, Send } from 'lucide-react'
 const WEEK_8_PREVIEW = {
   heading: 'Word from the late commissioner',
   lines: [
-    'All five week 8 picks are in, and Death has taken it personally. Tracy sent hers at 12:14 on Wednesday afternoon. Allison sent hers at 5:39 on Thursday, an hour and a half before the lock, after I messaged her twice in four minutes. The second message told her she had two hours. She had two hours and fifteen. Even dead, I round down.',
+    'All five week 8 picks are in, and Death has taken it personally. Tracy sent hers at 12:14 on Wednesday afternoon. Allison sent hers at 5:39 on Thursday, an hour and a half before the lock.',
     'It is the first week since week 5 that everyone still standing sent a pick. Wesley sent nothing in weeks 6 and 7, and he is now in no position to argue about it. Death says he misses the no-shows: they never make him wait for the late game.',
     'The field: five of you, with twenty-five headstones behind you. Four of you are on your last life. Cindy is on two, which in this cemetery counts as old money. The most popular pick has lost three weeks running and is zero for forty, and last week everyone who had company lost a life. Death isn’t saying whether anyone has company this week. He just keeps smiling at the standings, which he has never done before and which I would ask him to stop.',
     'Thursday’s Carolina at Green Bay locked the week; the Panthers came in 3–3 and the Packers 4–3. On Sunday, Minnesota take the league’s only unbeaten record, 6–0, to Detroit. Houston, New Orleans, the Giants and San Francisco are on bye, so Death can’t reach anyone through them, and he has checked.',

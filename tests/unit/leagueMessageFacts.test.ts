@@ -80,6 +80,10 @@ describe('the week 8 preview gives away nothing about week 8', () => {
     }
   })
 
+  it('says nothing about how the commissioner chased anyone for a pick', () => {
+    expect(body).not.toMatch(/\b(messag|DM'?d|nudg|remind|chas)\w*/i)
+  })
+
   it('never says how many share a team, or who is alone', () => {
     expect(body).not.toMatch(/\b(alone|same team|together|both|two of you|three of you)\b/i)
   })
@@ -96,15 +100,6 @@ describe('the commissioner’s week 8 preview states only true things', () => {
     expect(at(order.at(-1)!.submittedAt)).toBe('Thursday, October 29 at 5:39 PM')
     const lead = lockOf(WEEK).getTime() - new Date(order.at(-1)!.submittedAt).getTime()
     expect(Math.round(lead / 60_000)).toBe(91) // 1 h 30 min 52 s
-  })
-
-  it('“after I messaged her twice in four minutes. The second message told her she had two hours. She had two hours and fifteen”', () => {
-    // From the commissioner's Teams chat with Allison (read 2026-10-29): “who
-    // is your pick?” at 4:51 PM and “2 hours to get your pick in!” at 4:55 PM CT.
-    const second = new Date('2026-10-29T21:55:01.000Z')
-    expect(at(second.toISOString())).toBe('Thursday, October 29 at 4:55 PM')
-    expect(Math.floor((lockOf(WEEK).getTime() - second.getTime()) / 60_000)).toBe(2 * 60 + 14)
-    expect(Math.round((lockOf(WEEK).getTime() - second.getTime()) / 60_000)).toBe(2 * 60 + 15)
   })
 
   it('“the first week since week 5 that everyone still standing sent a pick. Wesley sent nothing in weeks 6 and 7”', () => {
