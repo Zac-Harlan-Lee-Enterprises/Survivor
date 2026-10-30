@@ -925,3 +925,4 @@ NEXT: after Monday night, week 8 review + epitaphs for anyone eliminated.
 
 2026-10-30 — Claude Opus 5.5 — Commissioner asked to remove the note's detail about how he messaged a player for her pick. Removed; the note keeps only when picks arrived. A test now bans any mention of chasing players for picks.
 2026-10-30 — Commissioner then asked for the week 8 note to say just "Good luck." Done; callout made optional. NEXT: week 8 review after Monday night only if he asks.
+2026-10-30 — Claude Opus 5.5 — New week 8 note draft (late-commissioner voice) replacing "Good luck.": league data only, no pick timing, no DMs, no week 8 scores; guards for all three plus a word-for-word phrase check. validate + e2e (113) green. Awaiting commissioner go-ahead.

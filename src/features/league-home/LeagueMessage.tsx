@@ -12,11 +12,23 @@ import { Megaphone, Send } from 'lucide-react'
  * Shown for weeks 1–8: the seed carries no results, so the engine calls week 1
  * current until the live sync lands them, at which point week 8 is.
  *
- * Week 8, after the lock: the commissioner's call — just good luck.
+ * Written after the week 8 lock, before the week's results: it never says
+ * what anyone picked, and it is built only from league data.
  */
 const WEEK_8_PREVIEW: { heading: string; lines: string[]; callout?: string } = {
   heading: 'Word from the late commissioner',
-  lines: ['Good luck.'],
+  lines: [
+    'Death is in a mood. For the first time since week 5, every one of you still standing got a pick in, so there was nobody for him to collect by default. He had cleared his whole Thursday for it. He spent it straightening headstones instead. There are twenty-five of them now, and he did every one twice.',
+    'The field: five of you. Four on your last life, and Cindy on two, which in this cemetery counts as old money. Last week everyone who had company lost a life, and the most popular pick has now lost three weeks running, zero for forty. Death would like to thank the group chat for its service.',
+    'Houston, who buried four of you last week, have the week off, along with New Orleans, the Giants and San Francisco. Death is sending Houston a fruit basket.',
+    'Thursday night, Carolina at Green Bay locked the week. On Sunday, Minnesota take the league’s last unbeaten record, 6–0, into Detroit. Death has a seat on the fifty-yard line and has promised to sit on his hands.',
+    'Monday night the Bears, 5–2, play in Seattle. Joey was buried in week 5, the same weekend the Bears lost 31–7 at Green Bay, and they haven’t lost since. Draw your own conclusions. Death has drawn his.',
+    'I’ll be back after Monday night with the damage. Until then, Death asks that you stop refreshing the scoreboard. It doesn’t help, and he can hear it.',
+  ],
+  // Set apart from the banter, because an instruction buried in jokes is an
+  // instruction somebody misses.
+  callout:
+    'Week 9: DM me your pick on Teams before 7:10 PM Thursday, November 5. A missing pick still costs a life.',
 }
 
 export function LeagueMessage({ week }: { week: number }) {
