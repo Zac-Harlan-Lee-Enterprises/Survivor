@@ -329,7 +329,9 @@ describe('the week 6 epitaphs', () => {
     expect(crowd(5, 'DAL')).toBe(21)
     expect(record('TB', 4)).toBe('0-4')
   }
-  const arizonaWins = () => Object.keys(FINALS).filter((id) => winnerOf(id) === 'ARI')
+  // As the week 6 epitaphs were written: through week 6.
+  const arizonaWins = () =>
+    Object.keys(FINALS).filter((id) => gamesById.get(id)!.week <= 6 && winnerOf(id) === 'ARI')
 
   it('bury exactly the twelve that week 6 eliminated', () => {
     const twelve = [
@@ -699,7 +701,9 @@ describe('the week 6 epitaphs', () => {
     expect(played('Tina Bush', 1)).toMatchObject({ teamId: 'DET', mine: 31, theirs: 30 })
     expect(pickOf('Tina Bush', 2)).toBeNull()
     expect(played('Tina Bush', 3)).toMatchObject({ teamId: 'KC' })
-    const neWins = Object.keys(FINALS).filter((id) => winnerOf(id) === 'NE')
+    const neWins = Object.keys(FINALS).filter(
+      (id) => gamesById.get(id)!.week <= 6 && winnerOf(id) === 'NE',
+    )
     expect(neWins).toHaveLength(4)
     const hers = neWins.filter((id) => [4, 5].some((w) => pickOf('Tina Bush', w)?.gameId === id))
     expect(hers).toHaveLength(2)
