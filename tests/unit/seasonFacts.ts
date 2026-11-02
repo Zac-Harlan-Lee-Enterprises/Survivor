@@ -38,7 +38,8 @@ export const season = JSON.parse(
  * reports them (site.api.espn.com, 2026 season type 2, weeks 1 to 4, read on
  * 2026-09-22, 2026-09-29 and 2026-10-05, Monday night's added on 2026-10-09; week 5 read 2026-10-13;
  * week 6 read 2026-10-20;
- * week 7 read 2026-10-26, before Monday night's DAL at PHI, which nobody picked). The seed deliberately carries no results — the app fetches them
+ * week 7 read 2026-10-26, before Monday night's DAL at PHI, which nobody picked;
+ * week 8 read 2026-11-02, before Monday night's CHI at SEA, which nobody picked). The seed deliberately carries no results — the app fetches them
  * live — so the note's outcome claims are pinned here instead, keyed by the
  * seed's own game ids so a pick and its result cannot drift apart.
  *
@@ -151,6 +152,19 @@ export const FINALS: Record<string, [number, number]> = {
   '2026-w07-GB-at-DET': [17, 20],
   '2026-w07-LAR-at-LV': [35, 21],
   '2026-w07-KC-at-SEA': [3, 20],
+  '2026-w08-CAR-at-GB': [19, 27],
+  '2026-w08-BAL-at-BUF': [10, 36],
+  '2026-w08-TEN-at-CIN': [36, 43],
+  '2026-w08-ARI-at-DAL': [33, 30],
+  '2026-w08-MIN-at-DET': [15, 19],
+  '2026-w08-LV-at-NYJ': [38, 33],
+  '2026-w08-CLE-at-PIT': [6, 27],
+  '2026-w08-ATL-at-TB': [0, 16],
+  '2026-w08-IND-at-JAX': [7, 42],
+  '2026-w08-LAC-at-LAR': [9, 24],
+  '2026-w08-KC-at-DEN': [24, 28],
+  '2026-w08-NE-at-MIA': [24, 19],
+  '2026-w08-PHI-at-WAS': [10, 27],
 }
 
 /**
@@ -272,12 +286,113 @@ export const SCORING: Record<string, ScoringPlay[]> = {
     [4, '10:21', 'TB', [43, 6], 'Sean Tucker 46 Yd Rush (Chase McLaughlin Kick)'],
     [4, '5:28', 'CAR', [43, 13], 'Anthony Tyus III 12 Yd Rush (Ryan Fitzgerald Kick)'],
   ],
+  '2026-w08-TEN-at-CIN': [
+    [1, '10:52', 'TEN', [3, 0], 'Joey Slye 46 Yd Field Goal'],
+    [1, '7:55', 'TEN', [10, 0], 'Tony Pollard 40 Yd Rush (Joey Slye Kick)'],
+    [1, '2:14', 'TEN', [13, 0], 'Joey Slye 29 Yd Field Goal'],
+    [2, '13:20', 'CIN', [13, 7], "Ja'Marr Chase 30 Yd pass from Joe Burrow (Evan McPherson Kick)"],
+    [2, '0:20', 'CIN', [13, 14], 'Jack Endries 1 Yd pass from Joe Burrow (Evan McPherson Kick)'],
+    [3, '12:25', 'CIN', [13, 21], 'Tee Higgins 17 Yd pass from Joe Burrow (Evan McPherson Kick)'],
+    [3, '7:47', 'TEN', [21, 21], 'Tony Pollard 1 Yd Rush (Cam Ward Run for Two-Point Conversion)'],
+    [3, '0:46', 'CIN', [21, 23], 'Demetrius Knight Jr. Safety'],
+    [4, '11:29', 'TEN', [28, 23], 'Chimere Dike 11 Yd pass from Cam Ward (Joey Slye Kick)'],
+    [
+      4,
+      '7:13',
+      'CIN',
+      [28, 29],
+      'Mike Gesicki 25 Yd pass from Joe Burrow (Two-Point Pass Conversion Failed)',
+    ],
+    [
+      4,
+      '3:46',
+      'TEN',
+      [36, 29],
+      "Wan'Dale Robinson 15 Yd pass from Cam Ward (Cam Ward Pass to Gunnar Helm for Two-Point Conversion)",
+    ],
+    [4, '1:17', 'CIN', [36, 36], 'Tee Higgins 18 Yd pass from Joe Burrow (Evan McPherson Kick)'],
+    [5, '7:00', 'CIN', [36, 43], 'Joe Burrow 9 Yd Rush (Evan McPherson Kick)'],
+  ],
+  '2026-w08-LAC-at-LAR': [
+    [1, '5:42', 'LAR', [0, 3], 'Brandon McManus 30 Yd Field Goal'],
+    [1, '0:04', 'LAC', [3, 3], 'Cameron Dicker 34 Yd Field Goal'],
+    [2, '10:06', 'LAC', [6, 3], 'Cameron Dicker 46 Yd Field Goal'],
+    [2, '1:55', 'LAC', [9, 3], 'Cameron Dicker 41 Yd Field Goal'],
+    [2, '0:19', 'LAR', [9, 10], 'Kyren Williams 1 Yd Rush (Brandon McManus Kick)'],
+    [3, '10:42', 'LAR', [9, 17], 'Blake Corum 23 Yd Rush (Brandon McManus Kick)'],
+    [
+      3,
+      '3:41',
+      'LAR',
+      [9, 24],
+      'Puka Nacua 18 Yd pass from Matthew Stafford (Brandon McManus Kick)',
+    ],
+  ],
+  '2026-w08-IND-at-JAX': [
+    [
+      1,
+      '5:30',
+      'JAX',
+      [0, 7],
+      'Brian Thomas Jr. 12 Yd pass from Trevor Lawrence (Cam Little Kick)',
+    ],
+    [
+      2,
+      '7:14',
+      'JAX',
+      [0, 14],
+      'Nate Boerkircher 31 Yd pass from Trevor Lawrence (Cam Little Kick)',
+    ],
+    [2, '1:51', 'JAX', [0, 21], 'Bhayshul Tuten 39 Yd Rush (Cam Little Kick)'],
+    [2, '0:10', 'JAX', [0, 28], 'Rayuan Lane III 92 Yd Interception Return (Cam Little Kick)'],
+    [3, '9:08', 'JAX', [0, 35], 'Chris Rodriguez Jr. 28 Yd Rush (Cam Little Kick)'],
+    [3, '3:59', 'IND', [7, 35], 'Josh Downs 6 Yd pass from Daniel Jones (Spencer Shrader Kick)'],
+    [3, '0:00', 'JAX', [7, 42], 'Bhayshul Tuten 25 Yd pass from Trevor Lawrence (Cam Little Kick)'],
+  ],
+  '2026-w08-CAR-at-GB': [
+    [1, '11:43', 'CAR', [3, 0], 'Ryan Fitzgerald 39 Yd Field Goal'],
+    [1, '5:08', 'GB', [3, 6], 'Tucker Kraft 12 Yd pass from Jordan Love (Trey Smack PAT Failed)'],
+    [2, '14:57', 'CAR', [10, 6], 'Chuba Hubbard 1 Yd Rush (Ryan Fitzgerald Kick)'],
+    [2, '6:33', 'GB', [10, 13], 'Josh Jacobs 1 Yd Rush (Trey Smack Kick)'],
+    [2, '1:46', 'GB', [10, 20], 'Matthew Golden 24 Yd pass from Jordan Love (Trey Smack Kick)'],
+    [3, '7:30', 'GB', [10, 27], 'Josh Jacobs 4 Yd pass from Jordan Love (Trey Smack Kick)'],
+    [3, '4:07', 'CAR', [13, 27], 'Ryan Fitzgerald 50 Yd Field Goal'],
+    [
+      4,
+      '5:37',
+      'CAR',
+      [19, 27],
+      'Jalen Coker 26 Yd pass from Bryce Young (Two-Point Pass Conversion Failed)',
+    ],
+  ],
+  '2026-w08-MIN-at-DET': [
+    [1, '2:18', 'DET', [0, 3], 'Jake Bates 25 Yd Field Goal'],
+    [
+      2,
+      '14:25',
+      'MIN',
+      [7, 3],
+      'Justin Jefferson 1 Yd pass from Kyler Murray (Will Reichard Kick)',
+    ],
+    [2, '0:02', 'DET', [7, 6], 'Jake Bates 37 Yd Field Goal'],
+    [3, '4:40', 'DET', [7, 12], 'Jahmyr Gibbs 30 Yd Rush (Two-Point Run Conversion Failed)'],
+    [
+      4,
+      '8:44',
+      'MIN',
+      [15, 12],
+      'T.J. Hockenson 8 Yd pass from Kyler Murray (Kyler Murray Pass to Jordan Addison for Two-Point Conversion)',
+    ],
+    [4, '4:35', 'DET', [15, 19], 'Jameson Williams 7 Yd pass from Jared Goff (Jake Bates Kick)'],
+  ],
 }
 
 /** Turnovers each side committed (ESPN box score, read 2026-10-26), for the games a note uses. */
 export const TURNOVERS: Record<string, Record<string, number>> = {
   '2026-w07-TB-at-CAR': { TB: 0, CAR: 4 },
   '2026-w07-SF-at-ATL': { SF: 4, ATL: 0 },
+  // Week 8, read 2026-11-02.
+  '2026-w08-TEN-at-CIN': { TEN: 2, CIN: 4 },
 }
 
 /**

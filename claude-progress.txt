@@ -926,3 +926,6 @@ NEXT: after Monday night, week 8 review + epitaphs for anyone eliminated.
 2026-10-30 — Claude Opus 5.5 — Commissioner asked to remove the note's detail about how he messaged a player for her pick. Removed; the note keeps only when picks arrived. A test now bans any mention of chasing players for picks.
 2026-10-30 — Commissioner then asked for the week 8 note to say just "Good luck." Done; callout made optional. NEXT: week 8 review after Monday night only if he asks.
 2026-10-30 — Claude Opus 5.5 — New week 8 note draft (late-commissioner voice) replacing "Good luck.": league data only, no pick timing, no DMs, no week 8 scores; guards for all three plus a word-for-word phrase check. validate + e2e (113) green. Awaiting commissioner go-ahead.
+
+2026-11-02 — Claude Opus 5.5 — Week 8 review (late-commissioner voice). Pinned week 8 finals (13; MNF CHI@SEA unpicked, unplayed) + scoring plays for CIN/JAX/LAR/GB/DET games + CIN turnovers. Nobody lost a life (first time all season), so no epitaphs. Week 6 epitaph checks for ARI/NE win counts pinned to weeks 1–6. Note guards: no week 9 picks, no DMs, no pick times. validate, e2e (113), init.sh 200 green.
+NEXT: record week 9 picks (lock Thu Nov 5 7:10 PM CT); review after week 9.
