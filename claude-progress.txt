@@ -929,3 +929,6 @@ NEXT: after Monday night, week 8 review + epitaphs for anyone eliminated.
 
 2026-11-02 — Claude Opus 5.5 — Week 8 review (late-commissioner voice). Pinned week 8 finals (13; MNF CHI@SEA unpicked, unplayed) + scoring plays for CIN/JAX/LAR/GB/DET games + CIN turnovers. Nobody lost a life (first time all season), so no epitaphs. Week 6 epitaph checks for ARI/NE win counts pinned to weeks 1–6. Note guards: no week 9 picks, no DMs, no pick times. validate, e2e (113), init.sh 200 green.
 NEXT: record week 9 picks (lock Thu Nov 5 7:10 PM CT); review after week 9.
+
+2026-11-05 — Claude Opus 5.5 — Week 9 picks from Teams (all before the 7:10 PM lock): Allison SF, Cindy DET, Dominic CHI, Melanie CHI, Tracy DET (Tracy sent a "lions GIF"). Week 9 preview note in the late-commissioner voice: names no week 9 team at all, no pick times, no messages; every claim asserted. validate, e2e (113), init.sh 200 green. Merged on the commissioner's instruction.
+NEXT: after Monday night (BUF@MIN), week 9 review + epitaphs for anyone eliminated.
