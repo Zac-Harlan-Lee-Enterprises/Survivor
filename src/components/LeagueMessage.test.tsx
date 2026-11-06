@@ -5,17 +5,19 @@ import { LeagueMessage } from '@/features/league-home/LeagueMessage'
 
 afterEach(cleanup)
 
-describe('the week 8 review from the late commissioner', () => {
+describe('the week 9 preview from the late commissioner', () => {
   it.each([1, 9])('reads in the week %i display scope, Death in the room', (week) => {
     render(<LeagueMessage week={week} />)
     expect(screen.getByRole('heading', { name: /word from the late commissioner/i })).toBeVisible()
-    expect(screen.getByText(/^Death went nought for five\./)).toBeVisible()
-    expect(screen.getByText(/He says he is an optimist/)).toBeVisible()
+    expect(screen.getByText(/^Death has had a difficult week\./)).toBeVisible()
+    expect(screen.getByText(/I’ll be back after the games with the damage/)).toBeVisible()
   })
 
-  it('sets the week 9 pick instruction apart from the banter', () => {
+  it('sets the week 10 pick instruction apart from the banter', () => {
     render(<LeagueMessage week={9} />)
-    const callout = screen.getByText(/DM me your week 9 pick on Teams before 7:10 PM Thursday/)
+    const callout = screen.getByText(
+      /Week 10: DM me your pick on Teams before 7:10 PM Thursday, November 12/,
+    )
     expect(callout).toBeVisible()
     expect(callout.textContent).toMatch(/costs a life/)
   })

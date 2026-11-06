@@ -1508,6 +1508,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dominic-green-9",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dominic-green",
+      "week": 9,
+      "teamId": "CHI",
+      "gameId": "2026-w09-TB-at-CHI",
+      "submittedAt": "2026-11-05T13:54:18.000Z",
+      "updatedAt": "2026-11-05T13:54:18.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-tracy-nelson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1608,6 +1621,19 @@
       "gameId": "2026-w08-TEN-at-CIN",
       "submittedAt": "2026-10-28T17:14:40.000Z",
       "updatedAt": "2026-10-28T17:14:40.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-tracy-nelson-9",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tracy-nelson",
+      "week": 9,
+      "teamId": "DET",
+      "gameId": "2026-w09-DET-at-MIA",
+      "submittedAt": "2026-11-03T23:46:41.000Z",
+      "updatedAt": "2026-11-03T23:46:41.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -2076,6 +2102,19 @@
       "gameId": "2026-w08-IND-at-JAX",
       "submittedAt": "2026-10-29T21:32:38.000Z",
       "updatedAt": "2026-10-29T21:32:38.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-melanie-moeller-9",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "melanie-moeller",
+      "week": 9,
+      "teamId": "CHI",
+      "gameId": "2026-w09-TB-at-CHI",
+      "submittedAt": "2026-11-05T14:55:55.000Z",
+      "updatedAt": "2026-11-05T14:55:55.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -2756,6 +2795,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-allison-petty-9",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "allison-petty",
+      "week": 9,
+      "teamId": "SF",
+      "gameId": "2026-w09-LV-at-SF",
+      "submittedAt": "2026-11-06T00:08:18.000Z",
+      "updatedAt": "2026-11-06T00:08:18.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-don-turner-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2908,6 +2960,19 @@
       "gameId": "2026-w08-LAC-at-LAR",
       "submittedAt": "2026-10-29T17:09:34.000Z",
       "updatedAt": "2026-10-29T17:09:34.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-cindy-mendoza-9",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "cindy-mendoza",
+      "week": 9,
+      "teamId": "DET",
+      "gameId": "2026-w09-DET-at-MIA",
+      "submittedAt": "2026-11-05T15:56:09.000Z",
+      "updatedAt": "2026-11-05T15:56:09.000Z",
       "version": 1,
       "source": "commissioner"
     },
