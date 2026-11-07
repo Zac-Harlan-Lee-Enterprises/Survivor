@@ -1,10 +1,20 @@
 import { useState } from 'react'
 import { getConfig } from '@/config/env'
-import type { TrophyFilm } from './crowning'
-import { engraving } from './crowning'
-import TROPHY from './trophyFrames.json'
+import { engraving } from './engraving'
+import TROPHY from './trophy.json'
 
-const FILM = TROPHY as TrophyFilm
+/**
+ * The trophy, rendered by scripts/art/trophy_scene.py and packed by
+ * trophy_film.py: the still, its size, and the plaque's blank line (as
+ * fractions of the image) where the champion's name goes.
+ */
+interface Still {
+  src: string
+  width: number
+  height: number
+  nameBox?: { x: number; y: number; w: number; h: number }
+}
+const STILL: Still = TROPHY
 /** How tall it stands on the page (px). */
 const HEIGHT = 360
 
@@ -16,15 +26,15 @@ const HEIGHT = 360
 export function Trophy({ name }: { name?: string }) {
   const [missing, setMissing] = useState(false)
   if (missing) return null
-  const width = (HEIGHT * FILM.frameWidth) / FILM.frameHeight
-  const line = FILM.nameBox
+  const width = (HEIGHT * STILL.width) / STILL.height
+  const line = STILL.nameBox
   return (
     <figure className="relative mx-auto" style={{ width, height: HEIGHT }}>
       <img
-        src={`${getConfig().basePath}trophy/still.webp`}
+        src={`${getConfig().basePath}${STILL.src}`}
         alt={`The league trophy${name ? `, engraved for ${name}` : ''}`}
-        width={FILM.frameWidth}
-        height={FILM.frameHeight}
+        width={STILL.width}
+        height={STILL.height}
         className="h-full w-full drop-shadow-[0_0_40px_rgba(251,191,36,0.25)]"
         onError={() => setMissing(true)}
       />

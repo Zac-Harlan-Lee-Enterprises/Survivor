@@ -25,21 +25,11 @@ import type { Cue } from './music'
 const DIM = 1000
 const BEAM = 1400
 const RING = 1500
-const HOLD = 6800
+const HOLD = 5200
 /** The wreath: when the first logo sets off, the gap between them, and each one's flight. */
 const WREATH_AT = DIM + 600
 const WREATH_STEP = 140
 const WREATH_FLIGHT = 1100
-/** The trophy: when it starts to rise, and how long it takes. */
-const TROPHY_AT = DIM + 1500
-const TROPHY_RISE = 1900
-/** It turns once as it rises (this fast), and stops facing you. */
-const TROPHY_FPS = 15
-/** Then the name is engraved, left to right. */
-const ENGRAVE = 900
-/** After the lights come up it stays a while, then goes. */
-const TROPHY_STAYS = 2600
-const TROPHY_GOES = 1400
 /** How far into the fanfare its swell comes (ms): it is started so the swell meets the confetti. */
 const SWELL = 5400
 const LIFT = 1600
@@ -71,32 +61,18 @@ export interface Laurel {
   won: boolean
 }
 
-/** The trophy's turn, rendered by scripts/art/trophy_scene.py: one sheet of frames. */
-export interface TrophyFilm {
-  sheet: string
-  frames: number
-  cols: number
-  frameWidth: number
-  frameHeight: number
-  fps: number
-  /** The plaque's blank line at frame 0, as fractions of a frame: where the name goes. */
-  nameBox?: { x: number; y: number; w: number; h: number }
-}
-
 export interface Staging {
   /** Music from the moment the light comes down. */
   fanfare?: Cue
   /** Each winner's picks in week order, in the same order as their headshots. */
   wreaths?: Laurel[][]
-  /** The trophy that rises into the light, turning: its film, where its sheet is, and whose name it takes. */
-  trophy?: { film: TrophyFilm; src: string; name?: string }
 }
 
 /** Plays the crowning over `section`; `finale` fires as the lights come up. Returns a cancel. */
 export function crown(
   section: Element,
   finale: () => void,
-  { fanfare, wreaths = [], trophy }: Staging = {},
+  { fanfare, wreaths = [] }: Staging = {},
 ): () => void {
   const doc = section.ownerDocument
   const faces = [...section.querySelectorAll<HTMLElement>('img.rounded-full')]
@@ -134,8 +110,6 @@ export function crown(
   const laurels = faces.length && wreaths.length === faces.length ? wreaths : []
   const wreathed = laurels.map((w) => w.map((l) => laurel(doc, l)))
   wreathed.forEach((w) => w.forEach((l) => root.append(l.el)))
-  const cup = trophy ? stand(doc, trophy) : null
-  if (cup) root.append(cup.el)
   doc.body.append(root)
 
   // Where the winners are, read every frame so a scroll never loses them.
@@ -172,7 +146,6 @@ export function crown(
         l.el.style.padding = `${spot.size * 0.14}px`
       })
     })
-    if (cup) cup.place({ left, right, top, bottom }, win.innerWidth, win.innerHeight)
     return { cx, cy, radius, top }
   }
 
@@ -297,9 +270,7 @@ export function crown(
         }
         ctx.restore()
       }
-      cup?.draw(t - TROPHY_AT)
-      const trophyGone = !cup || t > lightsUp + TROPHY_STAYS + TROPHY_GOES
-      if (t > lightsUp + LIFT && falling === 0 && trophyGone) return finish()
+      if (t > lightsUp + LIFT && falling === 0) return finish()
       if (t > lightsUp + LIFT * 3) return finish()
     }
     frame = win.requestAnimationFrame(tick)
@@ -362,32 +333,6 @@ export function crown(
     })
   })
 
-  // The trophy comes up out of the dark into the light, turning.
-  if (cup)
-    play(
-      cup.el,
-      [
-        { opacity: 0, transform: 'translateY(45%) scale(0.92)' },
-        { opacity: 1, offset: 0.4 },
-        { opacity: 1, transform: 'translateY(0) scale(1)' },
-      ],
-      { duration: TROPHY_RISE, delay: TROPHY_AT, easing: 'cubic-bezier(0.2, 0.75, 0.25, 1)' },
-    )
-  // Facing you now: the winner's name engraved on the plaque.
-  if (cup?.name)
-    play(
-      cup.name,
-      [
-        { clipPath: 'inset(0 100% 0 0)', opacity: 0.6 },
-        { clipPath: 'inset(0 0 0 0)', opacity: 1 },
-      ],
-      {
-        duration: ENGRAVE,
-        delay: TROPHY_AT + cup.turnMs + 150,
-        easing: 'cubic-bezier(0.45, 0, 0.55, 1)',
-      },
-    )
-
   // Lights up: the finale, and the ring passed to the headshot for good.
   const lift = win.setTimeout(() => {
     if (cancelled) return
@@ -397,12 +342,6 @@ export function crown(
     play(beam, [{ opacity: 1 }, { opacity: 0 }], out)
     rings.forEach((r) => play(r.el, [{ opacity: 1 }, { opacity: 0 }], out))
     wreathed.flat().forEach((l) => play(l.el, [{ opacity: 1 }, { opacity: 0 }], out))
-    if (cup)
-      play(cup.el, [{ opacity: 1 }, { opacity: 0 }], {
-        duration: TROPHY_GOES,
-        delay: TROPHY_STAYS,
-        easing: 'ease-in',
-      })
     settle()
     finale()
   }, DIM + HOLD)
@@ -499,125 +438,4 @@ function laurel(doc: Document, { src, won }: Laurel) {
   el.append(logo)
   el.style.opacity = '0'
   return { el }
-}
-
-type Box = { left: number; right: number; top: number; bottom: number }
-
-type Footing = 'right' | 'left' | 'below'
-
-/** Room left at the foot of a phone's screen for its tab bar (px). */
-const FOOT = 104
-
-/**
- * Where the trophy stands, for winners in `box` on a `vw` × `vh` screen: beside
- * them, on whichever side has the room, standing a little below their
- * eyeline; or, on a narrow screen, below them at the foot of the screen.
- * `keep` holds it to the footing it was first given, so it never changes
- * sides mid-scene, only follows a scroll.
- */
-export function trophySpot(box: Box, vw: number, vh: number, aspect: number, keep?: Footing) {
-  const height = Math.min(Math.max(vh * 0.3, 150), 300)
-  const width = height * aspect
-  const gap = Math.max(width * 0.9, 130)
-  const roomRight = vw - box.right
-  const roomLeft = box.left
-  const fits = (room: number) => room >= width + gap + 16
-  const footing: Footing =
-    keep ??
-    (fits(Math.max(roomRight, roomLeft)) ? (roomRight >= roomLeft ? 'right' : 'left') : 'below')
-  if (footing !== 'below') {
-    const cx = footing === 'right' ? box.right + gap + width / 2 : box.left - gap - width / 2
-    const cy = (box.top + box.bottom) / 2
-    const top = Math.min(Math.max(cy - height * 0.45, 8), vh - height - 8)
-    return { footing, left: cx - width / 2, top, width, height }
-  }
-  // Below: bigger, so the plaque can be read, and stood clear of the
-  // phone's tab bar so the plaque is not behind it.
-  const tall = Math.min(Math.max(vh * 0.36, 150), 320)
-  const wide = tall * aspect
-  const cx = (box.left + box.right) / 2
-  const top = Math.max(box.bottom + 24, vh - tall - FOOT)
-  const left = Math.min(Math.max(cx - wide / 2, 8), vw - wide - 8)
-  return { footing, left, top, width: wide, height: tall }
-}
-
-/** The trophy on the stage: a glow behind, and a canvas its turn is drawn on. */
-function stand(
-  doc: Document,
-  { film, src, name }: { film: TrophyFilm; src: string; name?: string },
-) {
-  const el = doc.createElement('div')
-  el.className = 'crowning-trophy'
-  el.style.opacity = '0'
-  const glow = doc.createElement('div')
-  glow.className = 'crowning-trophy-glow'
-  const canvas = doc.createElement('canvas')
-  canvas.width = film.frameWidth
-  canvas.height = film.frameHeight
-  el.append(glow, canvas)
-  // The name, laid on the plaque's blank line in the engraving's own type.
-  const line = film.nameBox
-  const plate = name && line ? doc.createElement('div') : null
-  if (plate && line) {
-    plate.className = 'crowning-trophy-name'
-    plate.textContent = name!
-    plate.style.left = `${line.x * 100}%`
-    plate.style.top = `${line.y * 100}%`
-    plate.style.width = `${line.w * 100}%`
-    plate.style.height = `${line.h * 100}%`
-    plate.style.clipPath = 'inset(0 100% 0 0)'
-    el.append(plate)
-  }
-  const ctx = canvas.getContext('2d')
-  const sheet = new Image()
-  sheet.decoding = 'async'
-  sheet.src = src
-  let shown = -1
-  let footing: Footing | undefined
-  return {
-    el,
-    name: plate,
-    /** One full turn, ending with the plaque to the front. */
-    turnMs: (film.frames / TROPHY_FPS) * 1000,
-    place(box: Box, vw: number, vh: number) {
-      const spot = trophySpot(box, vw, vh, film.frameWidth / film.frameHeight, footing)
-      footing = spot.footing
-      el.style.left = `${spot.left}px`
-      el.style.top = `${spot.top}px`
-      el.style.width = `${spot.width}px`
-      el.style.height = `${spot.height}px`
-      if (plate && line)
-        plate.style.fontSize = `${engraving(name!, spot.width * line.w, spot.height * line.h)}px`
-    },
-    draw(ms: number) {
-      if (!ctx || ms < 0 || !sheet.complete || sheet.naturalWidth === 0) return
-      // Once round, then still, facing you.
-      const k =
-        ms >= (film.frames / TROPHY_FPS) * 1000
-          ? 0
-          : Math.floor((ms / 1000) * TROPHY_FPS) % film.frames
-      if (k === shown) return
-      shown = k
-      const sx = (k % film.cols) * film.frameWidth
-      const sy = Math.floor(k / film.cols) * film.frameHeight
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.drawImage(
-        sheet,
-        sx,
-        sy,
-        film.frameWidth,
-        film.frameHeight,
-        0,
-        0,
-        canvas.width,
-        canvas.height,
-      )
-    },
-  }
-}
-
-/** The type size that fits `name` on a line `w` × `h` px: the line's height, or less for a long name. */
-export function engraving(name: string, w: number, h: number) {
-  // (Bold italic serif capitals and lower case run about half an em wide.)
-  return Math.max(4, Math.min(h * 0.95, w / Math.max(1, name.length * 0.5)))
 }

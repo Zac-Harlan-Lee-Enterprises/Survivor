@@ -812,18 +812,8 @@
   .crowning-laurel-lost img {
     filter: grayscale(1) brightness(0.7);
   }
-  /* The trophy, risen into the light: its own warm glow behind it. */
-  .crowning-trophy {
-    position: absolute;
-  }
-  .crowning-trophy canvas {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
   /* The winner's name, engraved on the plaque: the same black serif as the
      rendered lines, with the plate's light catching the cut. */
-  .crowning-trophy-name,
   .trophy-name {
     position: absolute;
     display: flex;
@@ -836,16 +826,6 @@
     line-height: 1;
     color: #1c1407;
     text-shadow: 0 0.5px 0 rgba(255, 238, 190, 0.45);
-  }
-  .crowning-trophy-glow {
-    position: absolute;
-    inset: -18% -45%;
-    background: radial-gradient(
-      ellipse 50% 50% at 50% 55%,
-      rgba(255, 214, 130, 0.28),
-      rgba(255, 214, 130, 0.08) 55%,
-      transparent 75%
-    );
   }
   /* What the crowning leaves behind: the winner ringed in gold. */
   [data-crowned] {

@@ -3,7 +3,6 @@ import { act, render, waitFor } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PlayerStanding } from '@/domain'
-import { LeagueContext, type LeagueContextValue } from '@/app/hooks'
 import { useConfetti, wreathOf } from './useConfetti'
 
 const { confetti } = vi.hoisted(() => ({ confetti: vi.fn() }))
@@ -11,21 +10,9 @@ vi.mock('canvas-confetti', () => ({ default: confetti }))
 
 const ANN = { playerId: 'ann', history: [] } as unknown as PlayerStanding
 
-function Celebration({ active, after }: { active: boolean; after?: number }) {
+function Party({ active, after }: { active: boolean; after?: number }) {
   const celebrate = useConfetti(active ? [ANN] : [], { after })
   return <section ref={celebrate}>Champion</section>
-}
-
-const LEAGUE = {
-  profileOf: (id: string) => ({ playerId: id, displayName: 'Ann Example', imageId: null }),
-} as unknown as LeagueContextValue
-
-function Party(props: { active: boolean; after?: number }) {
-  return (
-    <LeagueContext.Provider value={LEAGUE}>
-      <Celebration {...props} />
-    </LeagueContext.Provider>
-  )
 }
 
 /** A controllable IntersectionObserver: `show()` puts every watched element on screen. */

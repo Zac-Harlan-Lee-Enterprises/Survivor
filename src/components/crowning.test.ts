@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { crown, trophySpot, wreathSpots } from './crowning'
+import { crown, wreathSpots } from './crowning'
 
 function champion() {
   const section = document.createElement('section')
@@ -46,7 +46,8 @@ describe('crown', () => {
       expect(stage.querySelector('.crowning-beam')).not.toBeNull()
       expect(stage.querySelectorAll('.crowning-ring')).toHaveLength(1)
       expect(finale).not.toHaveBeenCalled()
-      vi.advanceTimersByTime(8000)
+      // Lights up a beat after the wreath is in, not a long wait in the dark.
+      vi.advanceTimersByTime(6500)
       expect(finale).toHaveBeenCalledOnce()
       expect(section.querySelector('img')!.hasAttribute('data-crowned')).toBe(true)
     })
@@ -98,35 +99,5 @@ describe('wreathSpots', () => {
     expect(spots[8]!.size).toBeLessThan(spots[0]!.size)
     // Nothing sits on the crown of the head: a gap between the tips.
     for (const s of spots) expect(Math.abs(s.x)).toBeGreaterThan(10)
-  })
-})
-
-describe('trophySpot', () => {
-  const box = { left: 80, right: 200, top: 300, bottom: 420 }
-
-  it('stands beside the winner, on the side with the room', () => {
-    const spot = trophySpot(box, 1280, 800, 2 / 3)
-    expect(spot.footing).toBe('right')
-    expect(spot.left).toBeGreaterThan(box.right)
-    const mirrored = trophySpot(
-      { left: 1080, right: 1200, top: 300, bottom: 420 },
-      1280,
-      800,
-      2 / 3,
-    )
-    expect(mirrored.footing).toBe('left')
-    expect(mirrored.left + mirrored.width).toBeLessThan(1080)
-  })
-
-  it('on a phone, stands below them at the foot of the screen', () => {
-    const spot = trophySpot({ left: 147, right: 243, top: 120, bottom: 216 }, 390, 844, 2 / 3)
-    expect(spot.footing).toBe('below')
-    // Clear of the phone's tab bar, so the plaque can be read.
-    expect(spot.top + spot.height).toBeLessThanOrEqual(844 - 100)
-    expect(spot.top).toBeGreaterThan(216)
-  })
-
-  it('keeps the footing it was first given', () => {
-    expect(trophySpot(box, 390, 844, 2 / 3, 'right').footing).toBe('right')
   })
 })

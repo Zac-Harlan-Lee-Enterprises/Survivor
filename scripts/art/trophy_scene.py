@@ -1,5 +1,5 @@
-"""Render the champion's trophy turning slowly, for the crowning
-(src/components/crowning.ts): a gold loving-cup, two handles, a slender stem
+"""Render the champion's trophy, standing still with its plaque to the front,
+for the Hall of Champions (src/components/Trophy.tsx): a gold loving-cup, two handles, a slender stem
 with a knop, on a stepped black-marble plinth with an engraved gold plaque.
 Everything is modelled here from numbers (lathed profiles, swept handles,
 bevelled blocks, real 3D type), so nothing is downloaded and the design is
@@ -7,7 +7,7 @@ our own, not any league's trophy.
 
     /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup \\
         -P scripts/art/trophy_scene.py -- --out /tmp/trophy \\
-        [--frames 60] [--fps 12] [--samples 96] [--height 660] \\
+        [--frames 1] [--fps 12] [--samples 96] [--height 660] \\
         [--line1 "THE SUNDAY SURVIVORS"] [--line2 "2026 CHAMPION"] \\
         [--name "Allison Petty"] [--only 0,15]
 
@@ -25,12 +25,14 @@ plaque they flash flat grey or white as a face turns into them. Frame 0 has
 the plaque square to the camera; frame i is turned 360·i/N degrees, so the
 last frame runs back into the first without repeating it.
 
-Renders 60 frames in about 2½ minutes on an M3 Pro (Metal). If a run exits
+The page uses frame 0 alone; --frames 60 still renders the whole turn, in
+about 2½ minutes on an M3 Pro (Metal). If a run exits
 with no frames right after the shaders change, run it again (the first run
 most likely compiles Metal kernels; it happened twice in development).
 
 Writes `turn-000.png` … (transparent, Cycles) and `take.json` (frame count,
-size, fps) into --out; trophy_film.py packs them for the page.
+size, fps, the plaque's name line) into --out; trophy_film.py packs frame 0
+for the page.
 """
 import argparse
 import json
@@ -60,7 +62,7 @@ def parse_args():
     argv = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     p = argparse.ArgumentParser()
     p.add_argument("--out", required=True)
-    p.add_argument("--frames", type=int, default=60)
+    p.add_argument("--frames", type=int, default=1)
     p.add_argument("--fps", type=int, default=12)
     p.add_argument("--samples", type=int, default=96)
     p.add_argument("--height", type=int, default=660, help="frame height in px; width is 2/3 of it")

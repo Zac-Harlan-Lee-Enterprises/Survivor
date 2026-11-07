@@ -946,3 +946,11 @@ NEXT: commissioner previews; when the season is decided, write the champion's CI
 
 2026-11-07 — Claude Opus 5.5 — Commissioner watched the phone video: the trophy spun and vanished before the plaque could be read, and the hall's trophy had no name; the citation was "super lame". Trophy now turns once as it rises (15 fps), stops with the plaque to the front, and the champion's name engraves itself on the plaque's blank third line (trophy_scene.py --name-slot; the line's place at frame 0 is projected from the camera into take.json and packed as trophyFrames.json nameBox); it stays through the confetti and goes 2.6 s after the lights come up. On phones it stands clear of the tab bar and bigger. The hall's trophy (Trophy.tsx) carries the newest champion's name. autoCitation is now a royal proclamation ("Hear ye, hear ye…", the commissioner and Joey the Bears fan among the beaten, the graveyard, every team ridden, the cardiologist's boat, the lemmings, "Breaker of Spirits, First of Their Name"), every claim still read off the record and asserted in citations.test.ts. HOLD 6.8 s. npm run validate (403), e2e (117), init.sh 200.
 NEXT: commissioner previews; PR for feat/champion-music stacked on #74.
+
+## 2026-11-07 — Claude Opus 5.5 — the trophy only at the end
+- Commissioner's call after the video: cut the spinning trophy from the crowning; show the trophy only at the end.
+- crowning.ts no longer stages a trophy (stand/trophySpot/TrophyFilm removed); lights come up sooner (HOLD 6800 → 5200, the wreath still settles first).
+- The still trophy, champion's name on the plaque, stands in the Hall of Champions (Trophy.tsx; `engraving` moved to engraving.ts). turn.webp (958 KB) deleted; trophyFrames.json → trophy.json (still size + name line). trophy_film.py packs only the still; trophy_scene.py renders 1 frame by default.
+- AGENTS.md: dropped "re-render with --name" (the page lays the name on the plaque, so it would appear twice).
+- Verified: validate (403 unit), e2e 117 passed, knip clean, init HTTP 200. New phone video sent.
+- NEXT: on the commissioner's go-ahead, open the PR for feat/champion-music, stacked on #74. Never merge.

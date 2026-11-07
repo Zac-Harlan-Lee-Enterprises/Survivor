@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import type confettiLib from 'canvas-confetti'
 import type { PlayerStanding } from '@/domain'
-import { crown, type Laurel, type TrophyFilm } from './crowning'
-import TROPHY from './trophyFrames.json'
+import { crown, type Laurel } from './crowning'
 import { fireworks, flashes } from './finale'
 import { cue } from './music'
 import { getConfig } from '@/config/env'
-import { useLeagueContext } from '@/app/hooks'
 
 // Loaded on first use and shared, so every page reuses one copy of the library.
 let library: Promise<{ default: typeof confettiLib }> | undefined
@@ -78,14 +76,11 @@ const FIREWORKS_AFTER = 1300
  * who prefer reduced motion get none of it.
  */
 export function useConfetti(winners: readonly PlayerStanding[], { after = 0 } = {}) {
-  const { profileOf } = useLeagueContext()
   const [target, setTarget] = useState<Element | null>(null)
   const fired = useRef(false)
   const active = winners.length > 0
   // (As a string, not the array: a re-render must not restart the scene.)
   const wreaths = JSON.stringify(winners.map((w) => wreathOf(w, getConfig().basePath)))
-  // The name for the trophy's plaque.
-  const engraved = winners.map((w) => profileOf(w.playerId).displayName).join(' & ')
 
   useEffect(() => {
     if (!active || !target || fired.current) return
@@ -113,7 +108,6 @@ export function useConfetti(winners: readonly PlayerStanding[], { after = 0 } = 
       const scene = crown(target, finale, {
         fanfare: cue(`${basePath}audio/crowning.m4a`, { volume: 0.6, fadeIn: 300, loop: true }),
         wreaths: JSON.parse(wreaths) as Laurel[][],
-        trophy: { film: TROPHY as TrophyFilm, src: `${basePath}${TROPHY.sheet}`, name: engraved },
       })
       stop = () => {
         scene()
@@ -146,7 +140,7 @@ export function useConfetti(winners: readonly PlayerStanding[], { after = 0 } = 
       watch.disconnect()
       stop()
     }
-  }, [active, target, wreaths, after, engraved])
+  }, [active, target, wreaths, after])
 
   return setTarget
 }
