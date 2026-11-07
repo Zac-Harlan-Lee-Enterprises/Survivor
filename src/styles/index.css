@@ -821,6 +821,22 @@
     width: 100%;
     height: 100%;
   }
+  /* The winner's name, engraved on the plaque: the same black serif as the
+     rendered lines, with the plate's light catching the cut. */
+  .crowning-trophy-name,
+  .trophy-name {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-family: 'Times New Roman', Times, serif;
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1;
+    color: #1c1407;
+    text-shadow: 0 0.5px 0 rgba(255, 238, 190, 0.45);
+  }
   .crowning-trophy-glow {
     position: absolute;
     inset: -18% -45%;

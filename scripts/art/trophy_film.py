@@ -53,12 +53,18 @@ def main():
     sheet.save(turn, "WEBP", quality=QUALITY, method=6, alpha_quality=90)
     ims[0].crop((l, t, r, b)).save(still, "WEBP", quality=90, method=6, alpha_quality=95)
 
-    with open(os.path.join(ROOT, "src", "components", "trophyFrames.json"), "w") as f:
-        json.dump(
-            dict(sheet="trophy/turn.webp", frames=n, cols=cols, frameWidth=fw, frameHeight=fh, fps=take["fps"]),
-            f,
-            indent=2,
+    film = dict(sheet="trophy/turn.webp", frames=n, cols=cols, frameWidth=fw, frameHeight=fh, fps=take["fps"])
+    box = take.get("nameBox")
+    if box:
+        # The blank name line on the plaque at frame 0, as fractions of a frame.
+        film["nameBox"] = dict(
+            x=round((box["x"] - l) / fw, 4),
+            y=round((box["y"] - t) / fh, 4),
+            w=round(box["w"] / fw, 4),
+            h=round(box["h"] / fh, 4),
         )
+    with open(os.path.join(ROOT, "src", "components", "trophyFrames.json"), "w") as f:
+        json.dump(film, f, indent=2)
         f.write("\n")
     print(
         f"packed {n} frames of {fw}x{fh} ({cols}x{rows}): turn.webp {round(os.path.getsize(turn) / 1024)} KB,"

@@ -67,6 +67,11 @@ def parse_args():
     p.add_argument("--line1", default="THE SUNDAY SURVIVORS")
     p.add_argument("--line2", default="2026 CHAMPION")
     p.add_argument("--name", default="")
+    p.add_argument(
+        "--name-slot",
+        action="store_true",
+        help="lay the plaque out for a name but leave its line blank, for the page to engrave",
+    )
     p.add_argument("--only", default="", help="comma-separated frame numbers to render (for looking)")
     return p.parse_args(argv)
 
@@ -374,6 +379,10 @@ def build_text(body, font_path, size, spacing, mat, extrude):
     return ob
 
 
+# Corners of the plaque's blank name line, in the world at frame 0 (--name-slot).
+SLOT = []
+
+
 def build(args, pivot):
     m_gold = gold("gold", 0.14)
     m_plaque = gold("plaque gold", 0.3, vary=False)
@@ -381,7 +390,7 @@ def build(args, pivot):
     m_enamel = enamel()
 
     # plinth: a plinth step, a tall block that carries the plaque, a cap
-    lines = [args.line1, args.line2] + ([args.name] if args.name else [])
+    lines = [args.line1, args.line2] + ([args.name or ""] if args.name or args.name_slot else [])
     parts = [
         box("plinth step", 1.46, 1.46, 0.14, 0.0, 0.02, m_marble),
         box("plinth block", 1.26, 1.26, 0.66, 0.14, 0.015, m_marble),
@@ -431,6 +440,13 @@ def build(args, pivot):
         zs.append(z)
     mid = (zs[0] + zs[-1]) / 2
     for i, line in enumerate(lines):
+        if not line:
+            # The blank line the page engraves: where it is, for take.json.
+            half_w = (pw - 0.14) / 2
+            half_h = sizes[i] * 0.62
+            zc = pz + (zs[i] - mid) - 0.01
+            SLOT.extend([(x, front - 0.001, z) for x in (-half_w, half_w) for z in (zc - half_h, zc + half_h)])
+            continue
         t = build_text(line, fonts[i], sizes[i], spacings[i], m_enamel, 0.0025)
         t.rotation_euler = (math.radians(90), 0, 0)
         t.location = (0, front - 0.0005, pz + (zs[i] - mid) - 0.01)
@@ -596,6 +612,20 @@ def main():
     camera(scene)
     setup_render(scene, args)
 
+    # Where the blank name line falls in the picture at frame 0, in pixels.
+    name_box = None
+    if SLOT:
+        from bpy_extras.object_utils import world_to_camera_view
+        from mathutils import Vector
+
+        pivot.rotation_euler = (0, 0, 0)
+        bpy.context.view_layer.update()
+        rx, ry = scene.render.resolution_x, scene.render.resolution_y
+        pts = [world_to_camera_view(scene, scene.camera, Vector(c)) for c in SLOT]
+        xs = [p.x * rx for p in pts]
+        ys = [(1 - p.y) * ry for p in pts]
+        name_box = dict(x=min(xs), y=min(ys), w=max(xs) - min(xs), h=max(ys) - min(ys))
+
     frames = range(args.frames)
     if args.only:
         frames = [int(x) for x in args.only.split(",")]
@@ -612,6 +642,7 @@ def main():
             height=scene.render.resolution_y,
             fps=args.fps,
             lines=[args.line1, args.line2] + ([args.name] if args.name else []),
+            nameBox=name_box,
         ),
         open(os.path.join(args.out, "take.json"), "w"),
         indent=2,

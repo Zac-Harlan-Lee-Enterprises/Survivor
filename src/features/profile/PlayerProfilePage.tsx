@@ -17,7 +17,7 @@ import { cn } from '@/lib/cn'
 /** A sports-card style profile: the person, their status, and their record. */
 export function PlayerProfilePage() {
   const { playerId = '' } = useParams()
-  const { evaluation, profileOf, snapshot, viewer } = useLeagueContext()
+  const { evaluation, league, profileOf, snapshot, viewer } = useLeagueContext()
   const standing = evaluation.standings.find((s) => s.playerId === playerId)
   const isChamp = standing?.status === 'champion' || standing?.status === 'co-champion'
   const celebrate = useConfetti(isChamp && standing ? [standing] : [])
@@ -42,6 +42,7 @@ export function PlayerProfilePage() {
     standing,
     evaluation.standings,
     evaluation.decidedWeek,
+    league.name,
   )
   const streak = streakLine(standing.streak)
 

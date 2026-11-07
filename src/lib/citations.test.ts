@@ -37,20 +37,53 @@ function season() {
 }
 
 describe('autoCitation', () => {
-  it('tells the champion’s season from the record, every line of it true', () => {
+  it('proclaims the champion’s season from the record, every claim in it true', () => {
     const { evaluation, ann } = season()
+    const text = autoCitation('Ann Example', ann, evaluation.standings, 'The Sunday Survivors')
+    for (const claim of [
+      'Ann Example is the champion of The Sunday Survivors.',
+      'Ann outlasted three of us and left every single one of them standing in the rain.',
+      'The graveyard holds three headstones, and Ann walked past every one of them',
+      'Two wins in three weeks, finishing on one of two lives',
+      'The road to glory ran through the Packers, the Buccaneers and the 49ers: three franchises',
+      'The closest call was week 1: the Packers at home, 31–30. One point.',
+      'In week 1 Ann took the Packers when not one other person in the league would touch them. The Packers won.',
+      'In week 1, three of us stampeded onto the Bears and lost a life together',
+      'Ann was over on the Packers, not even looking.',
+      'The Buccaneers in week 2 took a life.',
+    ])
+      expect(text).toContain(claim)
+    expect(text.startsWith('Hear ye, hear ye.')).toBe(true)
+    expect(
+      text.endsWith('All hail Ann: Last One Standing, Breaker of Spirits, First of Their Name.'),
+    ).toBe(true)
+  })
+
+  it('names the commissioner among the beaten when the commissioner played', () => {
+    const { evaluation, ann } = season()
+    const standings = evaluation.standings.map((s) =>
+      s.playerId === 'bob'
+        ? { ...s, membership: { ...s.membership, role: 'commissioner' as const } }
+        : s,
+    )
+    expect(autoCitation('Ann Example', ann, standings)).toContain(
+      'Ann outlasted three of us, the commissioner among them, and left',
+    )
+  })
+
+  it('never claims a close call or a lone stand the record does not hold', () => {
+    const snap = scenario()
+      .players('ann', 'bob')
+      .game(1, 'KC', 'MIA', { final: 'KC', score: [30, 10] })
+      .game(1, 'LAR', 'SEA', { final: 'SEA', score: [10, 30] })
+      .pick('ann', 1, 'KC')
+      .pick('bob', 1, 'LAR')
+      .build()
+    const evaluation = evaluateSeason(snap, { now: kickoffFor(1, 48) })
+    const ann = findStanding(evaluation, 'ann')!
     const text = autoCitation('Ann Example', ann, evaluation.standings)
-    expect(text).toContain('Ann Example outlasted three of us. Every single one.')
-    expect(text).toContain('Two wins in three weeks, and finished with one of two lives.')
-    expect(text).toContain('The closest call was week 1: the Packers at home, 31–30. One point.')
-    expect(text).toContain(
-      'In week 1 Ann was the only one of us on the Packers, and the Packers won.',
-    )
-    expect(text).toContain(
-      'In week 1, three of us lost a life on the Bears; Ann was over on the Packers, not looking.',
-    )
-    expect(text).toContain('The scars: Buccaneers in week 2. Ann kept walking.')
-    expect(text.endsWith('Long live Ann.')).toBe(true)
+    expect(text).not.toContain('closest call')
+    expect(text).not.toContain('not one other person')
   })
 })
 
@@ -75,7 +108,7 @@ describe('citationFor', () => {
     const { evaluation, ann } = season()
     CITATIONS['ann'] = { recap: 'All hail Ann.', writtenAfterWeek: 2 }
     expect(citationFor('ann', 'Ann Example', ann, evaluation.standings, 3)).toContain(
-      'Long live Ann.',
+      'All hail Ann',
     )
   })
 })

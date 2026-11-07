@@ -37,7 +37,7 @@ test.describe('the champion', () => {
     await page.goto('./')
     const banner = page.getByRole('figure', { name: new RegExp(`2026 champion: ${name}`, 'i') })
     await expect(banner).toBeVisible()
-    await expect(page.getByText(new RegExp(`${name} outlasted .* of us`))).toBeVisible()
+    await expect(page.getByText(new RegExp(`${name} is the champion of`))).toBeVisible()
     await page.getByRole('main').getByRole('link', { name: 'Hall of Champions' }).click()
     await expect(page).toHaveURL(/#\/champions/)
     await expect(page.getByRole('figure', { name: new RegExp(name, 'i') })).toBeVisible()

@@ -86,6 +86,7 @@ export function LeagueHome() {
       c,
       evaluation.standings,
       evaluation.decidedWeek,
+      league.name,
     )
     return text ? [{ playerId: c.playerId, text }] : []
   })

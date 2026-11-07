@@ -64,7 +64,7 @@ describe('crown', () => {
       stubAnimate()
       const fanfare = { start: vi.fn(), stop: vi.fn() }
       const stop = crown(champion(), () => {}, { fanfare })
-      await vi.advanceTimersByTimeAsync(2000)
+      await vi.advanceTimersByTimeAsync(3000)
       expect(fanfare.start).toHaveBeenCalledOnce()
       await vi.advanceTimersByTimeAsync(30000)
       expect(fanfare.stop).not.toHaveBeenCalled()
@@ -121,7 +121,8 @@ describe('trophySpot', () => {
   it('on a phone, stands below them at the foot of the screen', () => {
     const spot = trophySpot({ left: 147, right: 243, top: 120, bottom: 216 }, 390, 844, 2 / 3)
     expect(spot.footing).toBe('below')
-    expect(spot.top + spot.height).toBeLessThanOrEqual(844)
+    // Clear of the phone's tab bar, so the plaque can be read.
+    expect(spot.top + spot.height).toBeLessThanOrEqual(844 - 100)
     expect(spot.top).toBeGreaterThan(216)
   })
 

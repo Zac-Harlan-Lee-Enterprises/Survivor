@@ -1,9 +1,9 @@
 import { Link } from 'react-router'
 import { useLeagueContext } from '@/app/hooks'
 import { ChampionBanner } from '@/components/ChampionBanner'
+import { Trophy } from '@/components/Trophy'
 import { useCurrentBanner } from '@/app/useCurrentBanner'
 import { banners } from '@/lib/champions'
-import { getConfig } from '@/config/env'
 
 /**
  * The Hall of Champions: the trophy, and every season's banner hung in a row
@@ -13,7 +13,6 @@ export function HallOfChampions() {
   const { league, snapshot } = useLeagueContext()
   const current = useCurrentBanner()
   const hung = banners(current)
-  const { basePath } = getConfig()
   return (
     <div className="space-y-10">
       <header className="text-center">
@@ -24,14 +23,7 @@ export function HallOfChampions() {
         </p>
       </header>
 
-      <img
-        src={`${basePath}trophy/still.webp`}
-        alt="The league trophy: a gold cup with two handles on a dark base"
-        width={400}
-        height={600}
-        className="mx-auto h-56 w-auto drop-shadow-[0_0_40px_rgba(251,191,36,0.25)] md:h-72"
-        onError={(e) => (e.currentTarget.style.display = 'none')}
-      />
+      <Trophy name={hung[0]?.winners.map((w) => w.name).join(' & ')} />
 
       {hung.length ? (
         <ul className="flex flex-wrap items-start justify-center gap-x-10 gap-y-12 pt-4">
