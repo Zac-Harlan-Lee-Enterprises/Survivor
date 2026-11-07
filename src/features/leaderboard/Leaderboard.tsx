@@ -22,7 +22,7 @@ export function Leaderboard() {
   const graveyard = evaluation.standings.filter((s) => s.status === 'eliminated')
   const inactive = evaluation.standings.filter((s) => s.status === 'inactive')
   const hidden = new Set(snapshot.hiddenPicks.map((h) => `${h.playerId}:${h.week}`))
-  useConfetti(champions.length > 0)
+  const celebrate = useConfetti(champions.length > 0)
 
   return (
     <div className="space-y-10">
@@ -35,6 +35,7 @@ export function Leaderboard() {
 
       {champions.length > 0 && (
         <section
+          ref={celebrate}
           className="card border-gold-400/60 p-6 [--glow:rgba(251,191,36,0.5)] shadow-glow"
           aria-labelledby="lb-champ"
         >
