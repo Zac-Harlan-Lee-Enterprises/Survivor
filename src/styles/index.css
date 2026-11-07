@@ -692,6 +692,107 @@
     filter: blur(2px);
   }
 
+  /* The crowning (crowning.ts): the page goes dark round the last one
+     standing, light comes down onto them, gold leaf falls. Movement is
+     scripted there; these are the stage. Above the header, like Death. */
+  .crowning {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  /* A warm dark with the winner left in a pool of light. */
+  .crowning-dark {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background: radial-gradient(
+      circle at var(--cx) var(--cy),
+      transparent calc(var(--r) * 0.8),
+      rgba(20, 12, 2, 0.55) calc(var(--r) * 1.25),
+      rgba(8, 5, 1, 0.86) calc(var(--r) * 2.4)
+    );
+  }
+  /* The shaft of light, wider where it lands. The shape is cut on the inside
+     and blurred on the outside, so its edges are soft; it fades out before
+     its foot, where a glow takes over. */
+  .crowning-beam {
+    position: absolute;
+    top: 0;
+    opacity: 0;
+    transform-origin: top center;
+    filter: blur(18px);
+    mix-blend-mode: screen;
+  }
+  .crowning-beam::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(40% 0, 60% 0, 96% 100%, 4% 100%);
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 228, 160, 0) 0,
+      rgba(255, 222, 145, 0.13) 45%,
+      rgba(255, 214, 120, 0.2) 80%,
+      rgba(255, 214, 120, 0) 100%
+    );
+  }
+  .crowning-beam::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -18%;
+    height: 42%;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 50%,
+      rgba(255, 214, 130, 0.3),
+      transparent 70%
+    );
+  }
+  .crowning-leaf {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .crowning-ring {
+    position: absolute;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7));
+  }
+  .crowning-ring svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  /* A spark that runs once round the ring once it is drawn. */
+  .crowning-glint {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  .crowning-glint::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 1.5%;
+    width: 14px;
+    height: 14px;
+    margin-left: -7px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, #fff 0, rgba(255, 244, 200, 0.9) 30%, transparent 70%);
+    box-shadow: 0 0 18px 6px rgba(255, 230, 150, 0.55);
+  }
+  /* What the crowning leaves behind: the winner ringed in gold. */
+  [data-crowned] {
+    box-shadow:
+      0 0 0 3px rgba(251, 191, 36, 0.95),
+      0 0 0 7px rgba(251, 191, 36, 0.18),
+      0 0 36px 8px rgba(251, 191, 36, 0.35);
+    transition: box-shadow 1.2s ease-out;
+  }
+
   /* The crow. */
   .funeral-crow {
     position: absolute;

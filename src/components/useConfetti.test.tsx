@@ -77,21 +77,21 @@ describe('useConfetti', () => {
     const screen = stubObserver()
     render(<Party active />)
     screen.show()
-    await waitFor(() => expect(confetti).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(confetti).toHaveBeenCalledTimes(3))
     screen.show()
     await settle()
-    expect(confetti).toHaveBeenCalledTimes(2)
+    expect(confetti).toHaveBeenCalledTimes(3)
   })
 
   it('fires again on the next page load', async () => {
     const screen = stubObserver()
     const first = render(<Party active />)
     screen.show()
-    await waitFor(() => expect(confetti).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(confetti).toHaveBeenCalledTimes(3))
     first.unmount()
     render(<Party active />)
     screen.show()
-    await waitFor(() => expect(confetti).toHaveBeenCalledTimes(4))
+    await waitFor(() => expect(confetti).toHaveBeenCalledTimes(6))
   })
 
   it('stays still with no winner, or when the viewer prefers reduced motion', async () => {
