@@ -24,7 +24,7 @@ export function PlayerDashboard() {
   const me = evaluation.standings.find((s) => s.playerId === playerId)
   const profile = profileOf(playerId)
   const week = weekSummary(evaluation, evaluation.currentWeek)
-  useConfetti(me?.status === 'champion' || me?.status === 'co-champion')
+  const celebrate = useConfetti(me?.status === 'champion' || me?.status === 'co-champion')
 
   if (!me) {
     return (
@@ -59,6 +59,7 @@ export function PlayerDashboard() {
   return (
     <div className="space-y-8">
       <section
+        ref={celebrate}
         className={cn(
           'card flex flex-col items-center gap-5 p-6 text-center md:flex-row md:text-left',
           me.status === 'eliminated' && 'graveyard',

@@ -19,7 +19,7 @@ export function PlayerProfilePage() {
   const { evaluation, profileOf, snapshot, viewer } = useLeagueContext()
   const standing = evaluation.standings.find((s) => s.playerId === playerId)
   const isChamp = standing?.status === 'champion' || standing?.status === 'co-champion'
-  useConfetti(!!isChamp)
+  const celebrate = useConfetti(!!isChamp)
   if (!standing) return <NotFound />
   const profile = profileOf(playerId)
   const hidden = snapshot.hiddenPicks.some(
@@ -39,6 +39,7 @@ export function PlayerProfilePage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <section
+        ref={celebrate}
         className={cn(
           'card relative overflow-hidden p-6 md:p-8',
           standing.status === 'eliminated' && 'graveyard',

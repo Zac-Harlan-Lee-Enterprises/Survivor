@@ -73,7 +73,7 @@ export function LeagueHome() {
   const pickVisible = (s: PlayerStanding) =>
     !hiddenSet.has(`${s.playerId}:${evaluation.currentWeek}`)
 
-  useConfetti(champions.length > 0)
+  const celebrate = useConfetti(champions.length > 0)
 
   return (
     <div className="space-y-10">
@@ -145,6 +145,7 @@ export function LeagueHome() {
 
       {champions.length > 0 && (
         <section
+          ref={celebrate}
           className="card border-gold-400/60 p-6 text-center [--glow:rgba(251,191,36,0.5)] shadow-glow md:p-10"
           aria-labelledby="champ-title"
         >
