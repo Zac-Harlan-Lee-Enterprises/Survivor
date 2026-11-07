@@ -125,6 +125,7 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | `scripts/generate-demo-fixtures.ts` | Seeds the league: real roster, week 1 picks, real cached schedule, no results. `npm run fixtures:generate`. |
 | `scripts/fetch-nfl-schedule.mjs` | Caches the real NFL schedule from ESPN. `npm run schedule:fetch`. |
 | `scripts/import-headshots.mjs` | Turns `photos/` into cropped headshot variants. `npm run headshots:import`. |
+| `src/components/crowning.ts` | The champion's celebration, played by `useConfetti` once the winner is on screen: light, a gold ring, gold leaf and a gold-and-ivory confetti finale, to a looping fanfare (`music.ts`) with a sound switch. |
 | `scripts/art/death_scene.py` | Renders Death (`src/components/DeathArrives.tsx`) in Blender with BibleGame's figure engine: casting `death_cast.py`, suit and cane `death_dress.py`, the walk-stop-turn take `death_motion.py`; `death_film.py` packs the frames into `public/death/` and `src/components/deathFrames.json`. |
 | `src/domain/nfl/espn.ts` | Pure ESPN scoreboard parser, shared by browser and Lambda. |
 | `src/data/nfl/espnClient.ts` | Browser fetch for live scores (one of two network modules). |
@@ -222,6 +223,7 @@ See [SECURITY.md](SECURITY.md).
 - [docs/aws-connected-mode.md](docs/aws-connected-mode.md) — SAM deploy, Cognito, seeding, verification.
 - [docs/nfl-provider.md](docs/nfl-provider.md) — providers, sync, manual fallback.
 - [docs/images.md](docs/images.md) — headshot pipeline and validation.
+- [docs/music.md](docs/music.md) — the champion's fanfare: source, licence, cut, and the sound switch.
 - [docs/data-model.md](docs/data-model.md) — entities and DynamoDB keys.
 - [docs/import-report.md](docs/import-report.md) — spreadsheet migration and what the screenshot did (not) provide.
 - [infra/README.md](infra/README.md) — infrastructure operations.

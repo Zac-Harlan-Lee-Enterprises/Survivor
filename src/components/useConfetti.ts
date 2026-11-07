@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type confettiLib from 'canvas-confetti'
 import { crown } from './crowning'
+import { cue } from './music'
+import { getConfig } from '@/config/env'
 
 // Loaded on first use and shared, so every page reuses one copy of the library.
 let library: Promise<{ default: typeof confettiLib }> | undefined
@@ -66,7 +68,10 @@ export function useConfetti(active: boolean) {
     const begin = () => {
       if (cancelled || fired.current) return
       fired.current = true
-      stop = crown(target, () => burst(target, () => cancelled))
+      const { basePath } = getConfig()
+      stop = crown(target, () => burst(target, () => cancelled), {
+        fanfare: cue(`${basePath}audio/crowning.m4a`, { volume: 0.6, fadeIn: 300, loop: true }),
+      })
     }
 
     if (typeof IntersectionObserver === 'undefined') {

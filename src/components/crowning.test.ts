@@ -59,6 +59,18 @@ describe('crown', () => {
       expect(document.querySelectorAll('.crowning-ring')).toHaveLength(2)
     })
 
+    it('the fanfare comes in with the light and plays on after the scene; leaving the page stops it', async () => {
+      vi.useFakeTimers()
+      stubAnimate()
+      const fanfare = { start: vi.fn(), stop: vi.fn() }
+      const stop = crown(champion(), () => {}, { fanfare })
+      expect(fanfare.start).toHaveBeenCalledOnce()
+      await vi.advanceTimersByTimeAsync(30000)
+      expect(fanfare.stop).not.toHaveBeenCalled()
+      stop()
+      expect(fanfare.stop).toHaveBeenCalled()
+    })
+
     it('leaving the page mid-scene clears the stage and skips the finale', () => {
       vi.useFakeTimers()
       stubAnimate()

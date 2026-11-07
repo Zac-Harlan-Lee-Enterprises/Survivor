@@ -11,7 +11,12 @@
  * Plain DOM and the Web Animations API, laid over the page and pointed at the
  * winner's headshots wherever they are on screen. Without `Element.animate`
  * (old browsers, tests) it skips straight to the finale and the ring.
+ *
+ * A fanfare (music.ts) comes in with the light and plays on, looping, after
+ * the scene is over, until the page is left or it is silenced.
  */
+
+import type { Cue } from './music'
 
 const DIM = 1000
 const BEAM = 1400
@@ -41,7 +46,11 @@ type Flake = {
 type Mote = { x: number; y: number; r: number; rise: number; twinkle: number }
 
 /** Plays the crowning over `section`; `finale` fires as the lights come up. Returns a cancel. */
-export function crown(section: Element, finale: () => void): () => void {
+export function crown(
+  section: Element,
+  finale: () => void,
+  { fanfare }: { fanfare?: Cue } = {},
+): () => void {
   const doc = section.ownerDocument
   const faces = [...section.querySelectorAll<HTMLElement>('img.rounded-full')]
   const marks = faces.length ? faces : [section as HTMLElement]
@@ -231,6 +240,7 @@ export function crown(section: Element, finale: () => void): () => void {
   }
   win.addEventListener('resize', size)
   frame = win.requestAnimationFrame(tick)
+  fanfare?.start()
 
   // The light: the room goes down, the shaft comes on, the rings are drawn.
   play(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: DIM, easing: 'ease-in-out' })
@@ -284,8 +294,10 @@ export function crown(section: Element, finale: () => void): () => void {
     running.forEach((a) => a.cancel())
     root.remove()
   }
+  // Over, the stage is cleared but the fanfare plays on; leaving stops it.
   return () => {
     if (!cancelled) cleanup()
+    fanfare?.stop(1200)
   }
 }
 
