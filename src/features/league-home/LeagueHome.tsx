@@ -27,6 +27,9 @@ import { TeamMonogram } from '@/components/TeamMonogram'
 import { Countdown } from '@/components/Countdown'
 import { Button } from '@/components/ui/button'
 import { useConfetti } from '@/components/useConfetti'
+import { ChampionBanner } from '@/components/ChampionBanner'
+import { useCurrentBanner } from '@/app/useCurrentBanner'
+import { citationFor } from '@/lib/citations'
 import { formatKickoff } from '@/lib/time'
 import { getConfig } from '@/config/env'
 import { cn } from '@/lib/cn'
@@ -73,10 +76,45 @@ export function LeagueHome() {
   const pickVisible = (s: PlayerStanding) =>
     !hiddenSet.has(`${s.playerId}:${evaluation.currentWeek}`)
 
-  const celebrate = useConfetti(champions.length > 0)
+  // (Once the banner has unrolled: see .rafter-unroll in index.css.)
+  const celebrate = useConfetti(champions, { after: 1900 })
+  const banner = useCurrentBanner()
+  const citations = champions.flatMap((c) => {
+    const text = citationFor(
+      c.playerId,
+      profileOf(c.playerId).displayName,
+      c,
+      evaluation.standings,
+      evaluation.decidedWeek,
+    )
+    return text ? [{ playerId: c.playerId, text }] : []
+  })
 
   return (
     <div className="space-y-10">
+      {banner && (
+        <section className="pt-2 text-center" aria-labelledby="champ-title">
+          <h2 id="champ-title" className="sr-only">
+            {banner.winners.length > 1 ? 'Co-champions' : 'Champion'}
+          </h2>
+          <ChampionBanner ref={celebrate} banner={banner} league={league.name} unroll />
+          {citations.map((c) => (
+            <p
+              key={c.playerId}
+              className="mx-auto mt-8 max-w-3xl text-left text-base leading-relaxed text-ink-100 md:text-lg"
+            >
+              {c.text}
+            </p>
+          ))}
+          <Link
+            to="/champions"
+            className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-gold-300 underline-offset-4 hover:underline"
+          >
+            <Crown className="h-4 w-4" aria-hidden="true" /> Hall of Champions
+          </Link>
+        </section>
+      )}
+
       {/* Scoreboard hero */}
       <section className="scoreboard card overflow-hidden p-6 md:p-8" aria-labelledby="hero-title">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
@@ -142,46 +180,6 @@ export function LeagueHome() {
       </section>
 
       <LeagueMessage week={evaluation.currentWeek} />
-
-      {champions.length > 0 && (
-        <section
-          ref={celebrate}
-          className="card border-gold-400/60 p-6 text-center [--glow:rgba(251,191,36,0.5)] shadow-glow md:p-10"
-          aria-labelledby="champ-title"
-        >
-          <p className="eyebrow text-gold-300">
-            {champions.length > 1 ? 'Co-champions' : 'Champion'}
-          </p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-6">
-            {champions.map((c) => {
-              const p = profileOf(c.playerId)
-              return (
-                <Link
-                  key={c.playerId}
-                  to={`/players/${encodeURIComponent(c.playerId)}`}
-                  className="flex flex-col items-center gap-3 focus-visible:ring-2 focus-visible:ring-sky-400"
-                >
-                  <Headshot
-                    name={p.displayName}
-                    playerId={p.playerId}
-                    size="hero"
-                    status={c.status}
-                  />
-                  <span className="font-display text-3xl font-extrabold uppercase text-ink-50">
-                    {p.displayName}
-                  </span>
-                </Link>
-              )
-            })}
-          </div>
-          <h2
-            id="champ-title"
-            className="mt-4 flex items-center justify-center gap-2 text-2xl text-gold-300"
-          >
-            <Crown className="h-6 w-6" aria-hidden="true" /> Last one standing
-          </h2>
-        </section>
-      )}
 
       {finalists.length > 0 && (
         <section className="card border-gold-400/40 p-6" aria-labelledby="final-title">

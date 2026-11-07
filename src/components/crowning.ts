@@ -5,15 +5,19 @@
  * A shaft of light comes down onto them, dust turning slowly in it. A gold
  * ring draws itself round each winner's headshot and a glint runs once round
  * it. Gold leaf drifts down, turning over and catching the light as it falls.
- * Then the lights come up, the confetti goes off (the finale), and the ring
- * stays.
+ * While it does, the logo of every team they picked comes in, week by week,
+ * and settles into a laurel round them: two branches climbing from the
+ * bottom, the first weeks at the stem and the last at the tips, the lost
+ * weeks in grey. Then the lights come up, the confetti goes off (the
+ * finale), and the ring stays.
  *
  * Plain DOM and the Web Animations API, laid over the page and pointed at the
  * winner's headshots wherever they are on screen. Without `Element.animate`
  * (old browsers, tests) it skips straight to the finale and the ring.
  *
- * A fanfare (music.ts) comes in with the light and plays on, looping, after
- * the scene is over, until the page is left or it is silenced.
+ * A fanfare (music.ts) comes in with the light, timed so its swell meets the
+ * confetti, and plays on, looping, after the scene is over, until the page
+ * is left or it is silenced.
  */
 
 import type { Cue } from './music'
@@ -21,7 +25,16 @@ import type { Cue } from './music'
 const DIM = 1000
 const BEAM = 1400
 const RING = 1500
-const HOLD = 4400
+const HOLD = 6000
+/** The wreath: when the first logo sets off, the gap between them, and each one's flight. */
+const WREATH_AT = DIM + 600
+const WREATH_STEP = 140
+const WREATH_FLIGHT = 1100
+/** The trophy: when it starts to rise, and how long it takes. */
+const TROPHY_AT = DIM + 1700
+const TROPHY_RISE = 1900
+/** How far into the fanfare its swell comes (ms): it is started so the swell meets the confetti. */
+const SWELL = 5400
 const LIFT = 1600
 const LEAF_FOR = 3200
 
@@ -45,11 +58,36 @@ type Flake = {
 
 type Mote = { x: number; y: number; r: number; rise: number; twinkle: number }
 
+/** One week's pick in a winner's wreath: the team's logo, and whether it won. */
+export interface Laurel {
+  src: string
+  won: boolean
+}
+
+/** The trophy's turn, rendered by scripts/art/trophy_scene.py: one sheet of frames. */
+export interface TrophyFilm {
+  sheet: string
+  frames: number
+  cols: number
+  frameWidth: number
+  frameHeight: number
+  fps: number
+}
+
+export interface Staging {
+  /** Music from the moment the light comes down. */
+  fanfare?: Cue
+  /** Each winner's picks in week order, in the same order as their headshots. */
+  wreaths?: Laurel[][]
+  /** The trophy that rises into the light, turning: its film and where its sheet is. */
+  trophy?: { film: TrophyFilm; src: string }
+}
+
 /** Plays the crowning over `section`; `finale` fires as the lights come up. Returns a cancel. */
 export function crown(
   section: Element,
   finale: () => void,
-  { fanfare }: { fanfare?: Cue } = {},
+  { fanfare, wreaths = [], trophy }: Staging = {},
 ): () => void {
   const doc = section.ownerDocument
   const faces = [...section.querySelectorAll<HTMLElement>('img.rounded-full')]
@@ -83,6 +121,12 @@ export function crown(
   root.append(dark, beam, canvas)
   const rings = marks.map(() => ring(doc))
   rings.forEach((r) => root.append(r.el))
+  // (Only when there is a wreath for every face: never one on the wrong person.)
+  const laurels = faces.length && wreaths.length === faces.length ? wreaths : []
+  const wreathed = laurels.map((w) => w.map((l) => laurel(doc, l)))
+  wreathed.forEach((w) => w.forEach((l) => root.append(l.el)))
+  const cup = trophy ? stand(doc, trophy) : null
+  if (cup) root.append(cup.el)
   doc.body.append(root)
 
   // Where the winners are, read every frame so a scroll never loses them.
@@ -108,7 +152,18 @@ export function crown(
       r.style.top = `${b.top - pad}px`
       r.style.width = `${b.width + pad * 2}px`
       r.style.height = `${b.height + pad * 2}px`
+      const leaves = wreathed[i]
+      if (!leaves?.length) return
+      const spots = wreathSpots(leaves.length, b.width / 2 + pad)
+      leaves.forEach((l, k) => {
+        const spot = spots[k]!
+        l.el.style.left = `${b.left + b.width / 2 + spot.x - spot.size / 2}px`
+        l.el.style.top = `${b.top + b.height / 2 + spot.y - spot.size / 2}px`
+        l.el.style.width = l.el.style.height = `${spot.size}px`
+        l.el.style.padding = `${spot.size * 0.14}px`
+      })
     })
+    if (cup) cup.place({ left, right, top, bottom }, win.innerWidth, win.innerHeight)
     return { cx, cy, radius, top }
   }
 
@@ -233,6 +288,7 @@ export function crown(
         }
         ctx.restore()
       }
+      cup?.draw(t - TROPHY_AT)
       if (t > lightsUp + LIFT && falling === 0) return finish()
       if (t > lightsUp + LIFT * 3) return finish()
     }
@@ -240,7 +296,7 @@ export function crown(
   }
   win.addEventListener('resize', size)
   frame = win.requestAnimationFrame(tick)
-  fanfare?.start()
+  const music = win.setTimeout(() => fanfare?.start(), Math.max(0, DIM + HOLD - SWELL))
 
   // The light: the room goes down, the shaft comes on, the rings are drawn.
   play(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: DIM, easing: 'ease-in-out' })
@@ -270,6 +326,44 @@ export function crown(
     )
   })
 
+  // The wreath: each week's logo comes in from further out, one after the
+  // other, and settles in its place on the laurel.
+  wreathed.forEach((leaves, i) => {
+    const spots = wreathSpots(leaves.length, 100)
+    leaves.forEach((l, k) => {
+      const away = Math.atan2(spots[k]!.y, spots[k]!.x) + rand(-0.5, 0.5)
+      const far = rand(70, 130)
+      play(
+        l.el,
+        [
+          {
+            opacity: 0,
+            transform: `translate(${Math.cos(away) * far}px, ${Math.sin(away) * far}px) scale(0.5) rotate(${rand(-40, 40)}deg)`,
+          },
+          { opacity: 1, offset: 0.35 },
+          { opacity: 1, transform: 'translate(0, 0) scale(1) rotate(0deg)' },
+        ],
+        {
+          duration: WREATH_FLIGHT,
+          delay: WREATH_AT + i * 200 + k * WREATH_STEP,
+          easing: 'cubic-bezier(0.2, 0.8, 0.25, 1)',
+        },
+      )
+    })
+  })
+
+  // The trophy comes up out of the dark into the light, turning.
+  if (cup)
+    play(
+      cup.el,
+      [
+        { opacity: 0, transform: 'translateY(45%) scale(0.92)' },
+        { opacity: 1, offset: 0.4 },
+        { opacity: 1, transform: 'translateY(0) scale(1)' },
+      ],
+      { duration: TROPHY_RISE, delay: TROPHY_AT, easing: 'cubic-bezier(0.2, 0.75, 0.25, 1)' },
+    )
+
   // Lights up: the finale, and the ring passed to the headshot for good.
   const lift = win.setTimeout(() => {
     if (cancelled) return
@@ -278,6 +372,8 @@ export function crown(
     play(dark, [{ opacity: 1 }, { opacity: 0 }], out)
     play(beam, [{ opacity: 1 }, { opacity: 0 }], out)
     rings.forEach((r) => play(r.el, [{ opacity: 1 }, { opacity: 0 }], out))
+    wreathed.flat().forEach((l) => play(l.el, [{ opacity: 1 }, { opacity: 0 }], out))
+    if (cup) play(cup.el, [{ opacity: 1 }, { opacity: 0 }], out)
     settle()
     finale()
   }, DIM + HOLD)
@@ -297,6 +393,7 @@ export function crown(
   // Over, the stage is cleared but the fanfare plays on; leaving stops it.
   return () => {
     if (!cancelled) cleanup()
+    win.clearTimeout(music)
     fanfare?.stop(1200)
   }
 }
@@ -330,4 +427,130 @@ function ring(doc: Document) {
   glint.className = 'crowning-glint'
   el.append(svg, glint)
   return { el, stroke, glint, length }
+}
+
+/**
+ * Where each logo sits in a wreath of `n` round a headshot of radius `r`,
+ * relative to its centre: alternately on the left and right branch, climbing
+ * from the stem at the bottom to the tips near the top, a little smaller
+ * towards the tips, as leaves are.
+ */
+export function wreathSpots(n: number, r: number) {
+  const perSide = Math.max(1, Math.ceil(n / 2))
+  const BOTTOM = (30 * Math.PI) / 180 // the gap at the stem
+  const TOP = (34 * Math.PI) / 180 // the gap between the tips
+  const arc = Math.PI - BOTTOM - TOP
+  const radius0 = r + Math.min(Math.max(r * 0.34, 20), 38)
+  const room = (radius0 * arc) / perSide
+  const base = Math.min(Math.max(room * 0.86, 18), 40)
+  return Array.from({ length: n }, (_, k) => {
+    const side = k % 2 === 0 ? -1 : 1
+    const step = Math.floor(k / 2)
+    const along = perSide === 1 ? 0.5 : step / (perSide - 1)
+    // Angle from straight up, clockwise: the stem is at π.
+    const theta = Math.PI - BOTTOM / 2 - along * arc
+    const size = base * (1 - 0.22 * along)
+    const radius = radius0 + base * 0.5 - size * 0.5
+    return {
+      x: side * Math.sin(theta) * radius,
+      y: -Math.cos(theta) * radius,
+      size,
+    }
+  })
+}
+
+/** One logo in a wreath, on its own small gold-rimmed medallion; placed each frame. */
+function laurel(doc: Document, { src, won }: Laurel) {
+  const el = doc.createElement('div')
+  el.className = won ? 'crowning-laurel' : 'crowning-laurel crowning-laurel-lost'
+  const logo = doc.createElement('img')
+  logo.src = src
+  logo.alt = ''
+  logo.decoding = 'async'
+  el.append(logo)
+  el.style.opacity = '0'
+  return { el }
+}
+
+type Box = { left: number; right: number; top: number; bottom: number }
+
+type Footing = 'right' | 'left' | 'below'
+
+/**
+ * Where the trophy stands, for winners in `box` on a `vw` × `vh` screen: beside
+ * them, on whichever side has the room, standing a little below their
+ * eyeline; or, on a narrow screen, below them at the foot of the screen.
+ * `keep` holds it to the footing it was first given, so it never changes
+ * sides mid-scene, only follows a scroll.
+ */
+export function trophySpot(box: Box, vw: number, vh: number, aspect: number, keep?: Footing) {
+  const height = Math.min(Math.max(vh * 0.3, 150), 300)
+  const width = height * aspect
+  const gap = Math.max(width * 0.9, 130)
+  const roomRight = vw - box.right
+  const roomLeft = box.left
+  const fits = (room: number) => room >= width + gap + 16
+  const footing: Footing =
+    keep ??
+    (fits(Math.max(roomRight, roomLeft)) ? (roomRight >= roomLeft ? 'right' : 'left') : 'below')
+  if (footing !== 'below') {
+    const cx = footing === 'right' ? box.right + gap + width / 2 : box.left - gap - width / 2
+    const cy = (box.top + box.bottom) / 2
+    const top = Math.min(Math.max(cy - height * 0.45, 8), vh - height - 8)
+    return { footing, left: cx - width / 2, top, width, height }
+  }
+  const cx = (box.left + box.right) / 2
+  const top = Math.max(box.bottom + 24, vh - height - 12)
+  const left = Math.min(Math.max(cx - width / 2, 8), vw - width - 8)
+  return { footing, left, top, width, height }
+}
+
+/** The trophy on the stage: a glow behind, and a canvas its turn is drawn on. */
+function stand(doc: Document, { film, src }: { film: TrophyFilm; src: string }) {
+  const el = doc.createElement('div')
+  el.className = 'crowning-trophy'
+  el.style.opacity = '0'
+  const glow = doc.createElement('div')
+  glow.className = 'crowning-trophy-glow'
+  const canvas = doc.createElement('canvas')
+  canvas.width = film.frameWidth
+  canvas.height = film.frameHeight
+  el.append(glow, canvas)
+  const ctx = canvas.getContext('2d')
+  const sheet = new Image()
+  sheet.decoding = 'async'
+  sheet.src = src
+  let shown = -1
+  let footing: Footing | undefined
+  return {
+    el,
+    place(box: Box, vw: number, vh: number) {
+      const spot = trophySpot(box, vw, vh, film.frameWidth / film.frameHeight, footing)
+      footing = spot.footing
+      el.style.left = `${spot.left}px`
+      el.style.top = `${spot.top}px`
+      el.style.width = `${spot.width}px`
+      el.style.height = `${spot.height}px`
+    },
+    draw(ms: number) {
+      if (!ctx || ms < 0 || !sheet.complete || sheet.naturalWidth === 0) return
+      const k = Math.floor((ms / 1000) * film.fps) % film.frames
+      if (k === shown) return
+      shown = k
+      const sx = (k % film.cols) * film.frameWidth
+      const sy = Math.floor(k / film.cols) * film.frameHeight
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(
+        sheet,
+        sx,
+        sy,
+        film.frameWidth,
+        film.frameHeight,
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      )
+    },
+  }
 }

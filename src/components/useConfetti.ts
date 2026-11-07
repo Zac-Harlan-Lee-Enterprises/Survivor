@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import type confettiLib from 'canvas-confetti'
-import { crown } from './crowning'
+import type { PlayerStanding } from '@/domain'
+import { crown, type Laurel, type TrophyFilm } from './crowning'
+import TROPHY from './trophyFrames.json'
+import { fireworks, flashes } from './finale'
 import { cue } from './music'
 import { getConfig } from '@/config/env'
 
@@ -48,20 +51,45 @@ function burst(target: Element, cancelled: () => boolean) {
 }
 
 /**
- * Celebrates the winner: returns a ref for the element that shows them. The
- * first time that element is on screen, once per page load, it plays the
- * crowning (crowning.ts), ending in confetti. Viewers who prefer reduced
- * motion get neither.
+ * A winner's season as their wreath: every team they picked, in week order,
+ * the weeks that cost a life greyed. (A cancelled game's pick went back to
+ * the pool, so it is not in it. By the time anyone is crowned every week is
+ * settled; a pick still waiting on its game counts as standing.)
  */
-export function useConfetti(active: boolean) {
+export function wreathOf(s: PlayerStanding, basePath: string): Laurel[] {
+  return s.history
+    .filter((h) => h.pick && h.outcome !== 'void')
+    .map((h) => ({
+      src: `${basePath}team-logos/${h.pick!.teamId.toLowerCase()}.png`,
+      won: h.outcome !== 'loss' && h.outcome !== 'tie',
+    }))
+}
+
+/** After the confetti: the photographers, then the fireworks (finale.ts). */
+const FIREWORKS_AFTER = 1300
+
+/**
+ * Celebrates the winners: returns a ref for the element that shows them, in
+ * the order given. The first time that element is on screen, once per page
+ * load, it plays the crowning (crowning.ts) with each winner's season as a
+ * wreath, ending in confetti, camera flashes and fireworks — `after` ms
+ * once it is seen (the league home lets its banner unroll first). Viewers
+ * who prefer reduced motion get none of it.
+ */
+export function useConfetti(winners: readonly PlayerStanding[], { after = 0 } = {}) {
   const [target, setTarget] = useState<Element | null>(null)
   const fired = useRef(false)
+  const active = winners.length > 0
+  // (As a string, not the array: a re-render must not restart the scene.)
+  const wreaths = JSON.stringify(winners.map((w) => wreathOf(w, getConfig().basePath)))
 
   useEffect(() => {
     if (!active || !target || fired.current) return
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
     let cancelled = false
     let stop = () => {}
+    let wait: ReturnType<typeof setTimeout> | undefined
+    const encores: (() => void)[] = []
 
     // Marked only once it starts: StrictMode cancels the first run of every
     // effect in development, and the re-run must still be allowed to play.
@@ -69,16 +97,31 @@ export function useConfetti(active: boolean) {
       if (cancelled || fired.current) return
       fired.current = true
       const { basePath } = getConfig()
-      stop = crown(target, () => burst(target, () => cancelled), {
+      const doc = target.ownerDocument
+      const finale = () => {
+        burst(target, () => cancelled)
+        encores.push(flashes(doc))
+        const later = setTimeout(() => {
+          if (!cancelled) encores.push(fireworks(doc))
+        }, FIREWORKS_AFTER)
+        encores.push(() => clearTimeout(later))
+      }
+      const scene = crown(target, finale, {
         fanfare: cue(`${basePath}audio/crowning.m4a`, { volume: 0.6, fadeIn: 300, loop: true }),
+        wreaths: JSON.parse(wreaths) as Laurel[][],
+        trophy: { film: TROPHY as TrophyFilm, src: `${basePath}${TROPHY.sheet}` },
       })
+      stop = () => {
+        scene()
+        encores.splice(0).forEach((end) => end())
+      }
     }
 
     if (typeof IntersectionObserver === 'undefined') {
-      const soon = setTimeout(begin, 0)
+      wait = setTimeout(begin, after)
       return () => {
         cancelled = true
-        clearTimeout(soon)
+        clearTimeout(wait)
         stop()
       }
     }
@@ -86,7 +129,8 @@ export function useConfetti(active: boolean) {
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
           watch.disconnect()
-          begin()
+          if (after) wait = setTimeout(begin, after)
+          else begin()
         }
       },
       { threshold: 0.5 },
@@ -94,10 +138,11 @@ export function useConfetti(active: boolean) {
     watch.observe(target)
     return () => {
       cancelled = true
+      clearTimeout(wait)
       watch.disconnect()
       stop()
     }
-  }, [active, target])
+  }, [active, target, wreaths, after])
 
   return setTarget
 }

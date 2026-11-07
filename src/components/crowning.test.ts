@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { crown } from './crowning'
+import { crown, trophySpot, wreathSpots } from './crowning'
 
 function champion() {
   const section = document.createElement('section')
@@ -46,7 +46,7 @@ describe('crown', () => {
       expect(stage.querySelector('.crowning-beam')).not.toBeNull()
       expect(stage.querySelectorAll('.crowning-ring')).toHaveLength(1)
       expect(finale).not.toHaveBeenCalled()
-      vi.advanceTimersByTime(6000)
+      vi.advanceTimersByTime(8000)
       expect(finale).toHaveBeenCalledOnce()
       expect(section.querySelector('img')!.hasAttribute('data-crowned')).toBe(true)
     })
@@ -64,6 +64,7 @@ describe('crown', () => {
       stubAnimate()
       const fanfare = { start: vi.fn(), stop: vi.fn() }
       const stop = crown(champion(), () => {}, { fanfare })
+      await vi.advanceTimersByTimeAsync(2000)
       expect(fanfare.start).toHaveBeenCalledOnce()
       await vi.advanceTimersByTimeAsync(30000)
       expect(fanfare.stop).not.toHaveBeenCalled()
@@ -81,5 +82,50 @@ describe('crown', () => {
       expect(document.querySelector('.crowning')).toBeNull()
       expect(finale).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe('wreathSpots', () => {
+  it('climbs both sides from the stem, never crossing the top, smaller towards the tips', () => {
+    const spots = wreathSpots(9, 50)
+    expect(spots).toHaveLength(9)
+    // Alternating sides: week 1 on the left, week 2 on the right.
+    expect(spots[0]!.x).toBeLessThan(0)
+    expect(spots[1]!.x).toBeGreaterThan(0)
+    // Week 1 at the stem (low); the last weeks near the top.
+    expect(spots[0]!.y).toBeGreaterThan(40)
+    expect(spots[8]!.y).toBeLessThan(0)
+    expect(spots[8]!.size).toBeLessThan(spots[0]!.size)
+    // Nothing sits on the crown of the head: a gap between the tips.
+    for (const s of spots) expect(Math.abs(s.x)).toBeGreaterThan(10)
+  })
+})
+
+describe('trophySpot', () => {
+  const box = { left: 80, right: 200, top: 300, bottom: 420 }
+
+  it('stands beside the winner, on the side with the room', () => {
+    const spot = trophySpot(box, 1280, 800, 2 / 3)
+    expect(spot.footing).toBe('right')
+    expect(spot.left).toBeGreaterThan(box.right)
+    const mirrored = trophySpot(
+      { left: 1080, right: 1200, top: 300, bottom: 420 },
+      1280,
+      800,
+      2 / 3,
+    )
+    expect(mirrored.footing).toBe('left')
+    expect(mirrored.left + mirrored.width).toBeLessThan(1080)
+  })
+
+  it('on a phone, stands below them at the foot of the screen', () => {
+    const spot = trophySpot({ left: 147, right: 243, top: 120, bottom: 216 }, 390, 844, 2 / 3)
+    expect(spot.footing).toBe('below')
+    expect(spot.top + spot.height).toBeLessThanOrEqual(844)
+    expect(spot.top).toBeGreaterThan(216)
+  })
+
+  it('keeps the footing it was first given', () => {
+    expect(trophySpot(box, 390, 844, 2 / 3, 'right').footing).toBe('right')
   })
 })

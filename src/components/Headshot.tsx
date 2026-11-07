@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import type { SurvivorStatus } from '@/domain'
 import { useLeagueContext, useServices } from '@/app/hooks'
 import { cn } from '@/lib/cn'
@@ -43,8 +43,10 @@ export function Headshot({
   desaturate,
 }: HeadshotProps) {
   const { images } = useServices()
-  const { imageOf } = useLeagueContext()
+  const { imageOf, evaluation } = useLeagueContext()
   const [failed, setFailed] = useState(false)
+  // The champion wears the crown on every page, for the rest of the season.
+  const crowned = !!evaluation?.championIds.includes(playerId)
   const variant = size === 'xs' || size === 'sm' || size === 'md' ? 'thumb' : 'medium'
   const image = imageOf(playerId)
   const src = failed ? images.defaultAvatarUrl() : images.variantUrl(image, variant)
@@ -53,7 +55,7 @@ export function Headshot({
       ? 'ring-gold-400'
       : RINGS[status]
     : 'ring-white/10'
-  return (
+  const face = (
     <img
       src={src}
       alt={`Headshot of ${name}`}
@@ -70,5 +72,57 @@ export function Headshot({
         className,
       )}
     />
+  )
+  if (!crowned) return face
+  return (
+    <span className="relative inline-flex shrink-0">
+      {face}
+      <ChampionCrown />
+    </span>
+  )
+}
+
+/** A small gold crown, set at an angle on the champion's headshot. */
+export function ChampionCrown() {
+  // (Its own gradient id: a shared one breaks when the first copy is hidden.)
+  const gold = `crown-gold-${useId().replace(/:/g, '')}`
+  return (
+    <svg
+      className="champion-crown"
+      viewBox="0 0 64 48"
+      role="img"
+      aria-label="Champion"
+      focusable="false"
+    >
+      <title>Champion</title>
+      <defs>
+        <linearGradient id={gold} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fef3c7" />
+          <stop offset="0.45" stopColor="#fbbf24" />
+          <stop offset="1" stopColor="#b45309" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M6 40 L3 12 L19 25 L32 4 L45 25 L61 12 L58 40 Z"
+        fill={`url(#${gold})`}
+        stroke="#78350f"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <rect
+        x="6"
+        y="38"
+        width="52"
+        height="7"
+        rx="2"
+        fill={`url(#${gold})`}
+        stroke="#78350f"
+        strokeWidth="2"
+      />
+      <circle cx="3" cy="12" r="3.2" fill="#fde68a" stroke="#78350f" strokeWidth="1.5" />
+      <circle cx="32" cy="4" r="3.6" fill="#fde68a" stroke="#78350f" strokeWidth="1.5" />
+      <circle cx="61" cy="12" r="3.2" fill="#fde68a" stroke="#78350f" strokeWidth="1.5" />
+      <circle cx="32" cy="29" r="3.4" fill="#dc2626" stroke="#7f1d1d" strokeWidth="1" />
+    </svg>
   )
 }

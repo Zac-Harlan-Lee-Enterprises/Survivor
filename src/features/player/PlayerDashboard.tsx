@@ -24,7 +24,9 @@ export function PlayerDashboard() {
   const me = evaluation.standings.find((s) => s.playerId === playerId)
   const profile = profileOf(playerId)
   const week = weekSummary(evaluation, evaluation.currentWeek)
-  const celebrate = useConfetti(me?.status === 'champion' || me?.status === 'co-champion')
+  const celebrate = useConfetti(
+    me && (me.status === 'champion' || me.status === 'co-champion') ? [me] : [],
+  )
 
   if (!me) {
     return (
