@@ -39,7 +39,9 @@ export const season = JSON.parse(
  * 2026-09-22, 2026-09-29 and 2026-10-05, Monday night's added on 2026-10-09; week 5 read 2026-10-13;
  * week 6 read 2026-10-20;
  * week 7 read 2026-10-26, before Monday night's DAL at PHI, which nobody picked;
- * week 8 read 2026-11-02, before Monday night's CHI at SEA, which nobody picked). The seed deliberately carries no results — the app fetches them
+ * week 8 read 2026-11-02, before Monday night's CHI at SEA, which nobody picked;
+ * that game added 2026-11-08; week 9 read 2026-11-08, Sunday night's TB at CHI
+ * once it went final, before Monday night's BUF at MIN, which nobody picked). The seed deliberately carries no results — the app fetches them
  * live — so the note's outcome claims are pinned here instead, keyed by the
  * seed's own game ids so a pick and its result cannot drift apart.
  *
@@ -165,6 +167,21 @@ export const FINALS: Record<string, [number, number]> = {
   '2026-w08-KC-at-DEN': [24, 28],
   '2026-w08-NE-at-MIA': [24, 19],
   '2026-w08-PHI-at-WAS': [10, 27],
+  '2026-w08-CHI-at-SEA': [34, 17],
+  '2026-w09-JAX-at-BAL': [33, 10],
+  '2026-w09-CIN-at-ATL': [34, 17],
+  '2026-w09-DAL-at-IND': [27, 23],
+  '2026-w09-NYJ-at-KC': [12, 35],
+  '2026-w09-DET-at-MIA': [19, 9],
+  '2026-w09-CLE-at-NO': [22, 23],
+  '2026-w09-NYG-at-PHI': [19, 11],
+  '2026-w09-LAR-at-WAS': [20, 13],
+  '2026-w09-DEN-at-CAR': [26, 21],
+  '2026-w09-HOU-at-LAC': [44, 22],
+  '2026-w09-GB-at-NE': [45, 27],
+  '2026-w09-LV-at-SF': [17, 38],
+  '2026-w09-ARI-at-SEA': [3, 17],
+  '2026-w09-TB-at-CHI': [24, 27],
 }
 
 /**
@@ -385,6 +402,58 @@ export const SCORING: Record<string, ScoringPlay[]> = {
     ],
     [4, '4:35', 'DET', [15, 19], 'Jameson Williams 7 Yd pass from Jared Goff (Jake Bates Kick)'],
   ],
+  // Week 9, read 2026-11-08.
+  '2026-w09-DET-at-MIA': [
+    [1, '8:22', 'DET', [3, 0], 'Jake Bates 28 Yd Field Goal'],
+    [1, '1:02', 'MIA', [3, 3], 'Zane Gonzalez 34 Yd Field Goal'],
+    [2, '3:30', 'DET', [6, 3], 'Jake Bates 40 Yd Field Goal'],
+    [3, '9:14', 'DET', [9, 3], 'Jake Bates 33 Yd Field Goal'],
+    [3, '4:00', 'MIA', [9, 6], 'Zane Gonzalez 52 Yd Field Goal'],
+    [3, '1:20', 'DET', [16, 6], 'Jahmyr Gibbs 8 Yd Rush (Jake Bates Kick)'],
+    [4, '9:26', 'MIA', [16, 9], 'Zane Gonzalez 34 Yd Field Goal'],
+    [4, '4:28', 'DET', [19, 9], 'Jake Bates 43 Yd Field Goal'],
+  ],
+  '2026-w09-TB-at-CHI': [
+    [1, '9:38', 'CHI', [0, 7], 'Rome Odunze 9 Yd pass from Caleb Williams (Cairo Santos Kick)'],
+    [
+      1,
+      '6:00',
+      'CHI',
+      [0, 14],
+      'Luther Burden III 56 Yd pass from Caleb Williams (Cairo Santos Kick)',
+    ],
+    [2, '13:48', 'TB', [3, 14], 'Chase McLaughlin 27 Yd Field Goal'],
+    [2, '3:02', 'CHI', [3, 17], 'Cairo Santos 25 Yd Field Goal'],
+    [2, '0:00', 'TB', [6, 17], 'Chase McLaughlin 21 Yd Field Goal'],
+    [3, '11:37', 'TB', [13, 17], 'Bucky Irving 2 Yd Rush (Chase McLaughlin Kick)'],
+    [3, '3:39', 'CHI', [13, 24], 'Jaylon Johnson 67 Yd Interception Return (Cairo Santos Kick)'],
+    [4, '11:24', 'TB', [16, 24], 'Chase McLaughlin 35 Yd Field Goal'],
+    [
+      4,
+      '2:51',
+      'TB',
+      [24, 24],
+      'Bucky Irving 6 Yd Rush (Baker Mayfield Run for Two-Point Conversion)',
+    ],
+    [4, '0:00', 'CHI', [24, 27], 'Cairo Santos 38 Yd Field Goal'],
+  ],
+  '2026-w09-LV-at-SF': [
+    [1, '9:32', 'SF', [0, 7], 'Christian McCaffrey 1 Yd Rush (Eddy Pineiro Kick)'],
+    [1, '1:52', 'SF', [0, 14], 'Brock Purdy 1 Yd Rush (Eddy Pineiro Kick)'],
+    [2, '12:41', 'LV', [7, 14], 'Kirk Cousins 2 Yd Rush (Matt Gay Kick)'],
+    [
+      2,
+      '5:15',
+      'SF',
+      [7, 21],
+      'Christian McCaffrey 12 Yd pass from Brock Purdy (Eddy Pineiro Kick)',
+    ],
+    [2, '1:12', 'LV', [10, 21], 'Matt Gay 50 Yd Field Goal'],
+    [3, '14:43', 'SF', [10, 28], 'Jaden Dugger 35 Yd Interception Return (Eddy Pineiro Kick)'],
+    [3, '9:29', 'LV', [17, 28], 'Brock Bowers 21 Yd pass from Kirk Cousins (Matt Gay Kick)'],
+    [3, '0:36', 'SF', [17, 35], 'Jordan Watkins 37 Yd pass from Brock Purdy (Eddy Pineiro Kick)'],
+    [4, '5:21', 'SF', [17, 38], 'Eddy Pineiro 35 Yd Field Goal'],
+  ],
 }
 
 /** Turnovers each side committed (ESPN box score, read 2026-10-26), for the games a note uses. */
@@ -393,6 +462,23 @@ export const TURNOVERS: Record<string, Record<string, number>> = {
   '2026-w07-SF-at-ATL': { SF: 4, ATL: 0 },
   // Week 8, read 2026-11-02.
   '2026-w08-TEN-at-CIN': { TEN: 2, CIN: 4 },
+  // Week 9, read 2026-11-08.
+  '2026-w09-LV-at-SF': { LV: 5, SF: 1 },
+  '2026-w09-TB-at-CHI': { TB: 2, CHI: 5 },
+}
+
+/**
+ * Single plays a note tells, from the ESPN play-by-play (read 2026-11-08):
+ * quarter, game clock and ESPN's text. Only what a note uses.
+ */
+export const PLAYS: Record<string, [quarter: number, clock: string, text: string][]> = {
+  '2026-w09-TB-at-CHI': [
+    [
+      4,
+      '3:48',
+      'C.Williams pass short left to L.Burden to CHI 19 for 4 yards (R.Bain; K.Scott). FUMBLES (R.Bain), RECOVERED by TB-I.Melifonwu at CHI 21.',
+    ],
+  ],
 }
 
 /**
@@ -470,6 +556,34 @@ export const BOX: Record<
         interceptions: 2,
       },
       'Joey Slye': { team: 'TEN', fieldGoals: [4, 4], longest: 56, points: 14 },
+    },
+  },
+  // Week 9, read 2026-11-08.
+  '2026-w09-TB-at-CHI': {
+    teams: {
+      TB: { totalYards: 352, firstDowns: 18, passingYards: 226, redZone: [2, 5] },
+      CHI: { totalYards: 349, firstDowns: 15, passingYards: 277, redZone: [1, 4] },
+    },
+    players: {
+      'Caleb Williams': {
+        team: 'CHI',
+        completions: 22,
+        attempts: 37,
+        passingYards: 279,
+        touchdowns: 2,
+        interceptions: 4,
+      },
+      'Cairo Santos': { team: 'CHI', fieldGoals: [2, 2], longest: 38, points: 9 },
+    },
+  },
+  '2026-w09-DET-at-MIA': {
+    teams: {
+      DET: { totalYards: 270, firstDowns: 16, passingYards: 168, redZone: [1, 4] },
+      MIA: { totalYards: 228, firstDowns: 12, passingYards: 151, redZone: [0, 3] },
+    },
+    players: {
+      'Jake Bates': { team: 'DET', fieldGoals: [4, 4], longest: 43, points: 13 },
+      'Zane Gonzalez': { team: 'MIA', fieldGoals: [3, 4], longest: 52, points: 9 },
     },
   },
 }
