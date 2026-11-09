@@ -52,6 +52,9 @@ export function citationFor(
 const list = (items: string[]) =>
   items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}` : items[0]!
 
+/** The league's Bears fans, by the name they go by: the commissioner wants them greeted. */
+const BEARS_FANS: Record<string, string> = { 'joseph-tomczuk': 'Joey', 'maya-israel': 'Maya' }
+
 /**
  * A citation written from the record, for a champion the commissioner has
  * not yet found the words for: a proclamation. Everything it claims is read
@@ -86,10 +89,12 @@ export function autoCitation(
 
   // Who they outlasted, and who among them.
   const commissioner = beaten.some((o) => o.membership.role === 'commissioner')
-  const bearsFan = beaten.some((o) => o.playerId === 'joseph-tomczuk')
+  const bears = beaten.flatMap((o) => BEARS_FANS[o.playerId] ?? [])
   const among = [
     commissioner ? 'the commissioner' : null,
-    bearsFan ? 'at least one Bears fan (hi, Joey)' : null,
+    bears.length
+      ? `at least ${word(bears.length)} Bears ${bears.length === 1 ? 'fan' : 'fans'} (${bears.map((n) => `hi, ${n}`).join('; ')})`
+      : null,
   ].filter((x): x is string => !!x)
   const including = among.length ? `, ${list(among)} among them,` : ''
   if (partners.length) {

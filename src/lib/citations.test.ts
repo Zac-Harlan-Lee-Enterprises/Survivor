@@ -71,6 +71,21 @@ describe('autoCitation', () => {
     )
   })
 
+  it('greets the Bears fans among the beaten, Joey and Maya both', () => {
+    const { evaluation, ann } = season()
+    const as = (ids: Record<string, string>) =>
+      evaluation.standings.map((s) => ({ ...s, playerId: ids[s.playerId] ?? s.playerId }))
+    expect(
+      autoCitation('Ann Example', ann, as({ bob: 'joseph-tomczuk', cat: 'maya-israel' })),
+    ).toContain(
+      'Ann outlasted three of us, at least two Bears fans (hi, Joey; hi, Maya) among them,',
+    )
+    expect(autoCitation('Ann Example', ann, as({ cat: 'maya-israel' }))).toContain(
+      'at least one Bears fan (hi, Maya) among them,',
+    )
+    expect(autoCitation('Ann Example', ann, evaluation.standings)).not.toContain('Bears fan')
+  })
+
   it('never claims a close call or a lone stand the record does not hold', () => {
     const snap = scenario()
       .players('ann', 'bob')

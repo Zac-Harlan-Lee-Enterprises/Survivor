@@ -954,3 +954,8 @@ NEXT: commissioner previews; PR for feat/champion-music stacked on #74.
 - AGENTS.md: dropped "re-render with --name" (the page lays the name on the plaque, so it would appear twice).
 - Verified: validate (403 unit), e2e 117 passed, knip clean, init HTTP 200. New phone video sent.
 - NEXT: on the commissioner's go-ahead, open the PR for feat/champion-music, stacked on #74. Never merge.
+
+## 2026-11-08 — Claude Opus 5.5 — Maya joins the Bears jab
+- Commissioner: Maya Israel is a huge Bears fan too; include her with Joey. citations.ts now greets every Bears fan among the beaten (BEARS_FANS: Joey, Maya): "at least two Bears fans (hi, Joey; hi, Maya)". Test in citations.test.ts.
+- Verified: validate (404 unit), live page shows the line for Allison. Memory saved.
+- NEXT: on the commissioner's go-ahead, open the PR for feat/champion-music, stacked on #74. Never merge.
