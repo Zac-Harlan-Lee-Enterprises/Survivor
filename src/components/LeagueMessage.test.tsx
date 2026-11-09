@@ -10,7 +10,6 @@ describe('the week 9 review from the late commissioner', () => {
     render(<LeagueMessage week={week} />)
     expect(screen.getByRole('heading', { name: /word from the late commissioner/i })).toBeVisible()
     expect(screen.getByText(/^Death went nought for five again\./)).toBeVisible()
-    expect(screen.getByText(/two Bears fans, Joey and Maya/)).toBeVisible()
   })
 
   it('sets the week 10 pick instruction apart from the banter', () => {

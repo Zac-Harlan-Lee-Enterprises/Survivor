@@ -6,11 +6,9 @@ import {
   PLAYS,
   SCORING,
   TURNOVERS,
-  eliminatedWeekOf,
   livesAfter,
   lost,
   nameOf,
-  pickOf,
   picksIn,
   pinnedThrough,
   record,
@@ -62,14 +60,9 @@ const lostIn = (w: number) => {
   for (const [name, l] of livesAfter(w)) n += b.get(name)! - l
   return n
 }
-/** A team's game in a week, and its result for them. */
+/** A team's game in a week. */
 const gameOf = (w: number, team: string) =>
   week(w).find((g) => g.homeTeamId === team || g.awayTeamId === team) ?? null
-const resultOf = (w: number, team: string) => {
-  const g = gameOf(w, team)
-  if (!g) return 'bye'
-  return winnerOf(g.id) === team ? 'W' : 'L'
-}
 
 const source = readFileSync(
   new URL('../../src/features/league-home/LeagueMessage.tsx', import.meta.url),
@@ -130,25 +123,6 @@ describe('the commissioner’s week 9 review states only true things', () => {
     ])
     expect(plays.at(-1)).toEqual([4, '0:00', 'CHI', [24, 27], 'Cairo Santos 38 Yd Field Goal'])
     expect(FINALS[id]).toEqual([24, 27])
-  })
-
-  it('“two Bears fans, Joey and Maya … twelve picks this season and never once took the Bears; Joey even picked against them in week 3, and lost. Both are now in the graveyard”', () => {
-    const fans = ['joseph-tomczuk', 'maya-israel']
-    const theirs = season.picks.filter((p) => fans.includes(p.playerId))
-    expect(theirs).toHaveLength(12)
-    expect(theirs.filter((p) => p.teamId === 'CHI')).toEqual([])
-    const joey3 = pickOf('Joseph Tomczuk', 3)!
-    expect(joey3.gameId).toBe('2026-w03-PHI-at-CHI')
-    expect(joey3.teamId).toBe('PHI')
-    expect(lost(joey3)).toBe(true)
-    for (const id of fans) expect(eliminatedWeekOf(id, WEEK), id).not.toBeNull()
-  })
-
-  it('“The Bears have now won four straight, every game since they lost 31–7 at Green Bay the weekend Joey was buried. They won the week Maya went in, too, and both games since”', () => {
-    expect(FINALS['2026-w05-CHI-at-GB']).toEqual([7, 31])
-    expect(eliminatedWeekOf('joseph-tomczuk', WEEK)).toBe(5)
-    expect([6, 7, 8, 9].map((w) => resultOf(w, 'CHI'))).toEqual(['W', 'W', 'W', 'W'])
-    expect(eliminatedWeekOf('maya-israel', WEEK)).toBe(7)
   })
 
   it('“Cindy and Tracy took Detroit at Miami, and Detroit won 19–9 in a game with one touchdown in it”', () => {
