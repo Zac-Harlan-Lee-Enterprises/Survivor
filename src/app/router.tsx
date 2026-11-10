@@ -12,6 +12,7 @@ import { SeasonGrid } from '@/features/grid/SeasonGrid'
 import { MySeason } from '@/features/my-season/MySeason'
 import { PlayerProfilePage } from '@/features/profile/PlayerProfilePage'
 import { RulesPage } from '@/features/rules/RulesPage'
+import { HallOfChampions } from '@/features/champions/HallOfChampions'
 import { CommissionerDashboard } from '@/features/commissioner/CommissionerDashboard'
 import { SignInPage } from '@/features/auth/SignInPage'
 import { NotFound } from '@/features/NotFound'
@@ -43,6 +44,7 @@ export function AppRouter() {
             <Route path="grid" element={<SeasonGrid />} />
             <Route path="players/:playerId" element={<PlayerProfilePage />} />
             <Route path="rules" element={<RulesPage />} />
+            <Route path="champions" element={<HallOfChampions />} />
             <Route
               path="sign-in"
               element={

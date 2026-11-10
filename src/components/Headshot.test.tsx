@@ -17,7 +17,7 @@ const image: PlayerImage = {
   createdAt: '2026-08-01T00:00:00.000Z',
 }
 
-function wrap(children: ReactNode, images: PlayerImage[] = [image]) {
+function wrap(children: ReactNode, images: PlayerImage[] = [image], championIds: string[] = []) {
   const services = {
     images: {
       defaultAvatarUrl: () => '/Survivor/headshots/default.svg',
@@ -27,6 +27,7 @@ function wrap(children: ReactNode, images: PlayerImage[] = [image]) {
   } as unknown as Services
   const league = {
     imageOf: (id: string) => images.find((i) => i.playerId === id) ?? null,
+    evaluation: { championIds },
   } as unknown as LeagueContextValue
   return render(
     <ServicesContext.Provider value={services}>
@@ -36,6 +37,17 @@ function wrap(children: ReactNode, images: PlayerImage[] = [image]) {
 }
 
 describe('Headshot', () => {
+  it('the champion wears the crown, wherever their headshot is shown', () => {
+    wrap(<Headshot name="Ann Example" playerId="ann" size="xs" />, [image], ['ann'])
+    expect(screen.getByRole('img', { name: 'Champion' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Headshot of Ann Example' })).toBeInTheDocument()
+  })
+
+  it('nobody else does', () => {
+    wrap(<Headshot name="Bo Example" playerId="bo" />, [image], ['ann'])
+    expect(screen.queryByRole('img', { name: 'Champion' })).toBeNull()
+  })
+
   it('renders the stored variant with meaningful alt text', () => {
     wrap(<Headshot name="Ann Example" playerId="ann" size="lg" status="alive" />)
     const img = screen.getByRole('img', { name: 'Headshot of Ann Example' })

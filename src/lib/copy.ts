@@ -101,7 +101,7 @@ const TEENS = [
 ]
 const TENS = ['', '', 'twenty', 'thirty']
 /** Numbers as the commissioner writes them: words up to thirty-nine, digits beyond. */
-const word = (n: number): string => {
+export const word = (n: number): string => {
   if (n < 10) return ONES[n]!
   if (n < 20) return TEENS[n - 10]!
   if (n < 40) return `${TENS[Math.floor(n / 10)]}${n % 10 ? `-${ONES[n % 10]}` : ''}`
@@ -109,7 +109,7 @@ const word = (n: number): string => {
 }
 
 /** "the Chargers" — a team's name as the commissioner says it. */
-const the = (teamId: string) => {
+export const the = (teamId: string) => {
   const team = getTeam(teamId)
   return team ? `the ${team.name}` : teamId
 }
@@ -118,7 +118,7 @@ const the = (teamId: string) => {
  * How a week's game went for the pick: "14–26 to Arizona at home" or
  * "lost on the road to Cleveland, 19–23". Scores only where the game has them.
  */
-function gameLine(h: WeekResult): string {
+export function gameLine(h: WeekResult): string {
   const pick = h.pick
   const game = h.game
   if (!pick) return 'no pick arrived, which the rules price the same as a loss'

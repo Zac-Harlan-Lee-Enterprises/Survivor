@@ -784,6 +784,49 @@
     background: radial-gradient(circle, #fff 0, rgba(255, 244, 200, 0.9) 30%, transparent 70%);
     box-shadow: 0 0 18px 6px rgba(255, 230, 150, 0.55);
   }
+  /* The wreath: one logo per week, each on a small dark medallion with a
+     gold rim, so every crest reads against the dark. The weeks that cost a
+     life are greyed, rim and all. */
+  .crowning-laurel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 30%, #222b47, #080b16 75%);
+    box-shadow:
+      0 0 0 1.5px rgba(251, 191, 36, 0.9),
+      0 0 12px rgba(251, 191, 36, 0.45),
+      0 2px 6px rgba(0, 0, 0, 0.6);
+  }
+  .crowning-laurel img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .crowning-laurel-lost {
+    box-shadow:
+      0 0 0 1.5px rgba(148, 163, 184, 0.6),
+      0 2px 6px rgba(0, 0, 0, 0.6);
+  }
+  .crowning-laurel-lost img {
+    filter: grayscale(1) brightness(0.7);
+  }
+  /* The winner's name, engraved on the plaque: the same black serif as the
+     rendered lines, with the plate's light catching the cut. */
+  .trophy-name {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-family: 'Times New Roman', Times, serif;
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1;
+    color: #1c1407;
+    text-shadow: 0 0.5px 0 rgba(255, 238, 190, 0.45);
+  }
   /* What the crowning leaves behind: the winner ringed in gold. */
   [data-crowned] {
     box-shadow:
@@ -791,6 +834,270 @@
       0 0 0 7px rgba(251, 191, 36, 0.18),
       0 0 36px 8px rgba(251, 191, 36, 0.35);
     transition: box-shadow 1.2s ease-out;
+  }
+
+  /* The finale's encores (finale.ts): camera flashes from the crowd, then
+     gold fireworks high in the dark. Above the page, never in the way. */
+  .camera-flashes,
+  .fireworks {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+  }
+  .fireworks {
+    width: 100%;
+    height: 100%;
+  }
+  /* The night they burst in: the top of the page darkened for a while. */
+  .fireworks-sky {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(3, 5, 12, 0.72) 0,
+      rgba(3, 5, 12, 0.5) 40%,
+      rgba(3, 5, 12, 0) 85%
+    );
+  }
+  .camera-flash {
+    position: absolute;
+    opacity: 0;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle,
+      #fff 0,
+      rgba(240, 246, 255, 0.85) 12%,
+      rgba(220, 232, 255, 0.25) 34%,
+      transparent 62%
+    );
+  }
+  /* The star a flash makes for an instant: two thin rays across it. */
+  .camera-flash::before,
+  .camera-flash::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    height: 2px;
+    margin: -1px 0 0 -50%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  }
+  .camera-flash::after {
+    transform: rotate(90deg);
+  }
+
+  /* The champion's crown (Headshot.tsx): worn on every page, set at an
+     angle on the top right of the headshot. */
+  .champion-crown {
+    position: absolute;
+    top: -16%;
+    right: -12%;
+    width: 46%;
+    height: auto;
+    transform: rotate(20deg);
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 6px rgba(251, 191, 36, 0.45));
+    pointer-events: none;
+  }
+
+  /* A champion's banner in the rafters (ChampionBanner.tsx): navy cloth with
+     a gold edge, hung from a gold rod, cut to a point at the foot. The edge
+     is the cloth showing round the face, both cut to the same shape. */
+  .rafter {
+    --point: 2.25rem;
+    position: relative;
+    width: min(100%, 19rem);
+    margin: 0 auto;
+    padding-top: 0.4rem;
+    transform-origin: 50% 0;
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.55));
+  }
+  .rafter-rod {
+    position: absolute;
+    top: 0;
+    left: -7%;
+    right: -7%;
+    height: 0.7rem;
+    z-index: 1;
+    border-radius: 9999px;
+    background: linear-gradient(to bottom, #fef3c7, #fbbf24 40%, #b45309 85%, #78350f);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  }
+  .rafter-rod::before,
+  .rafter-rod::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: -0.55rem;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 30%, #fef3c7, #fbbf24 45%, #92400e);
+  }
+  .rafter-rod::before {
+    left: -0.5rem;
+  }
+  .rafter-rod::after {
+    right: -0.5rem;
+  }
+  .rafter-cloth {
+    position: relative;
+    padding: 3px;
+    background: linear-gradient(to bottom, #fde68a, #d97706);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - var(--point)), 0 100%);
+  }
+  .rafter-face {
+    position: relative;
+    padding: 1.5rem 1.25rem calc(var(--point) + 1.6rem);
+    text-align: center;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - var(--point) + 2px), 0 100%);
+    background:
+      /* folds in the cloth, faint */
+      repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.025) 18%,
+        rgba(0, 0, 0, 0.12) 34%,
+        rgba(255, 255, 255, 0) 50%
+      ),
+      linear-gradient(to bottom, #1a2546, #0c1328 70%, #080d1d);
+  }
+  .rafter-year {
+    font-family: var(--font-display, inherit);
+    font-size: 3.25rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    background: linear-gradient(to bottom, #fef3c7, #fbbf24 55%, #b45309);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .rafter-title {
+    margin-top: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-display, inherit);
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: #fcd34d;
+  }
+  .rafter-name {
+    font-family: var(--font-display, inherit);
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: #f8fafc;
+  }
+  .rafter-league {
+    margin-top: 1.1rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: rgba(252, 211, 77, 0.7);
+  }
+  /* Unrolling: the cloth comes down from the rod behind a rolled edge, then
+     hangs, swaying a little in the air of the room. */
+  .rafter-roll {
+    position: absolute;
+    left: -2%;
+    right: -2%;
+    top: 0.4rem;
+    height: 0.9rem;
+    border-radius: 9999px;
+    background: linear-gradient(to bottom, #fde68a, #b45309 60%, #78350f);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .rafter-unroll {
+      animation: rafter-sway 7s ease-in-out 2.2s infinite;
+    }
+    .rafter-unroll .rafter-cloth {
+      animation: rafter-unfurl 1.6s cubic-bezier(0.3, 0.6, 0.25, 1) 0.25s both;
+    }
+    .rafter-unroll .rafter-roll {
+      animation: rafter-roll 1.6s cubic-bezier(0.3, 0.6, 0.25, 1) 0.25s both;
+    }
+  }
+  @keyframes rafter-unfurl {
+    from {
+      clip-path: polygon(0 0, 100% 0, 100% 0, 50% 0, 0 0);
+    }
+    to {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - var(--point)), 0 100%);
+    }
+  }
+  @keyframes rafter-roll {
+    0% {
+      top: 0.4rem;
+      opacity: 1;
+    }
+    88% {
+      opacity: 1;
+    }
+    100% {
+      top: calc(100% - var(--point) - 0.5rem);
+      opacity: 0;
+    }
+  }
+  @keyframes rafter-sway {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    30% {
+      transform: rotate(0.7deg);
+    }
+    70% {
+      transform: rotate(-0.6deg);
+    }
+  }
+
+  /* The music's switch (music.ts): a small speaker in the corner while the
+     champion's music is on. Above the scene; clear of the phone's tab bar. */
+  .sound-switch {
+    position: fixed;
+    right: 1rem;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 6.5rem);
+    z-index: 61;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    color: #fbbf24;
+    background: rgba(10, 14, 26, 0.72);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    transition:
+      transform 0.15s ease,
+      border-color 0.15s ease;
+  }
+  .sound-switch:hover {
+    transform: scale(1.06);
+    border-color: rgba(251, 191, 36, 0.7);
+  }
+  .sound-switch:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+  }
+  @media (min-width: 768px) {
+    .sound-switch {
+      bottom: 1.25rem;
+      right: 1.25rem;
+    }
   }
 
   /* The crow. */

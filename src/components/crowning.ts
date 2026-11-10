@@ -5,18 +5,33 @@
  * A shaft of light comes down onto them, dust turning slowly in it. A gold
  * ring draws itself round each winner's headshot and a glint runs once round
  * it. Gold leaf drifts down, turning over and catching the light as it falls.
- * Then the lights come up, the confetti goes off (the finale), and the ring
- * stays.
+ * While it does, the logo of every team they picked comes in, week by week,
+ * and settles into a laurel round them: two branches climbing from the
+ * bottom, the first weeks at the stem and the last at the tips, the lost
+ * weeks in grey. Then the lights come up, the confetti goes off (the
+ * finale), and the ring stays.
  *
  * Plain DOM and the Web Animations API, laid over the page and pointed at the
  * winner's headshots wherever they are on screen. Without `Element.animate`
  * (old browsers, tests) it skips straight to the finale and the ring.
+ *
+ * A fanfare (music.ts) comes in with the light, timed so its swell meets the
+ * confetti, and plays on, looping, after the scene is over, until the page
+ * is left or it is silenced.
  */
+
+import type { Cue } from './music'
 
 const DIM = 1000
 const BEAM = 1400
 const RING = 1500
-const HOLD = 4400
+const HOLD = 5200
+/** The wreath: when the first logo sets off, the gap between them, and each one's flight. */
+const WREATH_AT = DIM + 600
+const WREATH_STEP = 140
+const WREATH_FLIGHT = 1100
+/** How far into the fanfare its swell comes (ms): it is started so the swell meets the confetti. */
+const SWELL = 5400
 const LIFT = 1600
 const LEAF_FOR = 3200
 
@@ -40,8 +55,25 @@ type Flake = {
 
 type Mote = { x: number; y: number; r: number; rise: number; twinkle: number }
 
+/** One week's pick in a winner's wreath: the team's logo, and whether it won. */
+export interface Laurel {
+  src: string
+  won: boolean
+}
+
+export interface Staging {
+  /** Music from the moment the light comes down. */
+  fanfare?: Cue
+  /** Each winner's picks in week order, in the same order as their headshots. */
+  wreaths?: Laurel[][]
+}
+
 /** Plays the crowning over `section`; `finale` fires as the lights come up. Returns a cancel. */
-export function crown(section: Element, finale: () => void): () => void {
+export function crown(
+  section: Element,
+  finale: () => void,
+  { fanfare, wreaths = [] }: Staging = {},
+): () => void {
   const doc = section.ownerDocument
   const faces = [...section.querySelectorAll<HTMLElement>('img.rounded-full')]
   const marks = faces.length ? faces : [section as HTMLElement]
@@ -74,6 +106,10 @@ export function crown(section: Element, finale: () => void): () => void {
   root.append(dark, beam, canvas)
   const rings = marks.map(() => ring(doc))
   rings.forEach((r) => root.append(r.el))
+  // (Only when there is a wreath for every face: never one on the wrong person.)
+  const laurels = faces.length && wreaths.length === faces.length ? wreaths : []
+  const wreathed = laurels.map((w) => w.map((l) => laurel(doc, l)))
+  wreathed.forEach((w) => w.forEach((l) => root.append(l.el)))
   doc.body.append(root)
 
   // Where the winners are, read every frame so a scroll never loses them.
@@ -99,6 +135,16 @@ export function crown(section: Element, finale: () => void): () => void {
       r.style.top = `${b.top - pad}px`
       r.style.width = `${b.width + pad * 2}px`
       r.style.height = `${b.height + pad * 2}px`
+      const leaves = wreathed[i]
+      if (!leaves?.length) return
+      const spots = wreathSpots(leaves.length, b.width / 2 + pad)
+      leaves.forEach((l, k) => {
+        const spot = spots[k]!
+        l.el.style.left = `${b.left + b.width / 2 + spot.x - spot.size / 2}px`
+        l.el.style.top = `${b.top + b.height / 2 + spot.y - spot.size / 2}px`
+        l.el.style.width = l.el.style.height = `${spot.size}px`
+        l.el.style.padding = `${spot.size * 0.14}px`
+      })
     })
     return { cx, cy, radius, top }
   }
@@ -231,6 +277,7 @@ export function crown(section: Element, finale: () => void): () => void {
   }
   win.addEventListener('resize', size)
   frame = win.requestAnimationFrame(tick)
+  const music = win.setTimeout(() => fanfare?.start(), Math.max(0, DIM + HOLD - SWELL))
 
   // The light: the room goes down, the shaft comes on, the rings are drawn.
   play(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: DIM, easing: 'ease-in-out' })
@@ -260,6 +307,32 @@ export function crown(section: Element, finale: () => void): () => void {
     )
   })
 
+  // The wreath: each week's logo comes in from further out, one after the
+  // other, and settles in its place on the laurel.
+  wreathed.forEach((leaves, i) => {
+    const spots = wreathSpots(leaves.length, 100)
+    leaves.forEach((l, k) => {
+      const away = Math.atan2(spots[k]!.y, spots[k]!.x) + rand(-0.5, 0.5)
+      const far = rand(70, 130)
+      play(
+        l.el,
+        [
+          {
+            opacity: 0,
+            transform: `translate(${Math.cos(away) * far}px, ${Math.sin(away) * far}px) scale(0.5) rotate(${rand(-40, 40)}deg)`,
+          },
+          { opacity: 1, offset: 0.35 },
+          { opacity: 1, transform: 'translate(0, 0) scale(1) rotate(0deg)' },
+        ],
+        {
+          duration: WREATH_FLIGHT,
+          delay: WREATH_AT + i * 200 + k * WREATH_STEP,
+          easing: 'cubic-bezier(0.2, 0.8, 0.25, 1)',
+        },
+      )
+    })
+  })
+
   // Lights up: the finale, and the ring passed to the headshot for good.
   const lift = win.setTimeout(() => {
     if (cancelled) return
@@ -268,6 +341,7 @@ export function crown(section: Element, finale: () => void): () => void {
     play(dark, [{ opacity: 1 }, { opacity: 0 }], out)
     play(beam, [{ opacity: 1 }, { opacity: 0 }], out)
     rings.forEach((r) => play(r.el, [{ opacity: 1 }, { opacity: 0 }], out))
+    wreathed.flat().forEach((l) => play(l.el, [{ opacity: 1 }, { opacity: 0 }], out))
     settle()
     finale()
   }, DIM + HOLD)
@@ -284,8 +358,11 @@ export function crown(section: Element, finale: () => void): () => void {
     running.forEach((a) => a.cancel())
     root.remove()
   }
+  // Over, the stage is cleared but the fanfare plays on; leaving stops it.
   return () => {
     if (!cancelled) cleanup()
+    win.clearTimeout(music)
+    fanfare?.stop(1200)
   }
 }
 
@@ -318,4 +395,47 @@ function ring(doc: Document) {
   glint.className = 'crowning-glint'
   el.append(svg, glint)
   return { el, stroke, glint, length }
+}
+
+/**
+ * Where each logo sits in a wreath of `n` round a headshot of radius `r`,
+ * relative to its centre: alternately on the left and right branch, climbing
+ * from the stem at the bottom to the tips near the top, a little smaller
+ * towards the tips, as leaves are.
+ */
+export function wreathSpots(n: number, r: number) {
+  const perSide = Math.max(1, Math.ceil(n / 2))
+  const BOTTOM = (30 * Math.PI) / 180 // the gap at the stem
+  const TOP = (34 * Math.PI) / 180 // the gap between the tips
+  const arc = Math.PI - BOTTOM - TOP
+  const radius0 = r + Math.min(Math.max(r * 0.34, 20), 38)
+  const room = (radius0 * arc) / perSide
+  const base = Math.min(Math.max(room * 0.86, 18), 40)
+  return Array.from({ length: n }, (_, k) => {
+    const side = k % 2 === 0 ? -1 : 1
+    const step = Math.floor(k / 2)
+    const along = perSide === 1 ? 0.5 : step / (perSide - 1)
+    // Angle from straight up, clockwise: the stem is at π.
+    const theta = Math.PI - BOTTOM / 2 - along * arc
+    const size = base * (1 - 0.22 * along)
+    const radius = radius0 + base * 0.5 - size * 0.5
+    return {
+      x: side * Math.sin(theta) * radius,
+      y: -Math.cos(theta) * radius,
+      size,
+    }
+  })
+}
+
+/** One logo in a wreath, on its own small gold-rimmed medallion; placed each frame. */
+function laurel(doc: Document, { src, won }: Laurel) {
+  const el = doc.createElement('div')
+  el.className = won ? 'crowning-laurel' : 'crowning-laurel crowning-laurel-lost'
+  const logo = doc.createElement('img')
+  logo.src = src
+  logo.alt = ''
+  logo.decoding = 'async'
+  el.append(logo)
+  el.style.opacity = '0'
+  return { el }
 }

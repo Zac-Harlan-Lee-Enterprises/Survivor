@@ -2,13 +2,16 @@
 import { act, render, waitFor } from '@testing-library/react'
 import { StrictMode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useConfetti } from './useConfetti'
+import type { PlayerStanding } from '@/domain'
+import { useConfetti, wreathOf } from './useConfetti'
 
 const { confetti } = vi.hoisted(() => ({ confetti: vi.fn() }))
 vi.mock('canvas-confetti', () => ({ default: confetti }))
 
-function Party({ active }: { active: boolean }) {
-  const celebrate = useConfetti(active)
+const ANN = { playerId: 'ann', history: [] } as unknown as PlayerStanding
+
+function Party({ active, after }: { active: boolean; after?: number }) {
+  const celebrate = useConfetti(active ? [ANN] : [], { after })
   return <section ref={celebrate}>Champion</section>
 }
 
@@ -73,6 +76,15 @@ describe('useConfetti', () => {
     await waitFor(() => expect(confetti).toHaveBeenCalled())
   })
 
+  it('can wait a moment once the winner is seen (for the banner to unroll)', async () => {
+    const screen = stubObserver()
+    render(<Party active after={200} />)
+    screen.show()
+    await settle()
+    expect(confetti).not.toHaveBeenCalled()
+    await waitFor(() => expect(confetti).toHaveBeenCalled())
+  })
+
   it('fires once per page load, not every time the winner scrolls back into view', async () => {
     const screen = stubObserver()
     render(<Party active />)
@@ -102,5 +114,33 @@ describe('useConfetti', () => {
     screen.show()
     await settle()
     expect(confetti).not.toHaveBeenCalled()
+  })
+})
+
+describe('wreathOf', () => {
+  it('is every team they picked, in week order, the weeks that cost a life marked', () => {
+    const week = (week: number, teamId: string | null, outcome: string) => ({
+      week,
+      pick: teamId ? { teamId } : null,
+      outcome,
+    })
+    const s = {
+      history: [
+        week(1, 'KC', 'win'),
+        week(2, null, 'missing'),
+        week(3, 'DAL', 'loss'),
+        week(4, 'WAS', 'tie'),
+        week(5, 'BUF', 'void'),
+        week(6, 'DET', 'pending'),
+        week(7, 'SF', 'win'),
+      ],
+    } as unknown as PlayerStanding
+    expect(wreathOf(s, '/Survivor/')).toEqual([
+      { src: '/Survivor/team-logos/kc.png', won: true },
+      { src: '/Survivor/team-logos/dal.png', won: false },
+      { src: '/Survivor/team-logos/was.png', won: false },
+      { src: '/Survivor/team-logos/det.png', won: true },
+      { src: '/Survivor/team-logos/sf.png', won: true },
+    ])
   })
 })
