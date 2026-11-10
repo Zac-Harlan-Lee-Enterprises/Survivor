@@ -9,32 +9,32 @@ import { Megaphone, Send } from 'lucide-react'
  * Every number and result in it is checked against the season in
  * tests/unit/leagueMessageFacts.test.ts. Death's habits are the only fiction.
  *
- * Shown for weeks 1–9: the seed carries no results, so the engine calls week 1
- * current until the live sync lands them, at which point week 9 is.
+ * Shown for weeks 1–10: the seed carries no results, so the engine calls week 1
+ * current until the live sync lands them, at which point week 10 is.
  *
- * Written after the week 9 lock, before the week's results: it names no team
- * anyone picked this week, and it is built only from league data.
+ * Written after Sunday night's game settled week 9 (Monday night's Buffalo at
+ * Minnesota had no picks), before any week 10 pick: it names no week 10 pick.
  */
-const WEEK_9_PREVIEW: { heading: string; lines: string[]; callout?: string } = {
+const WEEK_9_REVIEW: { heading: string; lines: string[]; callout?: string } = {
   heading: 'Word from the late commissioner',
   lines: [
-    'Death has had a difficult week. Last week nobody lost a life, for the first time all season, and he has spent the days since rereading the rules for a loophole. There isn’t one. He has checked twice, and once more with a magnifying glass.',
-    'All five week 9 picks are in, which means this league has gone two weeks running without a missing pick for the first time all season. Death says he liked you better when you were disorganised.',
-    'The field hasn’t moved: five of you, four on your last life, and Cindy on two. She has picked a winner in seven of her eight weeks. Death would like to know how she does it, and frankly, so would I.',
-    'Thursday’s Jacksonville at Baltimore locked the week. Sunday starts at 8:30 in the morning, our time, with Cincinnati at Atlanta, and every one of you has already used the Bengals, so for once Death can watch them with no conflict of interest. He is bringing a croissant.',
-    'Pittsburgh and Tennessee are on bye. Tennessee came in 1–6 last week and still took Cincinnati to overtime; Death says it’s a shame to rest talent like that.',
-    'Monday night is Buffalo at Minnesota, now 6–1 after losing their unbeaten record last week. Death says he loves a Monday. He is the only one who does.',
-    'I’ll be back after the games with the damage. Death has asked me to tell you he isn’t superstitious, and then he touched every headstone on his way out. There are still twenty-five.',
+    'Death went nought for five again. For the second week running nobody in the league lost a life; before last week it had not happened once all season. That is ten picks in a row he has watched without burying anybody. He has started turning the lights off in the graveyard to save on electricity. There are still twenty-five headstones.',
+    'Dominic and Melanie, both on their last life, took the Bears at home to Tampa Bay on Sunday night, and the Bears did everything they could to bury them. Caleb Williams threw four interceptions. The Bears turned it over five times. They led by eight with under four minutes left, fumbled it away at their own 21, and Tampa Bay scored and ran in the two-point conversion to tie it at 24 with 2:51 to go. Then Cairo Santos kicked a 38-yard field goal with no time left on the clock, and the Bears won 27–24. Death had the shovel in his hand. He has put it back, but he hasn’t cleaned it.',
+    'Cindy and Tracy took Detroit at Miami, and Detroit won 19–9 in a game with one touchdown in it. Jake Bates kicked four field goals from four tries and scored thirteen points, which means he beat the Dolphins on his own. Miami never found the end zone. Death watched the whole thing and says it was the most peaceful afternoon he has had in years; he would like it played at his own funeral. Cindy has now picked a winner in eight of her nine weeks and is still the only one of you on two lives.',
+    'Allison took San Francisco at home to Las Vegas and won 38–17. The Raiders turned it over five times, and seventeen seconds into the second half Jaden Dugger intercepted Kirk Cousins and ran it back 35 yards for a touchdown. The 49ers are 7–1. Death says watching the Raiders was like watching a man try to pay for his groceries with a library card. He means it kindly.',
+    'Cincinnati, whom every one of you has already used, won 34–17 at Atlanta at 8:30 in the morning. Death ate his croissant and felt nothing, which he says is how he likes his football.',
+    'Nobody picked Buffalo at Minnesota, so the week was settled when the Bears’ game ended. Death will watch Monday night anyway. He says he likes to keep his hand in.',
+    'Week 10: Chicago, Denver, Philadelphia and Tampa Bay are on bye, so the Bears can’t save anybody this time. Thursday night is Washington at the Giants, which locks the week, and Sunday starts at 8:30 in the morning again, with New England at Detroit; Cindy and Tracy can’t have the Lions twice. Five of you, four on your last life, Cindy on two. Death has gone two weeks without a customer. He says he isn’t worried. He says he has been doing this for a very long time.',
   ],
   // Set apart from the banter, because an instruction buried in jokes is an
-  // instruction somebody misses.
+  // instruction somebody misses, and four of the five are on their last life.
   callout:
-    'All five week 9 picks are locked. Week 10: DM me your pick on Teams before 7:10 PM Thursday, November 12. A missing pick still costs a life.',
+    'DM me your week 10 pick on Teams before 7:10 PM Thursday, November 12, five minutes before Washington at the Giants kicks off. Four of you are on your last life, and a missing pick costs a life.',
 }
 
 export function LeagueMessage({ week }: { week: number }) {
-  if (week < 1 || week > 9) return null
-  const note = WEEK_9_PREVIEW
+  if (week < 1 || week > 10) return null
+  const note = WEEK_9_REVIEW
 
   return (
     <section className="card border-sky-400/25 p-5 md:p-6" aria-labelledby="league-message-title">
