@@ -144,6 +144,10 @@ export function Layout() {
           Official rules
         </NavLink>
         {' · '}
+        <NavLink to="/champions" className="underline underline-offset-2 hover:text-ink-100">
+          Hall of Champions
+        </NavLink>
+        {' · '}
         <span>Times shown in your local timezone.</span>
       </footer>
       <nav

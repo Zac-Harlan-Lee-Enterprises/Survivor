@@ -11,15 +11,16 @@ import { NotFound } from '@/features/NotFound'
 import { useConfetti } from '@/components/useConfetti'
 import { livesLine, streakLine } from '@/lib/copy'
 import { epitaphFor } from '@/lib/epitaphs'
+import { citationFor } from '@/lib/citations'
 import { cn } from '@/lib/cn'
 
 /** A sports-card style profile: the person, their status, and their record. */
 export function PlayerProfilePage() {
   const { playerId = '' } = useParams()
-  const { evaluation, profileOf, snapshot, viewer } = useLeagueContext()
+  const { evaluation, league, profileOf, snapshot, viewer } = useLeagueContext()
   const standing = evaluation.standings.find((s) => s.playerId === playerId)
   const isChamp = standing?.status === 'champion' || standing?.status === 'co-champion'
-  const celebrate = useConfetti(!!isChamp)
+  const celebrate = useConfetti(isChamp && standing ? [standing] : [])
   if (!standing) return <NotFound />
   const profile = profileOf(playerId)
   const hidden = snapshot.hiddenPicks.some(
@@ -34,6 +35,15 @@ export function PlayerProfilePage() {
   const out = standing.status === 'eliminated'
   // The commissioner's own words when he has written them; the record's until then.
   const epitaph = epitaphFor(playerId, profile.displayName, standing)
+  // And for the champion, the opposite of an epitaph.
+  const citation = citationFor(
+    playerId,
+    profile.displayName,
+    standing,
+    evaluation.standings,
+    evaluation.decidedWeek,
+    league.name,
+  )
   const streak = streakLine(standing.streak)
 
   return (
@@ -100,6 +110,17 @@ export function PlayerProfilePage() {
           <Stat label="Teams left" value={standing.teamsRemaining.length} />
         </dl>
       </section>
+
+      {citation && (
+        <section className="card border-gold-400/40 p-5 md:p-6" aria-labelledby="citation-title">
+          <h2 id="citation-title" className="eyebrow text-gold-300">
+            Citation <span className="text-ink-400">· their season</span>
+          </h2>
+          <p className="mt-3 max-w-3xl text-base leading-relaxed text-ink-100 md:text-lg">
+            {citation}
+          </p>
+        </section>
+      )}
 
       {out && (
         <section

@@ -125,7 +125,11 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | `scripts/generate-demo-fixtures.ts` | Seeds the league: real roster, week 1 picks, real cached schedule, no results. `npm run fixtures:generate`. |
 | `scripts/fetch-nfl-schedule.mjs` | Caches the real NFL schedule from ESPN. `npm run schedule:fetch`. |
 | `scripts/import-headshots.mjs` | Turns `photos/` into cropped headshot variants. `npm run headshots:import`. |
+| `src/components/crowning.ts` | The champion's celebration, played by `useConfetti` once the winner is on screen: light, a gold ring, a laurel of every team they picked (`wreathSpots`), gold leaf, then the finale: confetti, camera flashes and gold fireworks (`finale.ts`), to a looping fanfare (`music.ts`) with a sound switch. |
+| `src/components/ChampionBanner.tsx` | The champion's banner in the rafters: unrolls atop the league home; every season's hangs at `/champions` (`src/features/champions/`, past seasons in `src/lib/champions.ts` `HALL`). The champion's headshot wears a gold crown everywhere (`Headshot.tsx`). |
+| `src/lib/citations.ts` | The champion's citation, the opposite of an epitaph: hand-written in `CITATIONS`, or written from the record (`autoCitation`) until then. |
 | `scripts/art/death_scene.py` | Renders Death (`src/components/DeathArrives.tsx`) in Blender with BibleGame's figure engine: casting `death_cast.py`, suit and cane `death_dress.py`, the walk-stop-turn take `death_motion.py`; `death_film.py` packs the frames into `public/death/` and `src/components/deathFrames.json`. |
+| `scripts/art/trophy_scene.py` | Renders the league trophy (a gold loving-cup on a black plinth, plaque front, its last line left blank) in Blender; `trophy_film.py` packs it into `public/trophy/still.webp` and `src/components/trophy.json`. It stands in the Hall of Champions (`Trophy.tsx`), the champion's name laid on the blank line by the page. |
 | `src/domain/nfl/espn.ts` | Pure ESPN scoreboard parser, shared by browser and Lambda. |
 | `src/data/nfl/espnClient.ts` | Browser fetch for live scores (one of two network modules). |
 | `scripts/serve-static.mjs` | GitHub Pages look-alike server (real 404s, base-only). |
@@ -171,6 +175,7 @@ All frontend variables are **public** (compiled into the bundle). Values in `.en
 | Import real player photos from `photos/` | `npm run headshots:import` |
 | Record picks before the lock | Sealed: in `STORY` write `sealed('<receipt ISO time>')`, never the team; `fixtures:generate` emits a `hiddenPicks` stub only. After the lock, re-read Teams and replace each `sealed(...)` with the team. Teams is the source of truth meanwhile. |
 | Someone was eliminated: carve their epitaph | Write a one-paragraph recap of their own season (factual, funny, a bit edgy) as their entry in `src/lib/epitaphs.ts`, in the same PR as that week's review, pin that week's finals in `tests/unit/seasonFacts.ts`, and assert each claim in `tests/unit/epitaphFacts.test.ts` |
+| Someone won the league: write their citation and hang their banner | Write a one-paragraph recap of their season (factual, funny, a bit edgy, every claim asserted in a test) as their entry in `src/lib/citations.ts` with `writtenAfterWeek` = the deciding week; when the next season starts, add them to `HALL` in `src/lib/champions.ts` |
 | Spreadsheet import report | `npm run import:report -- data/import/sample-league.csv --out report.md` |
 | Bundle Lambda handlers | `npm run api:build` |
 | Dead code | `npm run knip` |
@@ -223,6 +228,7 @@ See [SECURITY.md](SECURITY.md).
 - [docs/aws-connected-mode.md](docs/aws-connected-mode.md) — SAM deploy, Cognito, seeding, verification.
 - [docs/nfl-provider.md](docs/nfl-provider.md) — providers, sync, manual fallback.
 - [docs/images.md](docs/images.md) — headshot pipeline and validation.
+- [docs/music.md](docs/music.md) — the champion's fanfare: source, licence, cut, and the sound switch.
 - [docs/data-model.md](docs/data-model.md) — entities and DynamoDB keys.
 - [docs/import-report.md](docs/import-report.md) — spreadsheet migration and what the screenshot did (not) provide.
 - [infra/README.md](infra/README.md) — infrastructure operations.
