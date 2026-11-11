@@ -114,15 +114,7 @@ const PEOPLE: Person[] = [
  * a real answer.
  */
 type Outcome = 'W' | 'L' | 'T' | 'P'
-/**
- * `sealed(receivedAt)`: the player has picked but the team is withheld until
- * the week's shared deadline. Only the receipt time is kept; nothing about the
- * team reaches the public fixture, the generator source or git history.
- */
-type SealedEntry = ['SEALED', string]
-type StoryEntry = [string, Outcome] | [string, Outcome, string] | SealedEntry
-const sealed = (receivedAt: string): SealedEntry => ['SEALED', receivedAt]
-const isSealed = (e: StoryEntry): e is SealedEntry => e[0] === 'SEALED'
+type StoryEntry = [string, Outcome] | [string, Outcome, string]
 type Story = Record<string, Record<number, StoryEntry | null>>
 
 /**
@@ -151,7 +143,7 @@ const STORY: Story = {
   'sheila-acker': { 1: ['SEA', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-08T13:33:36.000Z'], 6: ['LAR', 'P', '2026-10-15T16:06:59.000Z'] },
   // Week 4: named Baltimore, which he used in week 1. Not a valid pick, so the
   // commissioner ruled it a miss.
-  'dominic-green': { 1: ['BAL', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: null, 5: ['DAL', 'P', '2026-10-06T14:23:12.000Z'], 6: ['NE', 'P', '2026-10-15T12:10:48.000Z'], 7: ['MIN', 'P', '2026-10-22T17:54:23.000Z'], 8: ['CIN', 'P', '2026-10-29T12:55:17.000Z'], 9: ['CHI', 'P', '2026-11-05T13:54:18.000Z'], 10: sealed('2026-11-11T20:25:19.000Z') },
+  'dominic-green': { 1: ['BAL', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: null, 5: ['DAL', 'P', '2026-10-06T14:23:12.000Z'], 6: ['NE', 'P', '2026-10-15T12:10:48.000Z'], 7: ['MIN', 'P', '2026-10-22T17:54:23.000Z'], 8: ['CIN', 'P', '2026-10-29T12:55:17.000Z'], 9: ['CHI', 'P', '2026-11-05T13:54:18.000Z'], 10: ['JAX', 'P', '2026-11-11T20:25:19.000Z'] },
   // Same team as Sheila Acker — different players may ride the same team.
   'tracy-nelson': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-16T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-05T15:00:00.000Z'], 6: ['LAR', 'P', '2026-10-15T19:02:25.000Z'], 7: ['DEN', 'P', '2026-10-22T18:02:42.000Z'], 8: ['CIN', 'P', '2026-10-28T17:14:40.000Z'], 9: ['DET', 'P', '2026-11-03T23:46:41.000Z'] },
   // Third player on the Lions, alongside Dave Johnson and James Parker.
@@ -160,7 +152,7 @@ const STORY: Story = {
   'jared-marks': { 1: ['LAC', 'P'], 2: null, 3: ['BUF', 'P', '2026-09-22T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-08T15:00:27.000Z'] },
   'joseph-tomczuk': { 1: ['JAX', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'], 3: ['PHI', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-08T20:07:38.000Z'] },
   'corey-cowell': { 1: ['PIT', 'P'], 2: ['TB', 'P', '2026-09-17T15:00:00.000Z'], 3: ['SEA', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['HOU', 'P', '2026-10-08T19:43:01.000Z'], 6: ['IND', 'P', '2026-10-15T22:02:57.000Z'] },
-  'melanie-moeller': { 1: ['LAC', 'P'], 2: ['PHI', 'P', '2026-09-17T15:00:00.000Z'], 3: ['SF', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['CIN', 'P', '2026-10-08T19:39:50.000Z'], 6: ['NE', 'P', '2026-10-14T20:08:53.000Z'], 7: ['HOU', 'P', '2026-10-22T18:06:04.000Z'], 8: ['JAX', 'P', '2026-10-29T21:32:38.000Z'], 9: ['CHI', 'P', '2026-11-05T14:55:55.000Z'], 10: sealed('2026-11-11T21:12:45.000Z') },
+  'melanie-moeller': { 1: ['LAC', 'P'], 2: ['PHI', 'P', '2026-09-17T15:00:00.000Z'], 3: ['SF', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['CIN', 'P', '2026-10-08T19:39:50.000Z'], 6: ['NE', 'P', '2026-10-14T20:08:53.000Z'], 7: ['HOU', 'P', '2026-10-22T18:06:04.000Z'], 8: ['JAX', 'P', '2026-10-29T21:32:38.000Z'], 9: ['CHI', 'P', '2026-11-05T14:55:55.000Z'], 10: ['BUF', 'P', '2026-11-11T21:12:45.000Z'] },
   'jason-snook': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'], 3: ['DET', 'P', '2026-09-24T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-08T19:59:20.000Z'], 6: ['LAR', 'P', '2026-10-15T18:42:04.000Z'], 7: ['CAR', 'P', '2026-10-20T13:38:42.000Z'] },
   'matt-hadley': { 1: ['GB', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BAL', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-08T15:52:57.000Z'], 6: ['LAR', 'P', '2026-10-15T15:13:32.000Z'] },
   'mike-lancaster': { 1: ['SEA', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BAL', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-08T17:45:05.000Z'], 6: ['LAR', 'P', '2026-10-15T18:44:29.000Z'], 7: ['HOU', 'P', '2026-10-22T18:22:16.000Z'] },
@@ -171,7 +163,7 @@ const STORY: Story = {
   'joanna-moss': { 1: ['DAL', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['SEA', 'P', '2026-09-23T15:00:00.000Z'], 4: ['BAL', 'P', '2026-10-01T15:00:00.000Z'], 5: ['HOU', 'P', '2026-10-08T18:54:51.000Z'], 6: ['IND', 'P', '2026-10-14T13:33:18.000Z'] },
   'allison-petty': { 1: ['DET', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BAL', 'P', '2026-10-01T15:00:00.000Z'], 5: ['CIN', 'P', '2026-10-08T21:49:26.000Z'], 6: ['IND', 'P', '2026-10-15T20:12:07.000Z'], 7: ['NYJ', 'P', '2026-10-22T18:26:14.000Z'], 8: ['GB', 'P', '2026-10-29T22:39:08.000Z'], 9: ['SF', 'P', '2026-11-06T00:08:18.000Z'] },
   'don-turner': { 1: ['PIT', 'P'], 2: ['BAL', 'P', '2026-09-15T15:00:00.000Z'], 3: ['SEA', 'P', '2026-09-24T15:00:00.000Z'], 4: ['DET', 'P', '2026-10-01T15:00:00.000Z'] },
-  'cindy-mendoza': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-23T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['CIN', 'P', '2026-10-07T20:13:08.000Z'], 6: ['NE', 'P', '2026-10-15T13:49:22.000Z'], 7: ['HOU', 'P', '2026-10-22T17:59:20.000Z'], 8: ['LAR', 'P', '2026-10-29T17:09:34.000Z'], 9: ['DET', 'P', '2026-11-05T15:56:09.000Z'], 10: sealed('2026-11-11T18:05:29.000Z') },
+  'cindy-mendoza': { 1: ['JAX', 'P'], 2: ['SF', 'P', '2026-09-15T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-23T15:00:00.000Z'], 4: ['MIN', 'P', '2026-10-01T15:00:00.000Z'], 5: ['CIN', 'P', '2026-10-07T20:13:08.000Z'], 6: ['NE', 'P', '2026-10-15T13:49:22.000Z'], 7: ['HOU', 'P', '2026-10-22T17:59:20.000Z'], 8: ['LAR', 'P', '2026-10-29T17:09:34.000Z'], 9: ['DET', 'P', '2026-11-05T15:56:09.000Z'], 10: ['SEA', 'P', '2026-11-11T18:05:29.000Z'] },
   'phyllis-collins': { 1: ['SEA', 'P'], 2: ['BUF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['GB', 'P', '2026-09-24T15:00:00.000Z'], 4: ['PIT', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-08T22:22:13.000Z'] },
   'wesley-childers': { 1: ['DET', 'P'], 2: ['SF', 'P', '2026-09-17T15:00:00.000Z'], 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BAL', 'P', '2026-10-01T15:00:00.000Z'], 5: ['DAL', 'P', '2026-10-08T19:38:22.000Z'] },
   'tina-bush': { 1: ['DET', 'P'], 2: null, 3: ['KC', 'P', '2026-09-24T15:00:00.000Z'], 4: ['BUF', 'P', '2026-10-01T15:00:00.000Z'], 5: ['NE', 'P', '2026-10-08T22:06:29.000Z'], 6: ['LAR', 'P', '2026-10-15T21:40:19.000Z'] },
@@ -267,15 +259,10 @@ const profiles: PlayerProfile[] = PEOPLE.map((p) => ({
 }))
 
 const picks: Pick[] = []
-const hiddenPicks: Array<{ playerId: string; week: number }> = []
 for (const [playerId, story] of Object.entries(STORY)) {
   for (const [weekStr, entry] of Object.entries(story)) {
     if (!entry) continue
     const week = Number(weekStr)
-    if (isSealed(entry)) {
-      hiddenPicks.push({ playerId, week })
-      continue
-    }
     const [teamId, , suppliedAt] = entry
     const game = games.find(
       (g) => g.week === week && (g.homeTeamId === teamId || g.awayTeamId === teamId),
@@ -349,7 +336,7 @@ const snapshot: SeasonSnapshot = SeasonSnapshotSchema.parse({
   profiles,
   images,
   picks,
-  hiddenPicks,
+  hiddenPicks: [],
   games,
   weeks,
   gameOverrides: [],

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import { NFL_TEAMS } from '../../src/domain/teams'
 import {
   BOX,
   FINALS,
@@ -69,6 +70,39 @@ const source = readFileSync(
   'utf8',
 )
 const body = source.slice(source.indexOf('const WEEK_9_REVIEW'), source.indexOf('export function'))
+
+// Paragraphs of the note, read from the TSX source: each string literal in
+// `lines: [...]` is one paragraph, plus the callout. Never split on '.'.
+const unescape = (lit: string) =>
+  lit
+    .replace(/\\u([0-9a-fA-F]{4})/g, (_, h: string) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/\\(['"\\])/g, '$1')
+const literals = (chunk: string) =>
+  [...chunk.matchAll(/'((?:[^'\\\n]|\\.)*)'/g)].map((m) => unescape(m[1]!))
+const linesChunk = body.slice(
+  body.indexOf('lines: ['),
+  body.indexOf('],', body.indexOf('lines: [')),
+)
+const calloutChunk = body.slice(body.indexOf('callout:'))
+const paragraphs = [
+  ...literals(linesChunk.slice('lines: ['.length)),
+  ...literals(calloutChunk.slice('callout:'.length)),
+]
+
+const esc = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+/** Every way the note could name a team; a location shared by two teams names neither. */
+const teamWords = (id: string) => {
+  const t = NFL_TEAMS.find((x) => x.id === id)!
+  const shared = (w: string) =>
+    NFL_TEAMS.filter((o) =>
+      [o.location, ...o.aliases].some((a) => a.toLowerCase() === w.toLowerCase()),
+    ).length > 1
+  return [t.id, t.location, t.name, ...t.aliases].filter((w) => !shared(w))
+}
+const nameParts = (full: string) => full.split(/\s+/)
+/** The first word of `words` found in `text` (case-insensitive, whole words), else null. */
+const mentions = (text: string, words: string[]): string | null =>
+  words.find((w) => new RegExp(`(?<![\\w])${esc(w)}(?![\\w])`, 'i').test(text)) ?? null
 
 describe('the commissioner’s week 9 review states only true things', () => {
   it('is written from a settled week: every week 9 pick has its final', () => {
@@ -200,8 +234,36 @@ describe('the commissioner’s week 9 review states only true things', () => {
     expect(at(week(10)[0]!.kickoffAt)).toBe('Thursday, November 12 at 7:15 PM')
   })
 
-  it('knows no week 10 team: picks before the lock are recorded sealed, so the note cannot leak one', () => {
-    expect(picksIn(10)).toEqual([])
+  it('names no week 10 pick: no paragraph that names a player names their team or its opponent', () => {
+    expect(paragraphs).toHaveLength(8)
+    const leaks: string[] = []
+    for (const pick of picksIn(10)) {
+      const game = season.games.find((g) => g.id === pick.gameId)!
+      const opponent = game.homeTeamId === pick.teamId ? game.awayTeamId : game.homeTeamId
+      const words = [...teamWords(pick.teamId), ...teamWords(opponent)]
+      const who = nameParts(nameOf(pick.playerId))
+      for (const para of paragraphs) {
+        if (!mentions(para, who)) continue
+        const hit = mentions(para, words)
+        if (hit) leaks.push(`${nameOf(pick.playerId)}: "${hit}" in: ${para.slice(0, 60)}…`)
+      }
+    }
+    expect(leaks).toEqual([])
+  })
+
+  it('the leak matcher catches a leak and passes a clean paragraph', () => {
+    const cindy = nameParts('Cindy Mendoza')
+    const dominic = nameParts('Dominic Green')
+    const sea = [...teamWords('SEA'), ...teamWords('LV')]
+    const jax = [...teamWords('JAX'), ...teamWords('TEN')]
+    const leaks = (text: string, who: string[], words: string[]) =>
+      Boolean(mentions(text, who) && mentions(text, words))
+    expect(leaks('Cindy went with the hawks', cindy, sea)).toBe(true)
+    expect(leaks('Mendoza took Seattle', cindy, sea)).toBe(true)
+    expect(leaks('Cindy is off to Las Vegas', cindy, sea)).toBe(true)
+    expect(leaks('Dominic likes the JAGUARS', dominic, jax)).toBe(true)
+    expect(leaks('Cindy is still on two lives. Seattle is far away.', cindy, [])).toBe(false)
+    expect(leaks('Cindy has two lives left', cindy, sea)).toBe(false)
   })
 
   it('says nothing of messages or pick times', () => {
