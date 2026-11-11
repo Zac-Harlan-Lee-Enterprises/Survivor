@@ -74,6 +74,8 @@ def main(src):
             frames=index,
             walk=walk,
             scene=scene,
+            # The soft-shoe's first and last frames, as indexes into `scene`.
+            dance=take.get("dance"),
         ),
         open(os.path.join(ROOT, "src", "components", "deathFrames.json"), "w"),
         separators=(",", ":"),

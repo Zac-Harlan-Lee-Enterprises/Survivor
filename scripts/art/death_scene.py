@@ -43,8 +43,9 @@ import death_motion  # noqa: E402
 world_cloth.FPS = death_motion.FPS
 TILE = 32.0
 # The frame, in the engine's units (32 to a metre): wide enough for the cane
-# planted ahead of him and the coat swinging, his feet FOOT from the top.
-FRAME_W, FRAME_H, FOOT = 40.0, 70.0, 66.0
+# planted ahead of him and, in the dance, his arms flung wide and the cane held
+# out (two metres across) and thrown up over his head; his feet FOOT from the top.
+FRAME_W, FRAME_H, FOOT = 72.0, 84.0, 80.0
 
 
 def args():
@@ -99,7 +100,7 @@ def main():
     print("DEATH height", round(person.H, 3), "cane", mo.L, "stride", round(mo.d, 3), flush=True)
     sims = [g for g in person.cloth.garments if g.sim]
     take = mo.take()
-    print("TAKE", len(take), "frames", sum(1 for f in take if f["rec"]), "to render", flush=True)
+    print("TAKE", len(take), "frames", sum(1 for f in take if f["rec"]), "to render; dance is scene-%03d to scene-%03d" % mo.dance_frames, flush=True)
     z = mo.z_hips
     C = death_motion.CYCLE
     walk = z[10 + C : 10 + 3 * C]
@@ -136,6 +137,9 @@ def main():
             camera(scene, a.ppu, closeup=True, head_z=person.H - 0.16)
             scene.render.filepath = os.path.join(a.out, name + "-closeup.png")
             bpy.ops.render.render(write_still=True)
+    mo.arm_clearance(take)
+    bad = sorted((v, k) for k, v in mo.by_frame.items() if v < 0) if hasattr(mo, "by_frame") else []
+    print("ARMS", mo.worst_at, "inside body:", [(k[1], round(v * 100, 1)) for v, k in bad if k[0] == "scene"][:80], flush=True)
     json.dump(
         dict(
             fps=death_motion.FPS,
@@ -150,6 +154,7 @@ def main():
             # How far his arms stay outside his body at the closest (cm).
             armClearance=round(mo.arm_clearance(take) * 100, 1),
             cane=mo.L,
+            dance=list(mo.dance_frames),
             frames=frames,
         ),
         open(os.path.join(a.out, "take.json"), "w"),

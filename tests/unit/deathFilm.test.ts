@@ -13,6 +13,8 @@ interface Film {
   frames: { s: number; w: number; h: number; dx: number; dy: number; x: number }[]
   walk: number[]
   scene: number[]
+  /** The dance's first and last frames, as indexes into `scene`. */
+  dance: [number, number]
 }
 const FILM = JSON.parse(readFileSync('src/components/deathFrames.json', 'utf8')) as Film
 
@@ -51,5 +53,19 @@ describe('the rendered film', () => {
     // ...and it ends on the move, a stride's pace, into the looped stride.
     const pace = FILM.stride / FILM.walk.length
     expect(scene.at(-1)! - scene.at(-2)!).toBeGreaterThan(pace * 0.8)
+  })
+
+  it('dances between regarding you and turning away: about 7 seconds, on the spot, 120 beats a minute', () => {
+    const [from, to] = FILM.dance
+    expect(from).toBeGreaterThan(100)
+    expect(to).toBeLessThanOrEqual(FILM.scene.length)
+    // 100 to 150 frames at 20 a second: five to seven and a half seconds.
+    expect(to - from).toBeGreaterThanOrEqual(100)
+    expect(to - from).toBeLessThanOrEqual(150)
+    // He does not travel while he dances.
+    const xs = FILM.scene.slice(from, to).map((i) => FILM.frames[i]!.x)
+    expect(Math.max(...xs) - Math.min(...xs)).toBe(0)
+    // His arms are flung wide and the cane held out: the frame is wider than the walk's.
+    expect(FILM.frameWidth).toBeGreaterThanOrEqual(2 * 32 * 8)
   })
 })
