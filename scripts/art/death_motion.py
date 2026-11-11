@@ -35,34 +35,31 @@ left, +Z up; the render turns -Y to screen right):
   steps off and walks on: the scene ends on the stride before the looped
   one, so the walk carries him off.
 - **dance**, between his regarding you and his hand leaving the cane:
-  a vaudeville soft-shoe on the spot, DANCE frames (6.75 s) at 120 beats a
-  minute (BEAT frames), planned on his stage (x across, y back, z up, from
-  where he stands) so the feet are real plants and the cane tip a real tap.
-  *The cue*: one small, sly nod, his eyes staying on you. *The cane comes up*:
-  his hand lifts it clear of the floor and it is twirled once, a full turn
-  about his hand in the plane facing you, out to his right where it never
-  crosses his face; his left hand flicks open beside his hip (fingers
-  fanned) and swings loosely, and his knees begin to bob on the beat (three
-  or four centimetres), his shoulders shimmying against his hips and his
-  head bobbing a little behind them. *Soft-shoe*: step, ball, change to his
-  left, then his right, twice through, a beat each: the stepping foot out,
-  the other set down on its ball with the heel up, the first back; his hips
-  follow the weight and tilt with it, and the cane tip taps the floor on
-  each downbeat (it is lifted between, never slid). *Kicks*: left, right,
-  left, right, a beat each, chorus-line: the knee comes up first, the lower
-  leg snaps out to a little above the hip with the toe pointed and comes back
-  through the knee to land; the other foot rises onto its ball at the top,
-  his knees dip before each kick and bounce on landing, and his chest leans
-  back and away. The cane is held level across his chest in his right hand
-  (pumped a little with each kick) and his left arm curves up over his head.
-  *The turn*: a pirouette on the ball of his left foot (it stays where it
-  is), the right foot tucked against the knee, his head holding on you and
-  whipping round to arrive before his body. *The finish*: arms flung wide,
-  the cane up in his right hand, weight on the left leg, the right heel
-  lifted, head cocked, held a beat or so. Then he settles: the cane comes
-  back and is set down in front of him, his hands go back on it, and the
-  scene goes on as before. Every pose is eased in and out; the head and the
-  cane arrive a frame or two after the body.
+  a vaudeville high-kick line, DANCE frames (7 s), in which he travels about
+  two metres toward the walk-off; the scene after it starts from where it
+  leaves him. Planned in the world, so every foot is a real plant and the
+  pelvis carries the travel (`take.json` / `deathFrames.json` record it
+  frame by frame, as for a walk). *The cue*: one small, sly nod, his eyes
+  staying on you. *The twirl*: his hand lifts the cane and it is twirled once
+  about his hand, in the plane facing you, out to his right where it never
+  crosses his face; his left hand goes to his brow, fingers curled, as if
+  tipping a hat brim (he has no hat). *The turn*: he turns to profile, facing
+  the way he travels (pivoting on his right foot and stepping the left on),
+  so the kicks read in silhouette; the cane comes level across his chest in
+  his right hand, its tip behind him. *The kick line*: ten kicks, R L R L ...,
+  KP frames each (three a second), the kicking leg kept straight and swung up
+  to nearly vertical with the toe pointed (the ankle follows an arc about the
+  hip, so the leg never folds), then down to a step that carries him on one
+  step further; the other leg stands, its knee bent and springing, deepest as
+  the foot comes down; he leans well back (pelvis, chest, head tipped back),
+  further with each kick, his head turned to you over his shoulder, his
+  cane hand pumping a little with each kick. *The finish*: he turns back to
+  face you (pivoting on the balls of both feet, then shuffling to stand), flings
+  his arms wide, the cane up in his right hand, weight on his left leg, the
+  right heel lifted, head cocked, held a beat or so. Then he settles: the
+  cane comes back and is set down in front of him (where he now stands), his
+  hands go back on it, and the scene goes on as before. Every pose is eased
+  in and out; the head and the cane arrive a frame or two after the body.
 """
 import math
 
@@ -79,7 +76,7 @@ CYCLE = 27
 # The camera looks down at him by this much (death_scene.py).
 TILT = 8.0
 # The dance (see the docstring): its length in frames, a beat every BEAT.
-DANCE = 135
+DANCE = 141
 BEAT = 10
 
 # How far one stride carries him (m), in CYCLE frames: a man walking slowly
@@ -391,10 +388,10 @@ class Motion:
                 th = prev.to + (pl.hs - prev.to) * smoother(min(1.0, u * 1.25))
                 turn = prev.turn + (pl.turn - prev.turn) * e
                 if pl.kick is not None:
-                    peak, path, k_pitch = pl.kick
-                    A = A + path(t)
-                    w = min(1.0, max(0.0, (t - (peak - 6.0)) / 1.5)) * min(1.0, max(0.0, (peak + 4.0 - t) / 1.0))
-                    th = th + (float(k_pitch(t)) - th) * w
+                    peak, arc, k_pitch, w_of = pl.kick
+                    w = w_of(t)
+                    A = lerp(A, arc(t), w)
+                    th = th + (k_pitch(t) - th) * w
                 return A, yaw(turn) @ rot(x=th), (max(th, 0.0) if (pl.air or prev.air) else 0.0), False
             if t <= pl.t3:
                 th = pl.pitch(t)
@@ -457,9 +454,16 @@ class Motion:
                 return Ye - v * (t - t_go) ** 2 / (2 * (t_acc - t_go))
             return Ye - v * (t_acc - t_go) / 2 - v * (t - t_acc)
 
+        # What the dance does to where he stands: the rest of the scene is shifted along by it.
+        _hy0 = hips_y
+        dsh = {"t": 1e18, "y": 0.0}
+
+        def hips_y(t):
+            return _hy0(t) + (dsh["y"] if t > dsh["t"] else 0.0)
+
         def pace(t):
             """How fast he is walking, as a share of his stride's pace."""
-            return max(0.0, min(1.0, (hips_y(t - 0.5) - hips_y(t + 0.5)) / v))
+            return max(0.0, min(1.0, (_hy0(t - 0.5) - _hy0(t + 0.5)) / v))
 
         def phase(t):
             return ((t - tw) / C) % 1.0 if t < te else ((t - t_s2) / C) % 1.0
@@ -491,279 +495,254 @@ class Motion:
             plants["L"].append(stride_plant("L", t_s2 + k * C, lift=0.036 if k else 0.04))
             plants["R"].append(stride_plant("R", t_s2 + k * C + C / 2))
 
-        # ── The dance: a vaudeville soft-shoe, DANCE frames from t_dance, a beat
-        # every BEAT. tau is the frame within it; beats fall on tau = 3 + 10k.
-        # Everything is planned on his stage: x across (his left), y back, z up,
-        # measured from where he stands (P_end), facing you.
+        # ── The dance: a vaudeville high-kick line, DANCE frames from t_dance.
+        # tau is the frame within it; the beat is BEAT frames. He nods, twirls
+        # the cane, turns to profile and kicks his way across the floor (a kick
+        # every KP frames, the leg straight and swung up nearly vertical, one
+        # step carrying him on between kicks), turns back to you, flings his
+        # arms wide, and settles on the cane.
         D0 = float(t_dance)
         LEG = {s: legs[s]["a"] + legs[s]["b"] for s in "LR"}
         sig = {"L": 1.0, "R": -1.0}
-        # Times (tau).
-        T_NOD, T_LIFT0, T_TW0, T_TW1, T_SBC0 = 3.0, 5.0, 9.0, 20.0, 23.0
-        T_SBC1 = T_SBC0 + 40.0  # (four step-ball-changes, a beat each)
-        T_KICK = (73.0, 83.0, 93.0, 103.0)  # L R L R: the leg out, on the beat
-        T_SPIN0, T_SPIN1 = 109.0, 120.0  # the pirouette
-        T_FIN, T_FIN_END = 119.0, 131.0  # arms flung wide ... held
+        FV = np.array([0.0, -1.0])  # the way he travels (world x y): toward the walk-off
+        T_NOD, T_LIFT0, T_TW0, T_TW1 = 3.0, 5.0, 8.0, 18.0
+        T_T0 = 20.0  # he starts to turn to profile
+        KP, NK = 7.0, 10
+        T_K0 = 30.0  # the first kick
+        T_K1 = T_K0 + KP * NK  # the last foot comes down
+        T_B1 = T_K1 + 10.0  # he has turned back to you
+        T_FIN, T_FIN_END = T_B1 + 1.0, T_B1 + 16.0  # arms flung wide ... held
         T_END = float(DANCE)
-        KICK_BETA = 94.0  # how far his leg swings from hanging (degrees): a little above the hip
+        BETA = 158.0  # how far a kicking leg swings from hanging (degrees): nearly vertical
+        STEP = 0.235  # how far each step carries him (m)
+        V = STEP / KP
+        SB = 0.55  # (a kicker's feet are set nearer the line he travels along)
 
-        def wp(x, y):
-            return P_end + Rq @ np.array([x, y], float)
+        def sp(s):
+            return np.array([SB * stand[s][0], stand[s][1]])
 
         def tp(s, dx=0.0, dy=0.0):
             """Where foot s's ankle is set down, from where it stands at rest."""
             return P_end + Rq @ (stand[s] + np.array([dx, dy]))
 
-        def pl3(F, a, b, c, d, **kw):
+        def bvv(s):
+            return self.legs[s]["bv"][:2]
+
+        def pl3(F, a, b, c, d, turn=0.0, **kw):
             kw.setdefault("lift", 0.05)
-            return Plant(F, -90.0, D0 + a, D0 + b, D0 + c, D0 + d, air=True, **kw)
+            return Plant(F, turn, D0 + a, D0 + b, D0 + c, D0 + d, air=True, **kw)
 
-        def ball_plant(F, a, d):
-            return pl3(F, a, a + 1.0, d - 1.0, d, hs=26.0, to=26.0, fn=lambda t, a=D0 + a, d=D0 + d: 26.0 - 13.0 * bump(t, a, d))
+        # Where he is turned: -90 facing you, 0 in profile (toward the walk-off).
+        def d_turn_in(tau):
+            return smoother((tau - (T_T0 + 1.0)) / (T_K0 - T_T0 - 2.0))
 
-        # His feet, before the turn.
-        pre = {"L": [], "R": []}
-        for j in range(4):
-            s0 = T_SBC0 + 10.0 * j
-            A, O = ("L", "R") if j % 2 == 0 else ("R", "L")
-            sg = sig[A]
-            pre[A].append(pl3(tp(A, sg * 0.21), s0 - 1.5, s0 + 0.5, s0 + 2.5, s0 + 3.5, hs=-6.0, to=16.0))
-            pre[O].append(ball_plant(tp(O, sg * 0.21, 0.06), s0 + 2.5, s0 + 6.0))
-            pre[A].append(pl3(tp(A, sg * 0.16), s0 + 5.5, s0 + 6.5, s0 + 8.5, s0 + 10.5, hs=-6.0, to=16.0))
+        def d_turn_out(tau):
+            return smoother((tau - (T_K1 + 1.0)) / (T_B1 - T_K1 - 2.0))
 
-        def rises(peak):
-            """The standing foot comes up onto its ball as the other leg reaches its height."""
-            return lambda t: 26.0 * bump(t, D0 + peak - 3.5, D0 + peak + 3.5)
+        def d_psi(tau):
+            return 90.0 * d_turn_in(tau) * (1.0 - d_turn_out(tau))
 
-        # (After the last step he stands on the right foot, the left set flat beside it, until the kicks.)
-        pre["R"][-1].t2, pre["R"][-1].t3 = D0 + T_KICK[1] - 8.0, D0 + T_KICK[1] - 6.0
-        pre["R"][-1].extra = rises(T_KICK[0])
-        pre["L"].append(pl3(tp("L"), T_KICK[0] - 14.0, T_KICK[0] - 12.5, T_KICK[0] - 8.0, T_KICK[0] - 6.0, hs=-3.0, to=8.0))
-        # Chorus-line kicks: the knee comes up first, the lower leg snaps out to
-        # a little above the hip with the toe pointed, and it comes back through
-        # the knee and lands; a beat each. The other foot stands, and rises onto
-        # its ball at the top.
-        ankle_up = {s: 0.97 * LEG[s] for s in "LR"}
-        beta = math.radians(KICK_BETA)
-        for i, pk in enumerate(T_KICK):
-            K = "L" if i % 2 == 0 else "R"
-            hv = unit([sig[K] * 0.5, -0.86])
-            a_, b_ = legs[K]["a"], legs[K]["b"]
-            reach = 0.97 * LEG[K]
+        # The feet he starts the kicks from: turned on the balls, which stay where they were.
+        B0 = {s: tp(s) + Rq @ bvv(s) for s in "LR"}
+        F_PROF = {s: B0[s] - bvv(s) for s in "LR"}
+        # He stands on the left to begin with; his pelvis is over it, and travels at STEP a kick.
+        # (He turns on his right foot and steps the left on ahead of where he
+        # stands; the pelvis stays put until the kicks carry it.)
+        mid0 = np.array([P_end[0], P_end[1] - V * KP * 0.5])
+        y_start = mid0[1] + V * (T_K0 + KP * 0.5 - T_K0)
+        F_L0 = mid0 + sp("L")
 
-            def local(h, z, hv=hv):
-                d = np.zeros(3)
-                d[:2] = Rq @ (hv * h)
-                d[2] = z
-                return d
+        def pel_lin(tau, xb):
+            """His pelvis along the kick line: steady travel, a lateral drift to xb."""
+            e = (tau - (T_K0 + KP * 0.5)) / (T_K1 - T_K0)
+            return np.array([mid0[0] + (xb - mid0[0]) * e, y_start - V * (tau - T_K0)])
 
-            d1 = local(a_ * math.sin(math.radians(75.0)), ankle_up[K] - (a_ * math.cos(math.radians(75.0)) + b_ * 0.97))
-            d2 = local(reach * math.sin(beta), ankle_up[K] - reach * math.cos(beta))
-            kt = [pk - 6.0, pk - 3.0, pk - 0.5, pk + 0.8, pk + 2.8, pk + 4.5]
-            path_fn = keyed([(D0 + kt[0], np.zeros(3)), (D0 + kt[1], d1), (D0 + kt[2], d2), (D0 + kt[3], d2), (D0 + kt[4], d1 * 0.6), (D0 + kt[5], np.zeros(3))])
-            pitch_fn = keyed([(D0 + kt[0], 8.0), (D0 + kt[1], 12.0), (D0 + kt[2], -(KICK_BETA - 78.0)), (D0 + kt[3], -(KICK_BETA - 78.0)), (D0 + kt[4], 14.0), (D0 + kt[5], -3.0)])
-            land = pk + 4.5
-            nxt = T_KICK[i + 1] if i < 3 else None
-            plant = pl3(tp(K), land, land + 1.5, land + 8.0, land + 10.0, hs=-3.0, to=8.0, kick=(D0 + pk, path_fn, pitch_fn))
-            if nxt is not None:
-                plant.extra = rises(nxt)
-            pre[K].append(plant)
-        # The first of each foot's plants is where it stood at the start: flat.
-        home = {s: Plant(tp(s), -90.0, -1e3, -1e3 + 1, 1e6, 1e6 + 1, hs=0.0, to=8.0, air=True) for s in "LR"}
-        pre_t3 = {"L": D0 + T_SBC0 - 5.0, "R": D0 + T_SBC0 + 0.0}
-        for s in "LR":
-            home[s].t2, home[s].t3 = pre_t3[s] - 2.5, pre_t3[s]
-            pre[s].insert(0, home[s])
-        # After the turn: the left stands (the weight), the right is set out behind on the ball of its foot, then both come home.
-        F_FIN = tp("R", -0.20, 0.10)
+        def fin_feet(xb):
+            """Where his feet end the line, and the post-turn pelvis P1."""
+            FL = pel_lin(T_K1 + KP * 0.5, xb) + sp("L")
+            FR = pel_lin(T_K0 + KP * (NK - 1) + KP * 0.5, xb) + sp("R")
+            Fp = {"L": FL, "R": FR}
+            Fq = {s: Fp[s] + bvv(s) - Rq @ bvv(s) for s in "LR"}
+            P1_ = 0.5 * ((Fq["L"] - Rq @ stand["L"]) + (Fq["R"] - Rq @ stand["R"]))
+            return Fp, Fq, P1_
+
+        xb = mid0[0]
+        _, _, P1_try = fin_feet(xb)
+        xb = xb + (X0 - P1_try[0])
+        F_END, F_Q, P1 = fin_feet(xb)
+        DTR = float(P_end[1] - P1[1])
+        dsh["t"], dsh["y"] = D0 + T_END, -DTR
+
+        def pelvis(tau):
+            """His pelvis (world x y) through the dance."""
+            if tau <= T_T0:
+                return P_end.copy()
+            if tau < T_K0:
+                e = smoother((tau - T_T0) / (T_K0 - T_T0))
+                return lerp(P_end, pel_lin(T_K0, xb), e)
+            if tau <= T_K1:
+                return pel_lin(tau, xb)
+            end_k = pel_lin(T_K1, xb)
+            hold = pel_lin(T_K1 + KP * 0.5, xb)
+            k = keyed([(T_K1, end_k), (T_K1 + 4.0, hold), (T_K1 + 6.0, hold), (T_B1 + 3.0, P1), (T_END, P1)])
+            return k(tau)
+
+        def d_ln(tau):
+            """How far he leans back through the kick line (0 to 1)."""
+            return smoother((tau - (T_K0 - 6.0)) / 6.0) * (1.0 - smoother((tau - (T_K1 - 1.0)) / 7.0))
+
+        def kick_bump(tau, a=0.0, b=KP):
+            return sum(bump(tau, T_K0 + KP * i + a, T_K0 + KP * i + b) for i in range(NK))
+
+        def d_sink(tau):
+            """How far his knees give (m): the standing knee bends and springs
+            through each kick, deepest as the foot comes down."""
+            if tau < 0.0 or tau > T_END:
+                return 0.0
+            z = 0.0
+            ramp = smoother((tau - (T_K0 - 4.0)) / 4.0) * (1.0 - smoother((tau - (T_K1 + 2.0)) / 4.0))
+            if ramp > 0.0:
+                z += ramp * (0.045 + 0.045 * (0.5 - 0.5 * math.cos(2 * math.pi * (tau - (T_K0 + 3.0)) / KP)))
+            z += 0.02 * smoother((tau - T_B1) / 4.0) * (1.0 - smoother((tau - T_FIN_END) / 5.0))
+            return z
+
+        def d_tilt(tau):
+            """How far his pelvis tips back (degrees)."""
+            return 10.0 * d_ln(tau) + 5.0 * kick_bump(tau, 0.0, KP) * d_ln(tau)
+
+        # His feet. Turned to profile on the balls of the feet, each a ball plant.
+        def pivot(s, tau, B, a0, a1, ta, tb):
+            frac = smoother((tau - ta) / (tb - ta))
+            turn = a0 + (a1 - a0) * frac
+            F = B - yaw(turn)[:2, :2] @ bvv(s)
+            pitch = 14.0 * bump(tau, ta - 1.5, tb + 1.0)
+            A, G = self.foot_pose(s, F, turn, pitch)
+            return A, G, max(pitch, 0.0), True
+
+        # The kicks: R L R L ... The standing foot is the other; a kicking foot lands
+        # where the pelvis will be over it, one step on.
+        kl = {"L": [], "R": []}
+        kl["R"].append(Plant(F_PROF["R"], 0.0, -1e3, -1e3 + 1, D0 + T_K0 - 1.5, D0 + T_K0, hs=0.0, to=8.0, air=True))
+        kl["L"].append(Plant(tp("L"), -90.0, -1e3, -1e3 + 1, D0 + T_T0 - 0.5, D0 + T_T0 + 1.5, hs=0.0, to=8.0, air=True))
+        kl["L"].append(pl3(F_L0, T_K0 - 3.0, T_K0 - 1.5, T_K0 + KP - 1.5, T_K0 + KP, turn=0.0, hs=-3.0, to=8.0))
+        hz0 = {s: legs[s]["A0"][2] + self.sole for s in "LR"}
+        for i in range(NK):
+            K = "R" if i % 2 == 0 else "L"
+            s_ = T_K0 + KP * i
+            ell = 0.97 * LEG[K]
+            hoff = legs[K]["hip"][:2] - self.Jp[:2]
+            beta_fn = keyed([(s_, 8.0), (s_ + 1.2, 75.0), (s_ + 3.0, BETA), (s_ + 3.8, BETA), (s_ + 5.0, 70.0), (s_ + KP - 0.5, 8.0)])
+            w_fn = keyed([(s_, 0.0), (s_ + 1.0, 1.0), (s_ + 5.2, 1.0), (s_ + KP - 0.5, 0.0)])
+            pitch_fn = keyed([(s_, 8.0), (s_ + 3.0, -(BETA - 98.0)), (s_ + 3.8, -(BETA - 98.0)), (s_ + KP - 0.5, -3.0)])
+
+            def arc(t, K=K, ell=ell, hoff=hoff, beta_fn=beta_fn):
+                tau = t - D0
+                pel = pelvis(tau)
+                beta = math.radians(float(beta_fn(tau)))
+                hz = hz0[K] + 0.97 * LEG[K] - d_sink(tau)
+                xy = pel + hoff + FV * ell * math.sin(beta)
+                return np.array([xy[0], xy[1], hz - ell * math.cos(beta)])
+
+            land = s_ + KP - 0.5
+            F_land = pel_lin(s_ + KP * 1.5, xb) + sp(K)
+            nxt = s_ + 2 * KP
+            leave = nxt if i + 2 < NK else 1e5
+            plant = pl3(F_land, land, land + 1.2, leave - 1.5, leave, hs=-3.0, to=8.0, kick=(D0 + s_ + 3.0, arc, lambda t, f=pitch_fn: float(f(t - D0)), lambda t, f=w_fn: float(f(t - D0))))
+            kl[K].append(plant)
+        # After the last kick, and the turn, his feet are where the pivots put them.
         post = {
-            "L": [Plant(tp("L"), -90.0, -1e3, -1e3 + 1, 1e6, 1e6 + 1, hs=0.0, to=8.0, air=True)],
+            "L": [Plant(F_Q["L"], -90.0, -1e3, -1e3 + 1, D0 + T_B1 + 3.5, D0 + T_B1 + 5.0, hs=0.0, to=8.0, air=True), pl3(P1 + Rq @ stand["L"], T_B1 + 6.5, T_B1 + 8.0, 1e6, 1e6 + 1, turn=-90.0, hs=-3.0, to=8.0)],
             "R": [
-                Plant(F_FIN, -90.0, -1e3, -1e3 + 1, T_FIN_END - 2.0 + D0, T_FIN_END + D0, hs=34.0, to=34.0, air=True, fn=lambda t: 34.0),
-                pl3(tp("R"), T_END - 3.0, T_END - 1.5, 1e6, 1e6 + 1, hs=-3.0, to=8.0),
+                Plant(F_Q["R"], -90.0, -1e3, -1e3 + 1, D0 + T_B1 + 0.5, D0 + T_B1 + 1.5, hs=0.0, to=8.0, air=True),
+                pl3(P1 + Rq @ (stand["R"] + np.array([-0.20, 0.10])), T_B1 + 3.0, T_B1 + 4.5, T_FIN_END + 1.0, T_FIN_END + 2.0, turn=-90.0, hs=34.0, to=34.0, fn=lambda t: 34.0),
+                pl3(P1 + Rq @ stand["R"], T_END - 4.0, T_END - 2.0, 1e6, 1e6 + 1, turn=-90.0, hs=-3.0, to=8.0),
             ],
         }
-        # Where his hips are over the turn: above the ball of the left foot, on
-        # which he turns, the right foot tucked up against its knee.
-        AX = stand["L"] + self.legs["L"]["bv"][:2]
-        RET = np.array([stand["L"][0] - 0.06, -0.14])  # (the right ankle, from the hips, on the stage's axes)
-
-        def spin_foot(s, tau):
-            t = D0 + tau
-            turn_ang = 360.0 * smoother((tau - (T_SPIN0 + 1.0)) / (T_SPIN1 - T_SPIN0 - 2.0))
-            if s == "L":
-                bv = self.legs["L"]["bv"][:2]
-                B = tp("L") + Rq @ bv
-                turn = -90.0 + turn_ang
-                F = B - yaw(turn)[:2, :2] @ bv
-                pitch = 30.0 * ease((tau - T_SPIN0) / 3.0) * (1.0 - ease((tau - (T_SPIN1 - 3.0)) / 3.0))
-                A, G = self.foot_pose("L", F, turn, pitch)
-                return A, G, max(pitch, 0.0), True
-            xy, psi, _ = hips_at(t)
-            w_in = smoother((tau - T_SPIN0) / 3.0)
-            w_out = smoother((tau - (T_SPIN1 - 4.0)) / 4.0)
-            Ah, _ = self.foot_pose("R", tp("R"), -90.0, 0.0)
-            Af, _ = self.foot_pose("R", F_FIN, -90.0, 34.0)
-            Ar = np.append(xy + yaw(psi)[:2, :2] @ RET, 0.52)
-            A = lerp(lerp(Ah, Ar, w_in), Af, w_out)
-            pitch = lerp(lerp(0.0, 42.0, w_in), 34.0, w_out)
-            return A, yaw(psi) @ rot(x=float(pitch)), max(float(pitch), 0.0), False
+        # (the plants after the dance, where it leaves him)
+        plants["R"][5].t2, plants["R"][5].t3 = D0 - 2.0, D0
+        plants["L"][6].t2, plants["L"][6].t3 = D0 - 2.0, D0
+        plants["L"].insert(7, Plant(P1 + Rq @ stand["L"], -90.0, D0 + T_END - 2.0, D0 + T_END, t_go - 3, t_go, hs=-3.0, to=10.0, lift=0.03))
+        plants["R"].insert(6, Plant(P1 + Rq @ stand["R"], -90.0, D0 + T_END - 2.0, D0 + T_END, r_back0 - 3, r_back0, hs=-3.0, to=8.0, lift=0.03))
 
         def foot_state(s, t):
             tau = t - D0
             if tau < 0.0 or t > D0 + T_END:
                 return self.foot_at(s, plants[s], t)
-            if tau < T_SPIN0:
-                return self.foot_at(s, pre[s], t)
-            if tau <= T_SPIN1:
-                return spin_foot(s, tau)
+            if tau < T_K0:
+                if s == "L":
+                    return self.foot_at(s, kl[s], t)
+                return pivot(s, tau, B0[s], -90.0, 0.0, T_T0 + 1.0, T_K0 - 1.0)
+            if tau < T_K1:
+                return self.foot_at(s, kl[s], t)
+            if tau <= T_B1:
+                return pivot(s, tau, F_END[s] + bvv(s), 0.0, -90.0, T_K1 + 1.0, T_B1 - 1.0)
             return self.foot_at(s, post[s], t)
 
-        # Where his hips go, how he turns and how deep his knees give.
-        sway_keys = [(0.0, 0.0), (21.0, 0.0)]
-        for j in range(4):
-            s0 = T_SBC0 + 10.0 * j
-            sg = 1.0 if j % 2 == 0 else -1.0
-            sway_keys += [(s0 + 3.0, sg * 0.13), (s0 + 5.5, sg * 0.07), (s0 + 8.0, sg * 0.13)]
-        for i, pk in enumerate(T_KICK):
-            side = -1.0 if i % 2 == 0 else 1.0  # over the foot he stands on
-            sway_keys += [(pk - 4.0, side * 0.04), (pk, side * 0.075), (pk + 4.0, side * 0.03)]
-        sway_keys += [(T_SPIN0 + 1.5, float(AX[0])), (T_SPIN1 - 1.0, float(AX[0])), (T_SPIN1 + 5.0, 0.06), (T_FIN_END, 0.06), (T_END - 2.0, 0.0), (T_END, 0.0)]
-        d_swayx = keyed(sway_keys)
-        d_swayy = keyed([(0.0, 0.0), (T_SPIN0 - 1.0, 0.0), (T_SPIN0 + 1.5, float(AX[1])), (T_SPIN1 - 1.0, float(AX[1])), (T_SPIN1 + 5.0, 0.0), (T_END, 0.0)])
-
-        def d_sway(tau):
-            return np.array([float(d_swayx(tau)), float(d_swayy(tau))])
-
         def d_yaw(tau):
-            """How far he has turned (degrees); a whole turn is back where he started, so 0."""
-            a = 360.0 * smoother((tau - (T_SPIN0 + 1.0)) / (T_SPIN1 - T_SPIN0 - 2.0))
-            return 0.0 if a >= 359.999 else a
-
-        def beat(tau):
-            """1 on a beat, -1 between."""
-            return math.cos(2 * math.pi * (tau - T_NOD) / BEAT)
-
-        def d_bounce(tau):
-            """How much he bounces: from the cane coming up until the kicks."""
-            return smoother((tau - 15.0) / 8.0) * (1.0 - smoother((tau - (T_KICK[0] - 10.0)) / 5.0))
-
-        def d_sink(tau):
-            """How far his knees give (m): a bob of several centimetres on every
-            beat of the soft-shoe, a dip before each kick and a bounce on landing."""
-            if tau < 0.0 or tau > T_END:
-                return 0.0
-            z = 0.038 * d_bounce(tau) * (0.5 + 0.5 * beat(tau))
-            for pk in T_KICK:
-                z += 0.03 * bump(tau, pk - 10.0, pk - 2.0) + 0.026 * bump(tau, pk + 1.0, pk + 9.0)
-            z += 0.02 * smoother((tau - T_SPIN1) / 4.0) * (1.0 - smoother((tau - T_FIN_END) / 5.0))
-            z += 0.012 * bump(tau, T_SPIN0 - 3.0, T_SPIN1)
-            return z
+            return d_psi(tau)
 
         def d_roll(tau):
-            """His pelvis tilts with the weight (degrees)."""
-            return 32.0 * float(d_swayx(tau)) * (1.0 if tau < T_SPIN0 - 4.0 or tau > T_SPIN1 + 4.0 else 0.0)
+            return 0.0
 
         def d_twist(tau):
-            return -26.0 * float(d_swayx(tau)) * (0.5 + 0.5 * math.sin(2 * math.pi * (tau - T_NOD) / BEAT)) * d_bounce(tau)
+            return 0.0
 
-        # The cane in his right hand, on his stage. Described by the point on
-        # the shaft his hand is at (G), the way the shaft points (u, from the
-        # tip toward the knob) and how far below the knob his hand is.
-        TAP_TIP = np.array([-0.22, -0.50, 0.0])
-        U_TAP = unit([-0.10, 0.42, 0.90])
+        # The cane in his right hand, on his body's own axes (x across, y back,
+        # z up; from his pelvis, turned with him). Described by the point on the
+        # shaft his hand is at (G), the way the shaft points (u, from the tip
+        # toward the knob) and how far below the knob his hand is.
         C_TW = np.array([-0.38, -0.32, 1.08])
-        # Through the kicks and the turn: held level across him at the chest.
-        G_KICK, U_KICK, S_KICK = np.array([-0.30, -0.34, 1.16]), unit([0.93, -0.10, 0.30]), 0.45
+        G_KC, U_KC, S_KC = np.array([-0.34, -0.12, 1.22]), unit([0.0, -0.95, 0.18]), 0.02
+        F_KC, N_KC = np.array([1.0, 0.0, 0.0]), np.array([0.0, 0.0, -1.0])  # (fingers, palm) round the level cane
         G_FIN, U_FIN = np.array([-0.52, -0.05, 1.62]), unit([0.10, 0.0, -0.99])
-        Ls = self.L
-
-        def tap_state(tau):
-            lift = 0.08 * math.sin(math.pi * (tau - T_SBC0) / BEAT) ** 2
-            tip = TAP_TIP + np.array([0.0, 0.0, lift])
-            sgd = 0.03
-            return tip + U_TAP * (Ls - 0.055 - sgd), U_TAP, sgd
+        T_TO = T_K0 - 2.0  # the cane is across his chest by here
 
         def cane_dance(tau):
-            """(G, u, s_g, u_hand, follow): the dance's cane, on his stage."""
+            """(G, u, s_g, u_hand, share of the level-cane grip): the dance's cane."""
             if tau < T_TW1:
                 th = 2 * math.pi * smoother((tau - T_TW0) / (T_TW1 - T_TW0))
                 u = np.array([-math.sin(th), 0.0, math.cos(th)])
                 sgd = float(keyed([(T_LIFT0, 0.0), (T_TW0, 0.04), (T_TW0 + 3.0, 0.33), (T_TW1, 0.33)])(tau))
                 G = C_TW.copy()
-                # He lifts it: the hand comes up with the cane.
                 G[2] = C_TW[2] - 0.12 * (1.0 - smoother((tau - T_LIFT0) / 4.0))
                 return G, u, sgd, unit([0.0, 0.0, 1.0]), 0.0
-            if tau < T_SBC0:
-                e = smoother((tau - T_TW1) / (T_SBC0 - T_TW1))
-                Gt, ut, st = tap_state(T_SBC0)
-                u = unit(lerp([0.0, 0.0, 1.0], ut, e))
-                s_d = 0.33 + (st - 0.33) * e
-                # The tip comes down onto its spot on the beat.
-                tip_now = lerp(C_TW - np.array([0.0, 0.0, 1.0]) * (Ls - 0.055 - 0.33), TAP_TIP, e)
-                G = tip_now + u * (Ls - 0.055 - s_d)
-                return G, u, s_d, u, 0.0
-            if tau <= T_SBC1 + 1e-6:
-                G, u, sgd = tap_state(tau)
-                return G, u, sgd, u, 0.0
-            if tau < T_FIN - 7.0:
-                Gt, ut, st = tap_state(T_SBC1)
-                e = smoother((tau - (T_SBC1 + 1.0)) / 6.0)
-                u = unit(lerp(ut, U_KICK, e))
-                G = lerp(Gt, G_KICK, e)
-                # A small pump with each kick.
-                pump = sum(bump(tau, pk - 5.0, pk + 5.0) for pk in T_KICK)
-                G = G + np.array([0.0, -0.03, 0.07]) * pump * e
-                return G, u, st * (1 - e) + S_KICK * e, u, e
-            e = smoother((tau - (T_FIN - 7.0)) / 7.0)
-            u = unit(lerp(U_KICK, U_FIN, e))
-            G = lerp(G_KICK, G_FIN, e)
-            sgd = S_KICK + (0.20 - S_KICK) * e
+            if tau < T_FIN - 8.0:
+                e = smoother((tau - T_TW1) / (T_TO - T_TW1))
+                u = unit(lerp([0.0, 0.0, 1.0], U_KC, e))
+                G = lerp(C_TW, G_KC, e)
+                pump = kick_bump(tau, -1.0, KP - 1.5)
+                G = G + np.array([0.0, -0.025, 0.06]) * pump * e
+                hk = smoother((tau - T_TW1) / (T_TO - T_TW1)) * (1.0 - smoother((tau - (T_B1 - 7.0)) / 5.0))
+                return G, u, 0.33 + (S_KC - 0.33) * e, u, hk
+            e = smoother((tau - (T_FIN - 8.0)) / 8.0)
+            u = unit(lerp(U_KC, U_FIN, e))
+            G = lerp(G_KC, G_FIN, e)
+            sgd = S_KC + (0.20 - S_KC) * e
             if tau > T_FIN:
                 G = G + np.array([0.0, 0.0, 0.015 * math.sin(2 * math.pi * (tau - T_FIN) / 14.0)])
-            return G, u, sgd, u, 1.0
+            return G, u, sgd, u, 0.0
 
         def wc_cane(tau):
             """How much of the cane is the dance's: it leaves the ground as his
             hand lifts it, and comes back to be set down at the end."""
-            return smoother((tau - 3.0) / 5.0) * (1.0 - smoother((tau - (T_FIN_END - 4.0)) / (T_END - T_FIN_END + 2.0)))
+            return smoother((tau - 3.0) / 5.0) * (1.0 - smoother((tau - T_FIN_END) / (T_END - T_FIN_END - 1.0)))
 
-        # His left hand: on his right, then flicked open beside his hip and
-        # waving loosely through the soft-shoe, up in a curve over his head for
-        # the kicks, flung out and up at the finish; back on the cane.
-        HIP_L = (np.array([0.38, -0.15, 0.95]), unit([0.30, -0.25, -0.9]), np.array([0.0, -1.0, 0.0]))
-        ARC_L = (np.array([0.36, -0.05, 1.80]), unit([0.15, 0.0, 1.0]), np.array([0.0, -1.0, 0.0]))
+        # His left hand: on his right, then up to his brow (tipping the brim he
+        # hasn't got) through the kicks, flung wide at the finish; back on the cane.
         FIN_L = (np.array([0.56, -0.06, 1.70]), unit([0.6, -0.1, 0.8]), np.array([0.0, -1.0, 0.0]))
 
-        def left_dance(tau):
-            """(palm, fingers, palm normal) of his left hand, from his hips."""
-            ks = [(14.0, 0), (T_SBC1 - 3.0, 0), (T_SBC1 + 5.0, 1), (T_FIN - 7.0, 1), (T_FIN, 2), (T_FIN_END, 2)]
-            sets = (HIP_L, ARC_L, FIN_L)
-            pos = keyed([(t, sets[k][0]) for t, k in ks])
-            fin = keyed([(t, sets[k][1]) for t, k in ks])
-            pal = keyed([(t, sets[k][2]) for t, k in ks])
-            p = pos(tau)
-            ph = 2 * math.pi * (tau - T_NOD) / (2 * BEAT)
-            wave = d_bounce(tau)
-            # A loose swing and wave while he dances the soft-shoe; a pump with each kick.
-            p[0] += 0.06 * math.sin(ph) * wave
-            p[2] += 0.035 * beat(tau) * wave
-            f = unit(fin(tau) + np.array([0.0, 0.0, 0.0]) + np.array([0.25 * math.sin(ph + 1.0) * wave, 0.0, 0.0]))
-            for pk in T_KICK:
-                k = bump(tau, pk - 5.0, pk + 5.0)
-                p[2] += 0.07 * k
-                p[0] += 0.05 * k
-            return p, f, unit(pal(tau))
-
-        def wl_left(tau):
-            return smoother((tau - 3.0) / 8.0) * (1.0 - smoother((tau - (T_FIN_END - 4.0)) / (T_END - T_FIN_END + 2.0)))
+        def wl_parts(tau):
+            """(brow, finish) shares of his left hand; the rest is the existing 'on the cane'."""
+            fin = smoother((tau - (T_FIN - 8.0)) / 6.0) * (1.0 - smoother((tau - (T_FIN_END - 3.0)) / (T_END - T_FIN_END + 1.0)))
+            brow = smoother((tau - 2.0) / 9.0) * (1.0 - smoother((tau - (T_FIN - 8.0)) / 6.0))
+            return brow, fin
 
         def spread_left(tau):
-            return smoother((tau - 8.0) / 3.0) * (1.0 - smoother((tau - (T_FIN_END - 1.0)) / 5.0))
+            return smoother((tau - (T_FIN - 6.0)) / 4.0) * (1.0 - smoother((tau - (T_FIN_END - 1.0)) / 5.0))
 
         def d_weight(tau):
             """How much of his body is the dance's."""
-            return smoother(tau / 8.0) * (1.0 - smoother((tau - (T_END - 9.0)) / 8.0))
+            return smoother(tau / 8.0) * (1.0 - smoother((tau - (T_END - 10.0)) / 9.0))
 
         # ── His cane: where its tip is set down, and where his hand would be.
         A_hand = 0.08
@@ -786,15 +765,19 @@ class Motion:
         # ...and turning away, carries it back round to his side the same way.
         back0, back1 = t_back + 0.1 * nJ, t_back + 0.65 * nJ
         canes.append((ts + C, carry0, side_tip))
-        canes.append((carry1, back0, front_tip))
+        front_tip1 = front_tip + np.array([0.0, -DTR, 0.0])
+        canes.append((carry1, D0 + 10.0, front_tip))
+        canes.append((D0 + T_END - 12.0, back0, front_tip1))
         # (Where he has carried it to, as a moment's stop before his stride.)
         canes.append((back1, back1, None))
         for k in range(0, 3):
             t0 = t_s2 + k * C
             canes.append((t0, t0 + C / 2, stride_tip(t0)))
 
-        def front_knob(psi):
-            return P_end + yaw(psi)[:2, :2] @ np.array([0.0, -0.36])
+        P1_now = lambda t: P_end if t < D0 + 0.5 * T_END else P1
+
+        def front_knob(psi, t=0.0):
+            return P1_now(t) + yaw(psi)[:2, :2] @ np.array([0.0, -0.36])
 
         def stride_knob(t):
             return np.array([X0 + self.cane_x + 0.03, hips_y(t) + self.hand_y - A_hand * math.cos(2 * math.pi * phase(t))])
@@ -808,9 +791,9 @@ class Motion:
             if t < t_turn:
                 return side_knob
             if t < t_back:
-                return lerp(side_knob, front_knob(psi), smoother(-psi / 90.0))
+                return lerp(side_knob, front_knob(psi, t), smoother(-psi / 90.0))
             if t <= back0:
-                return front_knob(-90.0)
+                return front_knob(-90.0, t)
             if t < t_s2:
                 # From his side, where he carried it, into his stride.
                 at_side = landed[0][:2]
@@ -842,8 +825,8 @@ class Motion:
             knob_b = arc(side_body[0], front_body[0], f)
             tip_b = arc(side_body[1], front_body[1], f)
             Y = yaw(psi)[:2, :2]
-            tip = np.append(P_end + Y @ tip_b, 0.0)
-            top = self._knob(tip, P_end + Y @ knob_b)
+            tip = np.append(P1_now(t) + Y @ tip_b, 0.0)
+            top = self._knob(tip, P1_now(t) + Y @ knob_b)
             return tip + np.array([0.0, 0.0, lift]), top + np.array([0.0, 0.0, lift])
 
         def cane_at(t, psi):
@@ -886,8 +869,7 @@ class Motion:
                 shift = 0.35 * (plants["L"][6].F - P_end) * bump(u, 0.05, 0.6)
             if D0 <= t <= D0 + T_END:
                 tau = t - D0
-                sh = Rq @ d_sway(tau)
-                return np.array([X0 + shift[0] + sh[0], hips_y(t) + shift[1] + sh[1]]), psi + d_yaw(tau), rot(y=d_roll(tau), z=d_twist(tau))
+                return pelvis(tau), psi + d_yaw(tau), rot(x=-d_tilt(tau))
             return np.array([X0 + sway + shift[0], hips_y(t) + shift[1]]), psi, rot(y=drop * 0.6, z=turn)
 
         # Where he set the cane down at his side, turning away (its top, its tip).
@@ -925,6 +907,8 @@ class Motion:
                 r = math.hypot(A[0] - hip[0], A[1] - hip[1])
                 if down or A[2] < leg["A0"][2] + self.sole + 0.02:
                     zs.append(A[2] + math.sqrt(max(0.0, reach * reach - r * r)) - hip[2])
+            if not zs:
+                raise RuntimeError(f'no foot on the ground at tau={t - D0}')
             k = 0.012
             m = min(zs)
             return m - k * math.log(sum(math.exp(-(z - m) / k) for z in zs)), max(zs)
@@ -1023,40 +1007,29 @@ class Motion:
 
         def dance_upper(R, tau):
             """What the dance does to his body above the hips (on top of his stance)."""
-            bn, b = d_bounce(tau), beat(tau)
-            # His shoulders bounce on the beat and shimmy against his hips; his chest rides with them.
-            sh = 4.0 * bn * b
-            shim = 5.0 * bn * math.sin(2 * math.pi * (tau - T_NOD) / (2 * BEAT))
-            _after(R, "clavicle.L", rot(y=-sh - shim))
-            _after(R, "clavicle.R", rot(y=sh - shim))
-            _after(R, "spine04", rot(x=-1.5 * bn * b, z=4.0 * bn * math.sin(2 * math.pi * (tau - T_NOD) / (2 * BEAT) + 0.6)))
-            # His chest stays over his feet when his hips tilt.
-            _after(R, "spine02", rot(y=-0.7 * d_roll(tau)))
-            # Through the kicks he leans back, away from the kicking leg, and his chest lifts.
-            for i, pk in enumerate(T_KICK):
-                kb = bump(tau, pk - 6.0, pk + 4.0)
-                side = -1.0 if i % 2 == 0 else 1.0
-                _after(R, "spine02", rot(x=-6.0 * kb, y=4.0 * side * kb))
-                _after(R, "spine04", rot(x=-3.5 * kb))
+            ln = d_ln(tau)
+            kb = kick_bump(tau, 0.0, KP) * ln
+            # He leans back through the kicks (pelvis, chest, head tipped back), further at each kick.
+            _after(R, "spine02", rot(x=-8.0 * ln - 4.0 * kb))
+            _after(R, "spine04", rot(x=-7.0 * ln - 3.0 * kb))
+            _after(R, "neck01", rot(x=-2.0 * ln))
+            _after(R, "head", rot(x=-5.0 * ln - 2.0 * kb))
             # The cue: a small, sly nod, the eyes staying on you.
             nod = keyed([(0.0, 0.0), (1.0, -0.2), (3.0, 1.0), (6.0, 0.2), (9.0, 0.0)])
             nn, nh = float(nod(tau - 1.0)), float(nod(tau - 2.0))
-            # (and his head bobs a little behind his body on every beat)
-            bob = 3.0 * bn * math.cos(2 * math.pi * (tau - T_NOD - 2.0) / BEAT)
-            _after(R, "neck01", rot(x=9.0 * nn + 0.5 * bob))
-            _after(R, "head", rot(x=8.0 * nh + bob))
+            _after(R, "neck01", rot(x=9.0 * nn))
+            _after(R, "head", rot(x=8.0 * nh))
             for s in "LR":
                 R[f"eye.{s}"] = R[f"eye.{s}"] @ rot(x=-14.0 * nh)
-            # The turn: his head holds on you as long as it can, whips round and
-            # arrives before his body does.
-            sp = smoother((tau - (T_SPIN0 + 1.0)) / (T_SPIN1 - T_SPIN0 - 2.0))
-            if 0.0 < sp < 1.0:
-                ang = 360.0 * sp
-                rel = -min(ang, 60.0) * (1.0 - smoother((sp - 0.25) / 0.2)) + 55.0 * bump(sp, 0.55, 1.0)
+            # In profile his head turns to you over his shoulder, his eyes on you.
+            prof = d_psi(tau) / 90.0
+            if prof > 0.0:
                 for bone, deg in HEAD:
-                    _after(R, bone, rot(z=rel * deg / 68.0))
+                    _after(R, bone, rot(z=-deg * 0.8 * prof))
+                for s in "LR":
+                    R[f"eye.{s}"] = R[f"eye.{s}"] @ rot(z=-EYES * 0.6 * prof)
             # The finish: head cocked, chest up, shoulders flung back.
-            fin = smoother((tau - (T_FIN - 4.0)) / 5.0) * (1.0 - smoother((tau - (T_FIN_END - 1.0)) / 5.0))
+            fin = smoother((tau - (T_FIN - 4.0)) / 5.0) * (1.0 - smoother((tau - (T_FIN_END - 1.0)) / 8.0))
             _after(R, "head", rot(x=-4.0 * fin, y=-9.0 * fin))
             _after(R, "spine02", rot(x=-5.0 * fin))
             _after(R, "clavicle.L", rot(y=-4.0 * fin))
@@ -1112,9 +1085,9 @@ class Motion:
             wcn = wc_cane(tau) if 0.0 <= tau <= T_END else 0.0
             if wcn > 0.0:
                 # The dance's cane (on his stage), his fist round it where it is.
-                Gd, ud, sgd, uhd, fol = cane_dance(tau)
+                Gd, ud, sgd, uhd, hk = cane_dance(tau)
                 Yp = yaw(psi)
-                Gw = np.append(P_end + Yp[:2, :2] @ Gd[:2] + fol * (Rq @ d_sway(tau)), Gd[2])
+                Gw = np.append(xy + Yp[:2, :2] @ Gd[:2], Gd[2])
                 uw, uhw = Yp @ ud, Yp @ uhd
                 top = lerp(top, Gw + uw * (0.055 + sgd), wcn)
                 u_cane = unit(lerp(u_cane, uw, wcn))
@@ -1122,10 +1095,11 @@ class Motion:
                 if tip[2] < 0.0:
                     top = top - np.array([0.0, 0.0, tip[2]])
                     tip[2] = 0.0
-                mix = smoother((abs(float(uhd[0])) - 0.3) / 0.4)
-                fv, iv = Yp @ np.array([0.0, -1.0, 0.0]), Yp @ lerp([1.0, 0.0, 0.0], [0.0, 0.0, -1.0], mix)
+                fv, iv = Yp @ np.array([0.0, -1.0, 0.0]), Yp @ np.array([1.0, 0.0, 0.0])
                 f_d = unit(fv - (fv @ uhw) * uhw)
                 n_d = unit(iv - (iv @ uhw) * uhw - (iv @ f_d) * f_d)
+                if hk > 0.0:
+                    f_d, n_d = unit(lerp(f_d, Yp @ F_KC, hk)), unit(lerp(n_d, Yp @ N_KC, hk))
                 target_r = lerp(target_r, Gw - n_d * 0.02 - f_d * 0.025, wcn)
                 fing_r, palm_r = lerp(fing_r, f_d, wcn), lerp(palm_r, n_d, wcn)
                 pole_w = lerp(pole_w, Yp @ np.array([-1.0, 0.3, -0.25]), min(1.0, 3.0 * wcn))
@@ -1157,18 +1131,24 @@ class Motion:
                     lift = bump(u)
                 target = lerp(start[0], on, e) + np.array([0.0, 0.0, 0.035]) * lift
                 fing_l, palm_l, pole_l = lerp(start[1], on_dirs[0], e), lerp(start[2], on_dirs[1], e), yaw(psi) @ np.array([0.85, 0.5, -0.15])
-                wl = wl_left(tau) if 0.0 <= tau <= T_END else 0.0
-                if wl > 0.0:
-                    pD, fD, nD = left_dance(tau)
-                    Yp = yaw(psi)
-                    # (The hand goes out and round, never straight across his belly.)
-                    swing = 4.0 * wl * (1.0 - wl)
-                    target = lerp(target, np.append(xy + Yp[:2, :2] @ pD[:2], pD[2]), wl) + Yp @ (np.array([0.20, -0.12, 0.0]) * swing)
-                    fing_l, palm_l = lerp(fing_l, Yp @ fD, wl), lerp(palm_l, Yp @ nD, wl)
+                wb, wf = wl_parts(tau) if 0.0 <= tau <= T_END else (0.0, 0.0)
+                Yp = yaw(psi)
+                if wb + wf > 0.0:
+                    # To his brow: fingertips to his temple, as if tipping a brim.
+                    Dk = self.fk(R, root)
+                    hp = self.at(Dk, "head", self.heads[self.idx["head"]])
+                    brow = hp + Yp @ np.array([0.10, -0.075, 0.075])
+                    fin_p = np.append(xy + Yp[:2, :2] @ FIN_L[0][:2], FIN_L[0][2])
+                    wo = max(0.0, 1.0 - wb - wf)
+                    wa = wb + wf
+                    swing = 4.0 * wa * (1.0 - wa)
+                    target = target * wo + brow * wb + fin_p * wf + Yp @ (np.array([0.22, -0.26, 0.06]) * swing)
+                    fing_l = unit(fing_l * wo + Yp @ unit([-0.55, -0.35, 0.55]) * wb + Yp @ FIN_L[1] * wf)
+                    palm_l = unit(palm_l * wo + Yp @ unit([0.3, -0.75, -0.3]) * wb + Yp @ FIN_L[2] * wf)
                 self.reach(R, root, "L", target, fing_l, palm_l, pole_l)
                 # Resting on his right hand, the fingers lie together over it.
-                self.fingers(R, "L", 0.42 + 0.2 * e)
-                if wl > 0.0:
+                self.fingers(R, "L", 0.42 + 0.2 * e + 0.25 * (wb if 0.0 <= tau <= T_END else 0.0))
+                if 0.0 <= tau <= T_END:
                     self.spread(R, "L", spread_left(tau))
             rec = None
             if fi < tw:
@@ -1183,7 +1163,7 @@ class Motion:
             zc = unit(top - tip)
             xc = unit(np.cross([0.0, 1.0, 0.0], zc))
             M[:3, 0], M[:3, 1], M[:3, 2], M[:3, 3] = xc, np.cross(zc, xc), zc, tip
-            out.append(dict(R=R, root=root, cane=M, blink=blink, hips=float(hips_y(t)), rec=rec))
+            out.append(dict(R=R, root=root, cane=M, blink=blink, hips=float(xy[1]) if D0 <= t <= D0 + T_END else float(hips_y(t)), rec=rec))
         return out
 
     def arm_clearance(self, take):

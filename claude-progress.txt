@@ -974,3 +974,8 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - death_motion.py: dance tightened to 135 frames (6.75 s); bouncier soft-shoe; chorus-line kicks a beat each; cane across the chest with the left arm curved overhead (no T-pose); the turn is a pirouette on the left ball.
 - Re-rendered at production settings; public/death is 3.6 MB.
 - NEXT: the settle after the finish is quick (cane returns in about 8 frames).
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances, third pass (the kick line)
+- death_motion.py: the dance is now the traveling high-kick line from the reference move (profile, ten straight-leg near-vertical kicks, lean back, cane across the chest, hand to the brow), a turn back, the ta-da and a settle; 141 frames, about 2 m of travel carried in take.json/deathFrames.json; everything after it (cane, plants, walk-off) starts from where it leaves him.
+- tests/unit/deathFilm.test.ts: travel is monotonic with no jumps. Removed committed __pycache__ files.
+- NEXT: the settle is about 8 visible frames; the left hand at the brow overlaps the cheek.

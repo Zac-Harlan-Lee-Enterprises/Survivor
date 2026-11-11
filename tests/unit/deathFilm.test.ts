@@ -55,16 +55,27 @@ describe('the rendered film', () => {
     expect(scene.at(-1)! - scene.at(-2)!).toBeGreaterThan(pace * 0.8)
   })
 
-  it('dances between regarding you and turning away: about 7 seconds, on the spot, 120 beats a minute', () => {
+  it('dances between regarding you and turning away: 6 to 8 seconds, travelling the floor in a kick line', () => {
     const [from, to] = FILM.dance
     expect(from).toBeGreaterThan(100)
     expect(to).toBeLessThanOrEqual(FILM.scene.length)
-    // 100 to 150 frames at 20 a second: five to seven and a half seconds.
-    expect(to - from).toBeGreaterThanOrEqual(100)
-    expect(to - from).toBeLessThanOrEqual(150)
-    // He does not travel while he dances.
-    const xs = FILM.scene.slice(from, to).map((i) => FILM.frames[i]!.x)
-    expect(Math.max(...xs) - Math.min(...xs)).toBe(0)
+    // 120 to 160 frames at 20 a second: six to eight seconds.
+    expect(to - from).toBeGreaterThanOrEqual(120)
+    expect(to - from).toBeLessThanOrEqual(160)
+    // He travels toward the walk-off while he dances (one to three metres: his stride is a metre and a bit)...
+    const xs = FILM.scene.map((i) => FILM.frames[i]!.x)
+    const travel = xs[to]! - xs[from]!
+    expect(travel).toBeGreaterThan(FILM.stride * 1.2)
+    expect(travel).toBeLessThan(FILM.stride * 3)
+    // ...never backward, and never faster than a walking pace (no jump between frames, none at either end of the dance).
+    const pace = FILM.stride / FILM.walk.length
+    for (let k = from - 2; k < to + 3; k++) {
+      const step = xs[k + 1]! - xs[k]!
+      expect(step, `frame ${k}`).toBeGreaterThanOrEqual(0)
+      expect(step, `frame ${k}`).toBeLessThanOrEqual(pace * 1.25)
+    }
+    // After it he stands where it left him (the turn away starts from there).
+    expect(xs[to + 5]! - xs[to]!).toBe(0)
     // His arms are flung wide and the cane held out: the frame is wider than the walk's.
     expect(FILM.frameWidth).toBeGreaterThanOrEqual(2 * 32 * 8)
   })
