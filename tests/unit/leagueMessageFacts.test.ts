@@ -64,6 +64,17 @@ const lostIn = (w: number) => {
 const gameOf = (w: number, team: string) =>
   week(w).find((g) => g.homeTeamId === team || g.awayTeamId === team) ?? null
 
+/** Every way the note could name a team: abbreviation, city, nickname, aliases (src/domain/teams.ts). */
+const teamNames = (() => {
+  const src = readFileSync(new URL('../../src/domain/teams.ts', import.meta.url), 'utf8')
+  const out = new Map<string, string[]>()
+  for (const m of src.matchAll(/\['([A-Z]+)', '([^']+)', '([^']+)',[^\]]*\[([^\]]*)\]\]/g)) {
+    const aliases = [...m[4]!.matchAll(/'([^']+)'/g)].map((a) => a[1]!)
+    out.set(m[1]!, [m[1]!, m[2]!, m[3]!, ...aliases])
+  }
+  return out
+})()
+
 const source = readFileSync(
   new URL('../../src/features/league-home/LeagueMessage.tsx', import.meta.url),
   'utf8',
@@ -200,8 +211,20 @@ describe('the commissioner’s week 9 review states only true things', () => {
     expect(at(week(10)[0]!.kickoffAt)).toBe('Thursday, November 12 at 7:15 PM')
   })
 
-  it('gives away no week 10 pick and says nothing of messages or pick times', () => {
-    expect(picksIn(10)).toEqual([])
+  it('never names a player in the same sentence as their week 10 team', () => {
+    expect(teamNames.size).toBe(32)
+    const sentences = body.split(/(?<=[.!?])\s+/)
+    for (const p of picksIn(10)) {
+      const first = nameOf(p.playerId).split(' ')[0]!
+      for (const s of sentences.filter((x) => new RegExp(`\\b${first}\\b`).test(x))) {
+        for (const n of teamNames.get(p.teamId)!) {
+          expect(new RegExp(`\\b${n}\\b`).test(s), `${first} beside ${n}: “${s}”`).toBe(false)
+        }
+      }
+    }
+  })
+
+  it('says nothing of messages or pick times', () => {
     expect(body).not.toMatch(/\b(messag|nudg|remind|chas)\w*/i)
     expect(body.replaceAll('late commissioner', '')).not.toMatch(/\b(sent|submitted|early|late)\b/i)
   })
