@@ -89,6 +89,8 @@ describe('demo fixture', () => {
     ['cindy-mendoza', 'SEA', '2026-11-11T18:05:29.000Z', '2026-w10-SEA-at-LV'],
     ['dominic-green', 'JAX', '2026-11-11T20:25:19.000Z', '2026-w10-JAX-at-TEN'],
     ['melanie-moeller', 'BUF', '2026-11-11T21:12:45.000Z', '2026-w10-BUF-at-NYJ'],
+    // Relayed by the commissioner in session; receipt time is that relay, not a Teams timestamp.
+    ['tracy-nelson', 'JAX', '2026-11-11T22:12:00.000Z', '2026-w10-JAX-at-TEN'],
   ])(
     'records %s’s week 10 pick with its team and receipt time',
     (playerId, teamId, submittedAt, gameId) => {
