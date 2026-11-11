@@ -101,6 +101,11 @@ def main():
     sims = [g for g in person.cloth.garments if g.sim]
     take = mo.take()
     print("TAKE", len(take), "frames", sum(1 for f in take if f["rec"]), "to render; dance is scene-%03d to scene-%03d" % mo.dance_frames, flush=True)
+    for i, f in enumerate(take):
+        bad = [k for k, v in f["R"].items() if not np.isfinite(v).all()]
+        if bad or not np.isfinite(f["root"]).all() or not np.isfinite(f["cane"]).all():
+            print("NAN at take frame", i, "scene", i - 91, bad[:6], np.isfinite(f["root"]).all(), np.isfinite(f["cane"]).all(), flush=True)
+            break
     z = mo.z_hips
     C = death_motion.CYCLE
     walk = z[10 + C : 10 + 3 * C]

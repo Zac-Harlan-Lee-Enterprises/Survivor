@@ -584,6 +584,11 @@ def _skirts(self, mat):
         rings.append(np.stack([np.sin(th) * rr, cy - np.cos(th) * rr, np.full(len(th), z)], 1))
     V, Q = ring_grid(rings)
     W = self.nearest_weights(V, k=6)
+    # The skirts hang from his hips: they never take an arm's weight from the
+    # hands at his sides (which lifted the hem like wings when his arms rose).
+    for n in _names(self, "upperarm", "lowerarm", "wrist", "finger", "metacarpal", "shoulder", "clavicle"):
+        W[:, self.idx[n]] = 0.0
+    W = W / np.maximum(W.sum(1, keepdims=True), 1e-9)
     hips = np.zeros_like(W)
     hips[:, self.idx["spine05"]] = 1.0
     # The waist with the hips; toward the hem, a share of each thigh.
