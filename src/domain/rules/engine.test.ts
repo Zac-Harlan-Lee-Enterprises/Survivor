@@ -136,6 +136,32 @@ describe('missing picks', () => {
     expect(s.livesRemaining).toBe(2)
   })
 
+  it('a sealed pick (in hiddenPicks) is pending after the deadline, never a miss', () => {
+    const snap = scenario()
+      .players('ann', 'bob')
+      .game(1, 'GB', 'CHI', { kickoff: kickoffFor(1, 0) })
+      .build()
+    snap.hiddenPicks = [{ playerId: 'ann', week: 1 }]
+    const ev = evaluateSeason(snap, { now: kickoffFor(1, -4 / 60) })
+    const ann = findStanding(ev, 'ann')
+    expect(ann?.history[0]?.outcome).toBe('pending')
+    expect(ann?.strikes).toBe(0)
+    // Bob has no sealed pick, so he is still struck, and the week is not settled.
+    expect(findStanding(ev, 'bob')?.history[0]?.outcome).toBe('missing')
+    expect(weekSummary(ev, 1)?.settled).toBe(false)
+  })
+
+  it('a sealed pick keeps the week unsettled even once every game is final', () => {
+    const snap = scenario()
+      .players('ann')
+      .game(1, 'GB', 'CHI', { final: 'GB' })
+      .build()
+    snap.hiddenPicks = [{ playerId: 'ann', week: 1 }]
+    const ev = evaluateSeason(snap, { now: AFTER_WEEK_3 })
+    expect(findStanding(ev, 'ann')?.history[0]?.outcome).toBe('pending')
+    expect(weekSummary(ev, 1)?.settled).toBe(false)
+  })
+
   it('missing pick does not cost a life when the league disables that rule', () => {
     const snap = scenario()
       .withSettings({ missingPickCountsAsMiss: false })

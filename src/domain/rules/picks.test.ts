@@ -352,4 +352,22 @@ describe('redactSnapshot', () => {
     expect(afterDeadline.picks).toHaveLength(2)
     expect(afterDeadline.hiddenPicks).toEqual([])
   })
+
+  it('keeps sealed stubs the snapshot already carries, deduped by player and week', () => {
+    const snap = scenario()
+      .players('ann', 'bob')
+      .game(1, 'GB', 'CHI', { kickoff: kickoffFor(1, 0) })
+      .pick('ann', 1, 'GB')
+      .build()
+    snap.hiddenPicks = [
+      { playerId: 'bob', week: 1 },
+      { playerId: 'ann', week: 1 },
+    ]
+    const viewer = { playerId: null, isCommissioner: false }
+    const before = redactSnapshot(snap, viewer, kickoffFor(1, -1))
+    expect(before.hiddenPicks).toHaveLength(2)
+    // After the deadline ann's pick is public, but bob's sealed stub survives.
+    const after = redactSnapshot(snap, viewer, kickoffFor(1, -4 / 60))
+    expect(after.hiddenPicks).toContainEqual({ playerId: 'bob', week: 1 })
+  })
 })

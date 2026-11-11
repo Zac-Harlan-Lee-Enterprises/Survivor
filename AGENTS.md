@@ -169,6 +169,7 @@ All frontend variables are **public** (compiled into the bundle). Values in `.en
 | Regenerate season / default avatar | `npm run fixtures:generate` · `npm run headshots:generate` |
 | Refresh the real NFL schedule | `npm run schedule:fetch` |
 | Import real player photos from `photos/` | `npm run headshots:import` |
+| Record picks before the lock | Sealed: in `STORY` write `sealed('<receipt ISO time>')`, never the team; `fixtures:generate` emits a `hiddenPicks` stub only. After the lock, re-read Teams and replace each `sealed(...)` with the team. Teams is the source of truth meanwhile. |
 | Someone was eliminated: carve their epitaph | Write a one-paragraph recap of their own season (factual, funny, a bit edgy) as their entry in `src/lib/epitaphs.ts`, in the same PR as that week's review, pin that week's finals in `tests/unit/seasonFacts.ts`, and assert each claim in `tests/unit/epitaphFacts.test.ts` |
 | Spreadsheet import report | `npm run import:report -- data/import/sample-league.csv --out report.md` |
 | Bundle Lambda handlers | `npm run api:build` |

@@ -87,13 +87,19 @@ describe('demo fixture', () => {
     expect(picks[0]).toMatchObject({ teamId: 'NYJ', submittedAt: '2026-10-22T18:26:14.000Z' })
   })
 
-  it.each([
-    ['cindy-mendoza', 'SEA', '2026-11-11T18:05:29.000Z', '2026-w10-SEA-at-LV'],
-    ['dominic-green', 'JAX', '2026-11-11T20:25:19.000Z', '2026-w10-JAX-at-TEN'],
-  ])('records %s’s week 10 pick from Teams (%s)', (playerId, teamId, submittedAt, gameId) => {
-    const picks = snapshot.picks.filter((pick) => pick.playerId === playerId && pick.week === 10)
-    expect(picks).toHaveLength(1)
-    expect(picks[0]).toMatchObject({ teamId, submittedAt, gameId })
+  it.each(['cindy-mendoza', 'dominic-green', 'melanie-moeller'])(
+    'holds %s’s week 10 pick sealed: hidden stub only, no team in the fixture',
+    (playerId) => {
+      expect(snapshot.hiddenPicks).toContainEqual({ playerId, week: 10 })
+      expect(snapshot.picks.filter((p) => p.playerId === playerId && p.week === 10)).toEqual([])
+    },
+  )
+
+  it('never has a hiddenPicks stub that also has a pick', () => {
+    const picked = new Set(snapshot.picks.map((p) => `${p.playerId}:${p.week}`))
+    for (const h of snapshot.hiddenPicks) {
+      expect(picked.has(`${h.playerId}:${h.week}`), `${h.playerId} week ${h.week}`).toBe(false)
+    }
   })
 
   it('points every pick at a game that week in which the team actually plays', () => {

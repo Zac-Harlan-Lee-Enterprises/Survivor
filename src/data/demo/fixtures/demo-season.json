@@ -1521,19 +1521,6 @@
       "source": "commissioner"
     },
     {
-      "id": "pick-dominic-green-10",
-      "leagueId": "demo-league",
-      "seasonId": "demo-2026",
-      "playerId": "dominic-green",
-      "week": 10,
-      "teamId": "JAX",
-      "gameId": "2026-w10-JAX-at-TEN",
-      "submittedAt": "2026-11-11T20:25:19.000Z",
-      "updatedAt": "2026-11-11T20:25:19.000Z",
-      "version": 1,
-      "source": "commissioner"
-    },
-    {
       "id": "pick-tracy-nelson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2986,19 +2973,6 @@
       "gameId": "2026-w09-DET-at-MIA",
       "submittedAt": "2026-11-05T15:56:09.000Z",
       "updatedAt": "2026-11-05T15:56:09.000Z",
-      "version": 1,
-      "source": "commissioner"
-    },
-    {
-      "id": "pick-cindy-mendoza-10",
-      "leagueId": "demo-league",
-      "seasonId": "demo-2026",
-      "playerId": "cindy-mendoza",
-      "week": 10,
-      "teamId": "SEA",
-      "gameId": "2026-w10-SEA-at-LV",
-      "submittedAt": "2026-11-11T18:05:29.000Z",
-      "updatedAt": "2026-11-11T18:05:29.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -6765,5 +6739,18 @@
   ],
   "gameOverrides": [],
   "decision": null,
-  "hiddenPicks": []
+  "hiddenPicks": [
+    {
+      "playerId": "dominic-green",
+      "week": 10
+    },
+    {
+      "playerId": "melanie-moeller",
+      "week": 10
+    },
+    {
+      "playerId": "cindy-mendoza",
+      "week": 10
+    }
+  ]
 }
