@@ -305,8 +305,16 @@ export function redactSnapshot(
 ): SeasonSnapshot {
   const visible = redactPicks(snapshot, viewer, now)
   const visibleIds = new Set(visible.map((p) => p.id))
-  const hiddenPicks = snapshot.picks
-    .filter((p) => !visibleIds.has(p.id))
-    .map((p) => ({ playerId: p.playerId, week: p.week }))
+  // Keep stubs the snapshot already carries (sealed picks have no team to
+  // redact), and add one for each pick hidden now. Deduped by player and week.
+  const stubs = new Map<string, { playerId: string; week: number }>()
+  for (const h of [
+    ...(snapshot.hiddenPicks ?? []),
+    ...snapshot.picks
+      .filter((p) => !visibleIds.has(p.id))
+      .map((p) => ({ playerId: p.playerId, week: p.week })),
+  ])
+    stubs.set(`${h.playerId}:${h.week}`, { playerId: h.playerId, week: h.week })
+  const hiddenPicks = [...stubs.values()]
   return { ...snapshot, picks: visible, hiddenPicks }
 }

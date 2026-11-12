@@ -15,6 +15,8 @@ export default defineConfig([
     'coverage',
     'playwright-report',
     'test-results',
+    // Agents' git worktrees: other checkouts of this repo, linted there.
+    '.claude/worktrees',
   ]),
   {
     files: ['**/*.{ts,tsx,mts}'],

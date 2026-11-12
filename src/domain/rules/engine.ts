@@ -312,6 +312,10 @@ export function evaluateSeason(
     picksByPlayerWeek.set(`${p.playerId}:${p.week}`, p)
   }
 
+  // A sealed pick: the player has picked but the team is withheld, so it is
+  // neither a pick we can score nor a missing one.
+  const sealed = new Set((snapshot.hiddenPicks ?? []).map((h) => `${h.playerId}:${h.week}`))
+
   interface Acc {
     membership: LeagueMembership
     livesTotal: number
@@ -376,7 +380,8 @@ export function evaluateSeason(
       } else if (ws.phase === 'upcoming') {
         outcome = 'pending'
       } else if (!pick) {
-        outcome = ws.phase === 'open' ? 'pending' : 'missing'
+        outcome =
+          ws.phase === 'open' || sealed.has(`${playerId}:${ws.week}`) ? 'pending' : 'missing'
       } else if (!game) {
         // Pick references a game we no longer know about (provider changed ids):
         // treat as pending so nobody is struck by a data glitch.
