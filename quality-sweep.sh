@@ -154,10 +154,14 @@ if git ls-files | grep -qE '^\.env(\.local|\..*\.local)?$'; then fail ".env/.env
 # ---------------------------------------------------------------------------
 echo "── Action guardrails (Pillar 6) ───────────────────────────────────"
 # ---------------------------------------------------------------------------
-if [[ -f .claude/settings.json ]]; then
-  jq -e '.permissions.deny | index("Bash(gh pr merge:*)")' .claude/settings.json >/dev/null 2>&1 && ok ".claude/settings.json denies PR merge" || fail ".claude/settings.json does not deny 'Bash(gh pr merge:*)'"
-  jq -e '.permissions.ask | index("Bash(git push *)")' .claude/settings.json >/dev/null 2>&1 && ok "'git push' requires confirmation (survives auto mode)" || fail "No ask rule for 'Bash(git push *)'"
-  jq -e '.permissions.deny | index("Bash(aws cloudformation delete-stack:*)")' .claude/settings.json >/dev/null 2>&1 && ok "AWS stack deletion denied" || fail "No deny rule for 'aws cloudformation delete-stack'"
+# Check the committed settings, the ones every checkout and cloud session gets.
+# A machine may keep a local copy that differs (git skip-worktree); that is
+# its owner's choice and is not what this sweep guards.
+SETTINGS_JSON=$(git show HEAD:.claude/settings.json 2>/dev/null || cat .claude/settings.json 2>/dev/null || true)
+if [[ -n "$SETTINGS_JSON" ]]; then
+  jq -e '.permissions.deny | index("Bash(gh pr merge:*)")' <<<"$SETTINGS_JSON" >/dev/null 2>&1 && ok ".claude/settings.json denies PR merge" || fail ".claude/settings.json does not deny 'Bash(gh pr merge:*)'"
+  jq -e '.permissions.ask | index("Bash(git push *)")' <<<"$SETTINGS_JSON" >/dev/null 2>&1 && ok "'git push' requires confirmation (survives auto mode)" || fail "No ask rule for 'Bash(git push *)'"
+  jq -e '.permissions.deny | index("Bash(aws cloudformation delete-stack:*)")' <<<"$SETTINGS_JSON" >/dev/null 2>&1 && ok "AWS stack deletion denied" || fail "No deny rule for 'aws cloudformation delete-stack'"
 else
   fail "No .claude/settings.json — agents run with no command-level guardrails"
 fi
@@ -170,8 +174,8 @@ else
   fail "$GUARD missing or not executable"
 fi
 
-if [[ -f .claude/settings.json ]] && [[ -n "${SENSITIVE_PATH_PATTERNS+x}" ]]; then
-  rules=$(jq -r '((.permissions.ask // []) + (.permissions.deny // []))[] | select(startswith("Edit("))' .claude/settings.json)
+if [[ -n "$SETTINGS_JSON" ]] && [[ -n "${SENSITIVE_PATH_PATTERNS+x}" ]]; then
+  rules=$(jq -r '((.permissions.ask // []) + (.permissions.deny // []))[] | select(startswith("Edit("))' <<<"$SETTINGS_JSON")
   covered=1
   for pat in "${SENSITIVE_PATH_PATTERNS[@]}"; do
     frag=$(printf '%s' "$pat" | sed 's/^\^//; s/\$$//; s/\\//g; s:/$::; s/\.\*//g')
