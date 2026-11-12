@@ -56,6 +56,10 @@ def args():
     ap.add_argument("--samples", type=int, default=64)
     ap.add_argument("--only", default="")
     ap.add_argument("--closeup", action="store_true", help="also render his head and shoulders, large")
+    ap.add_argument("--blur", type=int, default=5, help="sub-frame poses averaged for the fast frames of the dance (0: none)")
+    ap.add_argument("--shutter", type=float, default=0.5, help="the shutter, in frames")
+    ap.add_argument("--blur-px", type=float, default=50.0, help="blur a dance frame when a limb moves this far (pixels) in a frame")
+    ap.add_argument("--blur-samples", type=int, default=24, help="samples for each sub-frame pose (they are averaged)")
     ap.add_argument("--nosim", action="store_true", help="skip any cloth simulation (quick looks at the pose and the dress)")
     return ap.parse_args(argv)
 
@@ -73,8 +77,8 @@ def set_frame(person, cane, hat, f, sims, key):
     keys = person.body_obj.data.shape_keys.key_blocks
     keys["blink"].value = f["blink"]
     # His mouth shut (the engine's talking shapes off).
-    keys["talk"].value = 0.0
-    keys["talk2"].value = 0.0
+    keys["talk"].value = f.get("talk", 0.0)
+    keys["talk2"].value = f.get("talk2", 0.0)
     cane.matrix_basis = Matrix(f["cane"].tolist())
     hat.hide_render = f["hat"] is None
     if f["hat"] is not None:
@@ -85,6 +89,31 @@ def set_frame(person, cane, hat, f, sims, key):
             g.obj.data.vertices.foreach_set("co", v.ravel())
             g.obj.data.update()
     bpy.context.view_layer.update()
+
+
+def fast_frames(mo, take, ppb, px):
+    """Which frames of the dance have a limb moving fast enough to strobe: how far
+    (pixels) his feet, hands, the cane's tip and the hat move from a frame to the
+    next, measured from his pelvis."""
+    bones = ("foot.L", "foot.R", "wrist.L", "wrist.R")
+    rel = []
+    for f in take:
+        D = mo.fk(f["R"], f["root"])
+        pel = (f["root"] @ np.append(mo.Jp, 1.0))[:3]
+        pts = [mo.at(D, b, mo.heads[mo.idx[b]]) - pel for b in bones]
+        pts.append(f["cane"][:3, 3] - pel)
+        rel.append(np.array(pts))
+    d0, d1 = mo.dance_frames
+    flags = []
+    for i, f in enumerate(take):
+        rec = f["rec"]
+        if rec is None or rec[0] != "scene" or not (d0 - 2 <= rec[1] <= d1 + 2):
+            flags.append(False)
+            continue
+        a = np.abs(rel[i] - rel[max(0, i - 1)]).max()
+        b = np.abs(rel[min(len(take) - 1, i + 1)] - rel[i]).max()
+        flags.append(float(max(np.linalg.norm(rel[i] - rel[max(0, i - 1)], axis=1).max(), np.linalg.norm(rel[min(len(take) - 1, i + 1)] - rel[i], axis=1).max())) * ppb > px)
+    return flags
 
 
 def label(rec):
@@ -130,7 +159,17 @@ def main():
     only = set(a.only.split(",")) if a.only else None
     frames = []
     ppb = a.ppu * TILE
-    for f in take:
+    # The fast frames of the dance are blurred: a few poses a shutter's width (half a
+    # frame) apart are rendered and averaged afterwards (death_blur.py).
+    flags = [False] * len(take)
+    subs = []
+    if a.blur > 1:
+        flags = fast_frames(mo, take, ppb, a.blur_px)
+        offs = [(k / (a.blur - 1) - 0.5) * a.shutter for k in range(a.blur)]
+        subs = [(o, mo.take(shift=o)) for o in offs if abs(o) > 1e-9]
+        print("BLUR", sum(flags), "fast frames of", len(take), "offsets", [round(o, 3) for o, _ in subs], flush=True)
+    os.makedirs(os.path.join(a.out, "blur"), exist_ok=True)
+    for ti, f in enumerate(take):
         if f["rec"] is None:
             continue
         name = label(f["rec"])
@@ -142,6 +181,15 @@ def main():
         scene.render.filepath = os.path.join(a.out, name + ".png")
         bpy.ops.render.render(write_still=True)
         print("FRAME", name, flush=True)
+        if flags[ti]:
+            full = scene.cycles.samples
+            scene.cycles.samples = min(full, a.blur_samples)
+            for k, (o, sub) in enumerate(subs):
+                set_frame(person, cane, hat, sub[ti], sims, f["rec"])
+                camera(scene, a.ppu)
+                scene.render.filepath = os.path.join(a.out, "blur", f"{name}__{k}.png")
+                bpy.ops.render.render(write_still=True)
+            scene.cycles.samples = full
         if a.closeup:
             camera(scene, a.ppu, closeup=True, head_z=person.H - 0.16)
             scene.render.filepath = os.path.join(a.out, name + "-closeup.png")

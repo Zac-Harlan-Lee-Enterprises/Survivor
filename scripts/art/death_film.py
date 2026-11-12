@@ -19,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 PER_SHEET = 16
 COLS = 8
-QUALITY = 80
+QUALITY = 70
 
 
 def main(src):

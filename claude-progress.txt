@@ -984,3 +984,9 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - death_dress.py: boater() (straw crown, brim, red/white band; one rigid object like the cane). death_motion.py: hat produced from behind his back on the nod, worn through the kick line (tip on every other kick), swept off and held high for the ta-da, tucked behind his back and gone at the settle (walk loop and walk-on stay hatless).
 - Kicks slowed to 10 frames, 8 of them; whip mechanics (thigh leads, knee straightens, hang, faster descent, ball-heel landing), pelvis tuck and hike, counterbalance lean, standing leg loads/extends/rises on the ball. 151 frames, about 2.2 strides of travel.
 - NEXT: the hat hand is on the far side in profile and only partly visible; the settle is quick.
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances, fifth pass (show-stopper)
+- death_motion.py: the kick line plays to the house (chest cheated 50 degrees round) and builds: 2 waist-high, 4 climbing with a hat tip on the beat, 4 double-time, a final held head-height kick (KICKS); a turn-out, a sweeping bow with the hat, the ta-da held 1.5 beats with a breath, a 15-frame settle; the cane arm lives; shoulders pop on the beat. 186 frames (9.3 s), about 2.5 strides of travel.
+- Motion blur on the 108 fastest dance frames: death_scene.py renders 5 sub-frame poses (0.5 frame shutter), death_blur.py averages them. public/death is 4.2 MB (webp quality 70).
+- Skipped: tie and jacket-front secondary motion (not separate bones), facial expression (the rig has only blink, talk, talk2 shape keys; the mouth opens for the ta-da).
+- NEXT: the blur shows discrete ghost steps on the fastest limbs (5 samples); more samples would smooth it.

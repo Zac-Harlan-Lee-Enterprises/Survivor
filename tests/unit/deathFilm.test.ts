@@ -55,13 +55,13 @@ describe('the rendered film', () => {
     expect(scene.at(-1)! - scene.at(-2)!).toBeGreaterThan(pace * 0.8)
   })
 
-  it('dances between regarding you and turning away: 6 to 8 seconds, travelling the floor in a kick line', () => {
+  it('dances between regarding you and turning away: eight to eleven seconds, travelling the floor in a kick line', () => {
     const [from, to] = FILM.dance
     expect(from).toBeGreaterThan(100)
     expect(to).toBeLessThanOrEqual(FILM.scene.length)
-    // 120 to 160 frames at 20 a second: six to eight seconds.
-    expect(to - from).toBeGreaterThanOrEqual(120)
-    expect(to - from).toBeLessThanOrEqual(160)
+    // 160 to 220 frames at 20 a second: eight to eleven seconds.
+    expect(to - from).toBeGreaterThanOrEqual(160)
+    expect(to - from).toBeLessThanOrEqual(220)
     // He travels toward the walk-off while he dances (one to three metres: his stride is a metre and a bit)...
     const xs = FILM.scene.map((i) => FILM.frames[i]!.x)
     const travel = xs[to]! - xs[from]!
