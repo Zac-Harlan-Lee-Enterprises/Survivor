@@ -2847,6 +2847,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-allison-petty-10",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "allison-petty",
+      "week": 10,
+      "teamId": "JAX",
+      "gameId": "2026-w10-JAX-at-TEN",
+      "submittedAt": "2026-11-12T02:36:58.000Z",
+      "updatedAt": "2026-11-12T02:36:58.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-don-turner-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
