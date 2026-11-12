@@ -990,3 +990,8 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - Motion blur on the 108 fastest dance frames: death_scene.py renders 5 sub-frame poses (0.5 frame shutter), death_blur.py averages them. public/death is 4.2 MB (webp quality 70).
 - Skipped: tie and jacket-front secondary motion (not separate bones), facial expression (the rig has only blink, talk, talk2 shape keys; the mouth opens for the ta-da).
 - NEXT: the blur shows discrete ghost steps on the fastest limbs (5 samples); more samples would smooth it.
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances, sixth pass (natural first)
+- Found with the new joint check: after the dance the walk-off feet were still planned back where he began (2.5 m behind), which folded his legs backward; they are now re-planned from where the dance leaves him. Dance knees now bend toward the toes from the pelvis frame (hip-to-ankle turned about its sideways axis).
+- Motion blur off (code kept, off by default). Kicks waist to chest (88 to 114 degrees, the last 116 held), seven-frame flurry, lean 11 degrees at most, everything eased, forearm clear of the face. Motion capture was not tried (see report).
+- Motion.joint_check (knees, hips, elbows, wrists, spine, neck, feet) fails death_scene.py; joints summary packed in deathFrames.json and asserted in the unit test.

@@ -19,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 PER_SHEET = 16
 COLS = 8
-QUALITY = 70
+QUALITY = 78
 
 
 def main(src):
@@ -70,6 +70,7 @@ def main(src):
             crownY=take["crownY"],
             stride=take["stride"],
             armClearance=take.get("armClearance"),
+            joints=take.get("joints"),
             sheets=sheets,
             frames=index,
             walk=walk,

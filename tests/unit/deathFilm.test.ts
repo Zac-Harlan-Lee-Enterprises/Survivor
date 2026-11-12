@@ -15,6 +15,11 @@ interface Film {
   scene: number[]
   /** The dance's first and last frames, as indexes into `scene`. */
   dance: [number, number]
+  /** What death_scene.py's joint check found over every frame (it fails the render if any joint leaves its human range). */
+  joints: {
+    summary: { kneeMin: number; kneeMax: number; hipMax: number; hipMin: number; abductionMax: number; leanBackMax: number; leanForwardMax: number; twistMax: number; floorMax: number }
+    flagged: string[]
+  }
 }
 const FILM = JSON.parse(readFileSync('src/components/deathFrames.json', 'utf8')) as Film
 
@@ -78,5 +83,21 @@ describe('the rendered film', () => {
     expect(xs[to + 5]! - xs[to]!).toBe(0)
     // His arms are flung wide and the cane held out: the frame is wider than the walk's.
     expect(FILM.frameWidth).toBeGreaterThanOrEqual(2 * 32 * 8)
+  })
+
+  it('keeps every joint inside a human range on every frame (his knees bend toward his toes, never the wrong way)', () => {
+    const { summary, flagged } = FILM.joints
+    expect(flagged, `frames outside the limits: ${flagged.join(', ')}`).toEqual([])
+    // Knees: 0 to 140 degrees of bend toward the toes, hyperextended no more than 5.
+    expect(summary.kneeMin).toBeGreaterThanOrEqual(-5)
+    expect(summary.kneeMax).toBeLessThanOrEqual(140)
+    // Hips: no further than a dancer's straight leg goes; no extreme abduction.
+    expect(summary.hipMax).toBeLessThanOrEqual(130)
+    expect(summary.hipMin).toBeGreaterThanOrEqual(-30)
+    expect(summary.abductionMax).toBeLessThanOrEqual(45)
+    // Spine: not more than 20 degrees back, twist under 45; no foot through the floor.
+    expect(summary.leanBackMax).toBeLessThanOrEqual(20)
+    expect(summary.twistMax).toBeLessThanOrEqual(45)
+    expect(summary.floorMax).toBeLessThanOrEqual(0.6)
   })
 })
