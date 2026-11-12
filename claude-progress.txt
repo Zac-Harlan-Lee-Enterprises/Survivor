@@ -979,3 +979,8 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - death_motion.py: the dance is now the traveling high-kick line from the reference move (profile, ten straight-leg near-vertical kicks, lean back, cane across the chest, hand to the brow), a turn back, the ta-da and a settle; 141 frames, about 2 m of travel carried in take.json/deathFrames.json; everything after it (cane, plants, walk-off) starts from where it leaves him.
 - tests/unit/deathFilm.test.ts: travel is monotonic with no jumps. Removed committed __pycache__ files.
 - NEXT: the settle is about 8 visible frames; the left hand at the brow overlaps the cheek.
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances, fourth pass (boater, slower whip kicks)
+- death_dress.py: boater() (straw crown, brim, red/white band; one rigid object like the cane). death_motion.py: hat produced from behind his back on the nod, worn through the kick line (tip on every other kick), swept off and held high for the ta-da, tucked behind his back and gone at the settle (walk loop and walk-on stay hatless).
+- Kicks slowed to 10 frames, 8 of them; whip mechanics (thigh leads, knee straightens, hang, faster descent, ball-heel landing), pelvis tuck and hike, counterbalance lean, standing leg loads/extends/rises on the ball. 151 frames, about 2.2 strides of travel.
+- NEXT: the hat hand is on the far side in profile and only partly visible; the settle is quick.

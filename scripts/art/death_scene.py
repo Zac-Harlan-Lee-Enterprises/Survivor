@@ -67,7 +67,7 @@ def camera(scene, ppu, closeup=False, head_z=1.7):
     return view.setup_figure_camera(scene, FOOT - FRAME_H / 2, int(FRAME_W * ppu), int(FRAME_H * ppu), ppu, tilt_deg=death_motion.TILT)
 
 
-def set_frame(person, cane, f, sims, key):
+def set_frame(person, cane, hat, f, sims, key):
     person.rig.root.location = (f["hips"], 0.0, 0.0)
     person.rig.set_pose(f["R"], f["root"])
     keys = person.body_obj.data.shape_keys.key_blocks
@@ -76,6 +76,9 @@ def set_frame(person, cane, f, sims, key):
     keys["talk"].value = 0.0
     keys["talk2"].value = 0.0
     cane.matrix_basis = Matrix(f["cane"].tolist())
+    hat.hide_render = f["hat"] is None
+    if f["hat"] is not None:
+        hat.matrix_basis = Matrix(np.asarray(f["hat"]).tolist())
     for g in sims:
         v = g.shapes.get(("death", key))
         if v is not None:
@@ -97,6 +100,7 @@ def main():
     death_dress.hide_covered(person)
     mo = death_motion.Motion(person, death_dress.SOLE)
     cane = death_dress.cane(person, mo.L)
+    hat = death_dress.boater(person)
     print("DEATH height", round(person.H, 3), "cane", mo.L, "stride", round(mo.d, 3), flush=True)
     sims = [g for g in person.cloth.garments if g.sim]
     take = mo.take()
@@ -133,7 +137,7 @@ def main():
         frames.append(dict(name=name, x=round(-f["hips"] * ppb, 2)))
         if only and name not in only and name.replace("-0", "").replace("-", "") not in only:
             continue
-        set_frame(person, cane, f, sims, f["rec"])
+        set_frame(person, cane, hat, f, sims, f["rec"])
         camera(scene, a.ppu)
         scene.render.filepath = os.path.join(a.out, name + ".png")
         bpy.ops.render.render(write_still=True)
