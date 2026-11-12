@@ -64,9 +64,7 @@ describe('demo fixture', () => {
   })
 
   it('records Shahid’s commissioner-supplied Texans selection for week 7', () => {
-    const picks = snapshot.picks.filter(
-      (pick) => pick.playerId === 'shahid-ali' && pick.week === 7,
-    )
+    const picks = snapshot.picks.filter((pick) => pick.playerId === 'shahid-ali' && pick.week === 7)
     expect(picks).toHaveLength(1)
     expect(picks[0]).toMatchObject({ teamId: 'HOU', submittedAt: '2026-10-22T18:18:32.000Z' })
   })
@@ -85,6 +83,30 @@ describe('demo fixture', () => {
     )
     expect(picks).toHaveLength(1)
     expect(picks[0]).toMatchObject({ teamId: 'NYJ', submittedAt: '2026-10-22T18:26:14.000Z' })
+  })
+
+  it.each([
+    ['cindy-mendoza', 'SEA', '2026-11-11T18:05:29.000Z', '2026-w10-SEA-at-LV'],
+    ['dominic-green', 'JAX', '2026-11-11T20:25:19.000Z', '2026-w10-JAX-at-TEN'],
+    ['melanie-moeller', 'BUF', '2026-11-11T21:12:45.000Z', '2026-w10-BUF-at-NYJ'],
+    // Relayed by the commissioner in session; receipt time is that relay, not a Teams timestamp.
+    ['tracy-nelson', 'JAX', '2026-11-11T22:12:00.000Z', '2026-w10-JAX-at-TEN'],
+    // Also relayed by the commissioner in session.
+    ['allison-petty', 'JAX', '2026-11-12T02:36:58.000Z', '2026-w10-JAX-at-TEN'],
+  ])(
+    'records %s’s week 10 pick with its team and receipt time',
+    (playerId, teamId, submittedAt, gameId) => {
+      const picks = snapshot.picks.filter((p) => p.playerId === playerId && p.week === 10)
+      expect(picks).toHaveLength(1)
+      expect(picks[0]).toMatchObject({ playerId, teamId, submittedAt, gameId })
+    },
+  )
+
+  it('never has a hiddenPicks stub that also has a pick', () => {
+    const picked = new Set(snapshot.picks.map((p) => `${p.playerId}:${p.week}`))
+    for (const h of snapshot.hiddenPicks) {
+      expect(picked.has(`${h.playerId}:${h.week}`), `${h.playerId} week ${h.week}`).toBe(false)
+    }
   })
 
   it('points every pick at a game that week in which the team actually plays', () => {

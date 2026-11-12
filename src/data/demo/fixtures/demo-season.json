@@ -1521,6 +1521,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dominic-green-10",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dominic-green",
+      "week": 10,
+      "teamId": "JAX",
+      "gameId": "2026-w10-JAX-at-TEN",
+      "submittedAt": "2026-11-11T20:25:19.000Z",
+      "updatedAt": "2026-11-11T20:25:19.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-tracy-nelson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -1634,6 +1647,19 @@
       "gameId": "2026-w09-DET-at-MIA",
       "submittedAt": "2026-11-03T23:46:41.000Z",
       "updatedAt": "2026-11-03T23:46:41.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-tracy-nelson-10",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tracy-nelson",
+      "week": 10,
+      "teamId": "JAX",
+      "gameId": "2026-w10-JAX-at-TEN",
+      "submittedAt": "2026-11-11T22:12:00.000Z",
+      "updatedAt": "2026-11-11T22:12:00.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -2115,6 +2141,19 @@
       "gameId": "2026-w09-TB-at-CHI",
       "submittedAt": "2026-11-05T14:55:55.000Z",
       "updatedAt": "2026-11-05T14:55:55.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-melanie-moeller-10",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "melanie-moeller",
+      "week": 10,
+      "teamId": "BUF",
+      "gameId": "2026-w10-BUF-at-NYJ",
+      "submittedAt": "2026-11-11T21:12:45.000Z",
+      "updatedAt": "2026-11-11T21:12:45.000Z",
       "version": 1,
       "source": "commissioner"
     },
@@ -2808,6 +2847,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-allison-petty-10",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "allison-petty",
+      "week": 10,
+      "teamId": "JAX",
+      "gameId": "2026-w10-JAX-at-TEN",
+      "submittedAt": "2026-11-12T02:36:58.000Z",
+      "updatedAt": "2026-11-12T02:36:58.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-don-turner-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2973,6 +3025,19 @@
       "gameId": "2026-w09-DET-at-MIA",
       "submittedAt": "2026-11-05T15:56:09.000Z",
       "updatedAt": "2026-11-05T15:56:09.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-cindy-mendoza-10",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "cindy-mendoza",
+      "week": 10,
+      "teamId": "SEA",
+      "gameId": "2026-w10-SEA-at-LV",
+      "submittedAt": "2026-11-11T18:05:29.000Z",
+      "updatedAt": "2026-11-11T18:05:29.000Z",
       "version": 1,
       "source": "commissioner"
     },
