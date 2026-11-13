@@ -139,3 +139,84 @@ def hairline(masc, child, recede=0.0):
 
 
 portrait_hair.hairline = hairline
+
+
+# ── No nipples: the base mesh models them as small bumps on the chest, and a
+# jacket cut from the body's surface inherits them (they showed through the
+# cloth as two points on his chest). MakeHuman's data here has no nipple targets,
+# so they are flattened on the mesh itself, before any garment is cut from it.
+import math  # noqa: E402
+import numpy as np  # noqa: E402
+import world_body as wb  # noqa: E402
+
+NIPPLE_R = (0.08, 0.12, 0.19)  # flatten inside, blend out to, fit the chest from the ring out to (m)
+
+
+def nipples(body):
+    """Where the two nipples are: the most prominent bumps (a vertex standing furthest
+    out of its neighbours) on the front of the chest, one a side."""
+    base = mh.Base.get()
+    co = body.co
+    J = body.J
+    v = base.verts_of("body")
+    nb = [set() for _ in range(len(co))]
+    for q in base.quads[base.faces_of("body")]:
+        for k in range(4):
+            nb[q[k]].update((q[(k + 1) % 4], q[(k + 3) % 4]))
+    out = []
+    for sign in (-1, 1):
+        best, at = 0.0, None
+        for i in v:
+            if sign * co[i, 0] < 0.03 or not (J["waist"][2] + 0.03 < co[i, 2] < J["chest"][2] + 0.02) or co[i, 1] > J["chest"][1] - 0.1:
+                continue
+            r = float(co[list(nb[i]), 1].mean() - co[i, 1])  # how far it stands out toward the front
+            if r > best:
+                best, at = r, i
+        out.append((at, best))
+    return out
+
+
+def flatten_nipples(body):
+    """Flatten the nipples where they are: the chest round each is fitted with a quadratic
+    surface from the ring outside it, and the bump is brought down onto that surface (full
+    inside, blended out), so no ribs or muscle shift. Returns the largest move (metres)."""
+    base = mh.Base.get()
+    co = body.co
+    v = base.verts_of("body")
+    r0, r1, r2 = NIPPLE_R
+    move = 0.0
+    for i, _ in nipples(body):
+        c = co[i].copy()
+        d = np.hypot(co[v, 0] - c[0], co[v, 2] - c[2])
+        front = co[v, 1] < c[1] + 0.03
+        ring = v[(d > r1) & (d < r2) & front]
+        inner = v[(d < r1) & front]
+        x, z = co[ring, 0] - c[0], co[ring, 2] - c[2]
+        A = np.stack([np.ones_like(x), x, z, x * x, x * z, z * z], 1)
+        coef, *_ = np.linalg.lstsq(A, co[ring, 1], rcond=None)
+        for j in inner:
+            x, z = co[j, 0] - c[0], co[j, 2] - c[2]
+            fit = coef @ np.array([1.0, x, z, x * x, x * z, z * z])
+            rr = math.hypot(x, z)
+            w = 1.0 if rr < r0 else 0.5 * (1 + math.cos(math.pi * (rr - r0) / (r1 - r0)))
+            if co[j, 1] < fit:  # only ever bring a bump back, never raise skin
+                move = max(move, (fit - co[j, 1]) * w)
+                co[j, 1] += (fit - co[j, 1]) * w
+    return move
+
+
+_body_init = wb.Body.__init__
+
+
+NIPPLE_MOVE_MM = 0.0
+
+
+def _body_init_flat(self, ident):
+    global NIPPLE_MOVE_MM
+    _body_init(self, ident)
+    if ident.P.id == DEATH:
+        NIPPLE_MOVE_MM = round(flatten_nipples(self) * 1000, 1)
+        print("NIPPLES flattened: moved at most", NIPPLE_MOVE_MM, "mm", flush=True)
+
+
+wb.Body.__init__ = _body_init_flat

@@ -15,6 +15,8 @@ interface Film {
   scene: number[]
   /** The dance's first and last frames, as indexes into `scene`. */
   dance: [number, number]
+  /** What death_scene.py checked about the skin under his suit (the render fails if any of it is off). */
+  skin: { hidden: number; chestSkinShowing: number; neckSkinKept: boolean; handsSkinKept: boolean; nippleMoveMm: number }
   /** What death_scene.py's joint check found over every frame (it fails the render if any joint leaves its human range). */
   joints: {
     summary: { kneeMin: number; kneeMax: number; hipMax: number; hipMin: number; abductionMax: number; leanBackMax: number; leanForwardMax: number; twistMax: number; floorMax: number }
@@ -99,5 +101,19 @@ describe('the rendered film', () => {
     expect(summary.leanBackMax).toBeLessThanOrEqual(20)
     expect(summary.twistMax).toBeLessThanOrEqual(45)
     expect(summary.floorMax).toBeLessThanOrEqual(0.6)
+  })
+
+  it('shows no skin through his suit: nipples flattened on the body, the skin under the clothes masked', () => {
+    // The base mesh's nipples showed through the jacket as two bumps on his chest. death_cast.py
+    // flattens them on the body (nippleMoveMm: how far the bump was brought down), and
+    // death_dress.hide_covered masks every body face under the jacket, shirt and trousers.
+    const { skin } = FILM
+    expect(skin.nippleMoveMm).toBeGreaterThan(5)
+    expect(skin.hidden).toBeGreaterThan(3000)
+    // No bare skin left on his chest between the collar and the waist...
+    expect(skin.chestSkinShowing).toBe(0)
+    // ...and the neck and hands keep theirs (no holes at the collar or cuffs).
+    expect(skin.neckSkinKept).toBe(true)
+    expect(skin.handsSkinKept).toBe(true)
   })
 })
