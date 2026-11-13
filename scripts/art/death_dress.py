@@ -1,7 +1,7 @@
 """What Death wears, for BibleGame's figure engine: black hair slicked back,
 a black suit (the jacket's skirts below the waist are simulated cloth), a
 white shirt and a black tie, polished black shoes, and a black cane with a
-silver knob. A man's suit, not a robe: his legs are his own.
+silver knob (and, for the dance only, a straw boater). A man's suit, not a robe: his legs are his own.
 
 Everything is added at run time by patching the engine's dressing (the
 `suit` flag in his appearance turns it on); nothing in BibleGame changes.
@@ -113,6 +113,32 @@ def silver():
         return n.mat
 
     return M.cached(("death-silver",), build)
+
+
+def straw():
+    """Boater straw: pale and a little yellow, with a fine plait running round it."""
+
+    def build():
+        n = M.Nodes("death-straw")
+        co = n.coords()
+        weave = n.new("ShaderNodeTexWave", Scale=260.0, Distortion=2.5, Detail=1.5, Vector=co)
+        fibre = n.noise(900.0, 3.0, 0.6, co)
+        col = n.mix((weave, "Fac"), "#d2a448", "#eec878")
+        col2 = n.mix((fibre, "Fac"), (col, 2), "#f5d98c")
+        bump = n.bump((weave, "Fac"), strength=0.35, distance=0.0007)
+        n.bsdf(**{"Base Color": (col2, 2), "Roughness": 0.58, "Specular IOR Level": 0.35, "Sheen Weight": 0.25, "Normal": (bump, "Normal")})
+        return n.mat
+
+    return M.cached(("death-straw",), build)
+
+
+def ribbon(color, name):
+    def build():
+        n = M.Nodes(f"death-band-{name}")
+        n.bsdf(**{"Base Color": common.hex_rgb(color), "Roughness": 0.5, "Sheen Weight": 0.4, "Specular IOR Level": 0.4})
+        return n.mat
+
+    return M.cached(("death-band", name), build)
 
 
 def slick(color, centre):
@@ -584,6 +610,11 @@ def _skirts(self, mat):
         rings.append(np.stack([np.sin(th) * rr, cy - np.cos(th) * rr, np.full(len(th), z)], 1))
     V, Q = ring_grid(rings)
     W = self.nearest_weights(V, k=6)
+    # The skirts hang from his hips: they never take an arm's weight from the
+    # hands at his sides (which lifted the hem like wings when his arms rose).
+    for n in _names(self, "upperarm", "lowerarm", "wrist", "finger", "metacarpal", "shoulder", "clavicle"):
+        W[:, self.idx[n]] = 0.0
+    W = W / np.maximum(W.sum(1, keepdims=True), 1e-9)
     hips = np.zeros_like(W)
     hips[:, self.idx["spine05"]] = 1.0
     # The waist with the hips; toward the hem, a share of each thigh.
@@ -641,5 +672,73 @@ def cane(person, length):
     common.add_modifier(obj, "SUBSURF", levels=1, render_levels=1)
     obj.parent = person.rig.root
     obj.matrix_parent_inverse = Matrix.Identity(4)
+    person.parts.append(wp.Piece(obj))
+    return obj
+
+
+# ── The boater ────────────────────────────────────────────────────────────
+def boater(person):
+    """A straw boater (his is for the dance): a flat-topped oval crown 7.5 cm
+    tall, a flat stiff brim 6 cm wide all round and a red and white striped
+    band, one rigid object, parented to the figure's root like the cane;
+    death_motion sets where it is each frame (on his head, or in his hand) and
+    when it is not there. Its origin is the middle of its brim, y toward his
+    back; the crown is cut to the head it goes on (a little wider than his
+    skull and hair, which the crown covers right to the top)."""
+    col = person.col
+    A, B = 0.092, 0.118  # the crown's half width and half depth
+    BR = 0.060  # the brim's width
+    H = 0.075
+    T = 0.0035  # the brim's thickness
+    SEG = 72
+    parts = []
+
+    def ring(bm, a, b, z):
+        return [bm.verts.new((a * math.cos(2 * math.pi * k / SEG), b * math.sin(2 * math.pi * k / SEG), z)) for k in range(SEG)]
+
+    def band(bm, rings, closed=True):
+        for r0, r1 in zip(rings, rings[1:]):
+            for k in range(SEG):
+                bm.faces.new((r0[k], r0[(k + 1) % SEG], r1[(k + 1) % SEG], r1[k]))
+
+    # The crown: straight sides, a flat top with a small round on its edge; open below.
+    bm = bmesh.new()
+    prof = [(A, B, -0.003), (A, B, H - 0.010), (A - 0.0025, B - 0.0025, H - 0.0045), (A - 0.0075, B - 0.0075, H)]
+    rs = [ring(bm, a, b, z) for a, b, z in prof]
+    band(bm, rs)
+    bm.faces.new(rs[-1])
+    parts.append(common.mesh_object("death-hat-crown", bm, straw(), col))
+    # The brim: flat, with a rounded edge, joined to the crown's foot.
+    bm = bmesh.new()
+    prof = [(A, B, T * 0.6), (A + BR - T, B + BR - T, T * 0.6), (A + BR, B + BR, 0.0), (A + BR - T, B + BR - T, -T * 0.6), (A, B, -T * 0.6)]
+    rs = [ring(bm, a, b, z) for a, b, z in prof]
+    band(bm, rs)
+    parts.append(common.mesh_object("death-hat-brim", bm, straw(), col))
+    # The band: alternate red and white stripes round the foot of the crown.
+    for name, hexc, par in (("red", "#b8202a", 0), ("white", "#f2efe6", 1)):
+        bm = bmesh.new()
+        n = 36
+        for k in range(n):
+            if k % 2 != par:
+                continue
+            quad = []
+            for z in (0.004, 0.026):
+                row = []
+                for t in (k / n, (k + 1) / n):
+                    th = 2 * math.pi * t
+                    row.append(bm.verts.new(((A + 0.0016) * math.cos(th), (B + 0.0016) * math.sin(th), z)))
+                quad.append(row)
+            bm.faces.new((quad[0][0], quad[0][1], quad[1][1], quad[1][0]))
+        parts.append(common.mesh_object(f"death-hat-band-{name}", bm, ribbon(hexc, name), col))
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in parts:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = parts[0]
+    bpy.ops.object.join()
+    obj = bpy.context.object
+    obj.name = "death-hat"
+    obj.parent = person.rig.root
+    obj.matrix_parent_inverse = Matrix.Identity(4)
+    obj.hide_render = True
     person.parts.append(wp.Piece(obj))
     return obj

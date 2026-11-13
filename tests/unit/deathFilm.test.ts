@@ -13,6 +13,13 @@ interface Film {
   frames: { s: number; w: number; h: number; dx: number; dy: number; x: number }[]
   walk: number[]
   scene: number[]
+  /** The dance's first and last frames, as indexes into `scene`. */
+  dance: [number, number]
+  /** What death_scene.py's joint check found over every frame (it fails the render if any joint leaves its human range). */
+  joints: {
+    summary: { kneeMin: number; kneeMax: number; hipMax: number; hipMin: number; abductionMax: number; leanBackMax: number; leanForwardMax: number; twistMax: number; floorMax: number }
+    flagged: string[]
+  }
 }
 const FILM = JSON.parse(readFileSync('src/components/deathFrames.json', 'utf8')) as Film
 
@@ -51,5 +58,46 @@ describe('the rendered film', () => {
     // ...and it ends on the move, a stride's pace, into the looped stride.
     const pace = FILM.stride / FILM.walk.length
     expect(scene.at(-1)! - scene.at(-2)!).toBeGreaterThan(pace * 0.8)
+  })
+
+  it('dances between regarding you and turning away: eight to eleven seconds, travelling the floor in a kick line', () => {
+    const [from, to] = FILM.dance
+    expect(from).toBeGreaterThan(100)
+    expect(to).toBeLessThanOrEqual(FILM.scene.length)
+    // 160 to 220 frames at 20 a second: eight to eleven seconds.
+    expect(to - from).toBeGreaterThanOrEqual(160)
+    expect(to - from).toBeLessThanOrEqual(220)
+    // He travels toward the walk-off while he dances (one to three metres: his stride is a metre and a bit)...
+    const xs = FILM.scene.map((i) => FILM.frames[i]!.x)
+    const travel = xs[to]! - xs[from]!
+    expect(travel).toBeGreaterThan(FILM.stride * 1.2)
+    expect(travel).toBeLessThan(FILM.stride * 3)
+    // ...never backward, and never faster than a walking pace (no jump between frames, none at either end of the dance).
+    const pace = FILM.stride / FILM.walk.length
+    for (let k = from - 2; k < to + 3; k++) {
+      const step = xs[k + 1]! - xs[k]!
+      expect(step, `frame ${k}`).toBeGreaterThanOrEqual(0)
+      expect(step, `frame ${k}`).toBeLessThanOrEqual(pace * 1.25)
+    }
+    // After it he stands where it left him (the turn away starts from there).
+    expect(xs[to + 5]! - xs[to]!).toBe(0)
+    // His arms are flung wide and the cane held out: the frame is wider than the walk's.
+    expect(FILM.frameWidth).toBeGreaterThanOrEqual(2 * 32 * 8)
+  })
+
+  it('keeps every joint inside a human range on every frame (his knees bend toward his toes, never the wrong way)', () => {
+    const { summary, flagged } = FILM.joints
+    expect(flagged, `frames outside the limits: ${flagged.join(', ')}`).toEqual([])
+    // Knees: 0 to 140 degrees of bend toward the toes, hyperextended no more than 5.
+    expect(summary.kneeMin).toBeGreaterThanOrEqual(-5)
+    expect(summary.kneeMax).toBeLessThanOrEqual(140)
+    // Hips: no further than a dancer's straight leg goes; no extreme abduction.
+    expect(summary.hipMax).toBeLessThanOrEqual(130)
+    expect(summary.hipMin).toBeGreaterThanOrEqual(-30)
+    expect(summary.abductionMax).toBeLessThanOrEqual(45)
+    // Spine: not more than 20 degrees back, twist under 45; no foot through the floor.
+    expect(summary.leanBackMax).toBeLessThanOrEqual(20)
+    expect(summary.twistMax).toBeLessThanOrEqual(45)
+    expect(summary.floorMax).toBeLessThanOrEqual(0.6)
   })
 })

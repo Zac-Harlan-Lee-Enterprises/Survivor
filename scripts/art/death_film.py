@@ -19,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 PER_SHEET = 16
 COLS = 8
-QUALITY = 80
+QUALITY = 78
 
 
 def main(src):
@@ -70,10 +70,13 @@ def main(src):
             crownY=take["crownY"],
             stride=take["stride"],
             armClearance=take.get("armClearance"),
+            joints=take.get("joints"),
             sheets=sheets,
             frames=index,
             walk=walk,
             scene=scene,
+            # The soft-shoe's first and last frames, as indexes into `scene`.
+            dance=take.get("dance"),
         ),
         open(os.path.join(ROOT, "src", "components", "deathFrames.json"), "w"),
         separators=(",", ":"),

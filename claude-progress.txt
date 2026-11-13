@@ -967,3 +967,35 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 2026-11-11 — Claude Opus 5.5 — Week 10 picks from Teams so far: Cindy, Dominic and Melanie, all DMed Wed Nov 11 (receipt times, not kickoffs: 12:05, 2:25 and 3:12 PM CT). Recorded with their teams as they arrive (sealing was tried and dropped at the commissioner's call). redactSnapshot hides them until the Thu Nov 12 7:10 PM CT lock and they reveal automatically; the engine still scores a hiddenPicks stub as pending. Leak guard in leagueMessageFacts: per paragraph, a paragraph naming a player must not name their pick's team or opponent (NFL_TEAMS names, shared cities skipped), with synthetic leaks proving the matcher. Note left alone. Allison and Tracy still out. NEXT: sweep Teams for Allison and Tracy before the lock.
 2026-11-11 — Claude Opus 5.5 — Tracy's week 10 pick (Jacksonville at Tennessee) relayed by the commissioner in session; receipt 22:12Z is that relay, not a Teams timestamp (her message wasn't searchable). Four of five in; Allison still owed before the Thu Nov 12 7:10 PM CT lock.
 2026-11-11 — Claude Opus 5.5 — Allison's week 10 pick (Jacksonville at Tennessee) relayed by the commissioner in session; receipt 02:36Z Nov 12 (8:36 PM CT Wed) is that relay, not a Teams timestamp. All five alive players have a week 10 pick. PR #77 merged on the commissioner's instruction.
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances
+- scripts/art/death_motion.py: a 145-frame (7.25 s) vaudeville soft-shoe inserted after he regards you and before his hand leaves the cane: sly nod, cane lifted and twirled once, step-ball-change left/right twice, four alternating kicks, a full turn on the balls of the feet, arms-wide finish. Feet are planted in world space (no sliding); cane tip taps on downbeats. Frame widened to 2.25 m (arms and cane out). Scene is now 396 frames (dance = scene-168..313, in deathFrames.json "dance").
+- Re-rendered at production settings and repacked public/death (3.7 MB, 27 sheets). tests/unit/deathFilm.test.ts pins the dance.
+- NEXT: the jacket hem flares like wings whenever his arms are raised (skinning of the suit, not the motion); fixing it belongs in death_dress.py. Watch the cane and the left hand in the first beat for any remaining clipping.
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances, second pass
+- death_dress.py: the jacket skirt no longer takes arm weights from the hands at his sides (the "bat wings").
+- death_motion.py: dance tightened to 135 frames (6.75 s); bouncier soft-shoe; chorus-line kicks a beat each; cane across the chest with the left arm curved overhead (no T-pose); the turn is a pirouette on the left ball.
+- Re-rendered at production settings; public/death is 3.6 MB.
+- NEXT: the settle after the finish is quick (cane returns in about 8 frames).
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances, third pass (the kick line)
+- death_motion.py: the dance is now the traveling high-kick line from the reference move (profile, ten straight-leg near-vertical kicks, lean back, cane across the chest, hand to the brow), a turn back, the ta-da and a settle; 141 frames, about 2 m of travel carried in take.json/deathFrames.json; everything after it (cane, plants, walk-off) starts from where it leaves him.
+- tests/unit/deathFilm.test.ts: travel is monotonic with no jumps. Removed committed __pycache__ files.
+- NEXT: the settle is about 8 visible frames; the left hand at the brow overlaps the cheek.
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances, fourth pass (boater, slower whip kicks)
+- death_dress.py: boater() (straw crown, brim, red/white band; one rigid object like the cane). death_motion.py: hat produced from behind his back on the nod, worn through the kick line (tip on every other kick), swept off and held high for the ta-da, tucked behind his back and gone at the settle (walk loop and walk-on stay hatless).
+- Kicks slowed to 10 frames, 8 of them; whip mechanics (thigh leads, knee straightens, hang, faster descent, ball-heel landing), pelvis tuck and hike, counterbalance lean, standing leg loads/extends/rises on the ball. 151 frames, about 2.2 strides of travel.
+- NEXT: the hat hand is on the far side in profile and only partly visible; the settle is quick.
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances, fifth pass (show-stopper)
+- death_motion.py: the kick line plays to the house (chest cheated 50 degrees round) and builds: 2 waist-high, 4 climbing with a hat tip on the beat, 4 double-time, a final held head-height kick (KICKS); a turn-out, a sweeping bow with the hat, the ta-da held 1.5 beats with a breath, a 15-frame settle; the cane arm lives; shoulders pop on the beat. 186 frames (9.3 s), about 2.5 strides of travel.
+- Motion blur on the 108 fastest dance frames: death_scene.py renders 5 sub-frame poses (0.5 frame shutter), death_blur.py averages them. public/death is 4.2 MB (webp quality 70).
+- Skipped: tie and jacket-front secondary motion (not separate bones), facial expression (the rig has only blink, talk, talk2 shape keys; the mouth opens for the ta-da).
+- NEXT: the blur shows discrete ghost steps on the fastest limbs (5 samples); more samples would smooth it.
+
+2026-11-11 | Claude Sonnet 5.5 | Death dances, sixth pass (natural first)
+- Found with the new joint check: after the dance the walk-off feet were still planned back where he began (2.5 m behind), which folded his legs backward; they are now re-planned from where the dance leaves him. Dance knees now bend toward the toes from the pelvis frame (hip-to-ankle turned about its sideways axis).
+- Motion blur off (code kept, off by default). Kicks waist to chest (88 to 114 degrees, the last 116 held), seven-frame flurry, lean 11 degrees at most, everything eased, forearm clear of the face. Motion capture was not tried (see report).
+- Motion.joint_check (knees, hips, elbows, wrists, spine, neck, feet) fails death_scene.py; joints summary packed in deathFrames.json and asserted in the unit test.
