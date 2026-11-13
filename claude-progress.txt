@@ -999,3 +999,10 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - Found with the new joint check: after the dance the walk-off feet were still planned back where he began (2.5 m behind), which folded his legs backward; they are now re-planned from where the dance leaves him. Dance knees now bend toward the toes from the pelvis frame (hip-to-ankle turned about its sideways axis).
 - Motion blur off (code kept, off by default). Kicks waist to chest (88 to 114 degrees, the last 116 held), seven-frame flurry, lean 11 degrees at most, everything eased, forearm clear of the face. Motion capture was not tried (see report).
 - Motion.joint_check (knees, hips, elbows, wrists, spine, neck, feet) fails death_scene.py; joints summary packed in deathFrames.json and asserted in the unit test.
+
+2026-11-12 | Claude Sonnet 5.5 | Death: no nipples through the suit
+- The base mesh's nipples/pectoral mound showed as a bump in the jacket (profile walk, arms-raised and kick-line frames); the body skin under the clothes was already masked, the jacket itself inherited the bump. MakeHuman data here has no nipple targets, so death_cast.py flattens them on the body mesh before any garment is cut (quadratic fit of the chest ring, bump brought down onto it, 13.7 mm at most).
+- death_dress.hide_covered now returns skin stats; death_scene.py fails the render if bare skin is left over his chest or the neck/hands are masked, and packs `skin` in deathFrames.json (asserted in deathFilm.test.ts). New --chest flag renders chest close-ups.
+- Full take re-rendered (ppu 8, 64 samples), 0 joint flags, public/death 3.9 MB.
+- Left alone: a faint shelf in the jacket front near z 1.03-1.05 (not visible at sprite size). init.sh skipped: port 5891 held by the owner's server.
+- NEXT: none.

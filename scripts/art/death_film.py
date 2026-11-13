@@ -71,6 +71,7 @@ def main(src):
             stride=take["stride"],
             armClearance=take.get("armClearance"),
             joints=take.get("joints"),
+            skin=take.get("skin"),
             sheets=sheets,
             frames=index,
             walk=walk,

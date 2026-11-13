@@ -342,6 +342,21 @@ def hide_covered(person):
     g.add(np.nonzero(keep)[0].tolist(), 1.0, "REPLACE")
     m = obj.modifiers.new("covered", "MASK")
     m.vertex_group = "skin"
+    # What is checked (death_scene.py, deathFrames.json): no skin left on show over his chest
+    # between the collar and the waist (a margin of 8 cm under the collar keeps the neckline closed; the jacket, and the shirt through its V, cover all of it,
+    # so nothing under them can show through in any pose), and the neck, hands and ankles keep theirs.
+    w = person.cloth
+    co = w.co[person.body_used]
+    limbs = w.bone_weight(*_names(w, "upperarm", "lowerarm", "wrist", "finger", "metacarpal", "shoulder"))[person.body_used]
+    neck = w.bone_weight("neck01", "neck02", "neck03", "head")[person.body_used]
+    is_body = np.isin(person.body_used, mh.Base.get().verts_of("body"))
+    chest = is_body & (co[:, 2] > w.belt_z + 0.02) & (co[:, 2] < w.nz - 0.08) & (limbs < 0.2) & (neck < 0.3) & (np.abs(co[:, 0]) < 0.25)
+    return dict(
+        hidden=int((~keep & is_body).sum()),
+        chestSkinShowing=int((chest & keep).sum()),
+        neckSkinKept=int((is_body & (neck > 0.5) & keep).sum()) > 0,
+        handsSkinKept=int((is_body & (w.bone_weight(*_names(w, "wrist", "finger", "metacarpal"))[person.body_used] > 0.5) & keep).sum()) > 0,
+    )
 
 
 def _names(self, *prefixes):

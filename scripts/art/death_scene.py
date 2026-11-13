@@ -58,6 +58,7 @@ def args():
     ap.add_argument("--samples", type=int, default=64)
     ap.add_argument("--only", default="")
     ap.add_argument("--closeup", action="store_true", help="also render his head and shoulders, large")
+    ap.add_argument("--chest", action="store_true", help="also render his chest, large (to look for anything showing through the suit)")
     ap.add_argument("--blur", type=int, default=0, help="the most sub-frame poses averaged for a fast frame of the dance (0: no blur)")
     ap.add_argument("--shutter", type=float, default=0.3, help="the shutter, in frames")
     ap.add_argument("--blur-px", type=float, default=25.0, help="blur a dance frame when a limb moves this far (pixels) in a frame")
@@ -67,7 +68,9 @@ def args():
     return ap.parse_args(argv)
 
 
-def camera(scene, ppu, closeup=False, head_z=1.7):
+def camera(scene, ppu, closeup=False, head_z=1.7, chest=False):
+    if chest:
+        return view.setup_figure_camera(scene, head_z * TILE, 720, 800, 720 / (0.6 * TILE), tilt_deg=death_motion.TILT)
     if closeup:
         cam = view.setup_figure_camera(scene, head_z * TILE, 640, 800, 640 / (0.42 * TILE), tilt_deg=death_motion.TILT)
         return cam
@@ -134,7 +137,11 @@ def main():
     os.makedirs(a.out, exist_ok=True)
     scene = common.reset(a.samples)
     person = world_person.Person(death_cast.APPEARANCE, name="death", pid="death")
-    death_dress.hide_covered(person)
+    skin = death_dress.hide_covered(person)
+    skin["nippleMoveMm"] = float(death_cast.NIPPLE_MOVE_MM)
+    print("SKIN", skin, flush=True)
+    if skin["chestSkinShowing"] or not (skin["neckSkinKept"] and skin["handsSkinKept"]):
+        raise SystemExit("skin showing over the chest, or the neck/hands masked: %s" % skin)
     mo = death_motion.Motion(person, death_dress.SOLE)
     cane = death_dress.cane(person, mo.L)
     hat = death_dress.boater(person)
@@ -230,6 +237,10 @@ def main():
                 scene.render.filepath = os.path.join(a.out, "blur", f"{name}__{k}.png")
                 bpy.ops.render.render(write_still=True)
             scene.cycles.samples = full
+        if a.chest:
+            camera(scene, a.ppu, chest=True, head_z=person.H * 0.74)
+            scene.render.filepath = os.path.join(a.out, name + "-chest.png")
+            bpy.ops.render.render(write_still=True)
         if a.closeup:
             camera(scene, a.ppu, closeup=True, head_z=person.H - 0.16)
             scene.render.filepath = os.path.join(a.out, name + "-closeup.png")
@@ -252,6 +263,8 @@ def main():
             armClearance=round(mo.arm_clearance(take) * 100, 1),
             cane=mo.L,
             joints=dict(summary=jsum, flagged=sorted({fl[0] for fl in flags})),
+            # Skin under his clothes is masked; what showed on his chest is flattened (death_cast.py).
+            skin=skin,
             dance=list(mo.dance_frames),
             frames=frames,
         ),
