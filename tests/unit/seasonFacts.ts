@@ -182,6 +182,22 @@ export const FINALS: Record<string, [number, number]> = {
   '2026-w09-LV-at-SF': [17, 38],
   '2026-w09-ARI-at-SEA': [3, 17],
   '2026-w09-TB-at-CHI': [24, 27],
+  // Monday night, unpicked; pinned 2026-11-16 for Buffalo's record.
+  '2026-w09-BUF-at-MIN': [23, 6],
+  // Week 10, read 2026-11-16 (Monday night's LAC at BAL, unpicked, not yet played).
+  '2026-w10-WAS-at-NYG': [24, 21],
+  '2026-w10-NE-at-DET': [10, 35],
+  '2026-w10-KC-at-ATL': [35, 13],
+  '2026-w10-HOU-at-CLE': [24, 27],
+  '2026-w10-MIN-at-GB': [30, 10],
+  '2026-w10-JAX-at-TEN': [40, 23],
+  '2026-w10-MIA-at-IND': [22, 24],
+  '2026-w10-CAR-at-NO': [20, 17],
+  '2026-w10-BUF-at-NYJ': [31, 12],
+  '2026-w10-SEA-at-LV': [21, 13],
+  '2026-w10-LAR-at-ARI': [34, 6],
+  '2026-w10-SF-at-DAL': [46, 40],
+  '2026-w10-PIT-at-CIN': [18, 38],
 }
 
 /**
@@ -454,6 +470,53 @@ export const SCORING: Record<string, ScoringPlay[]> = {
     [3, '0:36', 'SF', [17, 35], 'Jordan Watkins 37 Yd pass from Brock Purdy (Eddy Pineiro Kick)'],
     [4, '5:21', 'SF', [17, 38], 'Eddy Pineiro 35 Yd Field Goal'],
   ],
+  // Week 10, read 2026-11-16.
+  '2026-w10-JAX-at-TEN': [
+    [
+      1,
+      '9:33',
+      'JAX',
+      [7, 0],
+      'Parker Washington 2 Yd pass from Trevor Lawrence (Cam Little Kick)',
+    ],
+    [1, '7:04', 'TEN', [7, 3], 'Joey Slye 53 Yd Field Goal'],
+    [2, '12:54', 'JAX', [10, 3], 'Cam Little 46 Yd Field Goal'],
+    [2, '7:54', 'JAX', [13, 3], 'Cam Little 48 Yd Field Goal'],
+    [2, '5:06', 'TEN', [13, 10], 'Daniel Bellinger 2 Yd pass from Cam Ward (Joey Slye Kick)'],
+    [2, '0:00', 'JAX', [16, 10], 'Cam Little 36 Yd Field Goal'],
+    [3, '12:35', 'TEN', [16, 13], 'Joey Slye 54 Yd Field Goal'],
+    [
+      3,
+      '6:28',
+      'JAX',
+      [23, 13],
+      'Brenton Strange 3 Yd pass from Trevor Lawrence (Cam Little Kick)',
+    ],
+    [3, '2:13', 'TEN', [23, 16], 'Joey Slye 50 Yd Field Goal'],
+    [4, '9:44', 'JAX', [30, 16], 'Josh Cameron 25 Yd pass from Trevor Lawrence (Cam Little Kick)'],
+    [4, '8:21', 'TEN', [30, 23], 'Tony Pollard 32 Yd pass from Cam Ward (Joey Slye Kick)'],
+    [4, '4:31', 'JAX', [33, 23], 'Cam Little 40 Yd Field Goal'],
+    [4, '1:10', 'JAX', [40, 23], 'Bhayshul Tuten 6 Yd Rush (Cam Little Kick)'],
+  ],
+  '2026-w10-BUF-at-NYJ': [
+    [1, '2:49', 'BUF', [7, 0], 'Josh Allen 1 Yd Run (Tyler Bass Kick)'],
+    [2, '12:20', 'NYJ', [7, 3], 'Jason Sanders 41 Yd Field Goal'],
+    [2, '6:53', 'BUF', [10, 3], 'Tyler Bass 37 Yd Field Goal'],
+    [2, '0:12', 'NYJ', [10, 6], 'Jason Sanders 27 Yd Field Goal'],
+    [3, '10:02', 'NYJ', [10, 9], 'Jason Sanders 22 Yd Field Goal'],
+    [3, '8:02', 'BUF', [17, 9], 'Josh Allen 1 Yd Rush (Tyler Bass Kick)'],
+    [3, '4:21', 'NYJ', [17, 12], 'Jason Sanders 48 Yd Field Goal'],
+    [3, '3:42', 'BUF', [24, 12], 'DJ Moore 45 Yd pass from Josh Allen (Tyler Bass Kick)'],
+    [4, '4:42', 'BUF', [31, 12], 'James Cook III 74 Yd Rush (Tyler Bass Kick)'],
+  ],
+  '2026-w10-SEA-at-LV': [
+    [1, '7:41', 'LV', [0, 7], 'Fernando Mendoza 10 Yd Rush (Matt Gay Kick)'],
+    [1, '2:32', 'SEA', [7, 7], 'Cooper Kupp 34 Yd pass from Drew Lock (Jason Myers Kick)'],
+    [2, '11:13', 'LV', [7, 10], 'Matt Gay 34 Yd Field Goal'],
+    [3, '9:28', 'SEA', [14, 10], 'Jadarian Price 12 Yd Rush (Jason Myers Kick)'],
+    [3, '7:10', 'SEA', [21, 10], 'Jaxon Smith-Njigba 71 Yd pass from Drew Lock (Jason Myers Kick)'],
+    [4, '2:04', 'LV', [21, 13], 'Matt Gay 43 Yd Field Goal'],
+  ],
 }
 
 /** Turnovers each side committed (ESPN box score, read 2026-10-26), for the games a note uses. */
@@ -492,6 +555,10 @@ export interface TeamBox {
   passingYards: number
   /** Red-zone trips that ended in a touchdown, and trips. */
   redZone: [made: number, trips: number]
+  /** Time of possession, "m:ss". */
+  possession?: string
+  /** Times its quarterback was sacked. */
+  sacked?: number
 }
 export interface PlayerBox {
   team: string
@@ -584,6 +651,70 @@ export const BOX: Record<
     players: {
       'Jake Bates': { team: 'DET', fieldGoals: [4, 4], longest: 43, points: 13 },
       'Zane Gonzalez': { team: 'MIA', fieldGoals: [3, 4], longest: 52, points: 9 },
+    },
+  },
+  // Week 10, read 2026-11-16.
+  '2026-w10-JAX-at-TEN': {
+    teams: {
+      JAX: {
+        totalYards: 459,
+        firstDowns: 27,
+        passingYards: 336,
+        redZone: [3, 5],
+        possession: '38:10',
+      },
+      TEN: {
+        totalYards: 327,
+        firstDowns: 19,
+        passingYards: 222,
+        redZone: [1, 1],
+        possession: '21:50',
+      },
+    },
+    players: {
+      'Joey Slye': { team: 'TEN', fieldGoals: [3, 3], longest: 54, points: 11 },
+      'Cam Little': { team: 'JAX', fieldGoals: [4, 4], longest: 48, points: 16 },
+    },
+  },
+  '2026-w10-BUF-at-NYJ': {
+    teams: {
+      BUF: { totalYards: 389, firstDowns: 19, passingYards: 188, redZone: [2, 3] },
+      NYJ: { totalYards: 376, firstDowns: 19, passingYards: 267, redZone: [0, 2] },
+    },
+    players: {
+      'Geno Smith': {
+        team: 'NYJ',
+        completions: 13,
+        attempts: 21,
+        passingYards: 148,
+        touchdowns: 0,
+        interceptions: 0,
+      },
+      'Cade Klubnik': {
+        team: 'NYJ',
+        completions: 11,
+        attempts: 20,
+        passingYards: 137,
+        touchdowns: 0,
+        interceptions: 1,
+      },
+      'Jason Sanders': { team: 'NYJ', fieldGoals: [4, 4], longest: 48, points: 12 },
+    },
+  },
+  '2026-w10-SEA-at-LV': {
+    teams: {
+      SEA: { totalYards: 382, firstDowns: 17, passingYards: 232, redZone: [1, 2] },
+      LV: { totalYards: 163, firstDowns: 12, passingYards: 98, redZone: [1, 3], sacked: 6 },
+    },
+    players: {
+      'Fernando Mendoza': {
+        team: 'LV',
+        completions: 17,
+        attempts: 29,
+        passingYards: 143,
+        touchdowns: 0,
+        interceptions: 0,
+      },
     },
   },
 }
