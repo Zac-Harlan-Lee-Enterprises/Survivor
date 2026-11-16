@@ -9,32 +9,33 @@ import { Megaphone, Send } from 'lucide-react'
  * Every number and result in it is checked against the season in
  * tests/unit/leagueMessageFacts.test.ts. Death's habits are the only fiction.
  *
- * Shown for weeks 1–10: the seed carries no results, so the engine calls week 1
- * current until the live sync lands them, at which point week 10 is.
+ * Shown for weeks 1–11: the seed carries no results, so the engine calls week 1
+ * current until the live sync lands them, at which point week 11 is.
  *
- * Written after Sunday night's game settled week 9 (Monday night's Buffalo at
- * Minnesota had no picks), before any week 10 pick: it names no week 10 pick.
+ * Written after Sunday night's game settled week 10 (Monday night's Chargers at
+ * Baltimore had no picks), before any week 11 pick: it names no week 11 pick.
  */
-const WEEK_9_REVIEW: { heading: string; lines: string[]; callout?: string } = {
+const WEEK_10_REVIEW: { heading: string; lines: string[]; callout?: string } = {
   heading: 'Word from the late commissioner',
   lines: [
-    'Death went nought for five again. For the second week running nobody in the league lost a life; before last week it had not happened once all season. That is ten picks in a row he has watched without burying anybody. He has started turning the lights off in the graveyard to save on electricity. There are still twenty-five headstones.',
-    'Dominic and Melanie, both on their last life, took the Bears at home to Tampa Bay on Sunday night, and the Bears did everything they could to bury them. Caleb Williams threw four interceptions. The Bears turned it over five times. They led by eight with under four minutes left, fumbled it away at their own 21, and Tampa Bay scored and ran in the two-point conversion to tie it at 24 with 2:51 to go. Then Cairo Santos kicked a 38-yard field goal with no time left on the clock, and the Bears won 27–24. Death had the shovel in his hand. He has put it back, but he hasn’t cleaned it.',
-    'Cindy and Tracy took Detroit at Miami, and Detroit won 19–9 in a game with one touchdown in it. Jake Bates kicked four field goals from four tries and scored thirteen points, which means he beat the Dolphins on his own. Miami never found the end zone. Death watched the whole thing and says it was the most peaceful afternoon he has had in years; he would like it played at his own funeral. Cindy has now picked a winner in eight of her nine weeks and is still the only one of you on two lives.',
-    'Allison took San Francisco at home to Las Vegas and won 38–17. The Raiders turned it over five times, and seventeen seconds into the second half Jaden Dugger intercepted Kirk Cousins and ran it back 35 yards for a touchdown. The 49ers are 7–1. Death says watching the Raiders was like watching a man try to pay for his groceries with a library card. He means it kindly.',
-    'Cincinnati, whom every one of you has already used, won 34–17 at Atlanta at 8:30 in the morning. Death ate his croissant and felt nothing, which he says is how he likes his football.',
-    'Nobody picked Buffalo at Minnesota, so the week was settled when the Bears’ game ended. Death will watch Monday night anyway. He says he likes to keep his hand in.',
-    'Week 10: Chicago, Denver, Philadelphia and Tampa Bay are on bye, so the Bears can’t save anybody this time. Thursday night is Washington at the Giants, which locks the week, and Sunday starts at 8:30 in the morning again, with New England at Detroit; Cindy and Tracy can’t have the Lions twice. Five of you, four on your last life, Cindy on two. Death has gone two weeks without a customer. He says he isn’t worried. He says he has been doing this for a very long time.',
+    'Death went nought for five again. That is three weeks running without a funeral and fifteen winning picks in a row; before week 8 this league had never once gone a week without losing a life. There are still twenty-five headstones. Death has had so much time on his hands that he has taken up dancing. He has a straw hat now, and a routine, and he would like it known that he is very good. He has also had his jacket taken in across the chest. I asked him to. Don’t ask why.',
+    'Dominic, Tracy and Allison all took Jacksonville at Tennessee, and the Jaguars won 40–23 and kept the ball for 38 minutes. Tennessee is 1–8. Its one win all season came in week 6, against the Colts, on the afternoon Chloe, Corey and Joanna were buried, so Tennessee has now knocked three of you out of this league and beaten one football team. Joey Slye, the kicker whose four field goals did the burying that day, kicked three from 50 yards or more on Sunday. It made no difference. Death says he admires a man who keeps turning up for work after the work has gone.',
+    'Cindy took Seattle at Las Vegas, whose quarterback is Fernando Mendoza. Seattle sacked him six times, the Raiders gained 163 yards all afternoon, and Seattle won 21–13. So a Mendoza beat a Mendoza. Death says he has been to a great many family reunions, and that is usually how they end. Cindy has now picked a winner in nine of her ten weeks and is still the only one of you on two lives.',
+    'Melanie took Buffalo at the Jets and won 31–12. The Jets played two quarterbacks, got into the red zone twice, came away with nothing either time, and scored all twelve of their points on Jason Sanders field goals. They are 2–8. You will remember the Jets as the team that cost Allison a life and buried Dave in week 7, the day Miami won its first game. On Sunday they finally did something for one of you: they lost.',
+    'Here is your problem. The two best teams in football, San Francisco and Buffalo, are 8–1, and all five of you have used San Francisco. Jacksonville and Cincinnati are 7–2, and all five of you have used both of them too. Death has started reading the standings over breakfast. He says it relaxes him.',
+    'Nobody picked San Francisco at Dallas, which finished 46–40: eighty-six points, and Death watched every one of them with his feet up. Dallas, the team twenty-one of you lost with in week 5, lost again. Death sends them flowers every week as a professional courtesy.',
+    'Nobody picked the Chargers at Baltimore on Monday night either, so the week was settled on Sunday. The Chargers are 0–8. Seven of you took them in week 1. Death keeps a photograph of that weekend on his desk, and he says you all look very happy in it.',
+    'Week 11: Atlanta, Cleveland, Green Bay, the Rams, New England and Seattle are on bye, so Cindy spent Seattle at exactly the right moment. Thursday night is Indianapolis at Houston, which locks the week. Houston is the team six of you took in week 7 and lost with, 27–21 in overtime; Cindy and Melanie are the only two of those six still alive, and neither can have Houston again. Five of you, four on your last life, Cindy on two. Death has gone three weeks without a customer. He has bought a second hat.',
   ],
   // Set apart from the banter, because an instruction buried in jokes is an
   // instruction somebody misses, and four of the five are on their last life.
   callout:
-    'DM me your week 10 pick on Teams before 7:10 PM Thursday, November 12, five minutes before Washington at the Giants kicks off. Four of you are on your last life, and a missing pick costs a life.',
+    'DM me your week 11 pick on Teams before 7:10 PM Thursday, November 19, five minutes before Indianapolis at Houston kicks off. Four of you are on your last life, and a missing pick costs a life.',
 }
 
 export function LeagueMessage({ week }: { week: number }) {
-  if (week < 1 || week > 10) return null
-  const note = WEEK_9_REVIEW
+  if (week < 1 || week > 11) return null
+  const note = WEEK_10_REVIEW
 
   return (
     <section className="card border-sky-400/25 p-5 md:p-6" aria-labelledby="league-message-title">
