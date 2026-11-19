@@ -113,6 +113,8 @@ describe('demo fixture', () => {
     ['cindy-mendoza', 'BUF', '2026-11-18T18:24:12.000Z', '2026-w11-MIA-at-BUF'],
     ['dominic-green', 'BUF', '2026-11-19T15:49:29.000Z', '2026-w11-MIA-at-BUF'],
     ['melanie-moeller', 'KC', '2026-11-19T16:51:11.000Z', '2026-w11-ARI-at-KC'],
+    // Sent as a picture; the commissioner read it as the Bills. Time is the picture's Teams timestamp.
+    ['tracy-nelson', 'BUF', '2026-11-17T15:25:58.000Z', '2026-w11-MIA-at-BUF'],
   ])('records %s’s week 11 pick from Teams (%s)', (playerId, teamId, submittedAt, gameId) => {
     const picks = snapshot.picks.filter((pick) => pick.playerId === playerId && pick.week === 11)
     expect(picks).toHaveLength(1)
