@@ -125,7 +125,7 @@ describe('the commissioner’s week 10 review states only true things', () => {
     expect(record('TEN', WEEK)).toBe('1-8')
   })
 
-  it('“Its one win all season came in week 6, against the Colts, on the afternoon Chloe, Corey and Joanna were buried, so Tennessee has now knocked three of you out of this league and beaten one football team”', () => {
+  it('“Its one win all season came in week 6, on the afternoon Chloe, Corey and Joanna were buried, so Tennessee has now knocked three of you out of this league and beaten one football team”', () => {
     const tenWins = Object.keys(FINALS).filter((id) => {
       const g = season.games.find((x) => x.id === id)!
       return g.week <= WEEK && winnerOf(id) === 'TEN'
