@@ -198,6 +198,21 @@ export const FINALS: Record<string, [number, number]> = {
   '2026-w10-LAR-at-ARI': [34, 6],
   '2026-w10-SF-at-DAL': [46, 40],
   '2026-w10-PIT-at-CIN': [18, 38],
+  // Week 10's Monday night, unpicked; pinned 2026-11-23.
+  '2026-w10-LAC-at-BAL': [23, 20],
+  // Week 11, read 2026-11-23 (Monday night's CIN at WAS, unpicked, not yet played).
+  '2026-w11-IND-at-HOU': [3, 26],
+  '2026-w11-MIA-at-BUF': [9, 26],
+  '2026-w11-NO-at-CHI': [13, 21],
+  '2026-w11-TEN-at-DAL': [30, 51],
+  '2026-w11-TB-at-DET': [21, 31],
+  '2026-w11-ARI-at-KC': [7, 34],
+  '2026-w11-PIT-at-PHI': [16, 19],
+  '2026-w11-BAL-at-CAR': [33, 35],
+  '2026-w11-NYJ-at-LAC': [27, 24],
+  '2026-w11-LV-at-DEN': [24, 38],
+  '2026-w11-JAX-at-NYG': [18, 23],
+  '2026-w11-MIN-at-SF': [10, 35],
 }
 
 /**
@@ -517,6 +532,59 @@ export const SCORING: Record<string, ScoringPlay[]> = {
     [3, '7:10', 'SEA', [21, 10], 'Jaxon Smith-Njigba 71 Yd pass from Drew Lock (Jason Myers Kick)'],
     [4, '2:04', 'LV', [21, 13], 'Matt Gay 43 Yd Field Goal'],
   ],
+  // Week 11, read 2026-11-23.
+  '2026-w11-IND-at-HOU': [
+    [1, '10:43', 'IND', [3, 0], 'Spencer Shrader 34 Yd Field Goal'],
+    [1, '2:14', 'HOU', [3, 7], "Nico Collins 42 Yd pass from C.J. Stroud (Ka'imi Fairbairn Kick)"],
+    [
+      2,
+      '7:38',
+      'HOU',
+      [3, 14],
+      "Kayshon Boutte 24 Yd pass from C.J. Stroud (Ka'imi Fairbairn Kick)",
+    ],
+    [2, '0:15', 'HOU', [3, 17], "Ka'imi Fairbairn 27 Yd Field Goal"],
+    [
+      3,
+      '10:22',
+      'HOU',
+      [3, 19],
+      'Daniel Jones Sacked by Will Anderson Jr. For 7 Yd Loss for Safety',
+    ],
+    [3, '4:19', 'HOU', [3, 26], "Marlin Klein 13 Yd pass from C.J. Stroud (Ka'imi Fairbairn Kick)"],
+  ],
+  '2026-w11-MIA-at-BUF': [
+    [1, '11:04', 'BUF', [0, 3], 'Tyler Bass 43 Yd Field Goal'],
+    [1, '5:27', 'BUF', [0, 6], 'Tyler Bass 54 Yd Field Goal'],
+    [2, '13:23', 'BUF', [0, 13], 'DJ Moore 4 Yd pass from Josh Allen (Tyler Bass Kick)'],
+    [2, '9:44', 'MIA', [3, 13], 'Daniel Carlson 52 Yd Field Goal'],
+    [2, '3:48', 'BUF', [3, 20], 'James Cook III 1 Yd Rush (Tyler Bass Kick)'],
+    [2, '1:14', 'MIA', [6, 20], 'Daniel Carlson 52 Yd Field Goal'],
+    [3, '11:42', 'MIA', [9, 20], 'Daniel Carlson 27 Yd Field Goal'],
+    [4, '14:56', 'BUF', [9, 23], 'Tyler Bass 40 Yd Field Goal'],
+    [4, '1:57', 'BUF', [9, 26], 'Tyler Bass 28 Yd Field Goal'],
+  ],
+  '2026-w11-ARI-at-KC': [
+    [1, '9:46', 'KC', [0, 7], 'Travis Kelce 8 Yd pass from Patrick Mahomes (Harrison Butker Kick)'],
+    [1, '0:48', 'KC', [0, 14], 'Emmett Johnson 3 Yd Rush (Harrison Butker Kick)'],
+    [2, '9:48', 'ARI', [7, 14], 'Simi Fehoko 2 Yd pass from Josh Johnson (Chad Ryland Kick)'],
+    [2, '4:32', 'KC', [7, 17], 'Harrison Butker 40 Yd Field Goal'],
+    [
+      2,
+      '1:54',
+      'KC',
+      [7, 24],
+      'Travis Kelce 22 Yd pass from Patrick Mahomes (Harrison Butker Kick)',
+    ],
+    [2, '0:00', 'KC', [7, 27], 'Harrison Butker 44 Yd Field Goal'],
+    [
+      4,
+      '14:54',
+      'KC',
+      [7, 34],
+      'Xavier Worthy 18 Yd pass from Patrick Mahomes (Harrison Butker Kick)',
+    ],
+  ],
 }
 
 /** Turnovers each side committed (ESPN box score, read 2026-10-26), for the games a note uses. */
@@ -715,6 +783,32 @@ export const BOX: Record<
         touchdowns: 0,
         interceptions: 0,
       },
+    },
+  },
+  // Week 11, read 2026-11-23.
+  '2026-w11-MIA-at-BUF': {
+    teams: {
+      MIA: { totalYards: 185, firstDowns: 10, passingYards: 86, redZone: [0, 1] },
+      BUF: { totalYards: 405, firstDowns: 25, passingYards: 310, redZone: [2, 5] },
+    },
+    players: {
+      'Kyle McCord': {
+        team: 'MIA',
+        completions: 12,
+        attempts: 33,
+        passingYards: 102,
+        touchdowns: 0,
+        interceptions: 1,
+      },
+      'Josh Allen': {
+        team: 'BUF',
+        completions: 27,
+        attempts: 45,
+        passingYards: 304,
+        touchdowns: 1,
+        interceptions: 2,
+      },
+      'Tyler Bass': { team: 'BUF', fieldGoals: [4, 4], longest: 54, points: 14 },
     },
   },
 }

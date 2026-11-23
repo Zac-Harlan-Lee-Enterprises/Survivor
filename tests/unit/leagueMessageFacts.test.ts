@@ -6,7 +6,6 @@ import {
   FINALS,
   SCORING,
   eliminatedWeekOf,
-  crowd,
   livesAfter,
   lost,
   nameOf,
@@ -25,10 +24,10 @@ import {
  * the only fiction in it. When these fail, the note needs rewriting — that is
  * the signal working, not a broken test.
  *
- * Week 10's review went up once Sunday night settled the week, before any week
- * 11 pick.
+ * Week 11's review went up once Sunday night settled the week, before any week
+ * 12 pick.
  */
-const WEEK = 10
+const WEEK = 11
 const after = livesAfter(WEEK)
 const alive = season.profiles.filter((p) => after.get(p.displayName)! > 0)
 const firstNames = (names: string[]) => names.map((n) => n.split(' ')[0]!).sort()
@@ -69,7 +68,7 @@ const source = readFileSync(
   new URL('../../src/features/league-home/LeagueMessage.tsx', import.meta.url),
   'utf8',
 )
-const body = source.slice(source.indexOf('const WEEK_10_REVIEW'), source.indexOf('export function'))
+const body = source.slice(source.indexOf('const WEEK_11_REVIEW'), source.indexOf('export function'))
 
 // Paragraphs of the note, read from the TSX source: each string literal in
 // `lines: [...]` is one paragraph, plus the callout. Never split on '.'.
@@ -104,174 +103,172 @@ const nameParts = (full: string) => full.split(/\s+/)
 const mentions = (text: string, words: string[]): string | null =>
   words.find((w) => new RegExp(`(?<![\\w])${esc(w)}(?![\\w])`, 'i').test(text)) ?? null
 
-describe('the commissioner’s week 10 review states only true things', () => {
-  it('is written from a settled week: every week 10 pick has its final', () => {
+describe('the commissioner’s week 11 review states only true things', () => {
+  const winsOf = (team: string) =>
+    Object.keys(FINALS).filter((id) => {
+      const g = season.games.find((x) => x.id === id)!
+      return g.week <= WEEK && winnerOf(id) === team
+    })
+  const buriedBy = (w: number, team: string) =>
+    firstNames(
+      picksIn(w)
+        .filter((p) => p.teamId === team && eliminatedWeekOf(p.playerId, WEEK) === w)
+        .map((p) => nameOf(p.playerId)),
+    )
+  const usedByAll = (team: string) =>
+    alive.every((p) =>
+      season.picks.some((x) => x.playerId === p.playerId && x.week <= WEEK && x.teamId === team),
+    )
+
+  it('is written from a settled week: every week 11 pick has its final', () => {
     expect(pinnedThrough).toBe(WEEK)
   })
 
-  it('“three weeks running without a funeral and fifteen winning picks in a row; before week 8 this league had never once gone a week without losing a life. There are still twenty-five headstones”', () => {
-    for (const w of [8, 9, 10]) expect(lostIn(w), `week ${w}`).toBe(0)
-    for (let w = 1; w < 8; w++) expect(lostIn(w), `week ${w}`).toBeGreaterThan(0)
-    const run = [...picksIn(8), ...picksIn(9), ...picksIn(10)]
-    expect(run).toHaveLength(15)
+  it('“four weeks running without a funeral and twenty winning picks in a row, and there are still twenty-five headstones”', () => {
+    for (const w of [8, 9, 10, 11]) expect(lostIn(w), `week ${w}`).toBe(0)
+    expect(lostIn(7)).toBeGreaterThan(0)
+    const run = [8, 9, 10, 11].flatMap((w) => picksIn(w))
+    expect(run).toHaveLength(20)
     expect(run.filter(lost)).toEqual([])
     expect([...after.values()].filter((l) => l === 0)).toHaveLength(25)
   })
 
-  it('“Dominic, Tracy and Allison all took Jacksonville at Tennessee, and the Jaguars won 40–23 and kept the ball for 38 minutes. Tennessee is 1–8”', () => {
-    expect(on(WEEK, 'JAX')).toEqual(['Allison', 'Dominic', 'Tracy'])
-    expect(FINALS['2026-w10-JAX-at-TEN']).toEqual([40, 23])
-    expect(BOX['2026-w10-JAX-at-TEN']!.teams.JAX!.possession).toMatch(/^38:/)
-    expect(record('TEN', WEEK)).toBe('1-8')
+  it('“Allison took Houston at home to Indianapolis on Thursday night and won 26–3. The Colts kicked a field goal in the first quarter and never scored again, and in the third Will Anderson Jr. sacked Daniel Jones in his own end zone for a safety”', () => {
+    const id = '2026-w11-IND-at-HOU'
+    expect(on(WEEK, 'HOU')).toEqual(['Allison'])
+    expect(FINALS[id]).toEqual([3, 26])
+    expect(at(gameOf(WEEK, 'HOU')!.kickoffAt)).toMatch(/^Thursday/)
+    const colts = SCORING[id]!.filter((p) => p[2] === 'IND')
+    expect(colts).toHaveLength(1)
+    expect(colts[0]![0]).toBe(1)
+    expect(colts[0]![4]).toMatch(/Field Goal/)
+    const safety = SCORING[id]!.find((p) => /Safety/.test(p[4]))!
+    expect(safety[0]).toBe(3)
+    expect(safety[4]).toMatch(/^Daniel Jones Sacked by Will Anderson Jr\./)
   })
 
-  it('“Its one win all season came in week 6, on the afternoon Chloe, Corey and Joanna were buried, so Tennessee has now knocked three of you out of this league and beaten one football team”', () => {
-    const tenWins = Object.keys(FINALS).filter((id) => {
-      const g = season.games.find((x) => x.id === id)!
-      return g.week <= WEEK && winnerOf(id) === 'TEN'
+  it('“Allison lost a life on the Colts in week 6. Houston is the team that cost Cindy and Melanie a life in week 7”', () => {
+    const allison6 = pickOf('Allison Petty', 6)!
+    expect(allison6.teamId).toBe('IND')
+    expect(lost(allison6)).toBe(true)
+    for (const name of ['Cindy Mendoza', 'Melanie Moeller']) {
+      const p = pickOf(name, 7)!
+      expect(p.teamId, name).toBe('HOU')
+      expect(lost(p), name).toBe(true)
+    }
+  })
+
+  it('“Cindy, Dominic and Tracy all took Buffalo at home to Miami and won 26–9. Josh Allen threw two interceptions … Tyler Bass kicked four field goals, Miami’s quarterback completed 12 of 33 passes for 102 yards, and all nine of Miami’s points were field goals”', () => {
+    const id = '2026-w11-MIA-at-BUF'
+    expect(on(WEEK, 'BUF')).toEqual(['Cindy', 'Dominic', 'Tracy'])
+    expect(FINALS[id]).toEqual([9, 26])
+    expect(BOX[id]!.players['Josh Allen']!.interceptions).toBe(2)
+    expect(BOX[id]!.players['Tyler Bass']!.fieldGoals).toEqual([4, 4])
+    expect(BOX[id]!.players['Kyle McCord']).toMatchObject({
+      team: 'MIA',
+      completions: 12,
+      attempts: 33,
+      passingYards: 102,
     })
-    expect(tenWins).toEqual(['2026-w06-TEN-at-IND'])
-    const buried = picksIn(6)
-      .filter((p) => p.teamId === 'IND' && eliminatedWeekOf(p.playerId, WEEK) === 6)
-      .map((p) => nameOf(p.playerId))
-    expect(firstNames(buried)).toEqual(['Chloe', 'Corey', 'Joanna'])
+    const miami = SCORING[id]!.filter((p) => p[2] === 'MIA')
+    expect(miami.every((p) => /Field Goal/.test(p[4]))).toBe(true)
+    expect(miami.length * 3).toBe(9)
   })
 
-  it('“Joey Slye, the kicker whose four field goals did the burying that day, kicked three from 50 yards or more on Sunday. It made no difference”', () => {
-    expect(BOX['2026-w06-TEN-at-IND']!.players['Joey Slye']).toMatchObject({
-      team: 'TEN',
-      fieldGoals: [4, 4],
-    })
-    const long = SCORING['2026-w10-JAX-at-TEN']!.filter((p) => {
-      const m = /^Joey Slye (\d+) Yd Field Goal/.exec(p[4])
-      return m && Number(m[1]) >= 50
-    })
-    expect(long).toHaveLength(3)
-    expect(winnerOf('2026-w10-JAX-at-TEN')).toBe('JAX')
+  it('“Miami is 1–9. So is Tennessee. Each has won exactly one game all season, and each of those wins buried somebody in this league: Tennessee’s took Chloe, Corey and Joanna in week 6, and Miami’s took Dave in week 7”', () => {
+    expect(record('MIA', WEEK)).toBe('1-9')
+    expect(record('TEN', WEEK)).toBe('1-9')
+    expect(winsOf('TEN')).toEqual(['2026-w06-TEN-at-IND'])
+    expect(winsOf('MIA')).toEqual(['2026-w07-MIA-at-NYJ'])
+    expect(buriedBy(6, 'IND')).toEqual(['Chloe', 'Corey', 'Joanna'])
+    expect(buriedBy(7, 'NYJ')).toEqual(['Dave'])
   })
 
-  it('“Cindy took Seattle at Las Vegas, whose quarterback is Fernando Mendoza. Seattle sacked him six times, the Raiders gained 163 yards all afternoon, and Seattle won 21–13. So a Mendoza beat a Mendoza”', () => {
-    expect(on(WEEK, 'SEA')).toEqual(['Cindy'])
-    const id = '2026-w10-SEA-at-LV'
-    const passers = Object.entries(BOX[id]!.players).filter(
-      ([, b]) => b.team === 'LV' && b.attempts,
-    )
-    expect(passers.map(([n]) => n)).toEqual(['Fernando Mendoza'])
-    expect(BOX[id]!.teams.LV!.sacked).toBe(6)
-    expect(BOX[id]!.teams.LV!.totalYards).toBe(163)
-    expect(FINALS[id]).toEqual([21, 13])
-    expect(at(gameOf(WEEK, 'SEA')!.kickoffAt)).toBe('Sunday, November 15 at 3:05 PM')
-    expect(nameOf('cindy-mendoza')).toBe('Cindy Mendoza')
+  it('“Melanie took Kansas City at home to Arizona and won 34–7. Patrick Mahomes threw three touchdowns, two of them to Travis Kelce, and it was 27–7 at half time”', () => {
+    const id = '2026-w11-ARI-at-KC'
+    expect(on(WEEK, 'KC')).toEqual(['Melanie'])
+    expect(FINALS[id]).toEqual([7, 34])
+    const tds = SCORING[id]!.filter((p) => /pass from Patrick Mahomes/.test(p[4]))
+    expect(tds).toHaveLength(3)
+    expect(tds.filter((p) => /^Travis Kelce/.test(p[4]))).toHaveLength(2)
+    const half = SCORING[id]!.filter((p) => p[0] <= 2).at(-1)!
+    expect(half[3]).toEqual([7, 27])
   })
 
-  it('“Cindy has now picked a winner in nine of her ten weeks and is still the only one of you on two lives”', () => {
-    const cindy = season.picks.filter((p) => p.playerId === 'cindy-mendoza' && p.week <= WEEK)
-    expect(cindy).toHaveLength(10)
-    expect(cindy.filter((p) => !lost(p))).toHaveLength(9)
-    expect(onLives(2)).toEqual(['Cindy'])
+  it('“Melanie has now lived through three straight weeks on the Bears with no time left on the clock, then the Bills, then the Chiefs”', () => {
+    expect([9, 10, 11].map((w) => pickOf('Melanie Moeller', w)!.teamId)).toEqual([
+      'CHI',
+      'BUF',
+      'KC',
+    ])
+    expect([9, 10, 11].map((w) => lost(pickOf('Melanie Moeller', w)!))).toEqual([
+      false,
+      false,
+      false,
+    ])
+    expect(SCORING['2026-w09-TB-at-CHI']!.at(-1)!.slice(0, 3)).toEqual([4, '0:00', 'CHI'])
   })
 
-  it('“Melanie took Buffalo at the Jets and won 31–12. The Jets played two quarterbacks, got into the red zone twice, came away with nothing either time, and scored all twelve of their points on Jason Sanders field goals. They are 2–8”', () => {
-    const id = '2026-w10-BUF-at-NYJ'
-    expect(on(WEEK, 'BUF')).toEqual(['Melanie'])
-    expect(FINALS[id]).toEqual([31, 12])
-    const jetsQBs = Object.values(BOX[id]!.players).filter((b) => b.team === 'NYJ' && b.attempts)
-    expect(jetsQBs).toHaveLength(2)
-    expect(BOX[id]!.teams.NYJ!.redZone).toEqual([0, 2])
-    const jets = SCORING[id]!.filter((p) => p[2] === 'NYJ')
-    expect(jets.every((p) => /^Jason Sanders \d+ Yd Field Goal/.test(p[4]))).toBe(true)
-    expect(jets.length * 3).toBe(12)
-    expect(record('NYJ', WEEK)).toBe('2-8')
+  it('“Last week I told you the Chargers were 0–8. That night they won 23–20 at Baltimore. On Sunday they lost 27–24 to the Jets”', () => {
+    expect(record('LAC', 9)).toBe('0-8')
+    expect(FINALS['2026-w10-LAC-at-BAL']).toEqual([23, 20])
+    expect(at(gameOf(10, 'LAC')!.kickoffAt)).toMatch(/^Monday/)
+    expect(FINALS['2026-w11-NYJ-at-LAC']).toEqual([27, 24])
+    expect(winnerOf('2026-w11-NYJ-at-LAC')).toBe('NYJ')
   })
 
-  it('“the Jets … cost Allison a life and buried Dave in week 7, the day Miami won its first game”', () => {
-    const id = '2026-w07-MIA-at-NYJ'
-    expect(pickOf('Allison Petty', 7)).toMatchObject({ teamId: 'NYJ', gameId: id })
-    expect(pickOf('Dave Johnson', 7)).toMatchObject({ teamId: 'NYJ', gameId: id })
-    expect(winnerOf(id)).toBe('MIA')
-    expect(eliminatedWeekOf('dave-johnson', WEEK)).toBe(7)
-    expect(record('MIA', 6)).toMatch(/^0-/)
-  })
-
-  it('“The two best teams in football, San Francisco and Buffalo, are 8–1, and all five of you have used San Francisco. Jacksonville and Cincinnati are 7–2, and all five of you have used both of them too”', () => {
-    const wins = (t: string) => Number(record(t, WEEK).split('-')[0])
-    const best = Math.max(...allTeams.map(wins))
-    expect(allTeams.filter((t) => wins(t) === best).sort()).toEqual(['BUF', 'SF'])
-    expect(record('SF', WEEK)).toBe('8-1')
-    expect(record('BUF', WEEK)).toBe('8-1')
-    expect(record('JAX', WEEK)).toBe('7-2')
-    expect(record('CIN', WEEK)).toBe('7-2')
-    expect(alive).toHaveLength(5)
-    for (const team of ['SF', 'JAX', 'CIN'])
-      for (const p of alive)
-        expect(
-          season.picks.some(
-            (x) => x.playerId === p.playerId && x.week <= WEEK && x.teamId === team,
-          ),
-          `${p.displayName} ${team}`,
-        ).toBe(true)
-  })
-
-  it('“Nobody picked San Francisco at Dallas, which finished 46–40: eighty-six points … Dallas, the team twenty-one of you lost with in week 5, lost again”', () => {
-    const id = '2026-w10-SF-at-DAL'
-    expect(FINALS[id]).toEqual([46, 40])
-    expect(FINALS[id]![0] + FINALS[id]![1]).toBe(86)
-    expect(picksIn(WEEK).filter((p) => p.gameId === id)).toEqual([])
+  it('“Jacksonville, which carried three of you last week, lost 23–18 at the Giants this week … Dallas scored 51 against Tennessee, which the twenty-one of you who lost with Dallas in week 5 are welcome to take personally”', () => {
+    expect(on(10, 'JAX')).toHaveLength(3)
+    expect(FINALS['2026-w11-JAX-at-NYG']).toEqual([18, 23])
+    expect(FINALS['2026-w11-TEN-at-DAL']).toEqual([30, 51])
     const dal5 = picksIn(5).filter((p) => p.teamId === 'DAL')
     expect(dal5).toHaveLength(21)
     expect(dal5.every(lost)).toBe(true)
-    expect(winnerOf(id)).toBe('SF')
   })
 
-  it('“Nobody picked the Chargers at Baltimore on Monday night either, so the week was settled on Sunday. The Chargers are 0–8. Seven of you took them in week 1”', () => {
+  it('“Nobody picked Cincinnati at Washington on Monday night, so the week was settled on Sunday. All five of you spent Cincinnati weeks ago”', () => {
     const mnf = week(WEEK).at(-1)!
-    expect(mnf.id).toBe('2026-w10-LAC-at-BAL')
+    expect(mnf.id).toBe('2026-w11-CIN-at-WAS')
     expect(at(mnf.kickoffAt)).toMatch(/^Monday/)
     expect(picksIn(WEEK).filter((p) => p.gameId === mnf.id)).toEqual([])
-    expect(record('LAC', WEEK)).toBe('0-8')
-    expect(crowd(1, 'LAC')).toBe(7)
+    expect(usedByAll('CIN')).toBe(true)
   })
 
-  it('“Week 11: Atlanta, Cleveland, Green Bay, the Rams, New England and Seattle are on bye … Thursday night is Indianapolis at Houston, which locks the week”', () => {
-    const playing = new Set(week(11).flatMap((g) => [g.homeTeamId, g.awayTeamId]))
-    expect(allTeams.filter((t) => !playing.has(t)).sort()).toEqual([
-      'ATL',
-      'CLE',
-      'GB',
-      'LAR',
-      'NE',
-      'SEA',
+  it('“the first game is Green Bay at the Rams on Wednesday night, so the week locks on Wednesday, not Thursday. Thursday is Chicago at Detroit, Philadelphia at Dallas, and Kansas City at Buffalo … Nobody is on bye”', () => {
+    const w12 = week(12)
+    expect(w12[0]!.id).toBe('2026-w12-GB-at-LAR')
+    expect(at(w12[0]!.kickoffAt)).toMatch(/^Wednesday/)
+    const thursday = w12.filter((g) => at(g.kickoffAt).startsWith('Thursday, November 26'))
+    expect(thursday.map((g) => g.id)).toEqual([
+      '2026-w12-CHI-at-DET',
+      '2026-w12-PHI-at-DAL',
+      '2026-w12-KC-at-BUF',
     ])
-    expect(week(11)[0]!.id).toBe('2026-w11-IND-at-HOU')
-    expect(at(week(11)[0]!.kickoffAt)).toMatch(/^Thursday/)
+    const playing = new Set(w12.flatMap((g) => [g.homeTeamId, g.awayTeamId]))
+    expect(allTeams.filter((t) => !playing.has(t))).toEqual([])
   })
 
-  it('“Houston is the team six of you took in week 7 and lost with, 27–21 in overtime; Cindy and Melanie are the only two of those six still alive, and neither can have Houston again”', () => {
-    const id = '2026-w07-NYG-at-HOU'
-    expect(crowd(7, 'HOU')).toBe(6)
-    expect(FINALS[id]).toEqual([27, 21])
-    expect(winnerOf(id)).toBe('NYG')
-    expect(SCORING[id]!.at(-1)![0]).toBe(5)
-    const six = picksIn(7)
-      .filter((p) => p.teamId === 'HOU')
-      .map((p) => nameOf(p.playerId))
-    expect(firstNames(six.filter((n) => after.get(n)! > 0))).toEqual(['Cindy', 'Melanie'])
+  it('“all five of you have already used both Kansas City and Buffalo”', () => {
+    expect(alive).toHaveLength(5)
+    expect(usedByAll('KC')).toBe(true)
+    expect(usedByAll('BUF')).toBe(true)
   })
 
   it('“Five of you, four on your last life, Cindy on two”', () => {
     expect(alive).toHaveLength(5)
     expect(onLives(1)).toEqual(['Allison', 'Dominic', 'Melanie', 'Tracy'])
+    expect(onLives(2)).toEqual(['Cindy'])
   })
 
-  it('“DM me your week 11 pick on Teams before 7:10 PM Thursday, November 19, five minutes before Indianapolis at Houston kicks off”', () => {
-    expect(at(lockOf(11).toISOString())).toBe('Thursday, November 19 at 7:10 PM')
-    expect(at(week(11)[0]!.kickoffAt)).toBe('Thursday, November 19 at 7:15 PM')
+  it('“DM me your week 12 pick on Teams before 6:55 PM Wednesday, November 25, five minutes before Green Bay at the Rams kicks off”', () => {
+    expect(at(lockOf(12).toISOString())).toBe('Wednesday, November 25 at 6:55 PM')
+    expect(at(week(12)[0]!.kickoffAt)).toBe('Wednesday, November 25 at 7:00 PM')
   })
 
-  it('names no week 11 pick: no paragraph that names a player names their team or its opponent', () => {
+  it('names no week 12 pick: no paragraph that names a player names their team or its opponent', () => {
     expect(paragraphs).toHaveLength(9)
     const leaks: string[] = []
-    for (const pick of picksIn(11)) {
+    for (const pick of picksIn(12)) {
       const game = season.games.find((g) => g.id === pick.gameId)!
       const opponent = game.homeTeamId === pick.teamId ? game.awayTeamId : game.homeTeamId
       const words = [...teamWords(pick.teamId), ...teamWords(opponent)]

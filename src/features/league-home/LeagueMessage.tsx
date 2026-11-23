@@ -9,33 +9,33 @@ import { Megaphone, Send } from 'lucide-react'
  * Every number and result in it is checked against the season in
  * tests/unit/leagueMessageFacts.test.ts. Death's habits are the only fiction.
  *
- * Shown for weeks 1–11: the seed carries no results, so the engine calls week 1
- * current until the live sync lands them, at which point week 11 is.
+ * Shown for weeks 1–12: the seed carries no results, so the engine calls week 1
+ * current until the live sync lands them, at which point week 12 is.
  *
- * Written after Sunday night's game settled week 10 (Monday night's Chargers at
- * Baltimore had no picks), before any week 11 pick: it names no week 11 pick.
+ * Written after Sunday night's game settled week 11 (Monday night's Cincinnati
+ * at Washington had no picks), before any week 12 pick: it names no week 12 pick.
  */
-const WEEK_10_REVIEW: { heading: string; lines: string[]; callout?: string } = {
+const WEEK_11_REVIEW: { heading: string; lines: string[]; callout?: string } = {
   heading: 'Word from the late commissioner',
   lines: [
-    'Death went nought for five again. That is three weeks running without a funeral and fifteen winning picks in a row; before week 8 this league had never once gone a week without losing a life. There are still twenty-five headstones. Death has had so much time on his hands that he has taken up dancing. He has a straw hat now, and a routine, and he would like it known that he is very good. He has also had his jacket taken in across the chest. I asked him to. Don’t ask why.',
-    'Dominic, Tracy and Allison all took Jacksonville at Tennessee, and the Jaguars won 40–23 and kept the ball for 38 minutes. Tennessee is 1–8. Its one win all season came in week 6, on the afternoon Chloe, Corey and Joanna were buried, so Tennessee has now knocked three of you out of this league and beaten one football team. Joey Slye, the kicker whose four field goals did the burying that day, kicked three from 50 yards or more on Sunday. It made no difference. Death says he admires a man who keeps turning up for work after the work has gone.',
-    'Cindy took Seattle at Las Vegas, whose quarterback is Fernando Mendoza. Seattle sacked him six times, the Raiders gained 163 yards all afternoon, and Seattle won 21–13. So a Mendoza beat a Mendoza. Death says he has been to a great many family reunions, and that is usually how they end. Cindy has now picked a winner in nine of her ten weeks and is still the only one of you on two lives.',
-    'Melanie took Buffalo at the Jets and won 31–12. The Jets played two quarterbacks, got into the red zone twice, came away with nothing either time, and scored all twelve of their points on Jason Sanders field goals. They are 2–8. You will remember the Jets as the team that cost Allison a life and buried Dave in week 7, the day Miami won its first game. On Sunday they finally did something for one of you: they lost.',
-    'Here is your problem. The two best teams in football, San Francisco and Buffalo, are 8–1, and all five of you have used San Francisco. Jacksonville and Cincinnati are 7–2, and all five of you have used both of them too. Death has started reading the standings over breakfast. He says it relaxes him.',
-    'Nobody picked San Francisco at Dallas, which finished 46–40: eighty-six points, and Death watched every one of them with his feet up. Dallas, the team twenty-one of you lost with in week 5, lost again. Death sends them flowers every week as a professional courtesy.',
-    'Nobody picked the Chargers at Baltimore on Monday night either, so the week was settled on Sunday. The Chargers are 0–8. Seven of you took them in week 1. Death keeps a photograph of that weekend on his desk, and he says you all look very happy in it.',
-    'Week 11: Atlanta, Cleveland, Green Bay, the Rams, New England and Seattle are on bye, so Cindy spent Seattle at exactly the right moment. Thursday night is Indianapolis at Houston, which locks the week. Houston is the team six of you took in week 7 and lost with, 27–21 in overtime; Cindy and Melanie are the only two of those six still alive, and neither can have Houston again. Five of you, four on your last life, Cindy on two. Death has gone three weeks without a customer. He has bought a second hat.',
+    'Death went nought for five again. That is four weeks running without a funeral and twenty winning picks in a row, and there are still twenty-five headstones. Death has started giving tours of the graveyard himself, mostly to have somebody to talk to. Attendance is poor. He says the dance is coming along.',
+    'Allison took Houston at home to Indianapolis on Thursday night and won 26–3. The Colts kicked a field goal in the first quarter and never scored again, and in the third Will Anderson Jr. sacked Daniel Jones in his own end zone for a safety, so the Colts scored three points and handed Houston two. Allison lost a life on the Colts in week 6. Houston is the team that cost Cindy and Melanie a life in week 7. Death calls this closure. He says he would know.',
+    'Cindy, Dominic and Tracy all took Buffalo at home to Miami and won 26–9. Josh Allen threw two interceptions and it made no difference: Tyler Bass kicked four field goals, Miami’s quarterback completed 12 of 33 passes for 102 yards, and all nine of Miami’s points were field goals. Miami is 1–9. So is Tennessee. Each has won exactly one game all season, and each of those wins buried somebody in this league: Tennessee’s took Chloe, Corey and Joanna in week 6, and Miami’s took Dave in week 7. Death sends them both a fruit basket at Christmas.',
+    'Melanie took Kansas City at home to Arizona and won 34–7. Patrick Mahomes threw three touchdowns, two of them to Travis Kelce, and it was 27–7 at half time. Melanie has now lived through three straight weeks on the Bears with no time left on the clock, then the Bills, then the Chiefs. Death says that is not so much a strategy as a getaway.',
+    'A correction. Last week I told you the Chargers were 0–8. That night they won 23–20 at Baltimore. On Sunday they lost 27–24 to the Jets. Death says it is the shortest resurrection he has ever seen, and he has seen all of them.',
+    'Jacksonville, which carried three of you last week, lost 23–18 at the Giants this week. Death says timing is everything; he has never missed an appointment in his life, or in anybody else’s. Dallas scored 51 against Tennessee, which the twenty-one of you who lost with Dallas in week 5 are welcome to take personally.',
+    'Nobody picked Cincinnati at Washington on Monday night, so the week was settled on Sunday. All five of you spent Cincinnati weeks ago. Death will watch anyway; he likes to see how the other half lives.',
+    'Week 12 is Thanksgiving, and it starts the day before: the first game is Green Bay at the Rams on Wednesday night, so the week locks on Wednesday, not Thursday. Thursday is Chicago at Detroit, Philadelphia at Dallas, and Kansas City at Buffalo, and all five of you have already used both Kansas City and Buffalo, so the best game of the holiday is the one none of you can touch. Nobody is on bye. Five of you, four on your last life, Cindy on two. Death has gone four weeks without a customer. He has been asked to carve the turkey at four separate dinners; he says it is the only work he can get.',
   ],
   // Set apart from the banter, because an instruction buried in jokes is an
   // instruction somebody misses, and four of the five are on their last life.
   callout:
-    'DM me your week 11 pick on Teams before 7:10 PM Thursday, November 19, five minutes before Indianapolis at Houston kicks off. Four of you are on your last life, and a missing pick costs a life.',
+    'DM me your week 12 pick on Teams before 6:55 PM Wednesday, November 25, five minutes before Green Bay at the Rams kicks off. That is a day sooner than usual, because of Thanksgiving. Four of you are on your last life, and a missing pick costs a life.',
 }
 
 export function LeagueMessage({ week }: { week: number }) {
-  if (week < 1 || week > 11) return null
-  const note = WEEK_10_REVIEW
+  if (week < 1 || week > 12) return null
+  const note = WEEK_11_REVIEW
 
   return (
     <section className="card border-sky-400/25 p-5 md:p-6" aria-labelledby="league-message-title">
