@@ -9,8 +9,8 @@ describe('the week 11 review from the late commissioner', () => {
   it.each([1, 12])('reads in the week %i display scope, Death in the room', (week) => {
     render(<LeagueMessage week={week} />)
     expect(screen.getByRole('heading', { name: /word from the late commissioner/i })).toBeVisible()
-    expect(screen.getByText(/^Death went nought for five again\./)).toBeVisible()
-    expect(screen.getByText(/the shortest resurrection he has ever seen/)).toBeVisible()
+    expect(screen.getByText(/^Five picks, five winners, again\./)).toBeVisible()
+    expect(screen.getByText(/hit by a parked one/)).toBeVisible()
   })
 
   it('sets the week 12 pick instruction apart from the banter', () => {
