@@ -620,7 +620,7 @@
   {
     "id": "commish-message-beyond",
     "category": "content",
-    "description": "The commissioner's note (Word from the late commissioner) carries the week 10 review in the voice of the message from beyond: the late commissioner with Death in the room. All five picks won for a third straight week without a funeral (fifteen winners in a row); Jacksonville 40–23 at 1–8 Tennessee, whose only win buried Chloe, Corey and Joanna; Cindy Mendoza's Seattle sacked Fernando Mendoza six times; the Jets' twelve points all on field goals; every survivor has spent San Francisco, Jacksonville and Cincinnati; the 0–8 Chargers seven took in week 1; the week 11 byes and Thursday lock, and a set-apart pick instruction. Every factual claim is asserted against the pinned finals, scoring plays, box lines and picks. Shown for weeks 1–11.",
+    "description": "The commissioner's note (Word from the late commissioner) carries the week 11 review in the voice of the message from beyond, short and joke-first: twenty straight winners and Death's quietest month since penicillin; Daniel Jones reaching an end zone (his own); Tyler Bass outscoring Miami; Melanie and the Bears' four interceptions; and the Thanksgiving week 12 that locks on Wednesday; plus a set-apart pick instruction. Every factual claim is asserted against the pinned finals, scoring plays, box lines and picks. Shown for weeks 1–12.",
     "verification": "npx vitest run src/components/LeagueMessage.test.tsx tests/unit/leagueMessageFacts.test.ts",
     "priority": 1,
     "hermetic": true,

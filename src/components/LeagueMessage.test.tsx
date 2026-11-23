@@ -5,18 +5,18 @@ import { LeagueMessage } from '@/features/league-home/LeagueMessage'
 
 afterEach(cleanup)
 
-describe('the week 10 review from the late commissioner', () => {
-  it.each([1, 11])('reads in the week %i display scope, Death in the room', (week) => {
+describe('the week 11 review from the late commissioner', () => {
+  it.each([1, 12])('reads in the week %i display scope, Death in the room', (week) => {
     render(<LeagueMessage week={week} />)
     expect(screen.getByRole('heading', { name: /word from the late commissioner/i })).toBeVisible()
-    expect(screen.getByText(/^Death went nought for five again\./)).toBeVisible()
-    expect(screen.getByText(/So a Mendoza beat a Mendoza\./)).toBeVisible()
+    expect(screen.getByText(/^Five picks, five winners, again\./)).toBeVisible()
+    expect(screen.getByText(/gain more by fainting/)).toBeVisible()
   })
 
-  it('sets the week 11 pick instruction apart from the banter', () => {
-    render(<LeagueMessage week={11} />)
+  it('sets the week 12 pick instruction apart from the banter', () => {
+    render(<LeagueMessage week={12} />)
     const callout = screen.getByText(
-      /DM me your week 11 pick on Teams before 7:10 PM Thursday, November 19/,
+      /DM me your week 12 pick on Teams before 6:55 PM Wednesday, November 25/,
     )
     expect(callout).toBeVisible()
     expect(callout.textContent).toMatch(/costs a life/)
@@ -25,7 +25,7 @@ describe('the week 10 review from the late commissioner', () => {
   it('is not shown outside its weeks', () => {
     const { container, rerender } = render(<LeagueMessage week={0} />)
     expect(container).toBeEmptyDOMElement()
-    rerender(<LeagueMessage week={12} />)
+    rerender(<LeagueMessage week={13} />)
     expect(container).toBeEmptyDOMElement()
   })
 })
