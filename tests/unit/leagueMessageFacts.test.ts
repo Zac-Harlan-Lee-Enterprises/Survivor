@@ -5,16 +5,13 @@ import {
   BOX,
   FINALS,
   SCORING,
-  eliminatedWeekOf,
   livesAfter,
   lost,
   nameOf,
   pickOf,
   picksIn,
   pinnedThrough,
-  record,
   season,
-  winnerOf,
 } from './seasonFacts'
 
 /**
@@ -98,17 +95,6 @@ const mentions = (text: string, words: string[]): string | null =>
   words.find((w) => new RegExp(`(?<![\\w])${esc(w)}(?![\\w])`, 'i').test(text)) ?? null
 
 describe('the commissioner’s week 11 review states only true things', () => {
-  const winsOf = (team: string) =>
-    Object.keys(FINALS).filter((id) => {
-      const g = season.games.find((x) => x.id === id)!
-      return g.week <= WEEK && winnerOf(id) === team
-    })
-  const buriedBy = (w: number, team: string) =>
-    firstNames(
-      picksIn(w)
-        .filter((p) => p.teamId === team && eliminatedWeekOf(p.playerId, WEEK) === w)
-        .map((p) => nameOf(p.playerId)),
-    )
   it('is written from a settled week: every week 11 pick has its final', () => {
     expect(pinnedThrough).toBe(WEEK)
   })
@@ -170,15 +156,6 @@ describe('the commissioner’s week 11 review states only true things', () => {
     expect(FINALS[id]).toEqual([7, 34])
   })
 
-  it('“Miami is 1–9. So is Tennessee. That is two wins all season between the pair of them, and those two wins buried Dave, Chloe, Corey and Joanna”', () => {
-    expect(record('MIA', WEEK)).toBe('1-9')
-    expect(record('TEN', WEEK)).toBe('1-9')
-    expect(winsOf('MIA')).toEqual(['2026-w07-MIA-at-NYJ'])
-    expect(winsOf('TEN')).toEqual(['2026-w06-TEN-at-IND'])
-    expect(buriedBy(7, 'NYJ')).toEqual(['Dave'])
-    expect(buriedBy(6, 'IND')).toEqual(['Chloe', 'Corey', 'Joanna'])
-  })
-
   it('“Picks lock Wednesday, not Thursday: Green Bay at the Rams kicks off Wednesday night at 7:00 Central, so the door shuts at 6:55 PM on November 25 … four of you on your last life”', () => {
     expect(week(12)[0]!.id).toBe('2026-w12-GB-at-LAR')
     expect(at(week(12)[0]!.kickoffAt)).toBe('Wednesday, November 25 at 7:00 PM')
@@ -192,7 +169,7 @@ describe('the commissioner’s week 11 review states only true things', () => {
   })
 
   it('names no week 12 pick: no paragraph that names a player names their team or its opponent', () => {
-    expect(paragraphs).toHaveLength(7)
+    expect(paragraphs).toHaveLength(6)
     const leaks: string[] = []
     for (const pick of picksIn(12)) {
       const game = season.games.find((g) => g.id === pick.gameId)!
