@@ -1547,6 +1547,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-dominic-green-12",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "dominic-green",
+      "week": 12,
+      "teamId": "NYG",
+      "gameId": "2026-w12-NYG-at-IND",
+      "submittedAt": "2026-11-24T16:33:45.000Z",
+      "updatedAt": "2026-11-24T16:33:45.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-tracy-nelson-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",

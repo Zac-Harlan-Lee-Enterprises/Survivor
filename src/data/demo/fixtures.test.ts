@@ -123,6 +123,18 @@ describe('demo fixture', () => {
     expect(picks[0]).toMatchObject({ teamId, submittedAt, gameId })
   })
 
+  it('records Dominic’s week 12 pick from Teams (NYG)', () => {
+    const picks = snapshot.picks.filter(
+      (pick) => pick.playerId === 'dominic-green' && pick.week === 12,
+    )
+    expect(picks).toHaveLength(1)
+    expect(picks[0]).toMatchObject({
+      teamId: 'NYG',
+      submittedAt: '2026-11-24T16:33:45.000Z',
+      gameId: '2026-w12-NYG-at-IND',
+    })
+  })
+
   it('points every pick at a game that week in which the team actually plays', () => {
     for (const pick of snapshot.picks) {
       const game = gamesById.get(pick.gameId)
