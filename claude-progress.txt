@@ -1018,3 +1018,11 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 2026-11-23 — Claude Opus 5.5 — Per the commissioner: dropped the Chargers correction; Melanie's joke now 'spending good teams like it is somebody else's money' (Bears, Bills, Chiefs in a row; of the teams with two losses or fewer she has Detroit and Denver left).
 2026-11-23 — Claude Fable 5.2 — Week 11 note rewritten again at the commissioner's request (he asked for Fable): six short paragraphs with real punchlines (quietest month since penicillin; Jones reached an end zone, his own; Bass 14, Miami 9, 'gain more by fainting'; Death walked out at half time on Melanie; hit by a parked bus; Death hoping you'd assume Thursday). No Chargers correction. Every claim asserted in leagueMessageFacts.
 2026-11-23 — Claude Fable 5.2 — Commissioner cut the Miami/Tennessee 'parked bus' paragraph and approved the rest ('much, much better'); merged on his instruction. NEXT: week 12 picks before Wed Nov 25 6:55 PM CT (Thanksgiving week).
+
+2026-11-24 — Claude Opus 5.5 — Week 12 pick: Dominic NYG (at IND, Sunday), Teams DM Tue 10:33 AM CT; unused. Teams search missed it (index lag); reading the DM chat directly found it, so read the five survivors' DM chats when search comes up empty. Cindy, Melanie, Tracy, Allison not yet in. Lock Wed Nov 25 6:55 PM CT (GB at LAR).
+
+2026-11-24 (Claude Opus 5.5) — Week 12 picks, second check
+- Melanie's week 12 pick read from her Teams DM: Dallas (PHI at DAL, Thanksgiving), 18:48:17Z Tue Nov 24. Recorded in STORY, fixture regenerated, covered in fixtures.test.ts (week 12 it.each).
+- Cindy, Tracy, Allison: no week 12 pick in their DMs yet. Lock is Wed Nov 25 6:55 PM CT.
+- Verified: npm run validate green, e2e 117 passed. (prettier --check fails on main too; not part of validate.)
+- NEXT: record the remaining three as they arrive; merge PR #85 only on the commissioner's word.
