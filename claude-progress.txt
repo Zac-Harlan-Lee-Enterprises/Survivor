@@ -1026,3 +1026,10 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - Cindy, Tracy, Allison: no week 12 pick in their DMs yet. Lock is Wed Nov 25 6:55 PM CT.
 - Verified: npm run validate green, e2e 117 passed. (prettier --check fails on main too; not part of validate.)
 - NEXT: record the remaining three as they arrive; merge PR #85 only on the commissioner's word.
+
+2026-11-25 (Claude Opus 5.5) — Death's pocket watch (feat/death-pocket-watch)
+- Death's act is now `ACT = "watch"` (death_motion.py; `--act dance` brings back the soft-shoe): after he regards you he takes a gold pocket watch (death_dress.pocket_watch, new prop) from his hip pocket, studies it, raises only his eyes to you, cups it to his ear and listens, staring, slow blink, the smallest head shake, puts it away and draws himself up. 216 frames, standing still.
+- First cut had foot taps, watch-shaking and a big sigh; the commissioner called it childish. Rewritten in the register of Julian Richings's Death (Supernatural): calm, dry, no fidgets (memory: death-plays-like-richings).
+- Render: 0 joint flags, arm clearance 0.6 cm, public/death 3.3 MB. deathFrames.json gains `act`. tests/unit/deathFilm.test.ts asserts the act (length, standing still); the dance test is skipped unless act is dance.
+- Verified: validate green (422 + 1 skipped), e2e 117, quality sweep clean, init 200. Preview: node_modules/.tmp/death-player.html on :5895.
+- NEXT: merge only on the commissioner's word after he has watched the preview.

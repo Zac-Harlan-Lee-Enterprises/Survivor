@@ -1,7 +1,7 @@
 """What Death wears, for BibleGame's figure engine: black hair slicked back,
 a black suit (the jacket's skirts below the waist are simulated cloth), a
 white shirt and a black tie, polished black shoes, and a black cane with a
-silver knob (and, for the dance only, a straw boater). A man's suit, not a robe: his legs are his own.
+silver knob (and, for the dance only, a straw boater; for the watch act, a gold pocket watch). A man's suit, not a robe: his legs are his own.
 
 Everything is added at run time by patching the engine's dressing (the
 `suit` flag in his appearance turns it on); nothing in BibleGame changes.
@@ -752,6 +752,103 @@ def boater(person):
     bpy.ops.object.join()
     obj = bpy.context.object
     obj.name = "death-hat"
+    obj.parent = person.rig.root
+    obj.matrix_parent_inverse = Matrix.Identity(4)
+    obj.hide_render = True
+    person.parts.append(wp.Piece(obj))
+    return obj
+
+
+# ── The pocket watch ──────────────────────────────────────────────────────
+def gold():
+    """Old gold: warm, bright, a little worn."""
+
+    def build():
+        n = M.Nodes("death-gold")
+        v = n.noise(120.0, 4.0, 0.6, n.coords())
+        col = n.mix((v, "Fac"), "#d9a640", "#ffe08a")
+        n.bsdf(**{"Base Color": (col, 2), "Metallic": 1.0, "Roughness": 0.34})
+        return n.mat
+
+    return M.cached(("death-gold",), build)
+
+
+def enamel():
+    def build():
+        n = M.Nodes("death-enamel")
+        n.bsdf(**{"Base Color": common.hex_rgb("#f1ede2"), "Roughness": 0.25, "Coat Weight": 0.6, "Coat Roughness": 0.05})
+        return n.mat
+
+    return M.cached(("death-enamel",), build)
+
+
+def pocket_watch(person):
+    """A gold pocket watch (his is for the watch act): a case 6 cm across and a
+    centimetre thick, domed both sides, a white enamel face with black hands,
+    the crown and bow at twelve. One rigid object, parented to the figure's root
+    like the cane; death_motion sets where it is each frame (in his left palm)
+    and when it is not there. Its origin is the middle of the case, its face
+    toward +z, twelve o'clock toward +y. A little large for a watch: he is seen
+    from across a room."""
+    col = person.col
+    R_, T = 0.030, 0.0105
+    SEG_ = 48
+    parts = []
+
+    def lathe(name, prof, mat, segments=SEG_):
+        # prof: [(r, z)], a closed solid of revolution about z (capped at both ends).
+        bm = bmesh.new()
+        rings = [[bm.verts.new((r * math.cos(2 * math.pi * k / segments), r * math.sin(2 * math.pi * k / segments), z)) for k in range(segments)] for r, z in prof]
+        for a, b in zip(rings, rings[1:]):
+            for k in range(segments):
+                bm.faces.new((a[k], a[(k + 1) % segments], b[(k + 1) % segments], b[k]))
+        bm.faces.new(list(reversed(rings[0])))
+        bm.faces.new(rings[-1])
+        obj = common.mesh_object(name, bm, mat, col)
+        parts.append(obj)
+        return obj
+
+    # The case: a back domed down, a band, a bezel round the face.
+    lathe("death-watch-case", [(0.012, -T / 2 - 0.0018), (R_ * 0.75, -T / 2 - 0.001), (R_, -T / 2 + 0.0015), (R_, T / 2 - 0.0012), (R_ - 0.0022, T / 2 + 0.0004), (R_ - 0.0038, T / 2 - 0.0002)], gold())
+    # The face, just under the bezel.
+    lathe("death-watch-face", [(0.0005, T / 2 - 0.0016), (R_ - 0.0036, T / 2 - 0.0016), (R_ - 0.0036, T / 2 - 0.0008), (0.0005, T / 2 - 0.0008)], enamel())
+    # The hands: ten past ten.
+    bm = bmesh.new()
+    for ang, ln, w in ((math.radians(60.0), 0.016, 0.0016), (math.radians(-60.0), 0.022, 0.0012)):
+        d = np.array([math.sin(ang), math.cos(ang)])
+        nrm = np.array([-d[1], d[0]])
+        z = T / 2 - 0.0005
+        pts = [(-nrm * w / 2), (nrm * w / 2), (d * ln + nrm * w / 4), (d * ln - nrm * w / 4)]
+        vs = [bm.verts.new((float(p[0]), float(p[1]), z)) for p in pts]
+        bm.faces.new(vs)
+    parts.append(common.mesh_object("death-watch-hands", bm, lacquer(), col))
+    # The crown on its stem at twelve, and the bow (a ring) through it.
+    stem = lathe("death-watch-stem", [(0.0024, 0.0), (0.0024, 0.006), (0.0034, 0.006), (0.0034, 0.0105), (0.0012, 0.0115)], gold(), segments=16)
+    stem.rotation_euler = (math.radians(-90.0), 0.0, 0.0)
+    stem.location = (0.0, R_ - 0.001, 0.0)
+    bm = bmesh.new()
+    RB, rb, nb, nr = 0.0085, 0.0013, 32, 8
+    rings = []
+    for k in range(nb):
+        a = 2 * math.pi * k / nb
+        c = np.array([0.0, R_ + 0.007 + RB * math.cos(a), RB * math.sin(a)])
+        rad, nz = np.array([0.0, math.cos(a), math.sin(a)]), np.array([1.0, 0.0, 0.0])
+        rings.append([bm.verts.new(tuple(c + rb * (math.cos(2 * math.pi * j / nr) * rad + math.sin(2 * math.pi * j / nr) * nz))) for j in range(nr)])
+    for k in range(nb):
+        a, b = rings[k], rings[(k + 1) % nb]
+        for j in range(nr):
+            bm.faces.new((a[j], a[(j + 1) % nr], b[(j + 1) % nr], b[j]))
+    parts.append(common.mesh_object("death-watch-bow", bm, gold(), col))
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in parts:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = parts[0]
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
+    bpy.ops.object.join()
+    obj = bpy.context.object
+    obj.name = "death-watch"
+    for p in obj.data.polygons:
+        p.use_smooth = True
     obj.parent = person.rig.root
     obj.matrix_parent_inverse = Matrix.Identity(4)
     obj.hide_render = True

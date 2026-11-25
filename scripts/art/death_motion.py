@@ -31,10 +31,24 @@ left, +Z up; the render turns -Y to screen right):
   of him; his right hand comes up onto the knob, and his left comes to rest
   on it. He breathes,
   blinks once, slowly, and his head tilts a little as he regards you. Then
-  he dances (below). Then his hand leaves the cane; he turns away (his eyes the last to leave you),
+  he does his act (below: the watch, or the dance). Then his hand leaves the cane; he turns away (his eyes the last to leave you),
   steps off and walks on: the scene ends on the stride before the looped
   one, so the walk carries him off.
-- **dance**, between his regarding you and his hand leaving the cane:
+- **watch** (ACT = "watch", now: the league has stopped losing lives and he is
+  kept waiting), between his regarding you and his hand leaving the cane, WATCH
+  frames (10.8 s), standing where he faced you, his right hand on the cane
+  throughout. Death as an old, unhurried, absolute power put out by a small
+  inconvenience: calm, precise, never a wasted movement, never a fidget. In one
+  unhurried movement his left hand goes to the pocket at his left hip and brings
+  out a gold pocket watch (death_dress.pocket_watch), held up between thumb and
+  finger, its face to him (the house sees its gold back). A long, still look at
+  it; then only his eyes come up to you, his head still bowed. He cups it to his
+  ear and listens, perfectly still, staring at you, and blinks once, slowly. One
+  more look; the smallest shake of the head; his shoulders settle. It goes back
+  in the pocket, his hand back on the cane, and he draws himself up to his full
+  height and regards you, his head a little to one side. The same joint check
+  holds every frame of it.
+- **dance** (ACT = "dance"), between his regarding you and his hand leaving the cane:
   a vaudeville high-kick line, DANCE frames (9.7 s), in which he travels about
   two and a half metres toward the walk-off; the scene after it starts from
   where it leaves him. Planned in the world, so every foot is a real plant and
@@ -101,6 +115,13 @@ TILT = 8.0
 # The dance (see the docstring): its length in frames, a beat every BEAT.
 DANCE = 194
 BEAT = 10
+# What he does between regarding you and turning away (see the docstring):
+# "watch", his pocket watch (the league has stopped losing lives, and he is kept
+# waiting), WATCH frames; or "dance", the soft-shoe, DANCE frames.
+ACT = "watch"
+WATCH = 216
+# Which way a roll of his head (about its y axis) leans it toward his left shoulder.
+WATCH_ROLL = 1.0
 
 # How far one stride carries him (m), in CYCLE frames: a man walking slowly
 # (about 0.8 m/s: a stride of a little over a metre, some 88 steps a minute).
@@ -267,6 +288,7 @@ class Motion:
         self.cane_x = float(self.J["hip_R"][0]) - 0.14 - float(self.Jp[0])
         self.hand_y = float(shoulder[1]) - float(self.Jp[1]) + 0.01
         self.d = STRIDE
+        self.act = ACT
 
     # ── the skeleton ──────────────────────────────────────────────────────
     def fk(self, R, root):
@@ -497,7 +519,8 @@ class Motion:
         t_regard = t_hands + nG
         nH = 40
         t_dance = t_regard + nH  # he has regarded you; the dance begins
-        t_release = t_dance + DANCE
+        dancing = self.act == "dance"
+        t_release = t_dance + (DANCE if dancing else WATCH)
         nI = 14
         t_back = t_release + nI
         nJ = 34
@@ -586,7 +609,7 @@ class Motion:
         T_B1 = T_K1 + 14.0  # he has turned out to face you
         T_BOW = T_B1 + 16.0  # the bow ends, he pops up
         T_FIN, T_FIN_END = T_BOW + 1.0, T_BOW + 16.0  # the ta-da, held 1.5 beats
-        T_END = float(DANCE)
+        T_END = float(DANCE if dancing else WATCH)
         STEP = 0.27  # how far each ten-frame kick carries him (m)
         V = STEP / 10.0
         SB = 0.55  # (a kicker's feet are set nearer the line he travels along)
@@ -804,16 +827,17 @@ class Motion:
                 pl3(P1 + Rq @ stand["R"], T_END - 4.0, T_END - 2.0, 1e6, 1e6 + 1, turn=-90.0, hs=-3.0, to=8.0),
             ],
         }
-        # (the plants after the dance, where it leaves him)
-        plants["R"][5].t2, plants["R"][5].t3 = D0 - 2.0, D0
-        plants["L"][6].t2, plants["L"][6].t3 = D0 - 2.0, D0
-        plants["L"].insert(7, Plant(P1 + Rq @ stand["L"], -90.0, D0 + T_END - 2.0, D0 + T_END, t_go - 3, t_go, hs=-3.0, to=10.0, lift=0.03))
-        plants["R"].insert(6, Plant(P1 + Rq @ stand["R"], -90.0, D0 + T_END - 2.0, D0 + T_END, r_back0 - 3, r_back0, hs=-3.0, to=8.0, lift=0.03))
-        # (...and the feet of turning away and walking off, which were planned back where he began.)
-        plants["R"][7].F = P1 + stand["R"]
-        for k in range(0, 3):
-            plants["L"][8 + k] = stride_plant("L", t_s2 + k * C, lift=0.036 if k else 0.04)
-            plants["R"][8 + k] = stride_plant("R", t_s2 + k * C + C / 2)
+        if dancing:
+            # (the plants after the dance, where it leaves him)
+            plants["R"][5].t2, plants["R"][5].t3 = D0 - 2.0, D0
+            plants["L"][6].t2, plants["L"][6].t3 = D0 - 2.0, D0
+            plants["L"].insert(7, Plant(P1 + Rq @ stand["L"], -90.0, D0 + T_END - 2.0, D0 + T_END, t_go - 3, t_go, hs=-3.0, to=10.0, lift=0.03))
+            plants["R"].insert(6, Plant(P1 + Rq @ stand["R"], -90.0, D0 + T_END - 2.0, D0 + T_END, r_back0 - 3, r_back0, hs=-3.0, to=8.0, lift=0.03))
+            # (...and the feet of turning away and walking off, which were planned back where he began.)
+            plants["R"][7].F = P1 + stand["R"]
+            for k in range(0, 3):
+                plants["L"][8 + k] = stride_plant("L", t_s2 + k * C, lift=0.036 if k else 0.04)
+                plants["R"][8 + k] = stride_plant("R", t_s2 + k * C + C / 2)
 
         def foot_state(s, t):
             tau = t - D0
@@ -957,6 +981,156 @@ class Motion:
             """His mouth open for the ta-da."""
             return 0.8 * bump(tau, T_FIN - 1.0, T_FIN + 8.0)
 
+        # ── The watch: what he does instead of the dance (ACT = "watch"). Death as
+        # an old, unhurried, absolute power put out by a small inconvenience: calm,
+        # precise, never a wasted movement, never a fidget. He stands where he faced
+        # you, his right hand on the cane throughout. His left hand leaves it, in one
+        # unhurried movement, for the pocket at his left hip, and brings out a gold
+        # pocket watch (death_dress.pocket_watch; one rigid object, hidden until it
+        # is out), held up between thumb and finger like a coin, its face to him (the
+        # house sees its gold back). A long, still look at it; then only his eyes come
+        # up to you, his head still bowed over it. He cups it to his ear and listens,
+        # perfectly still, staring at you, and blinks once, slowly. One more look at
+        # it; the smallest shake of the head; his shoulders settle (a breath let go).
+        # It goes back in the pocket, his hand back on the cane, and he draws himself
+        # up to his full height and regards you, his head a little to one side. Then
+        # the scene goes on (he turns away and walks off).
+        if not dancing:
+            DTR = 0.0
+            P1 = P_end.copy()
+            dsh["y"] = 0.0
+            W_NEAR = 0.205  # (how near his shoulder the palm may come)
+            # The left palm (his body's axes: x his left, y back, z up from the floor),
+            # its fingers and the way the palm faces, and where the elbow points.
+            POCKET = ([0.20, -0.09, 1.02], [0.0, -0.25, -1.0], [-0.6, 0.6, 0.0], [0.9, 0.6, -0.2])
+            DIP = ([0.20, -0.09, 0.985], [0.0, -0.25, -1.0], [-0.6, 0.6, 0.0], [0.9, 0.6, -0.2])
+            LOOK = ([0.07, -0.32, 1.30], [-0.2, -0.3, 1.0], [0.0, 0.85, 0.45], [0.8, 0.5, -0.5])
+            LOOK2 = ([0.08, -0.31, 1.27], [-0.2, -0.3, 1.0], [0.0, 0.85, 0.45], [0.8, 0.5, -0.5])
+            EAR = ([0.13, -0.035, 1.60], [0.0, 0.35, 1.0], [-1.0, 0.0, 0.0], [0.7, 0.55, -0.6])  # (in his palm, cupped to his ear)
+            UP = ([0.17, -0.22, 1.50], [0.0, -0.3, 1.0], [-0.7, 0.4, 0.3], [0.9, 0.8, -0.2])  # (on the way between)
+            path = [(10, POCKET), (12.5, DIP), (15, POCKET), (29, LOOK), (86, LOOK), (93, UP), (100, EAR), (130, EAR), (136.5, UP), (143, LOOK2), (160, LOOK2), (171, POCKET), (174, POCKET)]
+            w_pos, w_fing, w_palm, w_pole = (keyed([(t, k[j]) for t, k in path]) for j in range(4))
+            # How the watch is held: 1 between thumb and finger, 0 in his palm (at his ear, and in the pocket).
+            grip_k = keyed([(13.0, 0.0), (22.0, 1.0), (90.0, 1.0), (96.0, 0.0), (134.0, 0.0), (140.0, 1.0), (161.0, 1.0), (168.0, 0.0)])
+            look_k = keyed([(22.0, 0.0), (34.0, 1.0), (86.0, 1.0), (95.0, 0.0), (137.0, 0.0), (146.0, 1.0), (161.0, 1.0), (170.0, 0.0)])
+            glare_k = keyed([(58.0, 0.0), (65.0, 1.0), (82.0, 1.0), (88.0, 0.0)])
+            listen_k = keyed([(90.0, 0.0), (100.0, 1.0), (130.0, 1.0), (137.0, 0.0)])
+            settle_k = keyed([(150.0, 0.0), (158.0, 1.0), (176.0, 1.0), (186.0, 0.0)])
+            tall_k = keyed([(182.0, 0.0), (194.0, 1.0), (206.0, 1.0), (215.0, 0.0)])
+            # (slow blinks, each over eight frames, at these moments of the act)
+            BLINKS = (48.0, 116.0, 198.0)
+            SLOW_BLINK = [0.15, 0.45, 0.8, 1.0, 1.0, 0.85, 0.5, 0.2]
+
+            def watch_hand_w(tau):
+                """How much his left hand is the watch's (otherwise on the cane)."""
+                return smoother((tau - 2.0) / 8.0) * (1.0 - smoother((tau - 173.0) / 10.0))
+
+            def watch_visible(tau):
+                return 13.0 <= tau <= 169.0
+
+            def watch_blink(tau):
+                for b in BLINKS:
+                    k = int(round(tau - b))
+                    if 0 <= k < len(SLOW_BLINK):
+                        return SLOW_BLINK[k]
+                return 0.0
+
+            def watch_hand(R, root, xy, psi, tau):
+                """(palm, fingers, palm faces, elbow pole) for his left hand, in the world."""
+                Yp = yaw(psi)
+                p = w_pos(tau)
+                at = np.append(xy + Yp[:2, :2] @ p[:2], p[2])
+                # (never so near his shoulder that the elbow would fold past a human bend)
+                Sl = self.at(self.fk(R, root), "upperarm01.L", self.heads[self.idx["upperarm01.L"]])
+                d = at - Sl
+                if np.linalg.norm(d) < W_NEAR:
+                    at = Sl + unit(d) * W_NEAR
+                return at, Yp @ unit(w_fing(tau)), Yp @ unit(w_palm(tau)), Yp @ unit(w_pole(tau))
+
+            def w_drum(tau):
+                return 0.0
+
+            def foot_state(s, t):
+                # (he does not move his feet: they stand where he faced you)
+                return self.foot_at(s, plants[s], t)
+
+            def pelvis(tau):
+                return P_end.copy()
+
+            def d_lat(tau):
+                return 0.0
+
+            def d_yaw(tau):
+                return 0.0
+
+            def d_tilt(tau):
+                return 0.0
+
+            def d_hike(tau):
+                return 0.0
+
+            def d_sink(tau):
+                return 0.0
+
+            def d_weight(tau):
+                """How far he has straightened off the cane (his left hand off it)."""
+                return 0.7 * watch_hand_w(tau)
+
+            def d_talk(tau):
+                return 0.0
+
+            def wc_cane(tau):
+                return 0.0
+
+            def hat_pose(R, root, xy, psi, tau):
+                return None
+
+            def hat_hand_w(tau):
+                return 0.0
+
+            def watch_pose(R, root, tau):
+                """The watch's 4x4 (character space): held by its rim between his left thumb
+                and first finger, its face toward him, twelve o'clock up his fingers; or, at
+                his ear and in the pocket, in his palm."""
+                D = self.fk(R, root)
+                pc = self.palm_of(R, root, "L")
+                fd, nd = self.hand_dirs(R, root, "L")
+                z = unit(nd)
+                y = unit(fd - (fd @ z) * z)
+                tip = lambda b: self.at(D, b, self.tails[self.idx[b]])
+                pinch = 0.5 * (tip("finger1-3.L") + tip("finger2-3.L"))
+                held = pinch + y * 0.026 + z * 0.006
+                palm = pc + z * 0.013
+                g = float(grip_k(tau))
+                M = np.eye(4)
+                M[:3, 0], M[:3, 1], M[:3, 2], M[:3, 3] = np.cross(y, z), y, z, palm * (1 - g) + held * g
+                return M
+
+            def watch_upper(R, tau):
+                """What the watch does to his body above the hips (on top of his stance)."""
+                ld, g, li = float(look_k(tau)), float(glare_k(tau)), float(listen_k(tau))
+                st, tall = float(settle_k(tau)), float(tall_k(tau))
+                # Looking down at it (then only his eyes come up to you, his head still bowed).
+                _after(R, "neck01", rot(x=11.0 * ld))
+                _after(R, "head", rot(x=14.0 * ld - 3.0 * g))
+                eye = ld * (36.0 * (1.0 - g) - 8.0 * g)
+                # Listening: his head inclines to the watch, his eyes on you.
+                _after(R, "neck01", rot(y=WATCH_ROLL * 4.0 * li))
+                _after(R, "head", rot(y=WATCH_ROLL * 5.0 * li))
+                # The smallest shake of the head, over the second look.
+                no = 3.0 * math.sin(2 * math.pi * (tau - 148.0) / 12.0) * bump(tau, 146.0, 164.0) ** 0.5
+                _after(R, "head", rot(z=no))
+                # A breath let go: his shoulders settle.
+                _after(R, "clavicle.L", rot(y=2.5 * st))
+                _after(R, "clavicle.R", rot(y=-2.5 * st))
+                _after(R, "spine02", rot(x=1.5 * st))
+                # Drawn up to his full height, his head a little to one side.
+                _after(R, "spine02", rot(x=-2.0 * tall))
+                _after(R, "spine04", rot(x=-1.0 * tall))
+                _after(R, "head", rot(x=-3.0 * tall, y=-WATCH_ROLL * 4.0 * tall))
+                for s in "LR":
+                    R[f"eye.{s}"] = R[f"eye.{s}"] @ rot(x=eye)
+
         # ── His cane: where its tip is set down, and where his hand would be.
         A_hand = 0.08
         side_tip = np.array([X0 + self.cane_x, Ye - 0.13, 0.0])
@@ -979,8 +1153,12 @@ class Motion:
         back0, back1 = t_back + 0.1 * nJ, t_back + 0.65 * nJ
         canes.append((ts + C, carry0, side_tip))
         front_tip1 = front_tip + np.array([0.0, -DTR, 0.0])
-        canes.append((carry1, D0 + 10.0, front_tip))
-        canes.append((D0 + T_END - 12.0, back0, front_tip1))
+        if dancing:
+            canes.append((carry1, D0 + 10.0, front_tip))
+            canes.append((D0 + T_END - 12.0, back0, front_tip1))
+        else:
+            # (the watch: it stays where he set it down, under his right hand)
+            canes.append((carry1, back0, front_tip))
         # (Where he has carried it to, as a moment's stop before his stride.)
         canes.append((back1, back1, None))
         for k in range(0, 3):
@@ -1264,6 +1442,9 @@ class Motion:
 
         out = []
         k_scene = 0
+        if dancing:
+            def watch_hand_w(tau):
+                return 0.0
         left_from = None
         left_back = None
         for fi, t in enumerate(frames):
@@ -1285,13 +1466,14 @@ class Motion:
                 tilt = smoother((t - t_regard) / nH) * (1.0 - smoother((t - t_release) / nI)) * (1.0 - dwt)
                 _after(R, "head", rot(x=1.5 * u, y=-3.5 * tilt))
             if 0.0 <= tau <= T_END:
-                dance_upper(R, tau)
+                (dance_upper if dancing else watch_upper)(R, tau)
             # The legs.
             fwd = yaw(psi) @ np.array([0.0, -1.0, 0.0])
             for s, out_x in (("L", 1.0), ("R", -1.0)):
                 A, G, toe, _ = foot_state(s, t)
                 self.step(R, root, s, A, G, toe, fwd + yaw(psi) @ np.array([0.12 * out_x, 0.0, 0.0]), own=out_x if 0.0 <= tau <= T_END else None)
             hatM = hat_pose(R, root, xy, psi, tau)
+            watchM = None
             # His free hand hangs at ease.
             self.relax_hand(R, root, "L", 0.42)
             # The cane, and his right hand on it: carried in his fist, or (facing
@@ -1378,12 +1560,25 @@ class Motion:
                     target = lerp(target, pg, wh) + Yp @ (np.array([0.30, 0.0, -0.05]) * swing)
                     fing_l, palm_l = unit(lerp(fing_l, fg, wh)), unit(lerp(palm_l, ng, wh))
                     pole_l = lerp(pole_l, Yp @ np.array([0.7, 0.5, 1.7]), min(1.0, 2.0 * wh))
+                ww = watch_hand_w(tau) if (not dancing and 0.0 <= tau <= T_END) else 0.0
+                if ww > 0.0:
+                    # The watch: his hand on its way to the pocket, the watch in it, back.
+                    pw, fw, nw, polew = watch_hand(R, root, xy, psi, tau)
+                    target = lerp(target, pw, ww) + np.array([0.0, 0.0, 0.04]) * 4.0 * ww * (1.0 - ww)
+                    fing_l, palm_l = unit(lerp(fing_l, fw, ww)), unit(lerp(palm_l, nw, ww))
+                    pole_l = unit(lerp(pole_l, polew, min(1.0, 2.0 * ww)))
                 if wh > 0.0:
                     self.reach2(R, root, "L", target, fing_l, palm_l, pole_l, follow=0.95 * wh)
+                elif ww > 0.0:
+                    self.reach2(R, root, "L", target, fing_l, palm_l, pole_l, follow=0.8 * ww)
                 else:
                     self.reach(R, root, "L", target, fing_l, palm_l, pole_l)
-                # Resting on his right hand, the fingers lie together over it.
-                self.fingers(R, "L", 0.42 + 0.2 * e + 0.1 * wh)
+                # Resting on his right hand, the fingers lie together over it (cupped round the
+                # watch while he has it; drumming on his right hand while he waits).
+                drum = w_drum(tau) if (not dancing and 0.0 <= tau <= T_END) else 0.0
+                self.fingers(R, "L", 0.42 + 0.2 * e + 0.1 * wh + 0.15 * ww - 0.3 * drum)
+                if not dancing and 0.0 <= tau <= T_END and watch_visible(tau):
+                    watchM = watch_pose(R, root, tau)
             rec = None
             if fi < tw:
                 pass
@@ -1393,11 +1588,13 @@ class Motion:
                 rec = ("scene", k_scene)
                 k_scene += 1
             blink = {20: 0.35, 21: 0.8, 22: 1.0, 23: 1.0, 24: 0.75, 25: 0.35}.get(int(round(t - t_regard)), 0.0)
+            if not dancing and 0.0 <= tau <= T_END:
+                blink = max(blink, watch_blink(tau))
             M = np.eye(4)
             zc = unit(top - tip)
             xc = unit(np.cross([0.0, 1.0, 0.0], zc))
             M[:3, 0], M[:3, 1], M[:3, 2], M[:3, 3] = xc, np.cross(zc, xc), zc, tip
-            out.append(dict(R=R, root=root, cane=M, blink=blink, talk=(d_talk(tau) if 0.0 <= tau <= T_END else 0.0), talk2=0.0, hat=(hatM if (hatM is not None and hat_visible(tau)) else None), hips=float(xy[1]) if D0 <= t <= D0 + T_END else float(hips_y(t)), rec=rec))
+            out.append(dict(R=R, root=root, cane=M, blink=blink, talk=(d_talk(tau) if 0.0 <= tau <= T_END else 0.0), talk2=0.0, hat=(hatM if (hatM is not None and hat_visible(tau)) else None), watch=watchM, hips=float(xy[1]) if (dancing and D0 <= t <= D0 + T_END) else float(hips_y(t)), rec=rec))
         return out
 
     def joint_check(self, take):

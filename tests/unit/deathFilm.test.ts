@@ -13,7 +13,9 @@ interface Film {
   frames: { s: number; w: number; h: number; dx: number; dy: number; x: number }[]
   walk: number[]
   scene: number[]
-  /** The dance's first and last frames, as indexes into `scene`. */
+  /** What he does between regarding you and turning away. */
+  act: 'watch' | 'dance'
+  /** That act's first and last frames, as indexes into `scene` (named for the dance, which came first). */
   dance: [number, number]
   /** What death_scene.py checked about the skin under his suit (the render fails if any of it is off). */
   skin: { hidden: number; chestSkinShowing: number; neckSkinKept: boolean; handsSkinKept: boolean; nippleMoveMm: number }
@@ -62,7 +64,21 @@ describe('the rendered film', () => {
     expect(scene.at(-1)! - scene.at(-2)!).toBeGreaterThan(pace * 0.8)
   })
 
-  it('dances between regarding you and turning away: eight to eleven seconds, travelling the floor in a kick line', () => {
+  it('does the watch act between regarding you and turning away: about eleven seconds, standing his ground', () => {
+    // The league has stopped losing lives, so Death checks his pocket watch instead of dancing.
+    expect(FILM.act).toBe('watch')
+    const [from, to] = FILM.dance
+    expect(from).toBeGreaterThan(100)
+    expect(to).toBeLessThanOrEqual(FILM.scene.length)
+    // 190 to 240 frames at 20 a second: nine and a half to twelve seconds.
+    expect(to - from).toBeGreaterThanOrEqual(190)
+    expect(to - from).toBeLessThanOrEqual(240)
+    // He does not move from where he faced you: every frame of it, and a few either side.
+    const xs = FILM.scene.map((i) => FILM.frames[i]!.x)
+    for (let k = from - 5; k <= to + 5; k++) expect(xs[k], `frame ${k}`).toBe(xs[from])
+  })
+
+  it.skipIf(FILM.act !== 'dance')('dances between regarding you and turning away: eight to eleven seconds, travelling the floor in a kick line', () => {
     const [from, to] = FILM.dance
     expect(from).toBeGreaterThan(100)
     expect(to).toBeLessThanOrEqual(FILM.scene.length)
