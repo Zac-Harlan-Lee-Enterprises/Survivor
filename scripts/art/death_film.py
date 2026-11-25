@@ -72,6 +72,7 @@ def main(src):
             armClearance=take.get("armClearance"),
             joints=take.get("joints"),
             skin=take.get("skin"),
+            dress=take.get("dress"),
             sheets=sheets,
             frames=index,
             walk=walk,

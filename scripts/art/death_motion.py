@@ -1349,9 +1349,14 @@ class Motion:
                 "clavicle.L": rot(z=4.0),
                 "clavicle.R": rot(z=-4.0),
             }
-            opp = wm._curve("hip", (p + 0.5) % 1.0) * wm.STRIDE
-            Rw["upperarm01.L"] = rot(x=-0.75 * opp + 1.0, y=5.0)
-            Rw["lowerarm01.L"] = rot(x=-(12.0 + 0.6 * max(0.0, opp)))
+            # His free arm swings from the shoulder against his left leg, as far back as
+            # forward (back as the left heel strikes, forward as the right does), the
+            # elbow easing open behind him and folding a little as it comes forward.
+            sw = math.cos(ph)
+            Rw["upperarm01.L"] = rot(x=14.0 * sw + 7.0, y=4.0)
+            Rw["lowerarm01.L"] = rot(x=-(15.0 - 8.0 * math.cos(ph - 0.5)))
+            # (and he walks into it a little: a man walking is not bolt upright)
+            Rw["spine02"] = rot(x=1.5, y=-drop * 0.4, z=-turn * 0.9)
             Rs = {
                 "spine04": rot(x=-0.8 * b),
                 "spine02": rot(x=-0.5 - 1.4 * b),

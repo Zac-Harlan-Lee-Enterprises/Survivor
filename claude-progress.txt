@@ -1033,3 +1033,13 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - Render: 0 joint flags, arm clearance 0.6 cm, public/death 3.3 MB. deathFrames.json gains `act`. tests/unit/deathFilm.test.ts asserts the act (length, standing still); the dance test is skipped unless act is dance.
 - Verified: validate green (422 + 1 skipped), e2e 117, quality sweep clean, init 200. Preview: node_modules/.tmp/death-player.html on :5895.
 - NEXT: merge only on the commissioner's word after he has watched the preview.
+
+2026-11-25 (Claude Fable 5.2) — Death's suit and walk, fixed (feat/death-pocket-watch)
+- Commissioner: jacket shoulders did not meet the collar, calves wider than thighs, walk unnatural. All three were real:
+  - Jacket stopped at neck weight 0.35, leaving a bare ring; its collar stood off like a ruff. Jacket now runs to the collar (neck < 0.85), collar and shirt collar sit close.
+  - Trousers followed the thin thigh then fell as a wide tube from the knee. Now one taper, thigh to hem (14.2 / 11.6 / 10.6 / 9.2 cm), recorded in take.json `dress` and asserted in tests/unit/deathFilm.test.ts.
+  - Free arm only swung forward. Now swings back and forward against the left leg; slight forward lean walking.
+  - Also found: "front" was measured from the chest joint, so the nape wore a patch of shirt and tie and the lapel V cut a hole there (the white scrap in side view). Fixed in _shirt and the jacket material; `shirtOnBack` asserted 0.
+- death_scene.py `--turn DEG` renders him from any side (how the back patch was found). Look at close-ups from front, side and back before calling the figure done.
+- Full re-render: 0 joint flags, 3.3 MB. validate 423 + 1 skipped, e2e 117, sweep clean, init 200.
+- NEXT: commissioner watches the preview (:5895 death-player.html); merge PR #86 only on his word. A faint crease remains at the back of the jacket's neck (not visible from the side).

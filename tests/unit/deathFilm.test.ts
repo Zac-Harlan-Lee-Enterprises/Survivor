@@ -19,6 +19,8 @@ interface Film {
   dance: [number, number]
   /** What death_scene.py checked about the skin under his suit (the render fails if any of it is off). */
   skin: { hidden: number; chestSkinShowing: number; neckSkinKept: boolean; handsSkinKept: boolean; nippleMoveMm: number }
+  /** How his suit is cut (death_dress.py): the trouser leg's width down the leg (cm), and how much shirt is on his back. */
+  dress: { trouserCm: { thigh: number; knee: number; calf: number; hem: number }; shirtOnBack: number }
   /** What death_scene.py's joint check found over every frame (it fails the render if any joint leaves its human range). */
   joints: {
     summary: { kneeMin: number; kneeMax: number; hipMax: number; hipMin: number; abductionMax: number; leanBackMax: number; leanForwardMax: number; twistMax: number; floorMax: number }
@@ -117,6 +119,18 @@ describe('the rendered film', () => {
     expect(summary.leanBackMax).toBeLessThanOrEqual(20)
     expect(summary.twistMax).toBeLessThanOrEqual(45)
     expect(summary.floorMax).toBeLessThanOrEqual(0.6)
+  })
+
+  it('wears trousers that taper from thigh to hem, and no shirt on his back', () => {
+    // The legs once followed his thin thighs and then fell as a wide tube from the knee, so his
+    // calves looked wider than his thighs. They are cut as trousers are: narrower all the way down.
+    const { thigh, knee, calf, hem } = FILM.dress.trouserCm
+    expect(thigh).toBeGreaterThan(knee)
+    expect(knee).toBeGreaterThan(calf)
+    expect(calf).toBeGreaterThan(hem)
+    expect(thigh / calf).toBeGreaterThan(1.2)
+    // A patch of shirt and tie once sat on his nape, under the collar: it showed from the side.
+    expect(FILM.dress.shirtOnBack).toBe(0)
   })
 
   it('shows no skin through his suit: nipples flattened on the body, the skin under the clothes masked', () => {
