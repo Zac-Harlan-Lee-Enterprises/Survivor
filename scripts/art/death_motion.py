@@ -40,10 +40,10 @@ left, +Z up; the render turns -Y to screen right):
   throughout. Death as an old, unhurried, absolute power put out by a small
   inconvenience: calm, precise, never a wasted movement, never a fidget. In one
   unhurried movement his left hand goes to the pocket at his left hip and brings
-  out a gold pocket watch (death_dress.pocket_watch), held up between thumb and
-  finger, its face to him (the house sees its gold back). A long, still look at
-  it; then only his eyes come up to you, his head still bowed. He cups it to his
-  ear and listens, perfectly still, staring at you, and blinks once, slowly. One
+  out a gold pocket watch (death_dress.pocket_watch), lying on the pads of his open
+  fingers, palm up (it never passes through a finger: `watch_in_hand`). A long, still look at
+  it; then only his eyes come up to you, his head still bowed. He holds it up
+  beside his ear (never against his head: `watch_clearance`) and listens, perfectly still, staring at you, and blinks once, slowly. One
   more look; the smallest shake of the head; his shoulders settle. It goes back
   in the pocket, his hand back on the cane, and he draws himself up to his full
   height and regards you, his head a little to one side. The same joint check
@@ -122,6 +122,10 @@ ACT = "watch"
 WATCH = 216
 # Which way a roll of his head (about its y axis) leans it toward his left shoulder.
 WATCH_ROLL = 1.0
+# Where the watch lies in his open hand, on the pads of his fingers: (toward his fingertips, off
+# the bones, away from his thumb) from the middle of the palm (m). Its case: radius and half thickness (death_dress.pocket_watch).
+WATCH_IN_PALM = (0.07, 0.029, 0.004)
+WATCH_R, WATCH_T = 0.031, 0.0075
 
 # How far one stride carries him (m), in CYCLE frames: a man walking slowly
 # (about 0.8 m/s: a stride of a little over a metre, some 88 steps a minute).
@@ -987,8 +991,8 @@ class Motion:
         # you, his right hand on the cane throughout. His left hand leaves it, in one
         # unhurried movement, for the pocket at his left hip, and brings out a gold
         # pocket watch (death_dress.pocket_watch; one rigid object, hidden until it
-        # is out), held up between thumb and finger like a coin, its face to him (the
-        # house sees its gold back). A long, still look at it; then only his eyes come
+        # is out), lying on the pads of his open fingers, palm up, tipped a little to
+        # the house so its gold shows. A long, still look at it; then only his eyes come
         # up to you, his head still bowed over it. He cups it to his ear and listens,
         # perfectly still, staring at you, and blinks once, slowly. One more look at
         # it; the smallest shake of the head; his shoulders settle (a breath let go).
@@ -1004,11 +1008,12 @@ class Motion:
             # its fingers and the way the palm faces, and where the elbow points.
             POCKET = ([0.20, -0.09, 1.02], [0.0, -0.25, -1.0], [-0.6, 0.6, 0.0], [0.9, 0.6, -0.2])
             DIP = ([0.20, -0.09, 0.985], [0.0, -0.25, -1.0], [-0.6, 0.6, 0.0], [0.9, 0.6, -0.2])
-            LOOK = ([0.07, -0.32, 1.30], [-0.2, -0.3, 1.0], [0.0, 0.85, 0.45], [0.8, 0.5, -0.5])
-            LOOK2 = ([0.08, -0.31, 1.27], [-0.2, -0.3, 1.0], [0.0, 0.85, 0.45], [0.8, 0.5, -0.5])
+            # (his palm up, tipped a little to the house: the watch lies on it and its gold shows)
+            LOOK = ([0.07, -0.32, 1.30], [-0.75, -0.6, 0.1], [0.0, -0.3, 1.0], [0.8, 0.5, -0.5])
+            LOOK2 = ([0.08, -0.31, 1.27], [-0.75, -0.6, 0.1], [0.0, -0.3, 1.0], [0.8, 0.5, -0.5])
             # (held by its rim at his fingertips, up beside his ear: a finger's width off it, never
             # against his head, and turned a little to the house so its gold shows)
-            EAR = ([0.178, 0.03, 1.54], [0.0, 0.35, 1.0], [-1.0, -0.22, 0.12], [0.7, 0.55, -0.6])
+            EAR = ([0.195, 0.028, 1.57], [0.0, 0.35, 1.0], [-1.0, -0.22, 0.12], [0.7, 0.55, -0.6])
             UP = ([0.17, -0.22, 1.50], [0.0, -0.3, 1.0], [-0.7, 0.4, 0.3], [0.9, 0.8, -0.2])  # (on the way between)
             path = [(10, POCKET), (12.5, DIP), (15, POCKET), (29, LOOK), (86, LOOK), (93, UP), (100, EAR), (130, EAR), (136.5, UP), (143, LOOK2), (160, LOOK2), (171, POCKET), (174, POCKET)]
             w_pos, w_fing, w_palm, w_pole = (keyed([(t, k[j]) for t, k in path]) for j in range(4))
@@ -1091,17 +1096,15 @@ class Motion:
                 return 0.0
 
             def watch_pose(R, root, tau):
-                """The watch's 4x4 (character space): held up at his left fingertips, its face the
-                way his palm faces, twelve o'clock up his fingers; or, in the pocket, in his palm."""
+                """The watch's 4x4 (character space): lying in his open left hand, on the pads of
+                his fingers (clear of the skin, never through a finger: `watch_in_hand` measures
+                it), its face the way the palm faces, twelve o'clock toward his fingertips."""
                 pc = self.palm_of(R, root, "L")
                 fd, nd = self.hand_dirs(R, root, "L")
                 z = unit(nd)
                 y = unit(fd - (fd @ z) * z)
-                held = pc + y * 0.075 + z * 0.012
-                palm = pc + z * 0.013
-                g = float(grip_k(tau))
                 M = np.eye(4)
-                M[:3, 0], M[:3, 1], M[:3, 2], M[:3, 3] = np.cross(y, z), y, z, palm * (1 - g) + held * g
+                M[:3, 0], M[:3, 1], M[:3, 2], M[:3, 3] = np.cross(y, z), y, z, pc + y * WATCH_IN_PALM[0] + z * WATCH_IN_PALM[1] + np.cross(y, z) * WATCH_IN_PALM[2]
                 return M
 
             def watch_upper(R, tau):
@@ -1579,7 +1582,14 @@ class Motion:
                 # Resting on his right hand, the fingers lie together over it (cupped round the
                 # watch while he has it; drumming on his right hand while he waits).
                 drum = w_drum(tau) if (not dancing and 0.0 <= tau <= T_END) else 0.0
-                self.fingers(R, "L", 0.42 + 0.2 * e + 0.1 * wh + 0.15 * ww - 0.3 * drum)
+                # (his hand open and flat under the watch while it lies in his palm)
+                self.fingers(R, "L", (0.42 + 0.2 * e + 0.1 * wh - 0.3 * drum) * (1.0 - ww) - 0.32 * ww)
+                if ww > 0.0:
+                    # (flat under the watch, a touch past straight, so it lies on their pads; his
+                    # thumb stays easy beside it)
+                    Rt = self.fingers({}, "L", (0.42 + 0.2 * e) * (1.0 - ww) + 0.06 * ww)
+                    for k in range(1, 4):
+                        R[f"finger1-{k}.L"] = Rt[f"finger1-{k}.L"]
                 if not dancing and 0.0 <= tau <= T_END and watch_visible(tau):
                     watchM = watch_pose(R, root, tau)
             rec = None
@@ -1724,6 +1734,28 @@ class Motion:
                         flags.append(("scene-%03d" % rec[1] if rec and rec[0] == "scene" else ("%s-%02d" % rec if rec else "frame%d" % fi), "%s foot slides" % s, round(d * 100, 1), "4.5 cm a frame"))
         summary = dict(kneeMin=round(lo["knee"], 1), kneeMax=round(hi["knee"], 1), hipMax=round(hi["hip"], 1), hipMin=round(lo["hip"], 1), abductionMax=round(hi["abduction"], 1), leanBackMax=round(hi["lean_back"], 1), leanForwardMax=round(hi["lean_fwd"], 1), twistMax=round(hi["twist"], 1), wristMax=round(hi["wrist"], 1), elbowMax=round(hi["elbow"], 1), floorMax=round(hi["floor"] * 100, 1))
         return flags, summary
+
+    def watch_in_hand(self, take):
+        """How far the watch goes into a finger of the hand that holds it, at the worst, over
+        the take (m; 0 or less: it never does). Each bone of his left fingers and thumb is a
+        rod of a finger's thickness; it is measured, in the watch's own frame, against the
+        watch's case on every frame the watch is out. None if the take has no watch."""
+        bones = [f"finger{f}-{k}.L" for f in range(1, 6) for k in range(1, 4)]
+        worst = None
+        for f in take:
+            w = f.get("watch")
+            if w is None:
+                continue
+            D = self.fk(f["R"], f["root"])
+            inv = np.linalg.inv(np.asarray(w))
+            for b in bones:
+                r = 0.0095 if b.startswith("finger1") else 0.0075
+                h0, t0 = self.at(D, b, self.heads[self.idx[b]]), self.at(D, b, self.tails[self.idx[b]])
+                for u in np.linspace(0.0, 1.0, 6):
+                    q = (inv @ np.append(h0 * (1 - u) + t0 * u, 1.0))[:3]
+                    depth = min(WATCH_R + r - math.hypot(q[0], q[1]), WATCH_T + r - abs(q[2]))
+                    worst = depth if worst is None else max(worst, depth)
+        return worst
 
     def watch_clearance(self, take):
         """How near the watch comes to his head over the take (m): its rim and both faces,

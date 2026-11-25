@@ -274,6 +274,8 @@ def main():
             cane=mo.L,
             # How near the watch comes to his head at the closest (cm; he holds it beside his ear).
             watchClearance=(None if mo.watch_clearance(take) is None else round(mo.watch_clearance(take) * 100, 1)),
+            # How far the watch goes into a finger of the hand that holds it, at the worst (cm; 0 or less: never).
+            watchInHand=(None if mo.watch_in_hand(take) is None else round(mo.watch_in_hand(take) * 100, 2)),
             joints=dict(summary=jsum, flagged=sorted({fl[0] for fl in flags})),
             # Skin under his clothes is masked; what showed on his chest is flattened (death_cast.py).
             skin=skin,

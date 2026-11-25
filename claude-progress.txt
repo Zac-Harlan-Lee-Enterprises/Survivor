@@ -1050,3 +1050,10 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - Commissioner's rule: check the work three times before asking him to look (measure, close-ups from several angles with `--turn`, then the final packed frames).
 - Full re-render: 0 joint flags, 3.3 MB. validate 424 + 1 skipped, e2e 117, sweep clean, init 200.
 - NEXT: merge PR #86 only on his word.
+
+2026-11-25 (Claude Fable 5.2) — Death's watch in his hand (feat/death-pocket-watch)
+- Commissioner: the watch went through his fingers as he looked at it. True: it was placed past his palm, inside his curled fingers; I had measured it against his head but never against his hand.
+- Now his hand is open, palm up, and the watch lies on the pads of his fingers (WATCH_IN_PALM), fingers a touch past straight, thumb easy. Same hold at the ear, the hand behind it. `Motion.watch_in_hand` measures the case against every left finger and thumb bone on every frame (-0.12 cm: clear, resting); recorded as `watchInHand`, asserted in tests/unit/deathFilm.test.ts. `watchClearance` 2.4 cm.
+- Lesson: a prop needs a measured check against everything it can touch (hand, head, body), not just the place the last complaint was about.
+- Full re-render: 0 joint flags, 3.3 MB. validate 425 + 1 skipped, e2e 117, sweep clean, init 200.
+- NEXT: merge PR #86 only on his word.

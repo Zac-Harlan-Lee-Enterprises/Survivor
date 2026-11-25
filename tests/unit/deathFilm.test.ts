@@ -21,6 +21,8 @@ interface Film {
   skin: { hidden: number; chestSkinShowing: number; neckSkinKept: boolean; handsSkinKept: boolean; nippleMoveMm: number }
   /** How near the watch comes to his head at the closest, over every frame it is out (cm). */
   watchClearance: number
+  /** How far the watch goes into a finger of the hand holding it, at the worst (cm; 0 or less: it never does). */
+  watchInHand: number
   /** How his suit is cut (death_dress.py): the trouser leg's width down the leg (cm), and how much shirt is on his back. */
   dress: { trouserCm: { thigh: number; knee: number; calf: number; hem: number }; shirtOnBack: number }
   /** What death_scene.py's joint check found over every frame (it fails the render if any joint leaves its human range). */
@@ -128,6 +130,14 @@ describe('the rendered film', () => {
     // its rim and faces against his head on every frame: a finger's width off, at the closest.
     expect(FILM.watchClearance).toBeGreaterThanOrEqual(1.5)
     expect(FILM.watchClearance).toBeLessThan(6)
+  })
+
+  it('rests the watch on his open fingers, never through them', () => {
+    // The watch once passed through his curled fingers as he looked at it. death_motion.watch_in_hand
+    // measures its case against every bone of his left fingers and thumb on every frame it is out.
+    expect(FILM.watchInHand).toBeLessThanOrEqual(0)
+    // ...and it lies on them: no more than a few millimetres off the nearest finger.
+    expect(FILM.watchInHand).toBeGreaterThan(-0.6)
   })
 
   it('wears trousers that taper from thigh to hem, and no shirt on his back', () => {

@@ -74,6 +74,7 @@ def main(src):
             skin=take.get("skin"),
             dress=take.get("dress"),
             watchClearance=take.get("watchClearance"),
+            watchInHand=take.get("watchInHand"),
             sheets=sheets,
             frames=index,
             walk=walk,
