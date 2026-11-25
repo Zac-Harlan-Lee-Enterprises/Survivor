@@ -22,7 +22,8 @@ import {
  * the signal working, not a broken test.
  *
  * Week 11's review went up once Sunday night settled the week, before any week
- * 12 pick.
+ * 12 pick. Its last paragraph and callout were rewritten once all five week 12
+ * picks were in, before the lock; they give none of them away.
  */
 const WEEK = 11
 const after = livesAfter(WEEK)
@@ -156,16 +157,57 @@ describe('the commissioner’s week 11 review states only true things', () => {
     expect(FINALS[id]).toEqual([7, 34])
   })
 
-  it('“Picks lock Wednesday, not Thursday: Green Bay at the Rams kicks off Wednesday night at 7:00 Central, so the door shuts at 6:55 PM on November 25 … four of you on your last life”', () => {
-    expect(week(12)[0]!.id).toBe('2026-w12-GB-at-LAR')
-    expect(at(week(12)[0]!.kickoffAt)).toBe('Wednesday, November 25 at 7:00 PM')
-    expect(at(lockOf(12).toISOString())).toBe('Wednesday, November 25 at 6:55 PM')
+  it('“All five week 12 picks are in, which makes five straight weeks without a missing pick … four of you are still on your last life”', () => {
+    const alive = [...after.entries()].filter(([, l]) => l > 0).map(([name]) => name)
+    expect(alive).toHaveLength(5)
+    expect(
+      picksIn(12)
+        .map((p) => nameOf(p.playerId))
+        .sort(),
+    ).toEqual([...alive].sort())
+    const missing = (w: number) =>
+      [...livesAfter(w - 1).entries()].filter(([name, l]) => l > 0 && !pickOf(name, w))
+    for (const w of [8, 9, 10, 11, 12]) expect(missing(w), `week ${w}`).toEqual([])
+    expect(missing(7)).not.toEqual([])
     expect(onLives(1)).toEqual(['Allison', 'Dominic', 'Melanie', 'Tracy'])
   })
 
-  it('“DM me your week 12 pick on Teams before 6:55 PM Wednesday, November 25, five minutes before Green Bay at the Rams kicks off”', () => {
-    expect(at(lockOf(12).toISOString())).toBe('Wednesday, November 25 at 6:55 PM')
+  it('“The door still shuts at 6:55 PM Wednesday, when Green Bay at the Rams kicks off … Thursday has three games, starting with Chicago at Detroit at noon”', () => {
+    expect(week(12)[0]!.id).toBe('2026-w12-GB-at-LAR')
     expect(at(week(12)[0]!.kickoffAt)).toBe('Wednesday, November 25 at 7:00 PM')
+    expect(at(lockOf(12).toISOString())).toBe('Wednesday, November 25 at 6:55 PM')
+    const thursday = week(12).filter((g) => at(g.kickoffAt).startsWith('Thursday, November 26'))
+    expect(thursday).toHaveLength(3)
+    expect(thursday[0]!.id).toBe('2026-w12-CHI-at-DET')
+    expect(at(thursday[0]!.kickoffAt)).toBe('Thursday, November 26 at 12:00 PM')
+  })
+
+  it('“They lock at 6:55 PM Wednesday, November 25 … Week 13: DM me your pick on Teams before 7:10 PM Thursday, December 3”', () => {
+    expect(at(lockOf(12).toISOString())).toBe('Wednesday, November 25 at 6:55 PM')
+    expect(at(lockOf(13).toISOString())).toBe('Thursday, December 3 at 7:10 PM')
+    for (const p of picksIn(12))
+      expect(new Date(p.submittedAt).getTime(), p.playerId).toBeLessThan(lockOf(12).getTime())
+  })
+
+  it('the paragraphs written with the week 12 picks in hand name no picked team and no opponent of one', () => {
+    const written = paragraphs.slice(4).join(' ')
+    for (const pick of picksIn(12)) {
+      const game = season.games.find((g) => g.id === pick.gameId)!
+      for (const id of [game.homeTeamId, game.awayTeamId]) {
+        // The abbreviation only in capitals: “was” is a word, WAS is Washington.
+        expect(new RegExp(`\\b${id}\\b`).test(written), id).toBe(false)
+        expect(
+          mentions(
+            written,
+            teamWords(id).filter((w) => w !== id),
+          ),
+          id,
+        ).toBeNull()
+      }
+    }
+    expect(written).not.toMatch(
+      /\b(alone|same team|together|both|company|crowd|two of you|three of you)\b/i,
+    )
   })
 
   it('names no week 12 pick: no paragraph that names a player names their team or its opponent', () => {

@@ -1703,6 +1703,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-tracy-nelson-12",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "tracy-nelson",
+      "week": 12,
+      "teamId": "WAS",
+      "gameId": "2026-w12-WAS-at-ARI",
+      "submittedAt": "2026-11-25T21:47:09.000Z",
+      "updatedAt": "2026-11-25T21:47:09.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-bradley-riedell-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -2938,6 +2951,19 @@
       "source": "commissioner"
     },
     {
+      "id": "pick-allison-petty-12",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "allison-petty",
+      "week": 12,
+      "teamId": "DAL",
+      "gameId": "2026-w12-PHI-at-DAL",
+      "submittedAt": "2026-11-25T20:26:32.000Z",
+      "updatedAt": "2026-11-25T20:26:32.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
       "id": "pick-don-turner-1",
       "leagueId": "demo-league",
       "seasonId": "demo-2026",
@@ -3129,6 +3155,19 @@
       "gameId": "2026-w11-MIA-at-BUF",
       "submittedAt": "2026-11-18T18:24:12.000Z",
       "updatedAt": "2026-11-18T18:24:12.000Z",
+      "version": 1,
+      "source": "commissioner"
+    },
+    {
+      "id": "pick-cindy-mendoza-12",
+      "leagueId": "demo-league",
+      "seasonId": "demo-2026",
+      "playerId": "cindy-mendoza",
+      "week": 12,
+      "teamId": "NYG",
+      "gameId": "2026-w12-NYG-at-IND",
+      "submittedAt": "2026-11-25T19:15:42.000Z",
+      "updatedAt": "2026-11-25T19:15:42.000Z",
       "version": 1,
       "source": "commissioner"
     },
