@@ -73,6 +73,7 @@ def main(src):
             joints=take.get("joints"),
             skin=take.get("skin"),
             dress=take.get("dress"),
+            watchClearance=take.get("watchClearance"),
             sheets=sheets,
             frames=index,
             walk=walk,

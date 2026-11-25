@@ -1043,3 +1043,10 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - death_scene.py `--turn DEG` renders him from any side (how the back patch was found). Look at close-ups from front, side and back before calling the figure done.
 - Full re-render: 0 joint flags, 3.3 MB. validate 423 + 1 skipped, e2e 117, sweep clean, init 200.
 - NEXT: commissioner watches the preview (:5895 death-player.html); merge PR #86 only on his word. A faint crease remains at the back of the jacket's neck (not visible from the side).
+
+2026-11-25 (Claude Fable 5.2) — Death's watch at his ear (feat/death-pocket-watch)
+- Commissioner: he shoved the watch into his head. True: it sat 4 cm from the ear, tilted, its rim inside his skull, buried under his palm.
+- Now held by its rim at his fingertips beside the ear, gold visible from the front. `Motion.watch_clearance` measures the watch against his head on every frame (2.3 cm at the closest); recorded as `watchClearance` in take.json / deathFrames.json and asserted (>= 1.5 cm) in tests/unit/deathFilm.test.ts.
+- Commissioner's rule: check the work three times before asking him to look (measure, close-ups from several angles with `--turn`, then the final packed frames).
+- Full re-render: 0 joint flags, 3.3 MB. validate 424 + 1 skipped, e2e 117, sweep clean, init 200.
+- NEXT: merge PR #86 only on his word.

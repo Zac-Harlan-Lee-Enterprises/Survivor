@@ -19,6 +19,8 @@ interface Film {
   dance: [number, number]
   /** What death_scene.py checked about the skin under his suit (the render fails if any of it is off). */
   skin: { hidden: number; chestSkinShowing: number; neckSkinKept: boolean; handsSkinKept: boolean; nippleMoveMm: number }
+  /** How near the watch comes to his head at the closest, over every frame it is out (cm). */
+  watchClearance: number
   /** How his suit is cut (death_dress.py): the trouser leg's width down the leg (cm), and how much shirt is on his back. */
   dress: { trouserCm: { thigh: number; knee: number; calf: number; hem: number }; shirtOnBack: number }
   /** What death_scene.py's joint check found over every frame (it fails the render if any joint leaves its human range). */
@@ -119,6 +121,13 @@ describe('the rendered film', () => {
     expect(summary.leanBackMax).toBeLessThanOrEqual(20)
     expect(summary.twistMax).toBeLessThanOrEqual(45)
     expect(summary.floorMax).toBeLessThanOrEqual(0.6)
+  })
+
+  it('holds the watch up beside his ear, never against or inside his head', () => {
+    // He once pushed the watch into the side of his head. death_motion.watch_clearance measures
+    // its rim and faces against his head on every frame: a finger's width off, at the closest.
+    expect(FILM.watchClearance).toBeGreaterThanOrEqual(1.5)
+    expect(FILM.watchClearance).toBeLessThan(6)
   })
 
   it('wears trousers that taper from thigh to hem, and no shirt on his back', () => {

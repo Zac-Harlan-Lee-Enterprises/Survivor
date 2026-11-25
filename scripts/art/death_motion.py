@@ -999,19 +999,21 @@ class Motion:
             DTR = 0.0
             P1 = P_end.copy()
             dsh["y"] = 0.0
-            W_NEAR = 0.205  # (how near his shoulder the palm may come)
+            W_NEAR = 0.18  # (how near his shoulder the palm may come)
             # The left palm (his body's axes: x his left, y back, z up from the floor),
             # its fingers and the way the palm faces, and where the elbow points.
             POCKET = ([0.20, -0.09, 1.02], [0.0, -0.25, -1.0], [-0.6, 0.6, 0.0], [0.9, 0.6, -0.2])
             DIP = ([0.20, -0.09, 0.985], [0.0, -0.25, -1.0], [-0.6, 0.6, 0.0], [0.9, 0.6, -0.2])
             LOOK = ([0.07, -0.32, 1.30], [-0.2, -0.3, 1.0], [0.0, 0.85, 0.45], [0.8, 0.5, -0.5])
             LOOK2 = ([0.08, -0.31, 1.27], [-0.2, -0.3, 1.0], [0.0, 0.85, 0.45], [0.8, 0.5, -0.5])
-            EAR = ([0.13, -0.035, 1.60], [0.0, 0.35, 1.0], [-1.0, 0.0, 0.0], [0.7, 0.55, -0.6])  # (in his palm, cupped to his ear)
+            # (held by its rim at his fingertips, up beside his ear: a finger's width off it, never
+            # against his head, and turned a little to the house so its gold shows)
+            EAR = ([0.178, 0.03, 1.54], [0.0, 0.35, 1.0], [-1.0, -0.22, 0.12], [0.7, 0.55, -0.6])
             UP = ([0.17, -0.22, 1.50], [0.0, -0.3, 1.0], [-0.7, 0.4, 0.3], [0.9, 0.8, -0.2])  # (on the way between)
             path = [(10, POCKET), (12.5, DIP), (15, POCKET), (29, LOOK), (86, LOOK), (93, UP), (100, EAR), (130, EAR), (136.5, UP), (143, LOOK2), (160, LOOK2), (171, POCKET), (174, POCKET)]
             w_pos, w_fing, w_palm, w_pole = (keyed([(t, k[j]) for t, k in path]) for j in range(4))
             # How the watch is held: 1 between thumb and finger, 0 in his palm (at his ear, and in the pocket).
-            grip_k = keyed([(13.0, 0.0), (22.0, 1.0), (90.0, 1.0), (96.0, 0.0), (134.0, 0.0), (140.0, 1.0), (161.0, 1.0), (168.0, 0.0)])
+            grip_k = keyed([(13.0, 0.0), (22.0, 1.0), (161.0, 1.0), (168.0, 0.0)])
             look_k = keyed([(22.0, 0.0), (34.0, 1.0), (86.0, 1.0), (95.0, 0.0), (137.0, 0.0), (146.0, 1.0), (161.0, 1.0), (170.0, 0.0)])
             glare_k = keyed([(58.0, 0.0), (65.0, 1.0), (82.0, 1.0), (88.0, 0.0)])
             listen_k = keyed([(90.0, 0.0), (100.0, 1.0), (130.0, 1.0), (137.0, 0.0)])
@@ -1089,17 +1091,13 @@ class Motion:
                 return 0.0
 
             def watch_pose(R, root, tau):
-                """The watch's 4x4 (character space): held by its rim between his left thumb
-                and first finger, its face toward him, twelve o'clock up his fingers; or, at
-                his ear and in the pocket, in his palm."""
-                D = self.fk(R, root)
+                """The watch's 4x4 (character space): held up at his left fingertips, its face the
+                way his palm faces, twelve o'clock up his fingers; or, in the pocket, in his palm."""
                 pc = self.palm_of(R, root, "L")
                 fd, nd = self.hand_dirs(R, root, "L")
                 z = unit(nd)
                 y = unit(fd - (fd @ z) * z)
-                tip = lambda b: self.at(D, b, self.tails[self.idx[b]])
-                pinch = 0.5 * (tip("finger1-3.L") + tip("finger2-3.L"))
-                held = pinch + y * 0.026 + z * 0.006
+                held = pc + y * 0.075 + z * 0.012
                 palm = pc + z * 0.013
                 g = float(grip_k(tau))
                 M = np.eye(4)
@@ -1726,6 +1724,33 @@ class Motion:
                         flags.append(("scene-%03d" % rec[1] if rec and rec[0] == "scene" else ("%s-%02d" % rec if rec else "frame%d" % fi), "%s foot slides" % s, round(d * 100, 1), "4.5 cm a frame"))
         summary = dict(kneeMin=round(lo["knee"], 1), kneeMax=round(hi["knee"], 1), hipMax=round(hi["hip"], 1), hipMin=round(lo["hip"], 1), abductionMax=round(hi["abduction"], 1), leanBackMax=round(hi["lean_back"], 1), leanForwardMax=round(hi["lean_fwd"], 1), twistMax=round(hi["twist"], 1), wristMax=round(hi["wrist"], 1), elbowMax=round(hi["elbow"], 1), floorMax=round(hi["floor"] * 100, 1))
         return flags, summary
+
+    def watch_clearance(self, take):
+        """How near the watch comes to his head over the take (m): its rim and both faces,
+        brought into his head's own frame, against the surface of his head and face. He holds
+        it up beside his ear; it never touches him, let alone goes into his head. None if the
+        take has no watch."""
+        ih = self.idx["head"]
+        body = mh.Base.get().verts_of("body")
+        hw = self.W[body][:, ih]
+        hw = np.asarray(hw.todense()).ravel() if hasattr(hw, "todense") else np.asarray(hw).ravel()
+        pts = self.co[body][hw > 0.5]
+        ang = np.linspace(0, 2 * math.pi, 24, endpoint=False)
+        worst = None
+        for f in take:
+            w = f.get("watch")
+            if w is None:
+                continue
+            ring = np.array([w[:3, 3] + 0.03 * (math.cos(a) * w[:3, 0] + math.sin(a) * w[:3, 1]) + sg * 0.006 * w[:3, 2] for a in ang for sg in (-1, 1)] + [w[:3, 3] + sg * 0.006 * w[:3, 2] for sg in (-1, 1)])
+            inv = np.linalg.inv(self.fk(f["R"], f["root"])[ih])
+            loc = (inv[:3, :3] @ ring.T).T + inv[:3, 3]
+            d = float(np.min(np.linalg.norm(loc[:, None, :] - pts[None, :, :], axis=2)))
+            # (a point inside his head is nearer its middle than his ear is)
+            mid = pts.mean(0)
+            inside = bool(np.any(np.linalg.norm((loc - mid)[:, :2], axis=1) < 0.06) and np.any(np.abs(loc[:, 2] - mid[2]) < 0.08))
+            d = -d if inside else d
+            worst = d if worst is None else min(worst, d)
+        return worst
 
     def arm_clearance(self, take):
         """How far his elbows and forearms stay outside his body, at the

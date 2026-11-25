@@ -272,6 +272,8 @@ def main():
             # How far his arms stay outside his body at the closest (cm).
             armClearance=round(mo.arm_clearance(take) * 100, 1),
             cane=mo.L,
+            # How near the watch comes to his head at the closest (cm; he holds it beside his ear).
+            watchClearance=(None if mo.watch_clearance(take) is None else round(mo.watch_clearance(take) * 100, 1)),
             joints=dict(summary=jsum, flagged=sorted({fl[0] for fl in flags})),
             # Skin under his clothes is masked; what showed on his chest is flattened (death_cast.py).
             skin=skin,
