@@ -126,7 +126,7 @@ describe('the commissioner’s week 12 picks note states only true things', () =
     expect(livesAfter(3).get('Dominic Green')! - livesAfter(4).get('Dominic Green')!).toBe(1)
   })
 
-  it('“Thursday opens with Chicago at Detroit at noon, which Joey and Maya, both Bears fans, will be watching from the graveyard”', () => {
+  it('“Thursday opens with Chicago at Detroit at noon, which Joey and Maya, both rabid Bears fans, will be watching from the graveyard”', () => {
     const thursday = week(12).filter((g) => at(g.kickoffAt).startsWith('Thursday, November 26'))
     expect(thursday[0]!.id).toBe('2026-w12-CHI-at-DET')
     expect(at(thursday[0]!.kickoffAt)).toBe('Thursday, November 26 at 12:00 PM')
