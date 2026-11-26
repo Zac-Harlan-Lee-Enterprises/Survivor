@@ -12,28 +12,28 @@ import { Megaphone, Send } from 'lucide-react'
  * Shown for weeks 1–12: the seed carries no results, so the engine calls week 1
  * current until the live sync lands them, at which point week 12 is.
  *
- * Written after Sunday night's game settled week 11 (Monday night's Cincinnati
- * at Washington had no picks). Its last paragraph and callout were rewritten once
- * all five week 12 picks were in, before the lock: it names no week 12 pick.
+ * Written once the week 12 picks locked (6:55 PM Wednesday, November 25): from
+ * then the app shows everyone's pick, so the note talks about them. Before a
+ * lock it never names a pick.
  */
-const WEEK_11_REVIEW: { heading: string; lines: string[]; callout?: string } = {
+const WEEK_12_PICKS: { heading: string; lines: string[]; callout?: string } = {
   heading: 'Word from the late commissioner',
   lines: [
-    'Five picks, five winners, again. That is twenty in a row, and four straight weeks without anyone losing a life, in a league where somebody had lost one every single week before that. Death says he hasn’t had a month this quiet since penicillin. He has filled the time learning a kick-line with a cane and a straw boater, and I’m the one who has to live with him. So to speak.',
-    'Allison took Houston over the Colts, the team that cost her a life in week 6. Houston won 26–3. To be fair to Colts quarterback Daniel Jones, he did reach an end zone: it was his own, and Will Anderson Jr. sacked him in it for a safety. Death watched that one twice. He says it’s rare to see a man dig the hole, climb in, and wait.',
-    'Cindy, Dominic and Tracy all piled onto Buffalo, who beat Miami 26–9. Bills kicker Tyler Bass scored 14 points. Miami, an entire football team, scored 9. Their quarterback, Kyle McCord, threw 33 passes for 102 yards, which is about three yards a throw. Death says he has seen men gain more by fainting.',
-    'Melanie is on her last life, and two weeks ago she handed it to the Bears, whose quarterback threw four interceptions before a field goal saved her with no time left. This week she took Kansas City, who led 27–7 at half time and won 34–7. Death left at half time. He says he has never walked out on her before. He sat through all four of those interceptions with the shovel on his lap.',
-    'All five week 12 picks are in, which makes five straight weeks without a missing pick. Death had rather counted on Thanksgiving. He says moving the lock to a Wednesday was his idea, and not one of you fell for it. The door still shuts at 6:55 PM Wednesday, when Green Bay at the Rams kicks off, and four of you are still on your last life. Thursday has three games, starting with Chicago at Detroit at noon. Death is coming to dinner either way. He has asked to carve.',
+    'All five week 12 picks are in and locked, and you have put the whole league on three teams: the Cowboys, the Giants and the Commanders. Death read the list twice and asked if I was joking. I pointed out which of us is dead.',
+    'Allison and Melanie have each put their last life on Dallas, at home to Philadelphia at 3:30 on Thanksgiving. Dallas has scored 91 points in its last two games and given up 76, so anything could happen and probably will. Dominic and Tracy know the feeling: Dallas is where each of them lost a life in week 5. Death is coming to dinner on Thursday. He has asked to carve, and to sit where he can see the television.',
+    'Cindy and Dominic took the Giants at Indianapolis on Sunday. The Colts lost 26–3 last week and their quarterback was sacked in his own end zone, so I see the appeal. But the Giants have already played one tie this season, 27–27 at Washington in week 5, and a tie costs a life here. Cindy has two lives. Dominic has one, which makes it the same pick at two very different prices.',
+    'Tracy is alone on Washington, the other half of that tie, at Arizona on Sunday afternoon. Arizona has scored 16 points in its last three games. Kansas City had more than that against them by half time last week. Death says nobody is ever truly alone, and then he looked at Tracy for rather a long time.',
+    'Here is the arithmetic. Four of you are on your last life. If Dallas, the Giants and Washington all lose, Cindy loses a life and wins the league in the same week. Death calls that efficient. He has wound his watch.',
   ],
   // Set apart from the banter, because an instruction buried in jokes is an
   // instruction somebody misses, and four of the five are on their last life.
   callout:
-    'All five week 12 picks are in. They lock at 6:55 PM Wednesday, November 25, and you can change yours until then. Week 13: DM me your pick on Teams before 7:10 PM Thursday, December 3. A missing pick still costs a life.',
+    'Week 12 picks are locked. Week 13: DM me your pick on Teams before 7:10 PM Thursday, December 3. A missing pick still costs a life.',
 }
 
 export function LeagueMessage({ week }: { week: number }) {
   if (week < 1 || week > 12) return null
-  const note = WEEK_11_REVIEW
+  const note = WEEK_12_PICKS
 
   return (
     <section className="card border-sky-400/25 p-5 md:p-6" aria-labelledby="league-message-title">

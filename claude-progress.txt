@@ -1063,3 +1063,9 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - Note (`LeagueMessage.tsx`): at the commissioner's request, the Thanksgiving paragraph and the callout were rewritten for "all five picks are in"; the week 11 review paragraphs are unchanged. It names no week 12 pick, team or opponent; `leagueMessageFacts.test.ts` asserts the new claims (five straight weeks without a missing pick, the lock, Thursday's three games, the week 13 lock 7:10 PM Thu Dec 3) and that the new text names none of the six teams involved.
 - Verified: validate (427 tests), e2e 117 passed, quality sweep 0, init HTTP 200.
 - NEXT: after the week 12 games settle, write the week 12 review (and epitaphs if anyone falls). PR #86 (Death's pocket watch) is still open, awaiting the commissioner's go-ahead.
+
+## 2026-11-25 (evening) — Claude Fable 5.2 — the note is now about the week 12 picks
+- The commissioner's "update the commish message now that all picks are in" meant: comment on the week 12 picks. PR #87 had only swapped the last paragraph and left the week 11 review above it ("Allison took Houston…"), which he read as wrong.
+- After the 6:55 PM lock the app shows every pick, so the note (`WEEK_12_PICKS` in LeagueMessage.tsx) is rewritten whole: Allison and Melanie on Dallas for Thanksgiving, Cindy and Dominic on the Giants at Indianapolis, Tracy alone on Washington at Arizona, and Cindy's lose-a-life-win-the-league scenario. Every claim is asserted in tests/unit/leagueMessageFacts.test.ts; the pre-lock leak tests are gone because the picks are public now.
+- Verified: validate (430 tests), e2e 117 passed, quality sweep 0, dev server 200.
+- NEXT: merge only on his word. After week 12 settles, write the review (and epitaphs: four are on their last life).
