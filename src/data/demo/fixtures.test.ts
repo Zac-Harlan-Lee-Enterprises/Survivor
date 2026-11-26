@@ -126,6 +126,10 @@ describe('demo fixture', () => {
   it.each([
     ['dominic-green', 'NYG', '2026-11-24T16:33:45.000Z', '2026-w12-NYG-at-IND'],
     ['melanie-moeller', 'DAL', '2026-11-24T18:48:17.000Z', '2026-w12-PHI-at-DAL'],
+    ['cindy-mendoza', 'NYG', '2026-11-25T19:15:42.000Z', '2026-w12-NYG-at-IND'],
+    ['allison-petty', 'DAL', '2026-11-25T20:26:32.000Z', '2026-w12-PHI-at-DAL'],
+    // Sent as a GIF of Washington fans; the commissioner confirmed the Commanders. Time is the GIF's Teams timestamp.
+    ['tracy-nelson', 'WAS', '2026-11-25T21:47:09.000Z', '2026-w12-WAS-at-ARI'],
   ])('records %s’s week 12 pick from Teams (%s)', (playerId, teamId, submittedAt, gameId) => {
     const picks = snapshot.picks.filter((pick) => pick.playerId === playerId && pick.week === 12)
     expect(picks).toHaveLength(1)
