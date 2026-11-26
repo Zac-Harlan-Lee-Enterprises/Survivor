@@ -72,11 +72,16 @@ def main(src):
             armClearance=take.get("armClearance"),
             joints=take.get("joints"),
             skin=take.get("skin"),
+            dress=take.get("dress"),
+            watchClearance=take.get("watchClearance"),
+            watchInHand=take.get("watchInHand"),
             sheets=sheets,
             frames=index,
             walk=walk,
             scene=scene,
-            # The soft-shoe's first and last frames, as indexes into `scene`.
+            # What he does between regarding you and turning away ("watch" or "dance"),
+            # and its first and last frames, as indexes into `scene`.
+            act=take.get("act", "dance"),
             dance=take.get("dance"),
         ),
         open(os.path.join(ROOT, "src", "components", "deathFrames.json"), "w"),

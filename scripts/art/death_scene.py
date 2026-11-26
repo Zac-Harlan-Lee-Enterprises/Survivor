@@ -64,6 +64,8 @@ def args():
     ap.add_argument("--blur-px", type=float, default=25.0, help="blur a dance frame when a limb moves this far (pixels) in a frame")
     ap.add_argument("--blur-samples", type=int, default=10, help="samples for each sub-frame pose (they are averaged)")
     ap.add_argument("--no-limits", action="store_true", help="do not fail on a joint outside its human range")
+    ap.add_argument("--act", choices=("watch", "dance"), default=death_motion.ACT, help="what he does between regarding you and turning away")
+    ap.add_argument("--turn", type=float, default=0.0, help="turn him this many degrees more about the vertical (looks from behind or in front, for checking the dress)")
     ap.add_argument("--nosim", action="store_true", help="skip any cloth simulation (quick looks at the pose and the dress)")
     return ap.parse_args(argv)
 
@@ -77,8 +79,10 @@ def camera(scene, ppu, closeup=False, head_z=1.7, chest=False):
     return view.setup_figure_camera(scene, FOOT - FRAME_H / 2, int(FRAME_W * ppu), int(FRAME_H * ppu), ppu, tilt_deg=death_motion.TILT)
 
 
-def set_frame(person, cane, hat, f, sims, key):
-    person.rig.root.location = (f["hips"], 0.0, 0.0)
+def set_frame(person, cane, hat, f, sims, key, watch=None):
+    # (his hips kept at the middle of the frame, however he is turned to the camera)
+    th = person.rig.root.rotation_euler.z if abs(person.rig.root.rotation_euler.z) > 1e-6 else math.radians(90.0)
+    person.rig.root.location = (f["hips"] * math.sin(th), -f["hips"] * math.cos(th), 0.0)
     person.rig.set_pose(f["R"], f["root"])
     keys = person.body_obj.data.shape_keys.key_blocks
     keys["blink"].value = f["blink"]
@@ -89,6 +93,10 @@ def set_frame(person, cane, hat, f, sims, key):
     hat.hide_render = f["hat"] is None
     if f["hat"] is not None:
         hat.matrix_basis = Matrix(np.asarray(f["hat"]).tolist())
+    if watch is not None:
+        watch.hide_render = f.get("watch") is None
+        if f.get("watch") is not None:
+            watch.matrix_basis = Matrix(np.asarray(f["watch"]).tolist())
     for g in sims:
         v = g.shapes.get(("death", key))
         if v is not None:
@@ -143,8 +151,10 @@ def main():
     if skin["chestSkinShowing"] or not (skin["neckSkinKept"] and skin["handsSkinKept"]):
         raise SystemExit("skin showing over the chest, or the neck/hands masked: %s" % skin)
     mo = death_motion.Motion(person, death_dress.SOLE)
+    mo.act = a.act
     cane = death_dress.cane(person, mo.L)
     hat = death_dress.boater(person)
+    watch = death_dress.pocket_watch(person)
     print("DEATH height", round(person.H, 3), "cane", mo.L, "stride", round(mo.d, 3), flush=True)
     sims = [g for g in person.cloth.garments if g.sim]
     take = mo.take()
@@ -176,7 +186,7 @@ def main():
         wr._run("death", set(), sims)
     # He walks to screen right (the take's -Y turned to +X), and the frame
     # follows him: his hips stay at its middle; take.json says where he is.
-    person.rig.root.rotation_euler = (0.0, 0.0, math.radians(90.0))
+    person.rig.root.rotation_euler = (0.0, 0.0, math.radians(90.0 + a.turn))
     lights(scene)
     only = set(a.only.split(",")) if a.only else None
     frames = []
@@ -219,7 +229,7 @@ def main():
         frames.append(dict(name=name, x=round(-f["hips"] * ppb, 2)))
         if only and name not in only and name.replace("-0", "").replace("-", "") not in only:
             continue
-        set_frame(person, cane, hat, f, sims, f["rec"])
+        set_frame(person, cane, hat, f, sims, f["rec"], watch)
         camera(scene, a.ppu)
         scene.render.filepath = os.path.join(a.out, name + ".png")
         bpy.ops.render.render(write_still=True)
@@ -232,7 +242,7 @@ def main():
             full = scene.cycles.samples
             scene.cycles.samples = min(full, a.blur_samples)
             for k in ks:
-                set_frame(person, cane, hat, subs[k][ti], sims, f["rec"])
+                set_frame(person, cane, hat, subs[k][ti], sims, f["rec"], watch)
                 camera(scene, a.ppu)
                 scene.render.filepath = os.path.join(a.out, "blur", f"{name}__{k}.png")
                 bpy.ops.render.render(write_still=True)
@@ -262,9 +272,17 @@ def main():
             # How far his arms stay outside his body at the closest (cm).
             armClearance=round(mo.arm_clearance(take) * 100, 1),
             cane=mo.L,
+            # How near the watch comes to his head at the closest (cm; he holds it beside his ear).
+            watchClearance=(None if mo.watch_clearance(take) is None else round(mo.watch_clearance(take) * 100, 1)),
+            # How far the watch goes into a finger of the hand that holds it, at the worst (cm; 0 or less: never).
+            watchInHand=(None if mo.watch_in_hand(take) is None else round(mo.watch_in_hand(take) * 100, 2)),
             joints=dict(summary=jsum, flagged=sorted({fl[0] for fl in flags})),
             # Skin under his clothes is masked; what showed on his chest is flattened (death_cast.py).
             skin=skin,
+            # His suit's cut: the trouser leg's width down the leg (cm), and how much shirt is on his back.
+            dress=dict(trouserCm=person.cloth.trouser_cm, shirtOnBack=person.cloth.shirt_on_back),
+            # What he does between regarding you and turning away, and its first and last frames.
+            act=mo.act,
             dance=list(mo.dance_frames),
             frames=frames,
         ),

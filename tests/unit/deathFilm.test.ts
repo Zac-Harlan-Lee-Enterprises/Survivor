@@ -13,10 +13,18 @@ interface Film {
   frames: { s: number; w: number; h: number; dx: number; dy: number; x: number }[]
   walk: number[]
   scene: number[]
-  /** The dance's first and last frames, as indexes into `scene`. */
+  /** What he does between regarding you and turning away. */
+  act: 'watch' | 'dance'
+  /** That act's first and last frames, as indexes into `scene` (named for the dance, which came first). */
   dance: [number, number]
   /** What death_scene.py checked about the skin under his suit (the render fails if any of it is off). */
   skin: { hidden: number; chestSkinShowing: number; neckSkinKept: boolean; handsSkinKept: boolean; nippleMoveMm: number }
+  /** How near the watch comes to his head at the closest, over every frame it is out (cm). */
+  watchClearance: number
+  /** How far the watch goes into a finger of the hand holding it, at the worst (cm; 0 or less: it never does). */
+  watchInHand: number
+  /** How his suit is cut (death_dress.py): the trouser leg's width down the leg (cm), and how much shirt is on his back. */
+  dress: { trouserCm: { thigh: number; knee: number; calf: number; hem: number }; shirtOnBack: number }
   /** What death_scene.py's joint check found over every frame (it fails the render if any joint leaves its human range). */
   joints: {
     summary: { kneeMin: number; kneeMax: number; hipMax: number; hipMin: number; abductionMax: number; leanBackMax: number; leanForwardMax: number; twistMax: number; floorMax: number }
@@ -62,7 +70,21 @@ describe('the rendered film', () => {
     expect(scene.at(-1)! - scene.at(-2)!).toBeGreaterThan(pace * 0.8)
   })
 
-  it('dances between regarding you and turning away: eight to eleven seconds, travelling the floor in a kick line', () => {
+  it('does the watch act between regarding you and turning away: about eleven seconds, standing his ground', () => {
+    // The league has stopped losing lives, so Death checks his pocket watch instead of dancing.
+    expect(FILM.act).toBe('watch')
+    const [from, to] = FILM.dance
+    expect(from).toBeGreaterThan(100)
+    expect(to).toBeLessThanOrEqual(FILM.scene.length)
+    // 190 to 240 frames at 20 a second: nine and a half to twelve seconds.
+    expect(to - from).toBeGreaterThanOrEqual(190)
+    expect(to - from).toBeLessThanOrEqual(240)
+    // He does not move from where he faced you: every frame of it, and a few either side.
+    const xs = FILM.scene.map((i) => FILM.frames[i]!.x)
+    for (let k = from - 5; k <= to + 5; k++) expect(xs[k], `frame ${k}`).toBe(xs[from])
+  })
+
+  it.skipIf(FILM.act !== 'dance')('dances between regarding you and turning away: eight to eleven seconds, travelling the floor in a kick line', () => {
     const [from, to] = FILM.dance
     expect(from).toBeGreaterThan(100)
     expect(to).toBeLessThanOrEqual(FILM.scene.length)
@@ -101,6 +123,33 @@ describe('the rendered film', () => {
     expect(summary.leanBackMax).toBeLessThanOrEqual(20)
     expect(summary.twistMax).toBeLessThanOrEqual(45)
     expect(summary.floorMax).toBeLessThanOrEqual(0.6)
+  })
+
+  it('holds the watch up beside his ear, never against or inside his head', () => {
+    // He once pushed the watch into the side of his head. death_motion.watch_clearance measures
+    // its rim and faces against his head on every frame: a finger's width off, at the closest.
+    expect(FILM.watchClearance).toBeGreaterThanOrEqual(1.5)
+    expect(FILM.watchClearance).toBeLessThan(6)
+  })
+
+  it('rests the watch on his open fingers, never through them', () => {
+    // The watch once passed through his curled fingers as he looked at it. death_motion.watch_in_hand
+    // measures its case against every bone of his left fingers and thumb on every frame it is out.
+    expect(FILM.watchInHand).toBeLessThanOrEqual(0)
+    // ...and it lies on them: no more than a few millimetres off the nearest finger.
+    expect(FILM.watchInHand).toBeGreaterThan(-0.6)
+  })
+
+  it('wears trousers that taper from thigh to hem, and no shirt on his back', () => {
+    // The legs once followed his thin thighs and then fell as a wide tube from the knee, so his
+    // calves looked wider than his thighs. They are cut as trousers are: narrower all the way down.
+    const { thigh, knee, calf, hem } = FILM.dress.trouserCm
+    expect(thigh).toBeGreaterThan(knee)
+    expect(knee).toBeGreaterThan(calf)
+    expect(calf).toBeGreaterThan(hem)
+    expect(thigh / calf).toBeGreaterThan(1.2)
+    // A patch of shirt and tie once sat on his nape, under the collar: it showed from the side.
+    expect(FILM.dress.shirtOnBack).toBe(0)
   })
 
   it('shows no skin through his suit: nipples flattened on the body, the skin under the clothes masked', () => {

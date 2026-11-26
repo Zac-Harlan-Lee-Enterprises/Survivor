@@ -1,7 +1,7 @@
 """What Death wears, for BibleGame's figure engine: black hair slicked back,
 a black suit (the jacket's skirts below the waist are simulated cloth), a
 white shirt and a black tie, polished black shoes, and a black cane with a
-silver knob (and, for the dance only, a straw boater). A man's suit, not a robe: his legs are his own.
+silver knob (and, for the dance only, a straw boater; for the watch act, a gold pocket watch). A man's suit, not a robe: his legs are his own.
 
 Everything is added at run time by patching the engine's dressing (the
 `suit` flag in his appearance turns it on); nothing in BibleGame changes.
@@ -195,7 +195,7 @@ def _alpha(n, bsdf, fac):
     n.nt.links.new(mix.outputs[0], n.out.inputs["Surface"])
 
 
-def jacket(color, v_bottom, v_top, y_front, cy, hem):
+def jacket(color, v_bottom, v_top, y_front, cy, hem, y_top=None, z_chest=None):
     """The jacket's wool, open in the lapels' V and cut away below the button
     toward the hem (cut in the shader, from the cloth's rest position: a
     clean line, not the mesh's steps), the lapels rolled back along the V."""
@@ -211,7 +211,10 @@ def jacket(color, v_bottom, v_top, y_front, cy, hem):
         opening.inputs[2].default_value = 0.008
         diff = n.math("SUBTRACT", (opening, "Value"), (n.math("ABSOLUTE", (sep, "X")), "Value"))
         above = n.math("GREATER_THAN", (sep, "Z"), v_bottom)
-        front = n.math("LESS_THAN", (sep, "Y"), y_front)
+        # (His front: forward of the chest's middle, and higher up, where his back curves forward
+        # into his neck, forward of the neck's middle: or the V is cut out of his nape as well.)
+        yf = n.new("ShaderNodeMapRange", Value=(sep, "Z"), **{"From Min": z_chest if z_chest is not None else v_bottom, "From Max": v_top, "To Min": y_front, "To Max": y_top if y_top is not None else y_front})
+        front = n.math("LESS_THAN", (sep, "Y"), (yf, "Result"))
         where = n.math("MULTIPLY", (above, "Value"), (front, "Value"))
         inside = n.math("MULTIPLY", (n.math("GREATER_THAN", (diff, "Value"), 0.0), "Value"), (where, "Value"))
         # Below the button: the fronts part, the opening widening to the hem.
@@ -364,8 +367,8 @@ def _names(self, *prefixes):
 
 
 def _trousers(self, mat):
-    """Trousers, easy over the hips, the legs falling straight from the knee
-    to break over the shoe."""
+    """Trousers, easy over the hips, the legs tapering from the top of the
+    thigh to the hem, to break over the shoe."""
     J = self.body.J
     co = self.co
     b = self.body_idx
@@ -386,21 +389,36 @@ def _trousers(self, mat):
             sl = leg[np.abs(leg[:, 2] - z) < 0.015]
             return sl[:, :2].mean(0)
 
+        # One taper from the top of the thigh to the hem, as trousers are cut: widest at
+        # the thigh, narrower at the knee, narrowest at the hem. (Following his thin thigh
+        # and then falling straight from the knee made the lower leg wider than the thigh.)
+        ztop = float(J[f"hip_{s}"][2]) - 0.14
         ck = centre(knee + 0.02)
-        rk = _radii(_hull2(leg[np.abs(leg[:, 2] - (knee + 0.02)) < 0.015][:, :2]), ck, th) + 0.02
+        rk = _radii(_hull2(leg[np.abs(leg[:, 2] - (knee + 0.02)) < 0.015][:, :2]), ck, th) + 0.012
+        ct = centre(ztop)
+        rt = _radii(_hull2(leg[np.abs(leg[:, 2] - ztop) < 0.015][:, :2]), ct, th) + 0.016
+        rt = np.maximum(rt, rk * 1.12)
         ca = centre(0.12)
-        sel = (np.sign(V[:, 0]) == sgn) & (V[:, 2] < knee + 0.06)
+        sel = (np.sign(V[:, 0]) == sgn) & (V[:, 2] < ztop + 0.06)
         z = V[sel, 2]
-        f = np.clip((z - 0.12) / (knee + 0.02 - 0.12), 0, 1)[:, None]
-        c = ca * (1 - f) + ck * f
+        lo = z < knee + 0.02
+        f = np.clip((z - 0.12) / (knee + 0.02 - 0.12), 0, 1)
+        g = np.clip((z - (knee + 0.02)) / (ztop - (knee + 0.02)), 0, 1)
+        c = np.where(lo[:, None], ca * (1 - f[:, None]) + ck * f[:, None], ck * (1 - g[:, None]) + ct * g[:, None])
         d = V[sel, :2] - c
         r = np.hypot(d[:, 0], d[:, 1])
         a = np.arctan2(d[:, 0], -d[:, 1]) % (2 * math.pi)
-        want = np.interp(a, np.append(th, 2 * math.pi), np.append(rk, rk[0])) * (0.9 + 0.1 * f[:, 0])
-        # Over the knee the leg narrows into the straight fall (no step at the knee).
-        blend = np.clip((knee + 0.06 - z) / 0.08, 0, 1)
+        wk = np.interp(a, np.append(th, 2 * math.pi), np.append(rk, rk[0]))
+        wt = np.interp(a, np.append(th, 2 * math.pi), np.append(rt, rt[0]))
+        want = np.where(lo, wk * (0.84 + 0.16 * f), wk * (1 - g) + wt * g)
+        # (eased in below the seat, so there is no step where the taper begins)
+        blend = np.clip((ztop + 0.06 - z) / 0.08, 0, 1)
         k = np.maximum(1.0, 1.0 + blend * (want / np.maximum(r, 1e-6) - 1.0))
         V[sel, :2] = c + d * k[:, None]
+        if s == "L":
+            # What is checked (take.json, deathFrames.json): how wide the leg is, side to side (cm).
+            width = lambda zz: round(float(np.ptp(V[(np.sign(V[:, 0]) == sgn) & (np.abs(V[:, 2] - zz) < 0.012), 0])) * 100, 1)
+            self.trouser_cm = dict(thigh=width(ztop), knee=width(knee + 0.02), calf=width(0.5 * (knee + 0.12)), hem=width(0.15))
     self.garments.append(Garment("trousers", V.astype(F), Q, mat, weights=self.W[used], thickness=0.002, subsurf=1))
 
 
@@ -459,7 +477,7 @@ def _jacket(self, color):
     nz = self.nz
     sleeve = self.bone_weight(*_names(self, "upperarm", "lowerarm"))
     # (The hem cuts the body, not the sleeves: his arms hang below it.)
-    keep[b] = ((co[b, 2] > self.belt_z - 0.05) | (sleeve[b] > 0.5)) & (co[b, 2] < nz + 0.005) & (neck[b] < 0.35) & (legs[b] < 0.5) & (hand[b] < 0.45)
+    keep[b] = ((co[b, 2] > self.belt_z - 0.05) | (sleeve[b] > 0.5)) & (co[b, 2] < nz + 0.006) & (neck[b] < 0.85) & (legs[b] < 0.5) & (hand[b] < 0.45)
     used, Q = _subset(self, keep)
     V = co[used].astype(np.float64)
     N = self.p.look.normals[used]
@@ -510,7 +528,7 @@ def _jacket(self, color):
     V = bridge(V, Q, N, iterations=60, soften=14)
     y_front =float(J["chest"][1]) - 0.03
     self.skirt_cy = float(J["pelvis"][1]) + 0.005
-    mat = jacket(color, self.v_bottom, nz, y_front, self.skirt_cy, self.hem_z)
+    mat = jacket(color, self.v_bottom, nz, y_front, self.skirt_cy, self.hem_z, y_top=float(J["neck"][1]) - 0.01, z_chest=float(J["chest"][2]))
     self.jacket_mat = mat
     self.garments.append(Garment("jacket", V, Q, mat, weights=self.W[used], thickness=0.004, subsurf=1))
     # (Not the engine's `bodice_V`: the skirts below hang from the jacket's
@@ -521,7 +539,7 @@ def _jacket(self, color):
     # rolled a little outward, open at the front where the lapels begin.
     # (From a little below the neckline, lying out over it, so the jacket's
     # edge round the neck is under it.)
-    Vc, Qc = _neck_band(self, nz - 0.034, ((0.0, 0.034), (0.012, 0.026), (0.026, 0.019), (0.04, 0.018), (0.052, 0.021)), 0.7)
+    Vc, Qc = _neck_band(self, nz - 0.034, ((0.0, 0.024), (0.012, 0.019), (0.026, 0.0145), (0.04, 0.0125), (0.05, 0.0125)), 0.7)
     self.garments.append(Garment("collar", Vc, Qc, wool(color, "collar"), weights=self.nearest_weights(Vc), thickness=0.004, subsurf=1))
 
 
@@ -561,16 +579,22 @@ def _shirt(self):
     neck = self.bone_weight("neck01", "neck02", "neck03", "head")
     arms = self.bone_weight(*_names(self, "upperarm", "lowerarm", "wrist", "finger", "metacarpal", "shoulder"))
     nz = self.nz
-    front = co[:, 1] < float(J["chest"][1]) - 0.0
+    # His front: forward of the middle of his chest, and (higher up, where his back curves
+    # forward into his neck) forward of the middle of his neck. Measured from the chest alone,
+    # the nape counted as his front and wore a patch of shirt and tie on his back.
+    tz = np.clip((co[:, 2] - float(J["chest"][2])) / max(1e-6, nz - float(J["chest"][2])), 0, 1)
+    front = co[:, 1] < float(J["chest"][1]) + (float(J["neck"][1]) - float(J["chest"][1])) * tz - 0.01 * tz
     keep = np.zeros(len(co), bool)
     zc = co[b, 2]
     keep[b] = front[b] & (zc > self.v_bottom - 0.05) & (zc < nz + 0.012) & (neck[b] < 0.6) & (arms[b] < 0.3) & (np.abs(co[b, 0]) < self.v_open(zc) + 0.03)
     used, Q = _subset(self, keep)
     N = self.p.look.normals[used]
     V = bridge(co[used] + N * 0.006, Q, N, iterations=30, soften=6)
+    # What is checked: near his collar, none of the shirt lies behind the middle of his neck (on his back).
+    self.shirt_on_back = int(((co[used][:, 1] > float(J["neck"][1])) & (co[used][:, 2] > nz - 0.12)).sum())
     self.garments.append(Garment("shirt", V, Q, cotton(), weights=self.W[used], thickness=0.0, subsurf=1))
     # The collar: a band round the neck, its points meeting under the knot.
-    Vc, Qc = _neck_band(self, nz - 0.026, ((0.0, 0.012), (0.016, 0.008), (0.036, 0.006), (0.056, 0.005)), 0.985)
+    Vc, Qc = _neck_band(self, nz - 0.010, ((0.0, 0.009), (0.012, 0.007), (0.026, 0.006), (0.040, 0.005)), 0.985)
     self.garments.append(Garment("shirt-collar", Vc, Qc, cotton(), weights=self.nearest_weights(Vc), thickness=0.002, subsurf=1))
     # The tie: a strip down the middle, its knot at the collar.
     keep = np.zeros(len(co), bool)
@@ -752,6 +776,103 @@ def boater(person):
     bpy.ops.object.join()
     obj = bpy.context.object
     obj.name = "death-hat"
+    obj.parent = person.rig.root
+    obj.matrix_parent_inverse = Matrix.Identity(4)
+    obj.hide_render = True
+    person.parts.append(wp.Piece(obj))
+    return obj
+
+
+# ── The pocket watch ──────────────────────────────────────────────────────
+def gold():
+    """Old gold: warm, bright, a little worn."""
+
+    def build():
+        n = M.Nodes("death-gold")
+        v = n.noise(120.0, 4.0, 0.6, n.coords())
+        col = n.mix((v, "Fac"), "#d9a640", "#ffe08a")
+        n.bsdf(**{"Base Color": (col, 2), "Metallic": 1.0, "Roughness": 0.34})
+        return n.mat
+
+    return M.cached(("death-gold",), build)
+
+
+def enamel():
+    def build():
+        n = M.Nodes("death-enamel")
+        n.bsdf(**{"Base Color": common.hex_rgb("#f1ede2"), "Roughness": 0.25, "Coat Weight": 0.6, "Coat Roughness": 0.05})
+        return n.mat
+
+    return M.cached(("death-enamel",), build)
+
+
+def pocket_watch(person):
+    """A gold pocket watch (his is for the watch act): a case 6 cm across and a
+    centimetre thick, domed both sides, a white enamel face with black hands,
+    the crown and bow at twelve. One rigid object, parented to the figure's root
+    like the cane; death_motion sets where it is each frame (in his left palm)
+    and when it is not there. Its origin is the middle of the case, its face
+    toward +z, twelve o'clock toward +y. A little large for a watch: he is seen
+    from across a room."""
+    col = person.col
+    R_, T = 0.030, 0.0105
+    SEG_ = 48
+    parts = []
+
+    def lathe(name, prof, mat, segments=SEG_):
+        # prof: [(r, z)], a closed solid of revolution about z (capped at both ends).
+        bm = bmesh.new()
+        rings = [[bm.verts.new((r * math.cos(2 * math.pi * k / segments), r * math.sin(2 * math.pi * k / segments), z)) for k in range(segments)] for r, z in prof]
+        for a, b in zip(rings, rings[1:]):
+            for k in range(segments):
+                bm.faces.new((a[k], a[(k + 1) % segments], b[(k + 1) % segments], b[k]))
+        bm.faces.new(list(reversed(rings[0])))
+        bm.faces.new(rings[-1])
+        obj = common.mesh_object(name, bm, mat, col)
+        parts.append(obj)
+        return obj
+
+    # The case: a back domed down, a band, a bezel round the face.
+    lathe("death-watch-case", [(0.012, -T / 2 - 0.0018), (R_ * 0.75, -T / 2 - 0.001), (R_, -T / 2 + 0.0015), (R_, T / 2 - 0.0012), (R_ - 0.0022, T / 2 + 0.0004), (R_ - 0.0038, T / 2 - 0.0002)], gold())
+    # The face, just under the bezel.
+    lathe("death-watch-face", [(0.0005, T / 2 - 0.0016), (R_ - 0.0036, T / 2 - 0.0016), (R_ - 0.0036, T / 2 - 0.0008), (0.0005, T / 2 - 0.0008)], enamel())
+    # The hands: ten past ten.
+    bm = bmesh.new()
+    for ang, ln, w in ((math.radians(60.0), 0.016, 0.0016), (math.radians(-60.0), 0.022, 0.0012)):
+        d = np.array([math.sin(ang), math.cos(ang)])
+        nrm = np.array([-d[1], d[0]])
+        z = T / 2 - 0.0005
+        pts = [(-nrm * w / 2), (nrm * w / 2), (d * ln + nrm * w / 4), (d * ln - nrm * w / 4)]
+        vs = [bm.verts.new((float(p[0]), float(p[1]), z)) for p in pts]
+        bm.faces.new(vs)
+    parts.append(common.mesh_object("death-watch-hands", bm, lacquer(), col))
+    # The crown on its stem at twelve, and the bow (a ring) through it.
+    stem = lathe("death-watch-stem", [(0.0024, 0.0), (0.0024, 0.006), (0.0034, 0.006), (0.0034, 0.0105), (0.0012, 0.0115)], gold(), segments=16)
+    stem.rotation_euler = (math.radians(-90.0), 0.0, 0.0)
+    stem.location = (0.0, R_ - 0.001, 0.0)
+    bm = bmesh.new()
+    RB, rb, nb, nr = 0.0085, 0.0013, 32, 8
+    rings = []
+    for k in range(nb):
+        a = 2 * math.pi * k / nb
+        c = np.array([0.0, R_ + 0.007 + RB * math.cos(a), RB * math.sin(a)])
+        rad, nz = np.array([0.0, math.cos(a), math.sin(a)]), np.array([1.0, 0.0, 0.0])
+        rings.append([bm.verts.new(tuple(c + rb * (math.cos(2 * math.pi * j / nr) * rad + math.sin(2 * math.pi * j / nr) * nz))) for j in range(nr)])
+    for k in range(nb):
+        a, b = rings[k], rings[(k + 1) % nb]
+        for j in range(nr):
+            bm.faces.new((a[j], a[(j + 1) % nr], b[(j + 1) % nr], b[j]))
+    parts.append(common.mesh_object("death-watch-bow", bm, gold(), col))
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in parts:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = parts[0]
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=False)
+    bpy.ops.object.join()
+    obj = bpy.context.object
+    obj.name = "death-watch"
+    for p in obj.data.polygons:
+        p.use_smooth = True
     obj.parent = person.rig.root
     obj.matrix_parent_inverse = Matrix.Identity(4)
     obj.hide_render = True
