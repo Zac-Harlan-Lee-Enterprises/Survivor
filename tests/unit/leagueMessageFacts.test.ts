@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import { NFL_TEAMS } from '../../src/domain/teams'
 import {
   FINALS,
   SCORING,
@@ -89,7 +90,7 @@ describe('the commissioner’s week 12 picks note states only true things', () =
     expect(paragraphs).toHaveLength(6)
   })
 
-  it('“All five week 12 picks are in and locked, and you have put the whole league on three teams: the Cowboys, the Giants and the Commanders”', () => {
+  it('“All five week 12 picks are locked. There are 32 teams … the five of you found three: the Cowboys, the Giants and the Commanders. That is the NFC East, minus the one team in it two of you need to lose”', () => {
     const alive = [...after.entries()].filter(([, l]) => l > 0).map(([name]) => name)
     expect(alive).toHaveLength(5)
     expect(
@@ -100,9 +101,41 @@ describe('the commissioner’s week 12 picks note states only true things', () =
     expect([...new Set(picksIn(12).map((p) => p.teamId))].sort()).toEqual(['DAL', 'NYG', 'WAS'])
     for (const p of picksIn(12))
       expect(new Date(p.submittedAt).getTime(), p.playerId).toBeLessThan(lockOf(12).getTime())
+    expect(NFL_TEAMS).toHaveLength(32)
+    const east = NFL_TEAMS.filter((t) => t.conference === 'NFC' && t.division === 'East').map(
+      (t) => t.id,
+    )
+    expect(east.sort()).toEqual(['DAL', 'NYG', 'PHI', 'WAS'])
+    // The fourth, Philadelphia, is who Dallas plays: Allison and Melanie need it to lose.
+    expect(season.games.find((g) => g.id === pickOf('Allison Petty', 12)!.gameId)!.awayTeamId).toBe(
+      'PHI',
+    )
   })
 
-  it('“Allison and Melanie have each put their last life on Dallas, at home to Philadelphia at 3:30 on Thanksgiving”', () => {
+  it('“You have all already spent Kansas City, Buffalo, San Francisco and Jacksonville”', () => {
+    for (const p of picksIn(12)) {
+      const used = season.picks
+        .filter((q) => q.playerId === p.playerId && q.week < 12)
+        .map((q) => q.teamId)
+      expect(used, p.playerId).toEqual(expect.arrayContaining(['KC', 'BUF', 'SF', 'JAX']))
+    }
+  })
+
+  it('“Dominic already lost one life in week 4 by not picking anybody at all”', () => {
+    expect(pickOf('Dominic Green', 4)).toBeNull()
+    expect(livesAfter(3).get('Dominic Green')! - livesAfter(4).get('Dominic Green')!).toBe(1)
+  })
+
+  it('“Thursday opens with Chicago at Detroit at noon, which Joey and Maya, both Bears fans, will be watching from the graveyard”', () => {
+    const thursday = week(12).filter((g) => at(g.kickoffAt).startsWith('Thursday, November 26'))
+    expect(thursday[0]!.id).toBe('2026-w12-CHI-at-DET')
+    expect(at(thursday[0]!.kickoffAt)).toBe('Thursday, November 26 at 12:00 PM')
+    // Both are out of the league; that they are Bears fans is the commissioner's word.
+    expect(after.get('Joseph Tomczuk')).toBe(0)
+    expect(after.get('Maya Israel')).toBe(0)
+  })
+
+  it('“Allison and Melanie have each handed their last life to the Dallas Cowboys on Thanksgiving”', () => {
     expect(on(12, 'DAL')).toEqual(['Allison', 'Melanie'])
     expect(after.get('Allison Petty')).toBe(1)
     expect(after.get('Melanie Moeller')).toBe(1)
@@ -117,14 +150,14 @@ describe('the commissioner’s week 12 picks note states only true things', () =
     expect(sum(two.map((g) => g.other))).toBe(76)
   })
 
-  it('“Dominic and Tracy know the feeling: Dallas is where each of them lost a life in week 5”', () => {
+  it('“Dominic and Tracy each lost a life on Dallas in week 5 … the rules won’t let them make the same mistake twice”', () => {
     expect(on(5, 'DAL')).toEqual(expect.arrayContaining(['Dominic', 'Tracy']))
     expect(FINALS['2026-w05-TB-at-DAL']).toEqual([24, 16])
     for (const name of ['Dominic Green', 'Tracy Nelson'])
       expect(livesAfter(4).get(name)! - livesAfter(5).get(name)!, name).toBe(1)
   })
 
-  it('“Cindy and Dominic took the Giants at Indianapolis on Sunday. The Colts lost 26–3 last week and their quarterback was sacked in his own end zone”', () => {
+  it('“Cindy and Dominic took the Giants at Indianapolis … the Colts scored 3 points last week, and the only end zone their quarterback reached was his own, flat on his back”', () => {
     expect(on(12, 'NYG')).toEqual(['Cindy', 'Dominic'])
     const game = season.games.find((g) => g.id === '2026-w12-NYG-at-IND')!
     expect(game.homeTeamId).toBe('IND')
@@ -135,7 +168,7 @@ describe('the commissioner’s week 12 picks note states only true things', () =
     expect(safety[4]).toMatch(/^Daniel Jones Sacked by Will Anderson Jr\./)
   })
 
-  it('“the Giants have already played one tie this season, 27–27 at Washington in week 5, and a tie costs a life here”', () => {
+  it('“the Giants tied Washington 27–27 in week 5, and here a tie costs a life”', () => {
     expect(FINALS['2026-w05-NYG-at-WAS']).toEqual([27, 27])
     const ties = Object.entries(FINALS).filter(
       ([id, [a, h]]) => a === h && /NYG/.test(id) && pinnedThrough >= 5,
@@ -152,20 +185,20 @@ describe('the commissioner’s week 12 picks note states only true things', () =
     expect(onLives(2)).toEqual(['Cindy'])
   })
 
-  it('“Tracy is alone on Washington, the other half of that tie, at Arizona on Sunday afternoon”', () => {
+  it('“Tracy is alone on Washington, the other half of that tie, out at Arizona … not one of you went with her”', () => {
     expect(on(12, 'WAS')).toEqual(['Tracy'])
     const game = season.games.find((g) => g.id === '2026-w12-WAS-at-ARI')!
     expect(game.homeTeamId).toBe('ARI')
     expect(at(game.kickoffAt)).toBe('Sunday, November 29 at 3:25 PM')
   })
 
-  it('“Arizona has scored 16 points in its last three games. Kansas City had more than that against them by half time last week”', () => {
+  it('“Arizona has scored 16 points in its last three games; Kansas City had 27 on them by half time last week”', () => {
     expect(sum(last('ARI', 3).map((g) => g.own))).toBe(16)
     const id = '2026-w11-ARI-at-KC'
     expect(SCORING[id]!.filter((p) => p[0] <= 2).at(-1)![3]).toEqual([7, 27])
   })
 
-  it('“If Dallas, the Giants and Washington all lose, Cindy loses a life and wins the league in the same week”', () => {
+  it('“If Dallas, the Giants and Washington all lose, four of you are dead by Sunday night and Cindy wins the whole league by losing”', () => {
     // Every pick this week is on one of those three, so all five lose a life:
     // the four on their last are out, and Cindy is the only one left.
     const left = picksIn(12).map((p) => [nameOf(p.playerId), after.get(nameOf(p.playerId))! - 1])

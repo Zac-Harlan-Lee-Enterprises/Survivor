@@ -9,7 +9,7 @@ describe('the week 12 picks note from the late commissioner', () => {
   it.each([1, 12])('reads in the week %i display scope, Death in the room', (week) => {
     render(<LeagueMessage week={week} />)
     expect(screen.getByRole('heading', { name: /word from the late commissioner/i })).toBeVisible()
-    expect(screen.getByText(/^All five week 12 picks are in and locked/)).toBeVisible()
+    expect(screen.getByText(/^All five week 12 picks are locked\./)).toBeVisible()
     expect(screen.getByText(/He has wound his watch/)).toBeVisible()
   })
 
