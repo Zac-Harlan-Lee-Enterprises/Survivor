@@ -31,10 +31,22 @@ interface Film {
     flagged: string[]
   }
 }
-const FILM = JSON.parse(readFileSync('src/components/deathFrames.json', 'utf8')) as Film
+/** One film an act (scripts/art/death_film.py PACKS): the page plays the one the week calls for. */
+const FILMS = (
+  [
+    ['watch', 'src/components/deathFrames.json', /^death\/death-\d+\.webp$/],
+    ['dance', 'src/components/deathDanceFrames.json', /^death\/dance-\d+\.webp$/],
+  ] as const
+).map(([act, path, sheet]) => [act, JSON.parse(readFileSync(path, 'utf8')) as Film, sheet] as const)
 
 /** The film scripts/art/death_film.py packed: what the page will draw. */
-describe('the rendered film', () => {
+describe.each(FILMS)('the rendered film: the %s', (act, FILM, sheet) => {
+  it('is the take for its act, in its own sheets', () => {
+    expect(FILM.act).toBe(act)
+    expect(FILM.sheets.length).toBeGreaterThan(1)
+    for (const src of FILM.sheets) expect(src).toMatch(sheet)
+  })
+
   it('has a looped stride, a scene, and every sheet it draws from', () => {
     expect(FILM.walk.length).toBeGreaterThanOrEqual(24)
     expect(FILM.scene.length).toBeGreaterThan(FILM.walk.length)
@@ -70,9 +82,8 @@ describe('the rendered film', () => {
     expect(scene.at(-1)! - scene.at(-2)!).toBeGreaterThan(pace * 0.8)
   })
 
-  it('does the watch act between regarding you and turning away: about eleven seconds, standing his ground', () => {
-    // The league has stopped losing lives, so Death checks his pocket watch instead of dancing.
-    expect(FILM.act).toBe('watch')
+  it.skipIf(act !== 'watch')('does the watch act between regarding you and turning away: about eleven seconds, standing his ground', () => {
+    // A week nobody loses a life, Death checks his pocket watch instead of dancing.
     const [from, to] = FILM.dance
     expect(from).toBeGreaterThan(100)
     expect(to).toBeLessThanOrEqual(FILM.scene.length)
@@ -84,7 +95,7 @@ describe('the rendered film', () => {
     for (let k = from - 5; k <= to + 5; k++) expect(xs[k], `frame ${k}`).toBe(xs[from])
   })
 
-  it.skipIf(FILM.act !== 'dance')('dances between regarding you and turning away: eight to eleven seconds, travelling the floor in a kick line', () => {
+  it.skipIf(act !== 'dance')('dances between regarding you and turning away: eight to eleven seconds, travelling the floor in a kick line', () => {
     const [from, to] = FILM.dance
     expect(from).toBeGreaterThan(100)
     expect(to).toBeLessThanOrEqual(FILM.scene.length)
@@ -125,14 +136,14 @@ describe('the rendered film', () => {
     expect(summary.floorMax).toBeLessThanOrEqual(0.6)
   })
 
-  it('holds the watch up beside his ear, never against or inside his head', () => {
+  it.skipIf(act !== 'watch')('holds the watch up beside his ear, never against or inside his head', () => {
     // He once pushed the watch into the side of his head. death_motion.watch_clearance measures
     // its rim and faces against his head on every frame: a finger's width off, at the closest.
     expect(FILM.watchClearance).toBeGreaterThanOrEqual(1.5)
     expect(FILM.watchClearance).toBeLessThan(6)
   })
 
-  it('rests the watch on his open fingers, never through them', () => {
+  it.skipIf(act !== 'watch')('rests the watch on his open fingers, never through them', () => {
     // The watch once passed through his curled fingers as he looked at it. death_motion.watch_in_hand
     // measures its case against every bone of his left fingers and thumb on every frame it is out.
     expect(FILM.watchInHand).toBeLessThanOrEqual(0)

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { evaluateSeason } from '@/domain'
 import { kickoffFor, scenario } from '@/domain/testing/scenario'
-import { funeralWeek, graveyardPreview } from './graveyard'
+import { deathAct, funeralWeek, graveyardPreview } from './graveyard'
 
 const WEEK5 = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8']
 const WEEK3 = ['o1', 'o2', 'o3', 'o4', 'o5', 'o6', 'o7']
@@ -37,7 +37,7 @@ function season() {
 const ids = (xs: { playerId: string }[]) => xs.map((s) => s.playerId).sort()
 
 describe('graveyardPreview', () => {
-  it('gives every one of the week’s dead a funeral, however many', () => {
+  it('puts every one of the week’s dead among the fresh graves, however many', () => {
     // Tuesday after week 5: its games are done, week 6 is open for picks.
     const e = evaluateSeason(season(), { now: kickoffFor(5, 48) })
     expect(funeralWeek(e)).toBe(5)
@@ -46,7 +46,7 @@ describe('graveyardPreview', () => {
     expect(fresh.length).toBeGreaterThan(6)
   })
 
-  it('shows everyone from earlier weeks as a plain headstone — all of them, never the living', () => {
+  it('keeps everyone from earlier weeks as an old grave — all of them, never the living', () => {
     const e = evaluateSeason(season(), { now: kickoffFor(5, 48) })
     const { fresh, old } = graveyardPreview(e)
     expect(ids(old)).toEqual(WEEK3)
@@ -54,7 +54,7 @@ describe('graveyardPreview', () => {
     expect(ids([...fresh, ...old])).not.toContain('late')
   })
 
-  it('once the next week locks, last week’s dead are just headstones and the new dead get the scene', () => {
+  it('once the next week locks, last week’s dead are old graves and the new dead are the fresh ones', () => {
     // An hour into week 6: locked, nothing final. `late` never picked, so is out.
     const e = evaluateSeason(season(), { now: kickoffFor(6, 1) })
     expect(funeralWeek(e)).toBe(6)
@@ -73,5 +73,42 @@ describe('graveyardPreview', () => {
       { now: kickoffFor(1, 48) },
     )
     expect(graveyardPreview(e)).toEqual({ fresh: [], old: [] })
+  })
+})
+
+describe('deathAct', () => {
+  it('dances the week somebody loses a life, eliminated or not', () => {
+    // Tuesday after week 5: the eight went out in it.
+    expect(deathAct(evaluateSeason(season(), { now: kickoffFor(5, 48) }))).toBe('dance')
+    // A life lost without a death is still a life lost.
+    const b = scenario()
+      .players('alive', 'bruised')
+      .game(1, 'GB', 'CHI', { final: 'GB' })
+      .game(2, 'KC', 'LV')
+      .pick('alive', 1, 'GB')
+      .pick('bruised', 1, 'CHI')
+    const e = evaluateSeason(b.build(), { now: kickoffFor(1, 48) })
+    expect(e.standings.every((s) => s.status === 'alive')).toBe(true)
+    expect(deathAct(e)).toBe('dance')
+  })
+
+  it('checks his watch in a week nobody lost a life', () => {
+    const b = scenario()
+      .players('alive', 'bruised')
+      .game(1, 'GB', 'CHI', { final: 'GB' })
+      .game(2, 'KC', 'LV', { final: 'KC' })
+      .game(3, 'BUF', 'MIA')
+      .pick('alive', 1, 'GB')
+      .pick('bruised', 1, 'CHI')
+      .pick('alive', 2, 'KC')
+      .pick('bruised', 2, 'KC')
+      .pick('alive', 3, 'BUF')
+      .pick('bruised', 3, 'BUF')
+    // Tuesday after week 2: everybody won it.
+    expect(deathAct(evaluateSeason(b.build(), { now: kickoffFor(2, 48) }))).toBe('watch')
+    // An hour into week 3: locked, nothing final, so nothing lost yet.
+    const live = evaluateSeason(b.build(), { now: kickoffFor(3, 1) })
+    expect(funeralWeek(live)).toBe(3)
+    expect(deathAct(live)).toBe('watch')
   })
 })

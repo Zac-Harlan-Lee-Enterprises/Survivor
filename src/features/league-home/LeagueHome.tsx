@@ -33,7 +33,7 @@ import { citationFor } from '@/lib/citations'
 import { formatKickoff } from '@/lib/time'
 import { getConfig } from '@/config/env'
 import { cn } from '@/lib/cn'
-import { graveyardPreview } from '@/lib/graveyard'
+import { deathAct, graveyardPreview } from '@/lib/graveyard'
 
 export function LeagueHome() {
   const tz = useLeagueTimeZone()
@@ -47,7 +47,7 @@ export function LeagueHome() {
     (s) => s.status === 'champion' || s.status === 'co-champion',
   )
   const finalists = evaluation.standings.filter((s) => s.status === 'finalist')
-  // This week's dead get a funeral; everyone before them is a plain headstone.
+  // This week's dead come first; every grave plays its funeral when scrolled to.
   const { fresh: freshGraves, old: oldGraves } = graveyardPreview(evaluation)
   const graveyard = [...freshGraves, ...oldGraves]
   // The hero reports the LIVE week — next kickoff, deadline, whether picks are
@@ -333,48 +333,39 @@ export function LeagueHome() {
               </Link>
             </div>
           </div>
-          {/* Fresh graves get a stage and a funeral, every visit; old ones just stand there. */}
-          {freshGraves.length > 0 && (
-            <div className="relative mx-auto max-w-4xl">
-              <ul className="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-3">
-                {freshGraves.map((s, i) => (
-                  <li key={s.playerId}>
-                    <PlayerCard
-                      standing={s}
-                      profile={profileOf(s.playerId)}
-                      pickVisible={viewer.isCommissioner}
-                      index={i}
-                      funeral
-                      // A cascade, not a chorus: each grave starts a beat after the last.
-                      funeralDelay={i * 1.1}
-                    />
-                  </li>
-                ))}
-              </ul>
-              {/* When the funerals are over, Death arrives. */}
-              <DeathArrives graves={freshGraves} />
-            </div>
-          )}
-          {oldGraves.length > 0 && (
-            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
-              {oldGraves.map((s, i) => (
+          {/* Every grave gets a stage and a funeral, every visit: this week's dead first. */}
+          <div className="relative mx-auto max-w-4xl">
+            <ul className="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-3">
+              {graveyard.map((s, i) => (
                 <li key={s.playerId}>
                   <PlayerCard
                     standing={s}
                     profile={profileOf(s.playerId)}
                     pickVisible={viewer.isCommissioner}
-                    compact
                     index={i}
+                    funeral
+                    // A cascade along each row, not a chorus: each grave starts a beat after the last.
+                    funeralDelay={(i % GRAVES_PER_ROW) * 1.1}
                   />
                 </li>
               ))}
             </ul>
-          )}
+            {/* When the first funerals are over, Death arrives: this week's dead,
+                or the top row when nobody died. A week without a life lost he
+                checks his watch; a week with one, he dances. */}
+            <DeathArrives
+              after={freshGraves.length > 0 ? freshGraves : graveyard.slice(0, GRAVES_PER_ROW)}
+              act={deathAct(evaluation)}
+            />
+          </div>
         </section>
       )}
     </div>
   )
 }
+
+/** The graveyard's widest row. */
+const GRAVES_PER_ROW = 3
 
 function Stat({
   label,
