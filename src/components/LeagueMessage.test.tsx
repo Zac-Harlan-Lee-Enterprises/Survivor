@@ -5,12 +5,12 @@ import { LeagueMessage } from '@/features/league-home/LeagueMessage'
 
 afterEach(cleanup)
 
-describe('the week 11 review from the late commissioner', () => {
+describe('the week 12 picks note from the late commissioner', () => {
   it.each([1, 12])('reads in the week %i display scope, Death in the room', (week) => {
     render(<LeagueMessage week={week} />)
     expect(screen.getByRole('heading', { name: /word from the late commissioner/i })).toBeVisible()
-    expect(screen.getByText(/^Five picks, five winners, again\./)).toBeVisible()
-    expect(screen.getByText(/gain more by fainting/)).toBeVisible()
+    expect(screen.getByText(/^All five week 12 picks are locked\./)).toBeVisible()
+    expect(screen.getByText(/He has wound his watch/)).toBeVisible()
   })
 
   it('sets the lock and the week 13 pick instruction apart from the banter', () => {
@@ -18,9 +18,7 @@ describe('the week 11 review from the late commissioner', () => {
     const callout = screen.getByText(
       /Week 13: DM me your pick on Teams before 7:10 PM Thursday, December 3/,
     )
-    expect(callout.textContent).toMatch(
-      /^All five week 12 picks are in\. They lock at 6:55 PM Wednesday, November 25/,
-    )
+    expect(callout.textContent).toMatch(/^Week 12 picks are locked\./)
     expect(callout).toBeVisible()
     expect(callout.textContent).toMatch(/costs a life/)
   })
