@@ -1,8 +1,13 @@
 """Pack Death's rendered take (death_scene.py's PNGs and take.json) for the
-page: each frame cropped to what is in it, sixteen to a sheet
-(public/death/death-NN.webp), and src/components/deathFrames.json saying
-where each frame is, where it sits in the full frame and how far he has come
-(src/lib/deathFilm.ts reads it).
+page: each frame cropped to what is in it, sixteen to a sheet, and a JSON file
+saying where each frame is, where it sits in the full frame and how far he has
+come (src/lib/deathFilm.ts reads it). The page keeps one film for each act and
+plays the one the week calls for (src/lib/graveyard.ts `deathAct`):
+
+    the watch take  ->  public/death/death-NN.webp, src/components/deathFrames.json
+    the dance take  ->  public/death/dance-NN.webp, src/components/deathDanceFrames.json
+
+The take's own `act` says which it is.
 
     python3 scripts/art/death_film.py path/to/rendered/take
 
@@ -20,15 +25,19 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 PER_SHEET = 16
 COLS = 8
 QUALITY = 78
+# Each act's sheets and index: (sheet name prefix, index file in src/components).
+PACKS = {"watch": ("death", "deathFrames.json"), "dance": ("dance", "deathDanceFrames.json")}
 
 
 def main(src):
     take = json.load(open(os.path.join(src, "take.json")))
     frames = take["frames"]
+    act = take.get("act", "dance")
+    prefix, index_name = PACKS[act]
     out_dir = os.path.join(ROOT, "public", "death")
     os.makedirs(out_dir, exist_ok=True)
     for f in os.listdir(out_dir):
-        if f.startswith("death") and f.endswith(".webp"):
+        if f.startswith(prefix + "-") and f.endswith(".webp"):
             os.remove(os.path.join(out_dir, f))
     walk = [i for i, f in enumerate(frames) if f["name"].startswith("walk")]
     scene = [i for i, f in enumerate(frames) if f["name"].startswith("scene")]
@@ -55,7 +64,7 @@ def main(src):
             sheet.alpha_composite(c, (sx, sy))
             x0 = x_walk0 if f["name"].startswith("walk") else x_scene0
             index.append(dict(s=n, sx=sx, sy=sy, w=c.width, h=c.height, dx=l, dy=t, x=round(f["x"] - x0, 2)))
-        name = f"death-{n:02d}.webp"
+        name = f"{prefix}-{n:02d}.webp"
         path = os.path.join(out_dir, name)
         sheet.save(path, "WEBP", quality=QUALITY, method=6, alpha_quality=90)
         total += os.path.getsize(path)
@@ -81,10 +90,10 @@ def main(src):
             scene=scene,
             # What he does between regarding you and turning away ("watch" or "dance"),
             # and its first and last frames, as indexes into `scene`.
-            act=take.get("act", "dance"),
+            act=act,
             dance=take.get("dance"),
         ),
-        open(os.path.join(ROOT, "src", "components", "deathFrames.json"), "w"),
+        open(os.path.join(ROOT, "src", "components", index_name), "w"),
         separators=(",", ":"),
     )
     print("packed", len(frames), "frames into", len(sheets), "sheets,", round(total / 1024), "KB")

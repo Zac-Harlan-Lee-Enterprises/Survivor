@@ -16,11 +16,11 @@ import { FINALS, season } from '../unit/seasonFacts'
 const COUNTERFACTUAL: Record<string, [number, number]> = { '2026-w03-ARI-at-SF': [30, 27] }
 
 /** One week of finals, shaped the way ESPN's scoreboard sends them. */
-function scoreboard(week: number) {
-  const events = season.games
+function scoreboardEvents(week: number, flipped: Record<string, [number, number]> = {}) {
+  return season.games
     .filter((g) => g.week === week)
     .map((g) => {
-      const [away, home] = COUNTERFACTUAL[g.id] ?? FINALS[g.id] ?? [0, 0]
+      const [away, home] = flipped[g.id] ?? FINALS[g.id] ?? [0, 0]
       return {
         date: g.kickoffAt,
         competitions: [
@@ -45,6 +45,10 @@ function scoreboard(week: number) {
         ],
       }
     })
+}
+
+function scoreboard(week: number) {
+  const events = scoreboardEvents(week, COUNTERFACTUAL)
   return {
     season: { year: 2026, type: 2 },
     week: { number: week },
@@ -204,15 +208,18 @@ test.describe('the graveyard', () => {
         '.funeral-weapon, .funeral-score { animation: none !important; transform: none !important; opacity: 1 !important; }',
     })
     const tags = graves.locator('.funeral-score')
-    // Only this week's dead get the scene: five funerals; Don, a week older, is a plain stone.
-    await expect(graves.locator('[data-funeral]')).toHaveCount(5)
+    // Every grave gets the scene: this week's five, and Don, a week older, after them.
+    await expect(graves.locator('[data-funeral]')).toHaveCount(6)
     await expect(
       graves
         .locator('a.card', { has: page.getByRole('img', { name: /^Headstone of Don Turner/ }) })
         .locator('[data-funeral]'),
-    ).toHaveCount(0)
-    await expect(tags).toHaveCount(5)
-    for (let i = 0; i < 5; i++) {
+    ).toHaveCount(1)
+    await expect(graves.getByRole('img', { name: /^Headstone of/ }).last()).toHaveAccessibleName(
+      /^Headstone of Don Turner/,
+    )
+    await expect(tags).toHaveCount(6)
+    for (let i = 0; i < 6; i++) {
       const tag = tags.nth(i)
       const card = tag.locator('xpath=ancestor::a[contains(@class, "card")]')
       const [t, c] = await Promise.all([tag.boundingBox(), card.boundingBox()])
@@ -291,8 +298,8 @@ test.describe('the graveyard', () => {
         graves.getByRole('img', { name: new RegExp(`^Headstone of ${name},`) }),
       ).toHaveCount(1)
     }
-    // Every one of this week's graves gets a funeral; Don, from week 4, is a plain stone behind.
-    await expect(graves.locator('[data-funeral]')).toHaveCount(8)
+    // Every grave gets a funeral: this week's eight, and Don, from week 4, behind them.
+    await expect(graves.locator('[data-funeral]')).toHaveCount(9)
     await expect(
       graves.getByRole('img', { name: /^Headstone of Don Turner, eliminated in week 4/ }),
     ).toHaveCount(1)
@@ -354,8 +361,12 @@ test.describe('the graveyard', () => {
     // last-life Dallas pickers.
     await thursdayOfWeek5(page)
     const graves = page.locator('section[aria-labelledby="grave-title"]')
-    const stones = graves.locator('[data-funeral]')
-    await expect(stones).toHaveCount(5, { timeout: 20_000 })
+    // This week's five, whom he waits for (Don's older grave plays after them).
+    await expect(graves.locator('[data-funeral]')).toHaveCount(6, { timeout: 20_000 })
+    const stones = graves
+      .locator('[data-funeral]')
+      .filter({ has: page.getByRole('img', { name: /eliminated in week 5/ }) })
+    await expect(stones).toHaveCount(5)
     // A funeral waits for its grave to be seen: on a phone that means scrolling down the row.
     for (const stone of await stones.all()) {
       await stone.scrollIntoViewIfNeeded()
@@ -366,13 +377,15 @@ test.describe('the graveyard', () => {
     // One Death, over the whole page; everything else holds still for him.
     await expect(page.locator('.death-figure')).toHaveCount(1)
     await expect(page.locator('html')).toHaveClass(/death-is-here/)
+    // Lives were lost this week, so he dances.
+    await expect(scene.locator('canvas.death-sprite')).toHaveAttribute('data-act', 'dance')
     // He is rendered: every sheet of his frames is served (the canvas draws from them).
     const sheets = ((await scene.locator('canvas.death-sprite').getAttribute('data-sheets')) ?? '')
       .split(' ')
       .filter(Boolean)
     expect(sheets.length).toBeGreaterThan(1)
     for (const src of sheets) {
-      expect(src).toMatch(/^death\/death-\d+\.webp$/)
+      expect(src).toMatch(/^death\/dance-\d+\.webp$/)
       expect((await page.request.get(new URL(src, page.url()).href)).ok(), src).toBe(true)
     }
     // Hurry him along: finish each beat as soon as it starts (the falling rain loops forever).
@@ -385,12 +398,56 @@ test.describe('the graveyard', () => {
       }
       hurry()
     })
-    // Then he is not there; the page moves again; every crow is gone, every stone frosted.
+    // Then he is not there; the page moves again; the crows he passed are gone, their stones frosted.
     await expect(scene).toHaveCount(0, { timeout: 30_000 })
     await expect(page.locator('html')).not.toHaveClass(/death-is-here/)
     for (const stone of await stones.all()) await expect(stone).toHaveAttribute('data-frost', '')
-    for (const crow of await graves.locator('.funeral-crow').all()) {
+    for (const crow of await stones.locator('.funeral-crow').all()) {
       await expect(crow).toHaveCSS('opacity', '0')
+    }
+  })
+
+  test('in a week nobody lost a life, every grave still plays its funeral and Death checks his watch', async ({
+    page,
+  }) => {
+    test.slow()
+    // The real weeks 1–11, on the Tuesday after week 11: nobody has lost a life
+    // since week 7, so there is no fresh grave, only the graveyard.
+    await resetDemo(page)
+    await signInAs(page, COMMISSIONER)
+    await setDemoClock(page, '2026-11-24T15:00')
+    await page.route('**/site.api.espn.com/**', (route) => {
+      const week = Number(new URL(route.request().url()).searchParams.get('week'))
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ...scoreboard(week), events: week <= 11 ? scoreboardEvents(week) : [] }),
+      })
+    })
+    await page.goto('./#/')
+    const graves = page.locator('section[aria-labelledby="grave-title"]')
+    await expect(graves.getByRole('heading', { name: /survivor graveyard/i })).toBeVisible({
+      timeout: 60_000,
+    })
+    // Every one of the dead has a grave with a funeral to play, face and all.
+    const stones = graves.locator('[data-funeral]')
+    await expect(stones).toHaveCount(25, { timeout: 60_000 })
+    await expect(graves.getByRole('img', { name: /^Headstone of/ })).toHaveCount(25)
+    // The top row plays when it is scrolled to; a grave further down waits its turn.
+    for (const stone of (await stones.all()).slice(0, 3)) {
+      await stone.scrollIntoViewIfNeeded()
+      await expect(stone).not.toHaveAttribute('data-funeral', 'waiting', { timeout: 10_000 })
+    }
+    // When the top row's funerals are over he comes, and this week he takes out his watch.
+    const scene = page.locator('.death-scene')
+    await expect(scene).toHaveAttribute('data-death', 'arriving', { timeout: 45_000 })
+    const sprite = scene.locator('canvas.death-sprite')
+    await expect(sprite).toHaveAttribute('data-act', 'watch')
+    const sheets = ((await sprite.getAttribute('data-sheets')) ?? '').split(' ').filter(Boolean)
+    expect(sheets.length).toBeGreaterThan(1)
+    for (const src of sheets) {
+      expect(src).toMatch(/^death\/death-\d+\.webp$/)
+      expect((await page.request.get(new URL(src, page.url()).href)).ok(), src).toBe(true)
     }
   })
 
