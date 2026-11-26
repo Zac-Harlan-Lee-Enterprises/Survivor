@@ -13,10 +13,13 @@ describe('the week 11 review from the late commissioner', () => {
     expect(screen.getByText(/gain more by fainting/)).toBeVisible()
   })
 
-  it('sets the week 12 pick instruction apart from the banter', () => {
+  it('sets the lock and the week 13 pick instruction apart from the banter', () => {
     render(<LeagueMessage week={12} />)
     const callout = screen.getByText(
-      /DM me your week 12 pick on Teams before 6:55 PM Wednesday, November 25/,
+      /Week 13: DM me your pick on Teams before 7:10 PM Thursday, December 3/,
+    )
+    expect(callout.textContent).toMatch(
+      /^All five week 12 picks are in\. They lock at 6:55 PM Wednesday, November 25/,
     )
     expect(callout).toBeVisible()
     expect(callout.textContent).toMatch(/costs a life/)

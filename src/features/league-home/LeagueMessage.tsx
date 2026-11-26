@@ -13,7 +13,8 @@ import { Megaphone, Send } from 'lucide-react'
  * current until the live sync lands them, at which point week 12 is.
  *
  * Written after Sunday night's game settled week 11 (Monday night's Cincinnati
- * at Washington had no picks), before any week 12 pick: it names no week 12 pick.
+ * at Washington had no picks). Its last paragraph and callout were rewritten once
+ * all five week 12 picks were in, before the lock: it names no week 12 pick.
  */
 const WEEK_11_REVIEW: { heading: string; lines: string[]; callout?: string } = {
   heading: 'Word from the late commissioner',
@@ -22,12 +23,12 @@ const WEEK_11_REVIEW: { heading: string; lines: string[]; callout?: string } = {
     'Allison took Houston over the Colts, the team that cost her a life in week 6. Houston won 26–3. To be fair to Colts quarterback Daniel Jones, he did reach an end zone: it was his own, and Will Anderson Jr. sacked him in it for a safety. Death watched that one twice. He says it’s rare to see a man dig the hole, climb in, and wait.',
     'Cindy, Dominic and Tracy all piled onto Buffalo, who beat Miami 26–9. Bills kicker Tyler Bass scored 14 points. Miami, an entire football team, scored 9. Their quarterback, Kyle McCord, threw 33 passes for 102 yards, which is about three yards a throw. Death says he has seen men gain more by fainting.',
     'Melanie is on her last life, and two weeks ago she handed it to the Bears, whose quarterback threw four interceptions before a field goal saved her with no time left. This week she took Kansas City, who led 27–7 at half time and won 34–7. Death left at half time. He says he has never walked out on her before. He sat through all four of those interceptions with the shovel on his lap.',
-    'Now, Thanksgiving. Picks lock Wednesday, not Thursday: Green Bay at the Rams kicks off Wednesday night at 7:00 Central, so the door shuts at 6:55 PM on November 25. Miss it and it costs you a life, same as a loss. Death asked me not to mention any of this. He has four of you on your last life and a month with nothing to do, and he was rather hoping you’d all assume Thursday.',
+    'All five week 12 picks are in, which makes five straight weeks without a missing pick. Death had rather counted on Thanksgiving. He says moving the lock to a Wednesday was his idea, and not one of you fell for it. The door still shuts at 6:55 PM Wednesday, when Green Bay at the Rams kicks off, and four of you are still on your last life. Thursday has three games, starting with Chicago at Detroit at noon. Death is coming to dinner either way. He has asked to carve.',
   ],
   // Set apart from the banter, because an instruction buried in jokes is an
   // instruction somebody misses, and four of the five are on their last life.
   callout:
-    'DM me your week 12 pick on Teams before 6:55 PM Wednesday, November 25, five minutes before Green Bay at the Rams kicks off. That is a day sooner than usual, because of Thanksgiving. Four of you are on your last life, and a missing pick costs a life.',
+    'All five week 12 picks are in. They lock at 6:55 PM Wednesday, November 25, and you can change yours until then. Week 13: DM me your pick on Teams before 7:10 PM Thursday, December 3. A missing pick still costs a life.',
 }
 
 export function LeagueMessage({ week }: { week: number }) {

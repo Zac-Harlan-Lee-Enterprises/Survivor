@@ -1057,3 +1057,9 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - Lesson: a prop needs a measured check against everything it can touch (hand, head, body), not just the place the last complaint was about.
 - Full re-render: 0 joint flags, 3.3 MB. validate 425 + 1 skipped, e2e 117, sweep clean, init 200.
 - NEXT: merge PR #86 only on his word.
+
+## 2026-11-25 — Claude Fable 5.2 — week 12: the last three picks, and the note says all five are in
+- Recorded from Teams DMs: Cindy NYG (19:15:42Z), Allison DAL (20:26:32Z), Tracy WAS (21:47:09Z; sent as a GIF of Washington fans, the commissioner confirmed the Commanders). All five alive have a week 12 pick, each before the 6:55 PM CT Wednesday lock.
+- Note (`LeagueMessage.tsx`): at the commissioner's request, the Thanksgiving paragraph and the callout were rewritten for "all five picks are in"; the week 11 review paragraphs are unchanged. It names no week 12 pick, team or opponent; `leagueMessageFacts.test.ts` asserts the new claims (five straight weeks without a missing pick, the lock, Thursday's three games, the week 13 lock 7:10 PM Thu Dec 3) and that the new text names none of the six teams involved.
+- Verified: validate (427 tests), e2e 117 passed, quality sweep 0, init HTTP 200.
+- NEXT: after the week 12 games settle, write the week 12 review (and epitaphs if anyone falls). PR #86 (Death's pocket watch) is still open, awaiting the commissioner's go-ahead.
