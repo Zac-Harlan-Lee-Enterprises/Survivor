@@ -117,10 +117,10 @@ export function PicksPanel() {
                 size="sm"
                 status={s.status}
               />
-              <span className="w-40 truncate font-display text-base font-bold uppercase text-ink-50">
+              <span className="w-24 shrink-0 truncate font-display text-base font-bold uppercase text-ink-50 sm:w-40">
                 {profile.displayName}
               </span>
-              <span className="flex flex-1 items-center gap-2">
+              <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2">
                 {!pick ? (
                   <span className="italic text-ink-400">no pick</span>
                 ) : concealed ? (
@@ -129,7 +129,10 @@ export function PicksPanel() {
                   </span>
                 ) : (
                   <>
-                    <TeamMonogram teamId={pick.teamId} size="xs" /> {getTeam(pick.teamId)?.fullName}{' '}
+                    <TeamMonogram teamId={pick.teamId} size="xs" />{' '}
+                    {/* The nickname alone on a phone: the city pushes the row off the screen. */}
+                    <span className="sm:hidden">{getTeam(pick.teamId)?.name}</span>
+                    <span className="hidden sm:inline">{getTeam(pick.teamId)?.fullName}</span>{' '}
                     <span className="text-xs text-ink-400">({pick.source})</span>
                   </>
                 )}

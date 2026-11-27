@@ -140,11 +140,17 @@ export function Layout() {
         {league.tagline ??
           'Pick one team to win each week. Lose or tie and you burn a life. Last one standing wins.'}
         {' · '}
-        <NavLink to="/rules" className="underline underline-offset-2 hover:text-ink-100">
+        <NavLink
+          to="/rules"
+          className="inline-flex min-h-11 items-center underline underline-offset-2 hover:text-ink-100"
+        >
           Official rules
         </NavLink>
         {' · '}
-        <NavLink to="/champions" className="underline underline-offset-2 hover:text-ink-100">
+        <NavLink
+          to="/champions"
+          className="inline-flex min-h-11 items-center underline underline-offset-2 hover:text-ink-100"
+        >
           Hall of Champions
         </NavLink>
         {' · '}

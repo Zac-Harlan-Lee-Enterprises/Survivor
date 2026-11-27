@@ -305,6 +305,33 @@ describe('pick visibility', () => {
     expect(anon).toEqual([])
   })
 
+  it('keeps picks hidden until the deadline the commissioner’s corrections give', () => {
+    // The opener is cancelled, so the week's deadline moves to the later game:
+    // picks can still be changed until then, and must stay hidden until then.
+    const corrected = {
+      ...snap,
+      gameOverrides: [
+        {
+          gameId: snap.games[0]!.id,
+          status: 'cancelled' as const,
+          leagueId: snap.league.id,
+          reason: 'called off',
+          actorPlayerId: 'ann',
+          createdAt: kickoffFor(1, -24),
+        },
+      ],
+    }
+    const viewer = { playerId: 'ann', isCommissioner: false }
+    // After the cancelled game's old deadline, before the new one.
+    expect(redactPicks(corrected, viewer, kickoffFor(1, 1)).map((p) => p.playerId)).toEqual(['ann'])
+    // Past the new deadline (five minutes before the 7-hours-later game).
+    expect(
+      redactPicks(corrected, viewer, kickoffFor(1, 7 - 4 / 60))
+        .map((p) => p.playerId)
+        .sort(),
+    ).toEqual(['ann', 'bob'])
+  })
+
   it('shows everything when the league turns off hiding', () => {
     const open = {
       ...snap,

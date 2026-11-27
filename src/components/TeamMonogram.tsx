@@ -40,7 +40,13 @@ export function TeamMonogram({ teamId, size = 'md', className, muted }: TeamMark
         loading="lazy"
         decoding="async"
         onError={() => setFailed(true)}
-        className={cn('shrink-0 object-contain', dims, muted && 'opacity-50 grayscale', className)}
+        // A hairline of light behind the crest: several are navy on a navy page.
+        className={cn(
+          'shrink-0 object-contain drop-shadow-[0_0_1.5px_rgba(255,255,255,0.7)]',
+          dims,
+          muted && 'opacity-50 grayscale',
+          className,
+        )}
       />
     )
   }

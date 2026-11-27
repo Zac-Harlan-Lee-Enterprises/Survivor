@@ -40,7 +40,7 @@ export function PlayerCard({
     <Link
       to={`/players/${encodeURIComponent(standing.playerId)}`}
       className={cn(
-        'card group relative flex animate-rise flex-col items-center gap-2 p-4 text-center transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-sky-400',
+        'card group relative flex h-full animate-rise flex-col items-center gap-2 p-4 text-center transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-sky-400',
         // A funeral needs its colour: the face drains on its own, on cue.
         out && !funeral && 'graveyard',
         funeral && 'overflow-visible',

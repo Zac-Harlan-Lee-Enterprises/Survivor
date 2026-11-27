@@ -73,6 +73,36 @@ async function buryNate(page: Page) {
   await page.goto('./#/')
 }
 
+/**
+ * The real weeks 1–11, on the Tuesday after week 11: nobody has lost a life
+ * since week 7, so there is no fresh grave, only the graveyard, all 25 of it.
+ */
+async function weekNobodyLostALife(page: Page) {
+  await resetDemo(page)
+  await signInAs(page, COMMISSIONER)
+  await setDemoClock(page, '2026-11-24T15:00')
+  await page.route('**/site.api.espn.com/**', (route) => {
+    const week = Number(new URL(route.request().url()).searchParams.get('week'))
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ...scoreboard(week),
+        events: week <= 11 ? scoreboardEvents(week) : [],
+      }),
+    })
+  })
+  await page.goto('./#/')
+  const graves = page.locator('section[aria-labelledby="grave-title"]')
+  await expect(graves.getByRole('heading', { name: /survivor graveyard/i })).toBeVisible({
+    timeout: 60_000,
+  })
+  // Every one of the dead has a grave with a funeral to play, face and all.
+  const stones = graves.locator('[data-funeral]')
+  await expect(stones).toHaveCount(25, { timeout: 60_000 })
+  return { graves, stones }
+}
+
 test.describe('the graveyard', () => {
   test('a player who loses their last life becomes a headstone that leads to their epitaph', async ({
     page,
@@ -411,27 +441,13 @@ test.describe('the graveyard', () => {
     page,
   }) => {
     test.slow()
-    // The real weeks 1–11, on the Tuesday after week 11: nobody has lost a life
-    // since week 7, so there is no fresh grave, only the graveyard.
-    await resetDemo(page)
-    await signInAs(page, COMMISSIONER)
-    await setDemoClock(page, '2026-11-24T15:00')
-    await page.route('**/site.api.espn.com/**', (route) => {
-      const week = Number(new URL(route.request().url()).searchParams.get('week'))
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ ...scoreboard(week), events: week <= 11 ? scoreboardEvents(week) : [] }),
-      })
+    // His film is fetched only when he is about to appear, never on page load.
+    const film: string[] = []
+    page.on('request', (r) => {
+      if (/\/death\/[a-z]+-\d+\.webp/.test(r.url())) film.push(r.url())
     })
-    await page.goto('./#/')
-    const graves = page.locator('section[aria-labelledby="grave-title"]')
-    await expect(graves.getByRole('heading', { name: /survivor graveyard/i })).toBeVisible({
-      timeout: 60_000,
-    })
-    // Every one of the dead has a grave with a funeral to play, face and all.
-    const stones = graves.locator('[data-funeral]')
-    await expect(stones).toHaveCount(25, { timeout: 60_000 })
+    const { graves, stones } = await weekNobodyLostALife(page)
+    expect(film, 'no sheet is fetched before the graveyard is scrolled to').toEqual([])
     await expect(graves.getByRole('img', { name: /^Headstone of/ })).toHaveCount(25)
     // The top row plays when it is scrolled to; a grave further down waits its turn.
     for (const stone of (await stones.all()).slice(0, 3)) {
@@ -449,6 +465,24 @@ test.describe('the graveyard', () => {
       expect(src).toMatch(/^death\/death-\d+\.webp$/)
       expect((await page.request.get(new URL(src, page.url()).href)).ok(), src).toBe(true)
     }
+    // ...and only a few sheets ahead of him, not the whole film at once.
+    expect(film.length).toBeGreaterThan(0)
+    expect(film.length).toBeLessThan(sheets.length)
+  })
+
+  test('if his film cannot be fetched, Death does not come and the page never greys out', async ({
+    page,
+  }) => {
+    test.slow()
+    await page.route('**/death/*.webp', (route) => route.abort())
+    const { stones } = await weekNobodyLostALife(page)
+    for (const stone of (await stones.all()).slice(0, 3)) {
+      await stone.scrollIntoViewIfNeeded()
+      await expect(stone).not.toHaveAttribute('data-funeral', 'waiting', { timeout: 10_000 })
+    }
+    // The funerals end, he tries for his first sheet, and the scene is taken down.
+    await expect(page.locator('.death-scene')).toHaveCount(0, { timeout: 45_000 })
+    await expect(page.locator('html')).not.toHaveClass(/death-is-here/)
   })
 
   test('viewers who prefer reduced motion get no funeral, so no Death', async ({ page }) => {

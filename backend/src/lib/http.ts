@@ -1,5 +1,6 @@
 import type { APIGatewayProxyEventV2WithJWTAuthorizer, APIGatewayProxyResultV2 } from 'aws-lambda'
 import type { z } from 'zod'
+import { ResultConsistencyError } from '@domain/index'
 
 /** Small helpers for API Gateway HTTP API (payload v2) handlers. */
 
@@ -79,6 +80,10 @@ export function identityOf(event: Pick<EventLike, 'requestContext'>): Identity |
 export function errorResponse(err: unknown): APIGatewayProxyResultV2 {
   if (err instanceof HttpError)
     return json(err.status, { code: err.code, message: err.message, ...err.extra })
+  // A result that contradicts itself (winner against the score, a final with
+  // neither) is the caller's mistake, not the server's.
+  if (err instanceof ResultConsistencyError)
+    return json(422, { code: 'RESULT_INCONSISTENT', message: err.message })
   console.error('Unhandled error', err)
   return json(500, { code: 'INTERNAL', message: 'Something went wrong on the league server.' })
 }

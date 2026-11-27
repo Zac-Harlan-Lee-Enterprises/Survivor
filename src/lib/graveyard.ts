@@ -9,7 +9,12 @@ import { weekSummary, type PlayerStanding, type SeasonEvaluation } from '@/domai
  */
 export function funeralWeek(evaluation: SeasonEvaluation): number {
   const now = weekSummary(evaluation, evaluation.currentWeek)
-  return now?.phase === 'open' ? evaluation.currentWeek - 1 : evaluation.currentWeek
+  // A week not yet under way (open for picks, or its schedule not loaded) leaves
+  // the week before it on stage.
+  const notStarted = !now || now.phase === 'open' || now.phase === 'no-data'
+  return notStarted && evaluation.currentWeek > 1
+    ? evaluation.currentWeek - 1
+    : evaluation.currentWeek
 }
 
 /**

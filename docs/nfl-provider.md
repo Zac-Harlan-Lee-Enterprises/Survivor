@@ -39,3 +39,21 @@ The scheduled job syncs the current week and the previous week (late corrections
 ## When the provider is down
 
 Nothing stops. The Results tab keeps working: enter the schedule (one line per game `AWAY,HOME,KICKOFF`), enter results, correct results. The API returns `503 PROVIDER_UNAVAILABLE` with that guidance on manual sync. Weeks with no schedule data never strike anyone.
+
+## When a game is postponed or moved
+
+A postponed game stays `pending`, and its week is not final until every game in
+it is final or cancelled. The current week is the first week that is not final,
+so one postponed game holds the league there: the next week stays `upcoming` and
+its picks are refused (`WEEK_NOT_OPEN`).
+
+That is deliberate (nobody is struck, and no champion crowned, on a result that
+does not exist yet), but it needs the commissioner to act:
+
+- If the game will be played later in the same week, do nothing.
+- If it moves to another week or is called off, open **Commissioner → Results**
+  and override it to `cancelled`. Picks on it become `void`, the team returns to
+  each picker's pool, the week settles and the next one opens.
+
+A provider that stops returning a game does not change it; the stored game stays
+as it was last seen, which is the same situation.

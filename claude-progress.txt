@@ -1082,3 +1082,11 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - LeagueHome.tsx: `staged` (fresh, or all when none fresh) and `plain` (old, only when there are fresh). e2e counts updated (5 and 8 funerals; Don has none in a week with new dead).
 - Verified: npm run validate, graveyard e2e (18 passed), quality sweep, init.sh 200.
 - NEXT: week 12 review once the games settle, epitaphs for anyone eliminated; Death dances that week and only the new dead get funerals.
+
+## 2026-11-27 — Claude Fable 5.2 — code review and UI/UX audit of main, and the fixes
+- Reviewed main (independent reviewer + my own UI audit: every page, desktop and phone, real results through week 11).
+- Fixed: Death no longer restarts when a score flips his act mid-scene (act and film latched at arrival); his film is fetched only when he is about to appear, a few sheets ahead, index by dynamic import; no film = no scene; he leaves if the screen is rotated. Pick redaction and its deadline now honour commissioner overrides. Live polling is one chain (src/app/pollLoop.ts). ResultConsistencyError → 422. funeralWeek keeps last week on stage when next week has no schedule. A timer at the lock (src/lib/lock.ts) closes the up-to-a-minute gap. parseScoreboard refuses a different week than asked.
+- UI: hero says "Week N is under way" (was "Every game this week has kicked off" from the first kickoff); note in two columns on desktop; "Living dangerously" strip only when more than 6 are alive; commissioner picks tab fits a phone; 44px tap targets on standalone links, bigger checkboxes; a light edge on team crests (navy logos on navy); equal-height player cards.
+- Not changed: the phone graveyard is still one card per row (the funeral scene's tag overflows a two-up card; tried, e2e caught it). Postponed games still hold the week (by design); documented the commissioner's fix in docs/nfl-provider.md.
+- Verified: npm run validate, npm run test:e2e (121 passed), quality sweep, init.sh 200.
+- NEXT: week 12 review once the games settle, with epitaphs. Decide whether the phone graveyard should collapse behind "show all".
