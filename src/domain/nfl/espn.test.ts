@@ -145,6 +145,16 @@ describe('parseScoreboard result handling', () => {
     expect(week.byeTeamIds).not.toContain('GB')
   })
 
+  it('refuses a payload for a different week than the one asked for', () => {
+    expect(() =>
+      parseScoreboard(
+        { season: { year: 2026, type: 2 }, week: { number: 4 }, events: [] },
+        OBSERVED,
+        { seasonYear: 2026, week: 9 },
+      ),
+    ).toThrow(/week 4 when asked for week 9/)
+  })
+
   it('falls back to the requested season and week when the payload omits them', () => {
     const parsed = parseScoreboard({ events: [event('GB', 'CHI', 'STATUS_SCHEDULED')] }, OBSERVED, {
       seasonYear: 2026,

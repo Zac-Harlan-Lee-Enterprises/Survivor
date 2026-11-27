@@ -4,11 +4,18 @@ import type { PlayerStanding } from '@/domain'
 import { getConfig } from '@/config/env'
 import { frameAt, planEntrance, routeKeyframes, type Film } from '@/lib/deathFilm'
 import type { DeathAct } from '@/lib/graveyard'
-import WATCH from './deathFrames.json'
-import DANCE from './deathDanceFrames.json'
 
-/** One film for each thing he does when he stops: the same walk in, the same walk off. */
-const FILMS: Record<DeathAct, Film> = { watch: WATCH as Film, dance: DANCE as Film }
+/**
+ * One film for each thing he does when he stops: the same walk in, the same
+ * walk off. Each index is fetched only when he is about to play it, so neither
+ * rides in the main bundle.
+ */
+const FILMS: Record<DeathAct, () => Promise<Film>> = {
+  watch: () => import('./deathFrames.json').then((m) => m.default as Film),
+  dance: () => import('./deathDanceFrames.json').then((m) => m.default as Film),
+}
+/** How many sheets ahead of the one on screen are fetched (about three seconds of him). */
+const AHEAD = 4
 
 /** The pause, once the last funeral is over, before he comes. */
 const HUSH = 1800
@@ -61,16 +68,23 @@ const RAIN = Array.from({ length: 70 }, (_, i) => {
  * motion get no funerals, so no Death.
  */
 export function DeathArrives({ after, act }: { after: PlayerStanding[]; act: DeathAct }) {
-  const FILM = FILMS[act]
+  // What he plays is fixed the moment he sets out: a score landing while he is
+  // on screen changes next visit's act, never this one's.
+  const [film, setFilm] = useState<{ act: DeathAct; film: Film } | null>(null)
+  const wanted = useRef({ act, ids: '' })
   const marker = useRef<HTMLSpanElement>(null)
   const scene = useRef<HTMLDivElement>(null)
   const [phase, setPhase] = useState<Phase>(() => (prefersReducedMotion() ? 'off' : 'waiting'))
   const ids = after.map((g) => g.playerId).join(',')
   const off = phase === 'off'
   const { basePath } = getConfig()
+  const none = !ids
+  useEffect(() => {
+    wanted.current = { act, ids }
+  }, [act, ids])
 
   useEffect(() => {
-    if (off || !ids) return
+    if (off || none) return
     const stage = marker.current?.parentElement
     if (!stage) return
     let cancelled = false
@@ -86,29 +100,71 @@ export function DeathArrives({ after, act }: { after: PlayerStanding[]; act: Dea
         () => false,
       )
     const doc = stage.ownerDocument
-    // His frames, fetched while the funerals play (drawn later, a sheet at a time).
-    const sheets = FILM.sheets.map((src) => {
-      const img = new Image()
-      img.src = `${basePath}${src}`
-      return img
-    })
+    // His frames: nothing is fetched until the funerals he waits for are over
+    // and the graves are on screen, then a sheet at a time, a few ahead of him.
+    const sheets: HTMLImageElement[] = []
+    let pending: Film | undefined
+    const sheet = (k: number) => {
+      const src = pending?.sheets[k]
+      if (!src) return undefined
+      if (!sheets[k]) {
+        const img = new Image()
+        img.src = `${basePath}${src}`
+        sheets[k] = img
+      }
+      return sheets[k]
+    }
     const ready = (k: number) => {
-      const img = sheets[k]
+      const img = sheet(k)
       return img ? img.decode().catch(() => undefined) : Promise.resolve()
     }
+    const ahead = (k: number) => {
+      for (let i = 1; i <= AHEAD; i++) void ready(k + i)
+    }
+    let leave = () => {}
+    const onResize = () => leave()
     void (async () => {
-      for (const id of ids.split(',')) {
-        const stone = await finished(stage, id, () => cancelled)
-        if (cancelled) return
-        if (!stone) return setPhase('off')
+      // The graves he waits for are read as they stand now: if the week's dead
+      // change while he waits, he waits for the new ones.
+      for (;;) {
+        const want = wanted.current.ids
+        const stale = () => cancelled || wanted.current.ids !== want
+        let never = false
+        for (const id of want.split(',')) {
+          const stone = await finished(stage, id, stale)
+          if (cancelled) return
+          if (stale()) break
+          if (!stone) never = true
+        }
+        if (stale()) continue
+        if (never) return setPhase('off')
+        break
       }
       if (!(await inView(stage, () => cancelled))) return
       const root = scene.current
       if (!root || typeof root.animate !== 'function') return setPhase('off')
+      // From here the take is fixed, whatever the scores do next.
+      const playing = wanted.current.act
       // A beat of quiet after the last funeral, then he comes. (A real wait, not
       // an animation: nothing that fast-forwards the page should summon him.)
-      await Promise.all([new Promise((r) => setTimeout(r, HUSH)), ready(0)])
+      const [, loaded] = await Promise.all([
+        new Promise((r) => setTimeout(r, HUSH)),
+        FILMS[playing]().then(
+          async (f) => {
+            pending = f
+            ahead(0)
+            await ready(0)
+            return true
+          },
+          () => false,
+        ),
+      ])
       if (cancelled) return
+      // No film, no scene: the world never drains for a figure that cannot be drawn.
+      const FILM = pending
+      if (!loaded || !FILM || !(sheets[0]?.complete && sheets[0].naturalWidth > 0))
+        return setPhase('off')
+      setFilm({ act: playing, film: FILM })
       setPhase('arriving')
       doc.documentElement.classList.add('death-is-here')
 
@@ -134,6 +190,17 @@ export function DeathArrives({ after, act }: { after: PlayerStanding[]; act: Dea
 
       // His size and his route: tall and close, in from the dark on the left.
       const vw = doc.documentElement.clientWidth
+      // His route is measured once. If the screen is turned or resized under
+      // him he cannot finish it, so he is simply gone and the world comes back.
+      // (Width only: a phone's address bar changes the height on every scroll.)
+      leave = () => {
+        if (cancelled || doc.documentElement.clientWidth === vw) return
+        cancelled = true
+        doc.documentElement.classList.remove('death-is-here')
+        running.forEach((a) => a.cancel())
+        setPhase('gone')
+      }
+      window.addEventListener('resize', onResize)
       const plan = planEntrance(FILM, vw, window.innerHeight)
       me.style.width = `${plan.width}px`
       me.style.height = `${plan.height}px`
@@ -149,11 +216,11 @@ export function DeathArrives({ after, act }: { after: PlayerStanding[]; act: Dea
         const k = frameAt(FILM, plan, Number(route.currentTime ?? 0))
         if (k !== shown && ctx) {
           const f = FILM.frames[k]!
-          const img = sheets[f.s]
+          const img = sheet(f.s)
           if (img?.complete && img.naturalWidth > 0) {
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             ctx.drawImage(img, f.sx, f.sy, f.w, f.h, f.dx, f.dy, f.w, f.h)
-            if (shown < 0 || FILM.frames[shown]!.s !== f.s) void ready(f.s + 1)
+            if (shown < 0 || FILM.frames[shown]!.s !== f.s) ahead(f.s)
             shown = k
           }
         }
@@ -213,10 +280,13 @@ export function DeathArrives({ after, act }: { after: PlayerStanding[]; act: Dea
     })()
     return () => {
       cancelled = true
+      window.removeEventListener('resize', onResize)
       doc.documentElement.classList.remove('death-is-here')
       running.forEach((a) => a.cancel())
+      // Stop any sheet still on its way.
+      sheets.forEach((img) => img.removeAttribute('src'))
     }
-  }, [off, ids, basePath, FILM])
+  }, [off, none, basePath])
 
   return (
     <>
@@ -245,7 +315,11 @@ export function DeathArrives({ after, act }: { after: PlayerStanding[]; act: Dea
               {/* seen against a cold light behind him, the mist at his feet */}
               <div className="death-halo" />
               <div className="death-mist" />
-              <canvas className="death-sprite" data-act={act} data-sheets={FILM.sheets.join(' ')} />
+              <canvas
+                className="death-sprite"
+                data-act={film?.act ?? act}
+                data-sheets={film?.film.sheets.join(' ')}
+              />
             </div>
           </div>,
           document.body,
@@ -268,7 +342,12 @@ function finished(stage: HTMLElement, id: string, cancelled: () => boolean) {
       if (stone?.dataset.funeral === 'done') return settle(stone)
       if (stone?.dataset.funeral === 'skipped') return settle(null)
     }
-    watch.observe(stage, { subtree: true, attributes: true, attributeFilter: ['data-funeral'] })
+    watch.observe(stage, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['data-funeral'],
+    })
     check()
   })
 }

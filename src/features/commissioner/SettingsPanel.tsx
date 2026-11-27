@@ -222,7 +222,7 @@ export function SettingsPanel() {
                   type="checkbox"
                   name="champion"
                   value={c.playerId}
-                  className="accent-gold-400"
+                  className="h-6 w-6 accent-gold-400"
                 />{' '}
                 {profileOf(c.playerId).displayName}{' '}
                 <span className="text-ink-400">({c.status})</span>
@@ -260,7 +260,7 @@ function Check({
         type="checkbox"
         name={name}
         defaultChecked={defaultChecked}
-        className="h-4 w-4 accent-gold-400"
+        className="h-6 w-6 accent-gold-400"
       />{' '}
       {label}
     </label>

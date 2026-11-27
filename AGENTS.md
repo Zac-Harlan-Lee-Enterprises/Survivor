@@ -118,7 +118,7 @@ Ports are deliberately unusual (`build/ports.json`: dev 5891, pages 5892, test 5
 | `src/features/pick/PickPage.tsx` | The most important screen: weekly pick cards. |
 | `src/features/rules/RulesPage.tsx` | `/rules` — renders `docs/survivor-rules.md` in the app, linked from the nav and footer. |
 | `src/app/useSelectedWeek.ts` | Which week the league view shows, held in the URL (`?week=N`); `WeekSelect` renders it. |
-| `src/app/useLiveScores.ts` | Polls the provider while a week is live, for every reader — not just the commissioner. |
+| `src/app/useLiveScores.ts` | Polls the provider while a week is live, for every reader — not just the commissioner. The loop itself is `src/app/pollLoop.ts`: one chain, paused while the tab is hidden. |
 | `src/domain/rules/live.ts` | `weekIsLive` (poll on kickoff times, never on stored status) and `changedScores`. |
 | `src/lib/markdown.ts` | Small Markdown subset the rules page renders; `extractMarkedRegion` picks the player-facing slice. |
 | `src/features/commissioner/*` | Players/headshots, picks, results, settings, import, audit. |

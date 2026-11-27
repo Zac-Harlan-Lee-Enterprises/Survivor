@@ -102,7 +102,7 @@ test.describe('commissioner workflow (demo mode)', () => {
   test('the demo clock moves the league forward and locks the week', async ({ page }) => {
     await setDemoClock(page, '2026-09-15T12:00')
     await page.goto('./')
-    await expect(page.getByText(/every game this week has kicked off/i)).toBeVisible()
+    await expect(page.getByText(/week 1 is under way\. picks are locked/i)).toBeVisible()
     await page.goto('./#/pick')
     await expect(page.getByText(/kicked off .* locked/i)).toBeVisible()
   })

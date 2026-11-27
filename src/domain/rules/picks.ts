@@ -267,7 +267,9 @@ export function isPickVisible(
 function deadlinesByWeek(snapshot: SeasonSnapshot, now: Date | string): Map<number, string | null> {
   const lead = snapshot.league.settings.pickLockMinutesBeforeFirstKickoff
   const byWeek = new Map<number, NFLGame[]>()
-  for (const g of snapshot.games) {
+  // The commissioner's corrections count here as they do in the engine: a
+  // cancelled opener moves the deadline, and picks stay hidden until the new one.
+  for (const g of applyGameOverrides(snapshot.games, snapshot.gameOverrides ?? [])) {
     if (g.seasonYear !== snapshot.season.year) continue
     byWeek.set(g.week, [...(byWeek.get(g.week) ?? []), g])
   }
@@ -279,7 +281,9 @@ function deadlinesByWeek(snapshot: SeasonSnapshot, now: Date | string): Map<numb
 }
 
 export function redactPicks(snapshot: SeasonSnapshot, viewer: Viewer, now: Date | string): Pick[] {
-  const games = new Map(snapshot.games.map((g) => [g.id, g]))
+  const games = new Map(
+    applyGameOverrides(snapshot.games, snapshot.gameOverrides ?? []).map((g) => [g.id, g]),
+  )
   const deadlines = deadlinesByWeek(snapshot, now)
   return snapshot.picks.filter((p) =>
     isPickVisible(

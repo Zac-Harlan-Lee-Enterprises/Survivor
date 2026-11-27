@@ -113,8 +113,12 @@ describe('snapshot redaction', () => {
 
     // Players and anonymous visitors cannot reach it.
     expect(
-      (await h.call('GET', '/seasons/season-1/picks/all', { sub: 'sub-ann', email: 'ann@example.com' }))
-        .status,
+      (
+        await h.call('GET', '/seasons/season-1/picks/all', {
+          sub: 'sub-ann',
+          email: 'ann@example.com',
+        })
+      ).status,
     ).toBe(403)
     expect((await h.call('GET', '/seasons/season-1/picks/all')).status).toBe(401)
     // Nor through the anonymous public prefix.
@@ -319,7 +323,8 @@ describe('commissioner routes', () => {
       ...commish,
       body: { status: 'final', homeScore: 30, awayScore: 27, winnerTeamId: 'DEN', reason: 'oops' },
     })
-    expect(bad.status).toBe(500)
+    expect(bad.status).toBe(422)
+    expect(bad.body.code).toBe('RESULT_INCONSISTENT')
     // Clearing restores the provider result.
     await h.call('DELETE', '/leagues/league-1/games/g-1-DEN-KC/override', {
       ...commish,

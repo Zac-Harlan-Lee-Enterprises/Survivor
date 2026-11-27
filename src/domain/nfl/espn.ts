@@ -194,6 +194,11 @@ export function parseScoreboard(
   if (!seasonYear || !weekNumber) {
     throw new Error('ESPN payload did not identify a season year and week')
   }
+  // Asked for one week and answered with another: storing it would write the
+  // wrong week's games over the one requested.
+  if (fallback?.week && weekNumber !== fallback.week) {
+    throw new Error(`ESPN answered with week ${weekNumber} when asked for week ${fallback.week}`)
+  }
 
   const games: NFLGame[] = []
   const liveDetail: Record<string, string> = {}

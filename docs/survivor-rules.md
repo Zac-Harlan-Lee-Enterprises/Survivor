@@ -57,7 +57,7 @@ Kickoff changes are result observations; a rescheduled game keeps its id (`<year
 ## Results processing
 
 - Observations (provider or commissioner) pass through `applyGameResult`: identical observations are no-ops, any accepted change bumps `resultVersion` once, a commissioner-sourced result locks the game against provider updates until explicitly released.
-- Commissioner **league overrides** (`LeagueGameOverride`) sit on top of the stored game and win.
+- Commissioner **league overrides** (`LeagueGameOverride`) sit on top of the stored game and win, including for the week's deadline and for when picks are revealed.
 - Everything re-evaluates from picks + results, so a correction never leaves stale strikes behind.
 
 ## Time and timezone

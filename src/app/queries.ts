@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { evaluateSeason, type SeasonEvaluation, type SeasonSnapshot } from '@/domain'
 import type { SubmitPickInput } from '@/data'
 import { getConfig } from '@/config/env'
+import { msUntilLock } from '@/lib/lock'
 import { useNow, useServices, useSession } from './hooks'
 
 export const keys = {
@@ -40,10 +41,23 @@ export function useSnapshot(seasonId: string | undefined) {
 export function useEvaluation(snapshot: SeasonSnapshot | undefined): SeasonEvaluation | undefined {
   const now = useNow(30_000)
   const minute = Math.floor(now.getTime() / 30_000)
-  return useMemo(() => {
+  const { clock } = useServices()
+  // The instant the picks locked, when a timer caught it between two ticks.
+  const [lockedAt, setLockedAt] = useState(0)
+  const evaluation = useMemo(() => {
     if (!snapshot) return undefined
-    return evaluateSeason(snapshot, { now: new Date(minute * 30_000) })
-  }, [snapshot, minute])
+    return evaluateSeason(snapshot, { now: new Date(Math.max(minute * 30_000, lockedAt)) })
+  }, [snapshot, minute, lockedAt])
+  // The tick alone can leave the page a minute behind the lock, still offering a
+  // pick the server will refuse. So when the lock is near, be there for it.
+  useEffect(() => {
+    if (!evaluation) return
+    const ms = msUntilLock(evaluation, clock.now())
+    if (ms == null) return
+    const id = window.setTimeout(() => setLockedAt(clock.now().getTime()), ms)
+    return () => window.clearTimeout(id)
+  }, [evaluation, clock])
+  return evaluation
 }
 
 export function useInvalidateSeason() {

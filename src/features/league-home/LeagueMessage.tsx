@@ -41,9 +41,9 @@ export function LeagueMessage({ week }: { week: number }) {
         <Megaphone className="h-4 w-4 text-sky-400" aria-hidden="true" />
         {note.heading}
       </h2>
-      <div className="mt-3 space-y-2 text-ink-200">
+      <div className="mt-3 space-y-2 text-ink-200 lg:columns-2 lg:gap-10">
         {note.lines.map((line) => (
-          <p key={line} className="max-w-3xl leading-relaxed">
+          <p key={line} className="max-w-3xl break-inside-avoid leading-relaxed">
             {line}
           </p>
         ))}

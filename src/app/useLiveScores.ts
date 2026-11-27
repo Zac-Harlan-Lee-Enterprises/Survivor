@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { weekIsLive, type NFLGame } from '@/domain'
 import { useNow, useServices } from './hooks'
+import { startPollLoop } from './pollLoop'
 import { useInvalidateSeason } from './queries'
 
 /** How often to ask the provider while a week is actually being played. */
@@ -57,39 +58,11 @@ export function useLiveScores(seasonYear: number, week: number, games: NFLGame[]
 
   useEffect(() => {
     if (!live || !nfl.syncResults) return
-    let cancelled = false
-    let timer = 0
-
-    const run = async () => {
-      let wait = POLL_MS
-      try {
-        await pollRef.current()
-      } catch {
-        // The feed is unofficial and the viewer may simply be offline. Back off
-        // and try again; there is nothing here for a reader to act on.
-        wait = BACKOFF_MS
-      }
-      if (!cancelled) timer = window.setTimeout(() => void run(), wait)
-    }
-
-    // A league page sits open all Sunday. Polling a tab nobody is looking at
-    // burns a phone battery to update pixels no one can see.
-    const onVisibility = () => {
-      if (document.hidden) {
-        window.clearTimeout(timer)
-      } else {
-        window.clearTimeout(timer)
-        void run()
-      }
-    }
-
-    if (!document.hidden) void run()
-    document.addEventListener('visibilitychange', onVisibility)
-    return () => {
-      cancelled = true
-      window.clearTimeout(timer)
-      document.removeEventListener('visibilitychange', onVisibility)
-    }
+    return startPollLoop(() => pollRef.current(), {
+      pollMs: POLL_MS,
+      backoffMs: BACKOFF_MS,
+      doc: document,
+    })
   }, [live, nfl, seasonYear, week])
 
   // A stale clock is worse than none, so the detail is derived rather than

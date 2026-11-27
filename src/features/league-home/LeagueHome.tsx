@@ -152,7 +152,7 @@ export function LeagueHome() {
                 </span>
               </>
             ) : week?.phase === 'locked' ? (
-              <span>Every game this week has kicked off. Picks are locked.</span>
+              <span>Week {evaluation.currentWeek} is under way. Picks are locked.</span>
             ) : week?.phase === 'final' ? (
               <span>Week {evaluation.currentWeek} is in the books.</span>
             ) : (
@@ -220,7 +220,7 @@ export function LeagueHome() {
           </h2>
           <Link
             to="/leaderboard"
-            className="font-display text-sm font-bold uppercase tracking-wide text-sky-400 hover:underline"
+            className="inline-flex min-h-11 items-center font-display text-sm font-bold uppercase tracking-wide text-sky-400 hover:underline"
           >
             Full leaderboard →
           </Link>
@@ -243,7 +243,8 @@ export function LeagueHome() {
         )}
       </section>
 
-      {bubble.length > 0 && (
+      {/* With a handful left, the cards above already show who is on the bubble. */}
+      {bubble.length > 0 && alive.length > BUBBLE_STRIP_FROM && (
         <section className="card border-gold-400/30 p-5" aria-labelledby="bubble-title">
           <h2 id="bubble-title" className="flex items-center gap-2 text-2xl text-gold-300">
             <Flame className="h-5 w-5" aria-hidden="true" /> Living dangerously
@@ -330,7 +331,7 @@ export function LeagueHome() {
             <div className="flex items-center gap-4">
               <Link
                 to="/leaderboard#graveyard"
-                className="font-display text-sm font-bold uppercase tracking-wide text-sky-400 hover:underline"
+                className="inline-flex min-h-11 items-center font-display text-sm font-bold uppercase tracking-wide text-sky-400 hover:underline"
               >
                 Pay respects →
               </Link>
@@ -382,6 +383,9 @@ export function LeagueHome() {
     </div>
   )
 }
+
+/** The "Living dangerously" strip appears only once the field is bigger than this. */
+const BUBBLE_STRIP_FROM = 6
 
 /** The graveyard's widest row. */
 const GRAVES_PER_ROW = 3

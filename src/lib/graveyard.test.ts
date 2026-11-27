@@ -37,6 +37,16 @@ function season() {
 const ids = (xs: { playerId: string }[]) => xs.map((s) => s.playerId).sort()
 
 describe('graveyardPreview', () => {
+  it('keeps the week’s dead fresh when next week’s schedule has not loaded', () => {
+    // Week 5 is over and week 6 has no games yet: the stage is still week 5's.
+    const snap = season()
+    const noWeek6 = { ...snap, games: snap.games.filter((g) => g.week !== 6) }
+    const e = evaluateSeason(noWeek6, { now: kickoffFor(5, 48) })
+    expect(funeralWeek(e)).toBe(5)
+    expect(ids(graveyardPreview(e).fresh)).toEqual(WEEK5)
+    expect(deathAct(e)).toBe('dance')
+  })
+
   it('puts every one of the week’s dead among the fresh graves, however many', () => {
     // Tuesday after week 5: its games are done, week 6 is open for picks.
     const e = evaluateSeason(season(), { now: kickoffFor(5, 48) })
