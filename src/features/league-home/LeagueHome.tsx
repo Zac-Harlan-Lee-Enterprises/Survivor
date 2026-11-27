@@ -47,9 +47,12 @@ export function LeagueHome() {
     (s) => s.status === 'champion' || s.status === 'co-champion',
   )
   const finalists = evaluation.standings.filter((s) => s.status === 'finalist')
-  // This week's dead come first; every grave plays its funeral when scrolled to.
+  // A week with new dead, only they get a funeral and the older graves are plain
+  // stones under them. A week without, every grave plays its funeral.
   const { fresh: freshGraves, old: oldGraves } = graveyardPreview(evaluation)
   const graveyard = [...freshGraves, ...oldGraves]
+  const staged = freshGraves.length > 0 ? freshGraves : oldGraves
+  const plain = freshGraves.length > 0 ? oldGraves : []
   // The hero reports the LIVE week — next kickoff, deadline, whether picks are
   // open — so it must not follow the week someone is browsing.
   const currentWeekGames = snapshot.games
@@ -333,10 +336,10 @@ export function LeagueHome() {
               </Link>
             </div>
           </div>
-          {/* Every grave gets a stage and a funeral, every visit: this week's dead first. */}
+          {/* The stage: this week's dead, or every grave in a week nobody died. */}
           <div className="relative mx-auto max-w-4xl">
             <ul className="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-3">
-              {graveyard.map((s, i) => (
+              {staged.map((s, i) => (
                 <li key={s.playerId}>
                   <PlayerCard
                     standing={s}
@@ -354,10 +357,26 @@ export function LeagueHome() {
                 or the top row when nobody died. A week without a life lost he
                 checks his watch; a week with one, he dances. */}
             <DeathArrives
-              after={freshGraves.length > 0 ? freshGraves : graveyard.slice(0, GRAVES_PER_ROW)}
+              after={freshGraves.length > 0 ? freshGraves : staged.slice(0, GRAVES_PER_ROW)}
               act={deathAct(evaluation)}
             />
           </div>
+          {/* Older graves, the week somebody new dies: they just stand there. */}
+          {plain.length > 0 && (
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+              {plain.map((s, i) => (
+                <li key={s.playerId}>
+                  <PlayerCard
+                    standing={s}
+                    profile={profileOf(s.playerId)}
+                    pickVisible={viewer.isCommissioner}
+                    compact
+                    index={i}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       )}
     </div>

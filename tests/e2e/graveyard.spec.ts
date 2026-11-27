@@ -208,18 +208,18 @@ test.describe('the graveyard', () => {
         '.funeral-weapon, .funeral-score { animation: none !important; transform: none !important; opacity: 1 !important; }',
     })
     const tags = graves.locator('.funeral-score')
-    // Every grave gets the scene: this week's five, and Don, a week older, after them.
-    await expect(graves.locator('[data-funeral]')).toHaveCount(6)
+    // Only this week's five get the scene: Don, a week older, is a plain stone after them.
+    await expect(graves.locator('[data-funeral]')).toHaveCount(5)
     await expect(
       graves
         .locator('a.card', { has: page.getByRole('img', { name: /^Headstone of Don Turner/ }) })
         .locator('[data-funeral]'),
-    ).toHaveCount(1)
+    ).toHaveCount(0)
     await expect(graves.getByRole('img', { name: /^Headstone of/ }).last()).toHaveAccessibleName(
       /^Headstone of Don Turner/,
     )
-    await expect(tags).toHaveCount(6)
-    for (let i = 0; i < 6; i++) {
+    await expect(tags).toHaveCount(5)
+    for (let i = 0; i < 5; i++) {
       const tag = tags.nth(i)
       const card = tag.locator('xpath=ancestor::a[contains(@class, "card")]')
       const [t, c] = await Promise.all([tag.boundingBox(), card.boundingBox()])
@@ -298,8 +298,8 @@ test.describe('the graveyard', () => {
         graves.getByRole('img', { name: new RegExp(`^Headstone of ${name},`) }),
       ).toHaveCount(1)
     }
-    // Every grave gets a funeral: this week's eight, and Don, from week 4, behind them.
-    await expect(graves.locator('[data-funeral]')).toHaveCount(9)
+    // Only this week's eight get a funeral: Don, from week 4, is a plain stone behind them.
+    await expect(graves.locator('[data-funeral]')).toHaveCount(8)
     await expect(
       graves.getByRole('img', { name: /^Headstone of Don Turner, eliminated in week 4/ }),
     ).toHaveCount(1)
@@ -361,8 +361,8 @@ test.describe('the graveyard', () => {
     // last-life Dallas pickers.
     await thursdayOfWeek5(page)
     const graves = page.locator('section[aria-labelledby="grave-title"]')
-    // This week's five, whom he waits for (Don's older grave plays after them).
-    await expect(graves.locator('[data-funeral]')).toHaveCount(6, { timeout: 20_000 })
+    // This week's five, whom he waits for (Don's older grave has no funeral this week).
+    await expect(graves.locator('[data-funeral]')).toHaveCount(5, { timeout: 20_000 })
     const stones = graves
       .locator('[data-funeral]')
       .filter({ has: page.getByRole('img', { name: /eliminated in week 5/ }) })
