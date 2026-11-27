@@ -1076,3 +1076,9 @@ NEXT: commissioner previews and merges. Week 10 picks before Thu Nov 12 7:10 PM 
 - Death waits for this week's dead, or the top row when nobody died; he frosts only stones whose funeral is over. Fixed: his on-screen check asked for 15% of the graveyard, which a 25-card column on a phone can never show.
 - Verified: validate (444 tests), e2e 119 passed (new: a no-life-lost week plays 25 funerals and the watch), sweep 0. Looked at desktop and phone screenshots of both acts in the page.
 - NEXT: merge only on his word. Branch is stacked on feat/week12-picks-note (PR #88); merge #88 first.
+
+## 2026-11-26 — Claude Fable 5.2 — funerals only for the new dead
+- Commissioner's correction to PR #89: the week somebody is eliminated, only the new dead get the funeral animation; older graves are plain stones under them (as before #89). A week nobody is eliminated, every grave still plays its funeral.
+- LeagueHome.tsx: `staged` (fresh, or all when none fresh) and `plain` (old, only when there are fresh). e2e counts updated (5 and 8 funerals; Don has none in a week with new dead).
+- Verified: npm run validate, graveyard e2e (18 passed), quality sweep, init.sh 200.
+- NEXT: week 12 review once the games settle, epitaphs for anyone eliminated; Death dances that week and only the new dead get funerals.

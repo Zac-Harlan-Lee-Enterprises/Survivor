@@ -16,10 +16,11 @@ export function funeralWeek(evaluation: SeasonEvaluation): number {
  * Splits the fallen for the league page's graveyard.
  *
  * Fresh graves are this week's dead, every one of them; everyone who died in
- * an earlier week is an old grave. The page shows the fresh ones first, and
- * every grave, fresh or old, plays its funeral when it is scrolled to (the
- * commissioner's decision, 2026-11-25: weeks without a death had left the
- * graveyard a row of bare stones). Standings arrive with the most recently
+ * an earlier week is an old grave. A week with fresh graves, only they play
+ * a funeral and the old ones are plain stones under them; a week without,
+ * every grave plays its funeral when it is scrolled to (the commissioner's
+ * decisions, 2026-11-25 and 26: weeks without a death had left the graveyard
+ * a row of bare stones, but the new dead do not share their week). Standings arrive with the most recently
  * eliminated first, and both lists keep that order.
  */
 export function graveyardPreview(evaluation: SeasonEvaluation): {
